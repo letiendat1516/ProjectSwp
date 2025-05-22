@@ -1,18 +1,17 @@
 package model;
 
-import java.io.Serializable;
-
-public class Category implements Serializable {
-    private Integer id;
+public class Category {
+    private int id;
     private String name;
     private Integer parentId;
-    private String parentName; // Để hiển thị tên danh mục cha
     private boolean activeFlag;
     
+    // Constructor mặc định
     public Category() {
     }
     
-    public Category(Integer id, String name, Integer parentId, boolean activeFlag) {
+    // Constructor đầy đủ tham số
+    public Category(int id, String name, Integer parentId, boolean activeFlag) {
         this.id = id;
         this.name = name;
         this.parentId = parentId;
@@ -20,11 +19,11 @@ public class Category implements Serializable {
     }
     
     // Getters và Setters
-    public Integer getId() {
+    public int getId() {
         return id;
     }
     
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
     
@@ -44,14 +43,6 @@ public class Category implements Serializable {
         this.parentId = parentId;
     }
     
-    public String getParentName() {
-        return parentName;
-    }
-    
-    public void setParentName(String parentName) {
-        this.parentName = parentName;
-    }
-    
     public boolean isActiveFlag() {
         return activeFlag;
     }
@@ -62,6 +53,11 @@ public class Category implements Serializable {
     
     @Override
     public String toString() {
-        return "Category{" + "id=" + id + ", name=" + name + ", parentId=" + parentId + ", activeFlag=" + activeFlag + '}';
+        return "Category{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", parentId=" + parentId +
+                ", activeFlag=" + activeFlag +
+                '}';
     }
 }
