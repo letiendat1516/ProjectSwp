@@ -1,674 +1,1132 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Quản lý Danh mục</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-        
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            margin-bottom: 20px;
-        }
-        
-        h1, h2, h3, h4 {
-            color: #333;
-            margin-top: 0;
-        }
-        
-        .flex-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        .list-section {
-            flex: 2;
-            min-width: 600px;
-        }
-        
-        .form-section {
-            flex: 1;
-            min-width: 300px;
-        }
-        
-        .card {
-            background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        
-        .card-header {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .card-body {
-            padding: 15px;
-        }
-        
-        .alert {
-            padding: 10px 15px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-        
-        .alert-success {
-            background-color: #dff0d8;
-            color: #3c763d;
-            border: 1px solid #d6e9c6;
-        }
-        
-        .alert-danger {
-            background-color: #f2dede;
-            color: #a94442;
-            border: 1px solid #ebccd1;
-        }
-        
-        .search-form {
-            margin-bottom: 15px;
-            display: flex;
-        }
-        
-        .search-form input[type="text"] {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px 0 0 4px;
-        }
-        
-        .search-form button {
-            padding: 8px 15px;
-            background-color: #337ab7;
-            color: white;
-            border: 1px solid #2e6da4;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-        }
-        
-        table th, table td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-        
-        table th {
-            background-color: #f8f8f8;
-            font-weight: bold;
-        }
-        
-        table tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 3px 7px;
-            border-radius: 3px;
-            font-size: 12px;
-            color: white;
-        }
-        
-        .badge-success {
-            background-color: #5cb85c;
-        }
-        
-        .badge-danger {
-            background-color: #d9534f;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 6px 12px;
-            margin-bottom: 0;
-            font-size: 14px;
-            font-weight: 400;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: middle;
-            cursor: pointer;
-            border: 1px solid transparent;
-            border-radius: 4px;
-        }
-        
-        .btn-primary {
-            color: #fff;
-            background-color: #337ab7;
-            border-color: #2e6da4;
-        }
-        
-        .btn-success {
-            color: #fff;
-            background-color: #5cb85c;
-            border-color: #4cae4c;
-        }
-        
-        .btn-warning {
-            color: #fff;
-            background-color: #f0ad4e;
-            border-color: #eea236;
-        }
-        
-        .btn-danger {
-            color: #fff;
-            background-color: #d9534f;
-            border-color: #d43f3a;
-        }
-        
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-        
-        .action-buttons {
-            white-space: nowrap;
-        }
-        
-        .action-buttons a, .action-buttons button {
-            margin-right: 5px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        .form-control {
-            display: block;
-            width: 100%;
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .text-right {
-            text-align: right;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            list-style: none;
-            padding: 0;
-            margin: 20px 0;
-        }
-        
-        .pagination li {
-            margin: 0 2px;
-        }
-        
-        .pagination a {
-            display: inline-block;
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            text-decoration: none;
-            color: #337ab7;
-            border-radius: 3px;
-        }
-        
-        .pagination .active a {
-            background-color: #337ab7;
-            color: white;
-            border-color: #337ab7;
-        }
-        
-        .pagination .disabled a {
-            color: #777;
-            cursor: not-allowed;
-            background-color: #fff;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 5px;
-        }
-        
-        .modal-header {
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-footer {
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-            margin-top: 15px;
-            text-align: right;
-        }
-        
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        
-        .radio-group {
-            margin-top: 5px;
-        }
-        
-        .radio-group label {
-            font-weight: normal;
-            margin-right: 15px;
-        }
-        
-        .text-muted {
-            color: #777;
-        }
-        
-        .text-danger {
-            color: #d9534f;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Quản lý Danh mục</h1>
-        </div>
-        
-        <div class="flex-container">
-            <!-- Phần hiển thị danh sách -->
-            <div class="list-section">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Danh sách danh mục</h2>
-                        <button type="button" class="btn btn-primary" onclick="showAddForm()">
-                            Thêm mới
-                        </button>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quản lý danh mục & đơn vị tính</title>
+        <!-- Font Awesome (giữ lại nếu cần) -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+        <!-- Custom CSS -->
+        <style>
+            /* Reset CSS */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                background-color: #f4f4f4;
+            }
+
+            .container-fluid {
+                width: 95%;
+                margin: 0 auto;
+                padding: 15px;
+            }
+
+            /* Navbar styles */
+            .navbar {
+                background-color: #333;
+                color: white;
+                padding: 10px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .navbar-brand {
+                color: white;
+                font-size: 24px;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+            .navbar-nav {
+                display: flex;
+                list-style: none;
+            }
+
+            .nav-item {
+                margin-left: 20px;
+            }
+
+            .nav-link {
+                color: white;
+                text-decoration: none;
+                padding: 5px 10px;
+            }
+
+            .nav-link:hover {
+                background-color: #555;
+                border-radius: 3px;
+            }
+
+            /* Headers */
+            h1, h5 {
+                margin-bottom: 15px;
+                color: #333;
+            }
+
+            /* Alerts */
+            .alert {
+                padding: 10px 15px;
+                margin-bottom: 15px;
+                border-radius: 4px;
+                position: relative;
+            }
+
+            .alert-success {
+                background-color: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+
+            .alert-danger {
+                background-color: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+
+            .close {
+                position: absolute;
+                top: 5px;
+                right: 10px;
+                cursor: pointer;
+                font-size: 20px;
+                font-weight: bold;
+            }
+
+            /* Tabs */
+            .nav-tabs {
+                display: flex;
+                border-bottom: 1px solid #dee2e6;
+                margin-bottom: 20px;
+                list-style: none;
+            }
+
+            .nav-item {
+                margin-bottom: -1px;
+            }
+
+            .nav-link {
+                display: block;
+                padding: 10px 15px;
+                border: 1px solid transparent;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+                color: #333;
+                text-decoration: none;
+            }
+
+            .nav-link.active {
+                background-color: #fff;
+                border-color: #dee2e6 #dee2e6 #fff;
+            }
+
+            .tab-content {
+                padding: 20px 0;
+            }
+
+            .tab-pane {
+                display: none;
+            }
+
+            .tab-pane.active {
+                display: block;
+            }
+
+            /* Cards */
+            .card {
+                background-color: white;
+                border-radius: 4px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
+            }
+
+            .card-header {
+                padding: 10px 15px;
+                background-color: #f8f9fa;
+                border-bottom: 1px solid #dee2e6;
+            }
+
+            .card-body {
+                padding: 15px;
+            }
+
+            /* Forms */
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+
+            .form-control {
+                width: 100%;
+                padding: 8px 10px;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                font-size: 16px;
+            }
+
+            .form-check {
+                margin-right: 15px;
+                display: inline-block;
+            }
+
+            /* Buttons */
+            .btn {
+                display: inline-block;
+                font-weight: 400;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: middle;
+                user-select: none;
+                border: 1px solid transparent;
+                padding: 8px 12px;
+                font-size: 16px;
+                line-height: 1.5;
+                border-radius: 4px;
+                cursor: pointer;
+                text-decoration: none;
+            }
+
+            .btn-sm {
+                padding: 5px 10px;
+                font-size: 14px;
+            }
+
+            .btn-primary {
+                color: #fff;
+                background-color: #007bff;
+                border-color: #007bff;
+            }
+
+            .btn-secondary {
+                color: #fff;
+                background-color: #6c757d;
+                border-color: #6c757d;
+            }
+
+            .btn-danger {
+                color: #fff;
+                background-color: #dc3545;
+                border-color: #dc3545;
+            }
+
+            /* Tables */
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            .table {
+                width: 100%;
+                margin-bottom: 1rem;
+                color: #212529;
+                border-collapse: collapse;
+            }
+
+            .table th,
+            .table td {
+                padding: 12px;
+                vertical-align: top;
+                border-top: 1px solid #dee2e6;
+                text-align: left;
+            }
+
+            .table thead th {
+                vertical-align: bottom;
+                border-bottom: 2px solid #dee2e6;
+                background-color: #f8f9fa;
+            }
+
+            .table-striped tbody tr:nth-of-type(odd) {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
+
+            .table-bordered {
+                border: 1px solid #dee2e6;
+            }
+
+            .table-bordered th,
+            .table-bordered td {
+                border: 1px solid #dee2e6;
+            }
+
+            /* Badges */
+            .badge {
+                display: inline-block;
+                padding: 3px 7px;
+                font-size: 12px;
+                font-weight: 700;
+                line-height: 1;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: baseline;
+                border-radius: 10px;
+            }
+
+            .badge-success {
+                background-color: #28a745;
+                color: white;
+            }
+
+            .badge-danger {
+                background-color: #dc3545;
+                color: white;
+            }
+
+            .badge-info {
+                background-color: #17a2b8;
+                color: white;
+            }
+
+            /* Modal */
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0,0,0,0.4);
+            }
+
+            .modal-dialog {
+                margin: 30px auto;
+                max-width: 500px;
+            }
+
+            .modal-content {
+                position: relative;
+                background-color: #fefefe;
+                border: 1px solid #888;
+                border-radius: 5px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+
+            .modal-header {
+                padding: 15px;
+                border-bottom: 1px solid #dee2e6;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .modal-body {
+                padding: 15px;
+            }
+
+            .modal-footer {
+                padding: 15px;
+                border-top: 1px solid #dee2e6;
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            /* Layout */
+            .row {
+                display: flex;
+                flex-wrap: wrap;
+                margin-right: -15px;
+                margin-left: -15px;
+            }
+
+            .col-md-4 {
+                flex: 0 0 33.333333%;
+                max-width: 33.333333%;
+                padding-right: 15px;
+                padding-left: 15px;
+            }
+
+            .col-md-8 {
+                flex: 0 0 66.666667%;
+                max-width: 66.666667%;
+                padding-right: 15px;
+                padding-left: 15px;
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .col-md-4, .col-md-8 {
+                    flex: 0 0 100%;
+                    max-width: 100%;
+                }
+
+                .navbar {
+                    flex-direction: column;
+                }
+
+                .navbar-nav {
+                    margin-top: 10px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Navbar -->
+        <nav class="navbar">
+            <a href="#" class="navbar-brand">Hệ thống quản lý</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="category">Danh mục</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="product">Sản phẩm</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="order">Đơn hàng</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="logout">Đăng xuất</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="container-fluid">
+            <h1>Quản lý danh mục & đơn vị tính</h1>
+
+            <!-- Hiển thị thông báo lỗi nếu có -->
+            <c:if test="${not empty errorMessage}">
+                <div class="alert alert-danger">
+                    ${errorMessage}
+                    <span class="close" onclick="this.parentElement.style.display = 'none';">&times;</span>
+                </div>
+            </c:if>
+
+            <!-- Hiển thị thông báo thành công nếu có -->
+            <c:if test="${param.success eq 'add_category'}">
+                <div class="alert alert-success">
+                    Thêm danh mục thành công!
+                    <span class="close" onclick="this.parentElement.style.display = 'none';">&times;</span>
+                </div>
+            </c:if>
+            <c:if test="${param.success eq 'update_category'}">
+                <div class="alert alert-success">
+                    Cập nhật danh mục thành công!
+                    <span class="close" onclick="this.parentElement.style.display = 'none';">&times;</span>
+                </div>
+            </c:if>
+            <c:if test="${param.success eq 'add_unit'}">
+                <div class="alert alert-success">
+                    Thêm đơn vị tính thành công!
+                    <span class="close" onclick="this.parentElement.style.display = 'none';">&times;</span>
+                </div>
+            </c:if>
+            <c:if test="${param.success eq 'update_unit'}">
+                <div class="alert alert-success">
+                    Cập nhật đơn vị tính thành công!
+                    <span class="close" onclick="this.parentElement.style.display = 'none';">&times;</span>
+                </div>
+            </c:if>
+
+            <!-- Tab Navigation -->
+            <ul class="nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="category-tab" href="#category" role="tab">
+                        <i class="fas fa-folder"></i> Danh mục
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="parent-category-tab" href="#parent-category" role="tab">
+                        <i class="fas fa-folder-open"></i> Danh mục cha
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="unit-tab" href="#unit" role="tab">
+                        <i class="fas fa-ruler"></i> Đơn vị tính
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="myTabContent">
+                <!-- Category Tab -->
+                <div class="tab-pane active" id="category" role="tabpanel">
+                    <!-- Nội dung tab danh mục (giữ nguyên) -->
+                    <div class="row">
+                        <!-- Form thêm danh mục -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Thêm danh mục mới</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form action="category" method="POST">
+                                        <input type="hidden" name="action" value="add">
+                                        <div class="form-group">
+                                            <label for="categoryName">Tên danh mục *</label>
+                                            <input type="text" class="form-control" id="categoryName" name="categoryName" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="parentCategory">Danh mục cha</label>
+                                            <select class="form-control" id="parentCategory" name="parentCategory">
+                                                <option value="0">-- Không có danh mục cha --</option>
+                                                <c:forEach items="${parentCategories}" var="parent">
+                                                    <option value="${parent.id}">${parent.name}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Trạng thái</label>
+                                            <div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="status" id="statusActive" value="1" checked>
+                                                    <label class="form-check-label" for="statusActive">Hoạt động</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="status" id="statusInactive" value="0">
+                                                    <label class="form-check-label" for="statusInactive">Vô hiệu hóa</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Lưu
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bảng hiển thị danh sách danh mục -->
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Danh sách danh mục</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped" id="categoryTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Tên danh mục</th>
+                                                    <th>Danh mục cha</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <c:forEach items="${categories}" var="category">
+                                                    <tr class="category-row" data-parent="${category.parentId}" data-id="${category.id}">
+                                                        <td>${category.id}</td>
+                                                        <td>
+                                                            <c:if test="${category.parentId != 0}">
+                                                                <span class="ml-4">└─ </span>
+                                                            </c:if>
+                                                            ${category.name}
+                                                        </td>
+                                                        <td>
+                                                            <c:choose>
+                                                                <c:when test="${empty category.parentName}">
+                                                                    <span class="text-muted">Không có</span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    ${category.parentName}
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge ${category.activeFlag == 1 ? 'badge-success' : 'badge-danger'}">
+                                                                ${category.activeFlag == 1 ? 'Hoạt động' : 'Vô hiệu hóa'}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary edit-category-btn" data-id="${category.id}">
+                                                                <i class="fas fa-edit"></i> Sửa
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger delete-category-btn" data-id="${category.id}">
+                                                                <i class="fas fa-trash"></i> Xóa
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <!-- Thông báo -->
-                        <c:if test="${not empty message}">
-                            <div class="alert alert-success">
-                                ${message}
+                </div>
+
+                <!-- Parent Category Tab -->
+                <div class="tab-pane" id="parent-category" role="tabpanel">
+                    <!-- Nội dung tab danh mục cha (giữ nguyên) -->
+                    <div class="row">
+                        <!-- Form thêm danh mục cha -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Thêm danh mục cha mới</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form action="category" method="POST">
+                                        <input type="hidden" name="action" value="add_parent">
+                                        <input type="hidden" name="parentCategory" value="0">
+                                        <div class="form-group">
+                                            <label for="parentCategoryName">Tên danh mục cha *</label>
+                                            <input type="text" class="form-control" id="parentCategoryName" name="categoryName" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Trạng thái</label>
+                                            <div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="status" id="parentStatusActive" value="1" checked>
+                                                    <label class="form-check-label" for="parentStatusActive">Hoạt động</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="status" id="parentStatusInactive" value="0">
+                                                    <label class="form-check-label" for="parentStatusInactive">Vô hiệu hóa</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Lưu
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
-                        </c:if>
-                        
-                        <c:if test="${not empty error}">
-                            <div class="alert alert-danger">
-                                ${error}
+                        </div>
+
+                        <!-- Bảng hiển thị danh sách danh mục cha -->
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Danh sách danh mục cha</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped" id="parentCategoryTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Tên danh mục cha</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Số danh mục con</th>
+                                                    <th>Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <c:forEach items="${parentCategoriesWithCount}" var="parent">
+                                                    <tr>
+                                                        <td>${parent.id}</td>
+                                                        <td>${parent.name}</td>
+                                                        <td>
+                                                            <span class="badge ${parent.activeFlag == 1 ? 'badge-success' : 'badge-danger'}">
+                                                                ${parent.activeFlag == 1 ? 'Hoạt động' : 'Vô hiệu hóa'}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge badge-info">${parent.childCount}</span>
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary edit-parent-btn" data-id="${parent.id}">
+                                                                <i class="fas fa-edit"></i> Sửa
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger delete-parent-btn" data-id="${parent.id}" data-count="${parent.childCount}">
+                                                                <i class="fas fa-trash"></i> Xóa
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                        </c:if>
-                        
-                        <!-- Tìm kiếm -->
-                        <form action="${pageContext.request.contextPath}/category" method="get" class="search-form">
-                            <input type="text" name="search" placeholder="Tìm kiếm danh mục..." value="${searchKeyword}">
-                            <button type="submit">Tìm kiếm</button>
-                        </form>
-                        
-                        <!-- Bảng danh sách -->
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th width="5%">ID</th>
-                                    <th width="30%">Tên danh mục</th>
-                                    <th width="25%">Danh mục cha</th>
-                                    <th width="15%">Trạng thái</th>
-                                    <th width="25%">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach items="${categories}" var="category">
-                                    <tr>
-                                        <td>${category.id}</td>
-                                        <td>${category.name}</td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${empty category.parentName}">
-                                                    <span class="text-muted">Không có</span>
-                                                </c:when>
-                                                <c:otherwise>${category.parentName}</c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${category.activeFlag}">
-                                                    <span class="badge badge-success">Hoạt động</span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="badge badge-danger">Vô hiệu hóa</span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td class="action-buttons">
-                                            <!-- Nút thay đổi trạng thái -->
-                                            <c:choose>
-                                                <c:when test="${category.activeFlag}">
-                                                    <a href="${pageContext.request.contextPath}/category?action=toggle&id=${category.id}&status=0" 
-                                                       class="btn btn-sm btn-warning" title="Vô hiệu hóa">
-                                                        Tắt
-                                                    </a>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <a href="${pageContext.request.contextPath}/category?action=toggle&id=${category.id}&status=1" 
-                                                       class="btn btn-sm btn-success" title="Kích hoạt">
-                                                        Bật
-                                                    </a>
-                                                </c:otherwise>
-                                            </c:choose>
-                                            
-                                            <!-- Nút sửa -->
-                                            <button type="button" class="btn btn-sm btn-primary" 
-                                                    onclick="showEditForm(${category.id}, '${category.name}', ${category.parentId}, ${category.activeFlag})" 
-                                                    title="Sửa">
-                                                Sửa
-                                            </button>
-                                            
-                                            <!-- Nút xóa -->
-                                            <button type="button" class="btn btn-sm btn-danger" 
-                                                    onclick="confirmDelete(${category.id})" 
-                                                    title="Xóa">
-                                                Xóa
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                                
-                                <c:if test="${empty categories}">
-                                    <tr>
-                                        <td colspan="5" style="text-align: center;">Không có danh mục nào</td>
-                                    </tr>
-                                </c:if>
-                            </tbody>
-                        </table>
-                        
-                        <!-- Phân trang -->
-                        <c:if test="${totalPages > 1}">
-                            <ul class="pagination">
-                                <!-- Nút Previous -->
-                                <li class="${currentPage == 1 ? 'disabled' : ''}">
-                                    <a href="${pageContext.request.contextPath}/category?page=${currentPage - 1}&search=${searchKeyword}" aria-label="Previous">
-                                        &laquo;
-                                    </a>
-                                </li>
-                                
-                                <!-- Các trang -->
-                                <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <li class="${currentPage == i ? 'active' : ''}">
-                                        <a href="${pageContext.request.contextPath}/category?page=${i}&search=${searchKeyword}">${i}</a>
-                                    </li>
-                                </c:forEach>
-                                
-                                <!-- Nút Next -->
-                                <li class="${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a href="${pageContext.request.contextPath}/category?page=${currentPage + 1}&search=${searchKeyword}" aria-label="Next">
-                                        &raquo;
-                                    </a>
-                                </li>
-                            </ul>
-                        </c:if>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit Tab -->
+                <div class="tab-pane" id="unit" role="tabpanel">
+                    <!-- Nội dung tab đơn vị tính (giữ nguyên) -->
+                    <div class="row">
+                        <!-- Form thêm đơn vị tính -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Thêm đơn vị tính mới</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form action="category" method="POST">
+                                        <input type="hidden" name="action" value="add_unit">
+                                        <div class="form-group">
+                                            <label for="unitName">Tên đơn vị tính *</label>
+                                            <input type="text" class="form-control" id="unitName" name="unitName" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Lưu
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bảng hiển thị danh sách đơn vị tính -->
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Danh sách đơn vị tính</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped" id="unitTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Tên đơn vị tính</th>
+                                                    <th>Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <c:forEach items="${units}" var="unit">
+                                                    <tr>
+                                                        <td>${unit.id}</td>
+                                                        <td>${unit.name}</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary edit-unit-btn" data-id="${unit.id}">
+                                                                <i class="fas fa-edit"></i> Sửa
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger delete-unit-btn" data-id="${unit.id}">
+                                                                <i class="fas fa-trash"></i> Xóa
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Phần form thêm/sửa -->
-            <div class="form-section">
-                <!-- Form thêm mới -->
-                <div id="addForm" class="card ${showAddForm ? '' : 'hidden'}">
-                    <div class="card-header">
-                        <h3>Thêm danh mục mới</h3>
+        </div>
+
+        <!-- Modal sửa danh mục -->
+        <div class="modal" id="editCategoryModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Sửa danh mục</h5>
+                        <button type="button" class="close" onclick="closeModal('editCategoryModal')">&times;</button>
                     </div>
-                    <div class="card-body">
-                        <form action="${pageContext.request.contextPath}/category" method="post">
-                            <input type="hidden" name="action" value="add">
-                            
-                            <div class="form-group">
-                                <label for="name">Tên danh mục <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="name" name="name" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="parentId">Danh mục cha</label>
-                                <select class="form-control" id="parentId" name="parentId">
-                                    <option value="">-- Không có danh mục cha --</option>
-                                    <c:forEach items="${parentCategories}" var="parent">
-                                        <option value="${parent.id}">${parent.name}</option>
-                                    </c:forEach>
-                                </select>
-                                <small class="text-muted">Chọn danh mục cha nếu đây là danh mục con</small>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Trạng thái</label>
-                                <div class="radio-group">
-                                    <label>
-                                        <input type="radio" name="activeFlag" id="activeYes" value="1" checked> Hoạt động
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="activeFlag" id="activeNo" value="0"> Vô hiệu hóa
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group text-right">
-                                <button type="button" class="btn btn-danger" onclick="hideAddForm()">
-                                    Hủy
-                                </button>
-                                <button type="submit" class="btn btn-primary">
-                                    Lưu
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                
-                <!-- Form chỉnh sửa -->
-                <div id="editForm" class="card ${showEditForm ? '' : 'hidden'}">
-                    <div class="card-header">
-                        <h3>Chỉnh sửa danh mục</h3>
-                    </div>
-                    <div class="card-body">
-                        <form action="${pageContext.request.contextPath}/category" method="post">
+                    <form id="editCategoryForm" action="category" method="POST">
+                        <div class="modal-body">
                             <input type="hidden" name="action" value="update">
-                            <input type="hidden" name="id" id="edit-id">
-                            
+                            <input type="hidden" id="editCategoryId" name="categoryId">
                             <div class="form-group">
-                                <label for="edit-name">Tên danh mục <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="edit-name" name="name" required>
+                                <label for="editCategoryName">Tên danh mục *</label>
+                                <input type="text" class="form-control" id="editCategoryName" name="categoryName" required>
                             </div>
-                            
                             <div class="form-group">
-                                <label for="edit-parentId">Danh mục cha</label>
-                                <select class="form-control" id="edit-parentId" name="parentId">
-                                    <option value="">-- Không có danh mục cha --</option>
+                                <label for="editParentCategory">Danh mục cha</label>
+                                <select class="form-control" id="editParentCategory" name="parentCategory">
+                                    <option value="0">-- Không có danh mục cha --</option>
                                     <c:forEach items="${parentCategories}" var="parent">
                                         <option value="${parent.id}">${parent.name}</option>
                                     </c:forEach>
                                 </select>
-                                <small class="text-muted">Chọn danh mục cha nếu đây là danh mục con</small>
                             </div>
-                            
                             <div class="form-group">
                                 <label>Trạng thái</label>
-                                <div class="radio-group">
-                                    <label>
-                                        <input type="radio" name="activeFlag" id="edit-activeYes" value="1"> Hoạt động
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="activeFlag" id="edit-activeNo" value="0"> Vô hiệu hóa
-                                    </label>
+                                <div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="status" id="editStatusActive" value="1">
+                                        <label class="form-check-label" for="editStatusActive">Hoạt động</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="status" id="editStatusInactive" value="0">
+                                        <label class="form-check-label" for="editStatusInactive">Vô hiệu hóa</label>
+                                    </div>
                                 </div>
                             </div>
-                            
-                            <div class="form-group text-right">
-                                <button type="button" class="btn btn-danger" onclick="hideEditForm()">
-                                    Hủy
-                                </button>
-                                <button type="submit" class="btn btn-primary">
-                                    Cập nhật
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('editCategoryModal')">Đóng</button>
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Modal xác nhận xóa -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4>Xác nhận xóa</h4>
-                <span class="close" onclick="closeDeleteModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p>Bạn có chắc chắn muốn xóa danh mục này không?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" onclick="closeDeleteModal()">Hủy</button>
-                <a id="deleteLink" href="#" class="btn btn-primary">Xóa</a>
+
+        <!-- Modal sửa danh mục cha -->
+        <div class="modal" id="editParentModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Sửa danh mục cha</h5>
+                        <button type="button" class="close" onclick="closeModal('editParentModal')">&times;</button>
+                    </div>
+                    <form id="editParentForm" action="category" method="POST">
+                        <div class="modal-body">
+                            <input type="hidden" name="action" value="update_parent">
+                            <input type="hidden" id="editParentId" name="categoryId">
+                            <input type="hidden" name="parentCategory" value="0">
+                            <div class="form-group">
+                                <label for="editParentName">Tên danh mục cha *</label>
+                                <input type="text" class="form-control" id="editParentName" name="categoryName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Trạng thái</label>
+                                <div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="status" id="editParentStatusActive" value="1">
+                                        <label class="form-check-label" for="editParentStatusActive">Hoạt động</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="status" id="editParentStatusInactive" value="0">
+                                        <label class="form-check-label" for="editParentStatusInactive">Vô hiệu hóa</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('editParentModal')">Đóng</button>
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-    
-    <script>
-        // Xác nhận xóa
-        function confirmDelete(id) {
-            document.getElementById('deleteLink').href = '${pageContext.request.contextPath}/category?action=delete&id=' + id;
-            document.getElementById('deleteModal').style.display = 'block';
-        }
-        
-        // Đóng modal xóa
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-        }
-        
-        // Hiển thị form thêm mới
-        function showAddForm() {
-            document.getElementById('addForm').classList.remove('hidden');
-            document.getElementById('editForm').classList.add('hidden');
-        }
-        
-        // Ẩn form thêm mới
-        function hideAddForm() {
-            document.getElementById('addForm').classList.add('hidden');
-        }
-        
-        // Hiển thị form chỉnh sửa
-        function showEditForm(id, name, parentId, activeFlag) {
-            document.getElementById('edit-id').value = id;
-            document.getElementById('edit-name').value = name;
-            
-            // Xử lý parentId
-            const parentSelect = document.getElementById('edit-parentId');
-            if (parentId === null || parentId === 'null') {
-                parentSelect.value = '';
-            } else {
-                parentSelect.value = parentId;
-            }
-            
-            // Xử lý activeFlag
-            if (activeFlag === true || activeFlag === 'true' || activeFlag === 1) {
-                document.getElementById('edit-activeYes').checked = true;
-            } else {
-                document.getElementById('edit-activeNo').checked = true;
-            }
-            
-            document.getElementById('editForm').classList.remove('hidden');
-            document.getElementById('addForm').classList.add('hidden');
-        }
-        
-        // Ẩn form chỉnh sửa
-        function hideEditForm() {
-            document.getElementById('editForm').classList.add('hidden');
-        }
-        
-        // Khi nhấn ESC thì đóng modal
-        window.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeDeleteModal();
-            }
-        });
-        
-        // Khi nhấn bên ngoài modal thì đóng modal
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('deleteModal')) {
-                closeDeleteModal();
-            }
-        };
-        
-        // Hiển thị form thêm mới hoặc chỉnh sửa nếu có lỗi
-        window.onload = function() {
-            <c:if test="${showAddForm}">
-                showAddForm();
-            </c:if>
-            
-            <c:if test="${showEditForm}">
-                showEditForm(
-                    ${category.id}, 
-                    '${category.name}', 
-                    ${category.parentId != null ? category.parentId : 'null'}, 
-                    ${category.activeFlag}
-                );
-            </c:if>
-        };
-    </script>
-</body>
+
+        <!-- Modal sửa đơn vị tính -->
+        <div class="modal" id="editUnitModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Sửa đơn vị tính</h5>
+                        <button type="button" class="close" onclick="closeModal('editUnitModal')">&times;</button>
+                    </div>
+                    <form id="editUnitForm" action="category" method="POST">
+                        <div class="modal-body">
+                            <input type="hidden" name="action" value="update_unit">
+                            <input type="hidden" id="editUnitId" name="unitId">
+                            <div class="form-group">
+                                <label for="editUnitName">Tên đơn vị tính *</label>
+                                <input type="text" class="form-control" id="editUnitName" name="unitName" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('editUnitModal')">Đóng</button>
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script>
+                                // Hàm đóng modal
+                                function closeModal(modalId) {
+                                    document.getElementById(modalId).style.display = 'none';
+                                }
+
+                                // Hàm hiển thị modal
+                                function showModal(modalId) {
+                                    document.getElementById(modalId).style.display = 'block';
+                                }
+
+                                // Xử lý tab
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    // Lấy tất cả các tab và tab content
+                                    const tabs = document.querySelectorAll('.nav-link');
+                                    const tabContents = document.querySelectorAll('.tab-pane');
+
+                                    // Thêm sự kiện click cho mỗi tab
+                                    tabs.forEach(tab => {
+                                        tab.addEventListener('click', function (e) {
+                                            e.preventDefault();
+
+                                            // Loại bỏ active class từ tất cả tabs
+                                            tabs.forEach(t => t.classList.remove('active'));
+
+                                            // Thêm active class cho tab được click
+                                            this.classList.add('active');
+
+                                            // Lấy target tab content
+                                            const targetId = this.getAttribute('href').substring(1);
+
+                                            // Ẩn tất cả tab content
+                                            tabContents.forEach(content => {
+                                                content.classList.remove('active');
+                                            });
+
+                                            // Hiển thị tab content được chọn
+                                            document.getElementById(targetId).classList.add('active');
+
+                                            // Cập nhật URL (tùy chọn)
+                                            const tabId = this.id;
+                                            if (tabId === 'unit-tab') {
+                                                history.replaceState(null, null, '?tab=unit');
+                                            } else if (tabId === 'parent-category-tab') {
+                                                history.replaceState(null, null, '?tab=parent');
+                                            } else {
+                                                history.replaceState(null, null, '?tab=category');
+                                            }
+                                        });
+                                    });
+
+                                    // Xử lý tab active dựa trên URL parameter
+                                    const urlParams = new URLSearchParams(window.location.search);
+                                    const activeTab = urlParams.get('tab');
+
+                                    if (activeTab === 'unit') {
+                                        document.getElementById('unit-tab').click();
+                                    } else if (activeTab === 'parent') {
+                                        document.getElementById('parent-category-tab').click();
+                                    }
+
+                                    // Xử lý đóng thông báo
+                                    const closeButtons = document.querySelectorAll('.close');
+                                    closeButtons.forEach(button => {
+                                        button.addEventListener('click', function () {
+                                            this.parentElement.style.display = 'none';
+                                        });
+                                    });
+
+                                    // Xử lý sự kiện khi nhấn nút sửa danh mục
+                                    const editCategoryBtns = document.querySelectorAll('.edit-category-btn');
+                                    editCategoryBtns.forEach(btn => {
+                                        btn.addEventListener('click', function () {
+                                            const categoryId = this.getAttribute('data-id');
+
+                                            // Gửi AJAX request để lấy thông tin danh mục
+                                            fetch('category', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                                },
+                                                body: 'action=getCategory&categoryId=' + categoryId
+                                            })
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        if (data.error) {
+                                                            alert(data.error);
+                                                            return;
+                                                        }
+
+                                                        // Điền thông tin vào form
+                                                        document.getElementById('editCategoryId').value = data.id;
+                                                        document.getElementById('editCategoryName').value = data.name;
+                                                        document.getElementById('editParentCategory').value = data.parentId;
+
+                                                        if (data.activeFlag == 1) {
+                                                            document.getElementById('editStatusActive').checked = true;
+                                                        } else {
+                                                            document.getElementById('editStatusInactive').checked = true;
+                                                        }
+
+                                                        // Hiển thị modal
+                                                        showModal('editCategoryModal');
+                                                    })
+                                                    .catch(error => {
+                                                        alert('Đã xảy ra lỗi khi lấy thông tin danh mục');
+                                                    });
+                                        });
+                                    });
+
+                                    // Xử lý sự kiện khi nhấn nút xóa danh mục
+                                    const deleteCategoryBtns = document.querySelectorAll('.delete-category-btn');
+                                    deleteCategoryBtns.forEach(btn => {
+                                        btn.addEventListener('click', function () {
+                                            const categoryId = this.getAttribute('data-id');
+
+                                            if (confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
+                                                // Gửi AJAX request để xóa danh mục
+                                                fetch('category', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                                    },
+                                                    body: 'action=delete&categoryId=' + categoryId
+                                                })
+                                                        .then(response => response.json())
+                                                        .then(data => {
+                                                            if (data.success) {
+                                                                alert('Xóa danh mục thành công');
+                                                                location.reload();
+                                                            } else {
+                                                                alert(data.message || 'Không thể xóa danh mục');
+                                                            }
+                                                        })
+                                                        .catch(error => {
+                                                            alert('Đã xảy ra lỗi khi xóa danh mục');
+                                                        });
+                                            }
+                                        });
+                                    });
+
+                                    // Xử lý sự kiện khi nhấn nút sửa danh mục cha
+                                    const editParentBtns = document.querySelectorAll('.edit-parent-btn');
+                                    editParentBtns.forEach(btn => {
+                                        btn.addEventListener('click', function () {
+                                            const categoryId = this.getAttribute('data-id');
+
+                                            // Gửi AJAX request để lấy thông tin danh mục cha
+                                            fetch('category', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                                },
+                                                body: 'action=getCategory&categoryId=' + categoryId
+                                            })
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        if (data.error) {
+                                                            alert(data.error);
+                                                            return;
+                                                        }
+
+                                                        // Điền thông tin vào form
+                                                        document.getElementById('editParentId').value = data.id;
+                                                        document.getElementById('editParentName').value = data.name;
+
+                                                        if (data.activeFlag == 1) {
+                                                            document.getElementById('editParentStatusActive').checked = true;
+                                                        } else {
+                                                            document.getElementById('editParentStatusInactive').checked = true;
+                                                        }
+
+                                                        // Hiển thị modal
+                                                        showModal('editParentModal');
+                                                    })
+                                                    .catch(error => {
+                                                        alert('Đã xảy ra lỗi khi lấy thông tin danh mục cha');
+                                                    });
+                                        });
+                                    });
+
+                                    // Xử lý sự kiện khi nhấn nút xóa danh mục cha
+                                    const deleteParentBtns = document.querySelectorAll('.delete-parent-btn');
+                                    deleteParentBtns.forEach(btn => {
+                                        btn.addEventListener('click', function () {
+                                            const categoryId = this.getAttribute('data-id');
+                                            const childCount = parseInt(this.getAttribute('data-count'));
+
+                                            if (childCount > 0) {
+                                                alert('Không thể xóa danh mục cha đang có ' + childCount + ' danh mục con!');
+                                                return;
+                                            }
+
+                                            if (confirm('Bạn có chắc chắn muốn xóa danh mục cha này?')) {
+                                                // Gửi AJAX request để xóa danh mục cha
+                                                fetch('category', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                                    },
+                                                    body: 'action=delete&categoryId=' + categoryId
+                                                })
+                                                        .then(response => response.json())
+                                                        .then(data => {
+                                                            if (data.success) {
+                                                                alert('Xóa danh mục cha thành công');
+                                                                location.reload();
+                                                            } else {
+                                                                alert(data.message || 'Không thể xóa danh mục cha');
+                                                            }
+                                                        })
+                                                        .catch(error => {
+                                                            alert('Đã xảy ra lỗi khi xóa danh mục cha');
+                                                        });
+                                            }
+                                        });
+                                    });
+
+                                    // Xử lý sự kiện khi nhấn nút sửa đơn vị tính
+                                    const editUnitBtns = document.querySelectorAll('.edit-unit-btn');
+                                    editUnitBtns.forEach(btn => {
+                                        btn.addEventListener('click', function () {
+                                            const unitId = this.getAttribute('data-id');
+
+                                            // Gửi AJAX request để lấy thông tin đơn vị tính
+                                            fetch('category', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                                },
+                                                body: 'action=getUnit&unitId=' + unitId
+                                            })
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        if (data.error) {
+                                                            alert(data.error);
+                                                            return;
+                                                        }
+
+                                                        // Điền thông tin vào form
+                                                        document.getElementById('editUnitId').value = data.id;
+                                                        document.getElementById('editUnitName').value = data.name;
+
+                                                        // Hiển thị modal
+                                                        showModal('editUnitModal');
+                                                    })
+                                                    .catch(error => {
+                                                        alert('Đã xảy ra lỗi khi lấy thông tin đơn vị tính');
+                                                    });
+                                        });
+                                    });
+
+                                    // Xử lý sự kiện khi nhấn nút xóa đơn vị tính
+                                    const deleteUnitBtns = document.querySelectorAll('.delete-unit-btn');
+                                    deleteUnitBtns.forEach(btn => {
+                                        btn.addEventListener('click', function () {
+                                            const unitId = this.getAttribute('data-id');
+
+                                            if (confirm('Bạn có chắc chắn muốn xóa đơn vị tính này?')) {
+                                                // Gửi AJAX request để xóa đơn vị tính
+                                                fetch('category', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                                    },
+                                                    body: 'action=delete_unit&unitId=' + unitId
+                                                })
+                                                        .then(response => response.json())
+                                                        .then(data => {
+                                                            if (data.success) {
+                                                                alert('Xóa đơn vị tính thành công');
+                                                                location.reload();
+                                                            } else {
+                                                                alert(data.message || 'Không thể xóa đơn vị tính');
+                                                            }
+                                                        })
+                                                        .catch(error => {
+                                                            alert('Đã xảy ra lỗi khi xóa đơn vị tính');
+                                                        });
+                                            }
+                                        });
+                                    });
+                                });
+
+                                // Hàm lấy parameter từ URL
+                                function getUrlParameter(name) {
+                                    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+                                    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+                                    var results = regex.exec(location.search);
+                                    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+                                }
+        </script>
+    </body>
 </html>

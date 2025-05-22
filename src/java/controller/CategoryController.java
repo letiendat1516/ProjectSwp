@@ -1,19 +1,31 @@
 package controller;
 
 import dao.CategoryDAO;
+import dao.UnitDAO;
 import model.Category;
+import model.Unit;
+import model.ParentCategoryDTO;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.google.gson.Gson;
 
 @WebServlet(name = "CategoryController", urlPatterns = {"/category"})
 public class CategoryController extends HttpServlet {
     
-    private CategoryDAO categoryDAO = new CategoryDAO();
+    private CategoryDAO categoryDAO;
+    private UnitDAO unitDAO;
+    
+    @Override
+    public void init() {
+        categoryDAO = new CategoryDAO();
+        unitDAO = new UnitDAO();
+    }
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -21,10 +33,11 @@ public class CategoryController extends HttpServlet {
         
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
+        String tab = request.getParameter("tab");
         
         if (action == null) {
             // Mặc định hiển thị danh sách
-            listCategories(request, response);
+            listAll(request, response);
         } else {
             switch (action) {
                 case "delete":
@@ -34,7 +47,7 @@ public class CategoryController extends HttpServlet {
                     toggleStatus(request, response);
                     break;
                 default:
-                    listCategories(request, response);
+                    listAll(request, response);
                     break;
             }
         }
@@ -51,12 +64,42 @@ public class CategoryController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/category");
         } else {
             switch (action) {
+                // Xử lý danh mục
                 case "add":
                     addCategory(request, response);
                     break;
                 case "update":
                     updateCategory(request, response);
                     break;
+                case "delete":
+                    deleteCategory(request, response);
+                    break;
+                case "getCategory":
+                    getCategoryById(request, response);
+                    break;
+                
+                // Xử lý danh mục cha
+                case "add_parent":
+                    addParentCategory(request, response);
+                    break;
+                case "update_parent":
+                    updateParentCategory(request, response);
+                    break;
+                
+                // Xử lý đơn vị tính
+                case "add_unit":
+                    addUnit(request, response);
+                    break;
+                case "update_unit":
+                    updateUnit(request, response);
+                    break;
+                case "delete_unit":
+                    deleteUnit(request, response);
+                    break;
+                case "getUnit":
+                    getUnitById(request, response);
+                    break;
+                    
                 default:
                     response.sendRedirect(request.getContextPath() + "/category");
                     break;
@@ -64,11 +107,11 @@ public class CategoryController extends HttpServlet {
         }
     }
     
-    // Hiển thị danh sách danh mục có phân trang và tìm kiếm
-    private void listCategories(HttpServletRequest request, HttpServletResponse response)
+    // Hiển thị tất cả danh mục và đơn vị tính
+    private void listAll(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Lấy tham số tìm kiếm và phân trang
+        // Lấy tham số tìm kiếm và phân trang cho danh mục
         String searchKeyword = request.getParameter("search");
         if (searchKeyword == null) {
             searchKeyword = "";
@@ -91,16 +134,24 @@ public class CategoryController extends HttpServlet {
         // Lấy danh sách danh mục
         List<Category> categories = categoryDAO.getAllCategories(page, pageSize, searchKeyword);
         
-        // Tính tổng số trang
+        // Tính tổng số trang cho danh mục
         int totalCategories = categoryDAO.countCategories(searchKeyword);
         int totalPages = (int) Math.ceil((double) totalCategories / pageSize);
         
         // Lấy danh sách danh mục cha cho dropdown
         List<Category> parentCategories = categoryDAO.getParentCategories();
         
+        // Lấy danh sách danh mục cha kèm số lượng danh mục con
+        List<ParentCategoryDTO> parentCategoriesWithCount = categoryDAO.getParentCategoriesWithChildCount();
+        
+        // Lấy danh sách đơn vị tính
+        List<Unit> units = unitDAO.getAllUnits();
+        
         // Đặt thuộc tính để hiển thị trong JSP
         request.setAttribute("categories", categories);
         request.setAttribute("parentCategories", parentCategories);
+        request.setAttribute("parentCategoriesWithCount", parentCategoriesWithCount);
+        request.setAttribute("units", units);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("pageSize", pageSize);
@@ -115,51 +166,67 @@ public class CategoryController extends HttpServlet {
             throws ServletException, IOException {
         
         // Lấy dữ liệu từ form
-        String name = request.getParameter("name");
-        String parentIdStr = request.getParameter("parentId");
-        String activeFlagStr = request.getParameter("activeFlag");
+        String name = request.getParameter("categoryName");
+        int parentId = Integer.parseInt(request.getParameter("parentCategory"));
+        int status = Integer.parseInt(request.getParameter("status"));
         
         // Kiểm tra dữ liệu
         if (name == null || name.trim().isEmpty()) {
-            request.setAttribute("error", "Tên danh mục không được để trống");
-            request.setAttribute("showAddForm", true);
-            listCategories(request, response);
+            request.setAttribute("errorMessage", "Tên danh mục không được để trống");
+            listAll(request, response);
             return;
         }
         
         // Tạo đối tượng Category
         Category category = new Category();
         category.setName(name);
-        
-        // Xử lý parentId
-        if (parentIdStr != null && !parentIdStr.trim().isEmpty()) {
-            try {
-                int parentId = Integer.parseInt(parentIdStr);
-                category.setParentId(parentId);
-            } catch (NumberFormatException e) {
-                category.setParentId(null);
-            }
-        } else {
-            category.setParentId(null);
-        }
-        
-        // Xử lý activeFlag
-        boolean activeFlag = activeFlagStr != null && activeFlagStr.equals("1");
-        category.setActiveFlag(activeFlag);
+        category.setParentId(parentId);
+        category.setActiveFlag(status == 1);
         
         // Thêm danh mục vào database
         boolean success = categoryDAO.addCategory(category);
         
         if (success) {
             // Chuyển hướng về trang danh sách với thông báo thành công
-            request.setAttribute("message", "Thêm danh mục thành công");
-            listCategories(request, response);
+            response.sendRedirect(request.getContextPath() + "/category?success=add_category&tab=category");
         } else {
             // Hiển thị lại form với thông báo lỗi
-            request.setAttribute("error", "Không thể thêm danh mục");
-            request.setAttribute("category", category);
-            request.setAttribute("showAddForm", true);
-            listCategories(request, response);
+            request.setAttribute("errorMessage", "Không thể thêm danh mục");
+            listAll(request, response);
+        }
+    }
+    
+    // Xử lý thêm mới danh mục cha
+    private void addParentCategory(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        // Lấy dữ liệu từ form
+        String name = request.getParameter("categoryName");
+        int status = Integer.parseInt(request.getParameter("status"));
+        
+        // Kiểm tra dữ liệu
+        if (name == null || name.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Tên danh mục cha không được để trống");
+            listAll(request, response);
+            return;
+        }
+        
+        // Tạo đối tượng Category
+        Category category = new Category();
+        category.setName(name);
+        category.setParentId(0); // Danh mục cha có parent_id = 0
+        category.setActiveFlag(status == 1);
+        
+        // Thêm danh mục vào database
+        boolean success = categoryDAO.addCategory(category);
+        
+        if (success) {
+            // Chuyển hướng về trang danh sách với thông báo thành công
+            response.sendRedirect(request.getContextPath() + "/category?success=add_category&tab=parent");
+        } else {
+            // Hiển thị lại form với thông báo lỗi
+            request.setAttribute("errorMessage", "Không thể thêm danh mục cha");
+            listAll(request, response);
         }
     }
     
@@ -168,70 +235,78 @@ public class CategoryController extends HttpServlet {
             throws ServletException, IOException {
         
         // Lấy dữ liệu từ form
-        String idStr = request.getParameter("id");
-        String name = request.getParameter("name");
-        String parentIdStr = request.getParameter("parentId");
-        String activeFlagStr = request.getParameter("activeFlag");
+        int id = Integer.parseInt(request.getParameter("categoryId"));
+        String name = request.getParameter("categoryName");
+        int parentId = Integer.parseInt(request.getParameter("parentCategory"));
+        int status = Integer.parseInt(request.getParameter("status"));
         
         // Kiểm tra dữ liệu
-        if (idStr == null || idStr.trim().isEmpty() || name == null || name.trim().isEmpty()) {
-            request.setAttribute("error", "Dữ liệu không hợp lệ");
-            listCategories(request, response);
+        if (name == null || name.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Tên danh mục không được để trống");
+            listAll(request, response);
             return;
         }
         
-        try {
-            int id = Integer.parseInt(idStr);
-            
-            // Tạo đối tượng Category
-            Category category = new Category();
-            category.setId(id);
-            category.setName(name);
-            
-            // Xử lý parentId
-            if (parentIdStr != null && !parentIdStr.trim().isEmpty()) {
-                try {
-                    int parentId = Integer.parseInt(parentIdStr);
-                    
-                    // Kiểm tra xem parentId có phải là id của chính danh mục này không
-                    if (parentId == id) {
-                        request.setAttribute("error", "Danh mục không thể là cha của chính nó");
-                        request.setAttribute("category", category);
-                        request.setAttribute("showEditForm", true);
-                        listCategories(request, response);
-                        return;
-                    }
-                    
-                    category.setParentId(parentId);
-                } catch (NumberFormatException e) {
-                    category.setParentId(null);
-                }
-            } else {
-                category.setParentId(null);
-            }
-            
-            // Xử lý activeFlag
-            boolean activeFlag = activeFlagStr != null && activeFlagStr.equals("1");
-            category.setActiveFlag(activeFlag);
-            
-            // Cập nhật danh mục vào database
-            boolean success = categoryDAO.updateCategory(category);
-            
-            if (success) {
-                // Chuyển hướng về trang danh sách với thông báo thành công
-                request.setAttribute("message", "Cập nhật danh mục thành công");
-                listCategories(request, response);
-            } else {
-                // Hiển thị lại form với thông báo lỗi
-                request.setAttribute("error", "Không thể cập nhật danh mục");
-                request.setAttribute("category", category);
-                request.setAttribute("showEditForm", true);
-                listCategories(request, response);
-            }
-            
-        } catch (NumberFormatException e) {
-            request.setAttribute("error", "ID không hợp lệ");
-            listCategories(request, response);
+        // Kiểm tra xem parentId có phải là id của chính danh mục này không
+        if (parentId == id) {
+            request.setAttribute("errorMessage", "Danh mục không thể là cha của chính nó");
+            listAll(request, response);
+            return;
+        }
+        
+        // Tạo đối tượng Category
+        Category category = new Category();
+        category.setId(id);
+        category.setName(name);
+        category.setParentId(parentId);
+        category.setActiveFlag(status == 1);
+        
+        // Cập nhật danh mục vào database
+        boolean success = categoryDAO.updateCategory(category);
+        
+        if (success) {
+            // Chuyển hướng về trang danh sách với thông báo thành công
+            response.sendRedirect(request.getContextPath() + "/category?success=update_category&tab=category");
+        } else {
+            // Hiển thị lại form với thông báo lỗi
+            request.setAttribute("errorMessage", "Không thể cập nhật danh mục");
+            listAll(request, response);
+        }
+    }
+    
+    // Xử lý cập nhật danh mục cha
+    private void updateParentCategory(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        // Lấy dữ liệu từ form
+        int id = Integer.parseInt(request.getParameter("categoryId"));
+        String name = request.getParameter("categoryName");
+        int status = Integer.parseInt(request.getParameter("status"));
+        
+        // Kiểm tra dữ liệu
+        if (name == null || name.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Tên danh mục cha không được để trống");
+            listAll(request, response);
+            return;
+        }
+        
+        // Tạo đối tượng Category
+        Category category = new Category();
+        category.setId(id);
+        category.setName(name);
+        category.setParentId(0); // Đảm bảo vẫn là danh mục cha
+        category.setActiveFlag(status == 1);
+        
+        // Cập nhật danh mục vào database
+        boolean success = categoryDAO.updateCategory(category);
+        
+        if (success) {
+            // Chuyển hướng về trang danh sách với thông báo thành công
+            response.sendRedirect(request.getContextPath() + "/category?success=update_category&tab=parent");
+        } else {
+            // Hiển thị lại form với thông báo lỗi
+            request.setAttribute("errorMessage", "Không thể cập nhật danh mục cha");
+            listAll(request, response);
         }
     }
     
@@ -239,48 +314,57 @@ public class CategoryController extends HttpServlet {
     private void deleteCategory(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Lấy ID từ request
-        String idStr = request.getParameter("id");
-        
-        if (idStr == null || idStr.trim().isEmpty()) {
-            request.setAttribute("error", "ID không hợp lệ");
-            listCategories(request, response);
-            return;
-        }
+        // Kiểm tra xem là AJAX request hay không
+        boolean isAjax = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
         
         try {
-            int id = Integer.parseInt(idStr);
+            // Lấy ID từ request
+            int id = Integer.parseInt(request.getParameter("categoryId"));
             
             // Kiểm tra xem danh mục có danh mục con không
             if (categoryDAO.hasChildCategories(id)) {
-                request.setAttribute("error", "Không thể xóa danh mục này vì có danh mục con.");
-                listCategories(request, response);
+                if (isAjax) {
+                    sendJsonResponse(response, false, "Không thể xóa danh mục này vì có danh mục con.");
+                } else {
+                    request.setAttribute("errorMessage", "Không thể xóa danh mục này vì có danh mục con.");
+                    listAll(request, response);
+                }
                 return;
             }
             
             // Kiểm tra xem danh mục có đang được sử dụng không
             if (categoryDAO.isInUse(id)) {
-                request.setAttribute("error", "Không thể xóa danh mục này vì đang được sử dụng.");
-                listCategories(request, response);
+                if (isAjax) {
+                    sendJsonResponse(response, false, "Không thể xóa danh mục này vì đang được sử dụng.");
+                } else {
+                    request.setAttribute("errorMessage", "Không thể xóa danh mục này vì đang được sử dụng.");
+                    listAll(request, response);
+                }
                 return;
             }
             
             // Xóa danh mục
             boolean success = categoryDAO.deleteCategory(id);
             
-            if (success) {
-                // Chuyển hướng về trang danh sách với thông báo thành công
-                request.setAttribute("message", "Xóa danh mục thành công");
+            if (isAjax) {
+                sendJsonResponse(response, success, success ? "Xóa danh mục thành công" : "Không thể xóa danh mục");
             } else {
-                // Chuyển hướng về trang danh sách với thông báo lỗi
-                request.setAttribute("error", "Không thể xóa danh mục. Vui lòng thử lại sau.");
+                if (success) {
+                    request.setAttribute("message", "Xóa danh mục thành công");
+                } else {
+                    request.setAttribute("errorMessage", "Không thể xóa danh mục. Vui lòng thử lại sau.");
+                }
+                listAll(request, response);
             }
             
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "ID không hợp lệ");
+            if (isAjax) {
+                sendJsonResponse(response, false, "ID không hợp lệ");
+            } else {
+                request.setAttribute("errorMessage", "ID không hợp lệ");
+                listAll(request, response);
+            }
         }
-        
-        listCategories(request, response);
     }
     
     // Xử lý thay đổi trạng thái active/deactive
@@ -292,8 +376,8 @@ public class CategoryController extends HttpServlet {
         String statusStr = request.getParameter("status");
         
         if (idStr == null || idStr.trim().isEmpty() || statusStr == null) {
-            request.setAttribute("error", "Dữ liệu không hợp lệ");
-            listCategories(request, response);
+            request.setAttribute("errorMessage", "Dữ liệu không hợp lệ");
+            listAll(request, response);
             return;
         }
         
@@ -309,13 +393,167 @@ public class CategoryController extends HttpServlet {
                 request.setAttribute("message", status ? "Đã kích hoạt danh mục" : "Đã vô hiệu hóa danh mục");
             } else {
                 // Chuyển hướng về trang danh sách với thông báo lỗi
-                request.setAttribute("error", "Không thể thay đổi trạng thái danh mục");
+                request.setAttribute("errorMessage", "Không thể thay đổi trạng thái danh mục");
             }
             
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "ID không hợp lệ");
+            request.setAttribute("errorMessage", "ID không hợp lệ");
         }
         
-        listCategories(request, response);
+        listAll(request, response);
+    }
+    
+    // Lấy thông tin danh mục theo ID và trả về dạng JSON
+    private void getCategoryById(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        try {
+            int id = Integer.parseInt(request.getParameter("categoryId"));
+            Category category = categoryDAO.getCategoryById(id);
+            
+            if (category != null) {
+                Gson gson = new Gson();
+                String json = gson.toJson(category);
+                
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(json);
+            } else {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"error\": \"Không tìm thấy danh mục\"}");
+            }
+            
+        } catch (NumberFormatException e) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"error\": \"ID không hợp lệ\"}");
+        }
+    }
+    
+    // Xử lý thêm mới đơn vị tính
+    private void addUnit(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        // Lấy dữ liệu từ form
+        String name = request.getParameter("unitName");
+        
+        // Kiểm tra dữ liệu
+        if (name == null || name.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Tên đơn vị tính không được để trống");
+            listAll(request, response);
+            return;
+        }
+        
+        // Tạo đối tượng Unit
+        Unit unit = new Unit();
+        unit.setName(name);
+        
+        // Thêm đơn vị tính vào database
+        boolean success = unitDAO.addUnit(unit);
+        
+        if (success) {
+            // Chuyển hướng về trang danh sách với thông báo thành công
+            response.sendRedirect(request.getContextPath() + "/category?success=add_unit&tab=unit");
+        } else {
+            // Hiển thị lại form với thông báo lỗi
+            request.setAttribute("errorMessage", "Không thể thêm đơn vị tính");
+            listAll(request, response);
+        }
+    }
+    
+    // Xử lý cập nhật đơn vị tính
+    private void updateUnit(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        // Lấy dữ liệu từ form
+        int id = Integer.parseInt(request.getParameter("unitId"));
+        String name = request.getParameter("unitName");
+        
+        // Kiểm tra dữ liệu
+        if (name == null || name.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Tên đơn vị tính không được để trống");
+            listAll(request, response);
+            return;
+        }
+        
+        // Tạo đối tượng Unit
+        Unit unit = new Unit();
+        unit.setId(id);
+        unit.setName(name);
+        
+        // Cập nhật đơn vị tính vào database
+        boolean success = unitDAO.updateUnit(unit);
+        
+        if (success) {
+            // Chuyển hướng về trang danh sách với thông báo thành công
+            response.sendRedirect(request.getContextPath() + "/category?success=update_unit&tab=unit");
+        } else {
+            // Hiển thị lại form với thông báo lỗi
+            request.setAttribute("errorMessage", "Không thể cập nhật đơn vị tính");
+            listAll(request, response);
+        }
+    }
+    
+    // Xử lý xóa đơn vị tính
+    private void deleteUnit(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        try {
+            // Lấy ID từ request
+            int id = Integer.parseInt(request.getParameter("unitId"));
+            
+            // Kiểm tra xem đơn vị tính có đang được sử dụng không
+            if (unitDAO.isUnitInUse(id)) {
+                sendJsonResponse(response, false, "Không thể xóa đơn vị tính này vì đang được sử dụng.");
+                return;
+            }
+            
+            // Xóa đơn vị tính
+            boolean success = unitDAO.deleteUnit(id);
+            
+            sendJsonResponse(response, success, success ? "Xóa đơn vị tính thành công" : "Không thể xóa đơn vị tính");
+            
+        } catch (NumberFormatException e) {
+            sendJsonResponse(response, false, "ID không hợp lệ");
+        }
+    }
+    
+    // Lấy thông tin đơn vị tính theo ID và trả về dạng JSON
+    private void getUnitById(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        try {
+            int id = Integer.parseInt(request.getParameter("unitId"));
+            Unit unit = unitDAO.getUnitById(id);
+            
+            if (unit != null) {
+                Gson gson = new Gson();
+                String json = gson.toJson(unit);
+                
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(json);
+            } else {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"error\": \"Không tìm thấy đơn vị tính\"}");
+            }
+            
+        } catch (NumberFormatException e) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"error\": \"ID không hợp lệ\"}");
+        }
+    }
+    
+    // Phương thức gửi phản hồi JSON
+    private void sendJsonResponse(HttpServletResponse response, boolean success, String message) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        
+        PrintWriter out = response.getWriter();
+        out.print("{\"success\": " + success + ", \"message\": \"" + message + "\"}");
+        out.flush();
     }
 }
