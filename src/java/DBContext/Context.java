@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 public class Context {
     public static Connection getJDBCConnection() {
-        String url = "jdbc:mysql://localhost:3306/newwarehouse?serverTimezone=UTC";
+        String url = "jdbc:mysql://localhost:3306/warehouse_offical?serverTimezone=UTC";
         String user = "root";
         String password = "letiendat";
         
