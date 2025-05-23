@@ -24,6 +24,10 @@
         <servlet-name>EdituserServlet</servlet-name>
         <servlet-class>controller.EdituserServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UserFilterServlet</servlet-name>
+        <servlet-class>controller.UserFilterServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
         <url-pattern>/CategoryServlet</url-pattern>
@@ -47,5 +51,9 @@
     <servlet-mapping>
         <servlet-name>EdituserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserFilterServlet</servlet-name>
+        <url-pattern>/userfilter</url-pattern>
     </servlet-mapping>
 </web-app>

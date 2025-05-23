@@ -46,22 +46,45 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        UserDAO userDAO = new UserDAO();
-        List<Users> userList = userDAO.getAllUsers();
-        request.setAttribute("userList", userList);
-        request.getRequestDispatcher("Admin.jsp").forward(request, response);
-        response.sendRedirect("admin");
+    private static final int PAGE_SIZE = 10; // số bản ghi mỗi trang
 
+    @Override
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    UserDAO userDAO = new UserDAO();
+
+    String pageParam = request.getParameter("page");
+    int pageIndex = 1;
+    int pageSize = 10;
+
+    if (pageParam != null) {
+        try {
+            pageIndex = Integer.parseInt(pageParam);
+            if (pageIndex < 1) pageIndex = 1;
+        } catch (NumberFormatException e) {
+            pageIndex = 1;
+        }
     }
 
+    List<Users> userList = userDAO.getUsersByPage(pageIndex, pageSize);
+    int totalUsers = userDAO.getTotalUserCount();
+    int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+
+    request.setAttribute("userList", userList);
+    request.setAttribute("totalPages", totalPages);
+    request.setAttribute("currentPage", pageIndex);
+
+    request.getRequestDispatcher("Admin.jsp").forward(request, response);
+}
+
+
+    // Bạn có thể bổ sung doPost nếu cần xử lý POST request
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+        doGet(request, response);
     }
+
 
     @Override
     public String getServletInfo() {

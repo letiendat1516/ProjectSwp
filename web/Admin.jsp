@@ -180,27 +180,26 @@
             .deactivate-btn:hover {
                 background-color: #c0392b;
             }
-            .pagination {
-                margin-top: 20px;
-                display: flex;
-                justify-content: center;
-                gap: 5px;
-            }
-            .pagination button {
+            .pagination a, .pagination button {
                 padding: 8px 12px;
+                margin: 0 2px;
                 border: 1px solid #ddd;
-                background-color: #fff;
-                cursor: pointer;
+                text-decoration: none;
+                color: #3498db;
                 border-radius: 3px;
+                cursor: pointer;
             }
-            .pagination button:hover {
-                background-color: #ecf0f1;
-            }
+
             .pagination button.active {
                 background-color: #3498db;
                 color: white;
                 border-color: #3498db;
             }
+
+            .pagination a:hover {
+                background-color: #ecf0f1;
+            }
+
         </style>
     </head>
     <body>
@@ -208,8 +207,8 @@
             <div class="sidebar">
                 <h2>Warehouse<br>Manager</h2>
                 <ul >
-                    <li class="add-user-btn"><a>User Manager</a></li>
-                    <li class="add-user-btn">Role Assignment</li>
+                    <li class="add-user-btn"><a href="Admin.jsp">User Manager</a></li>
+                    <li class="add-user-btn"><a href="EditUser.jsp"> Role Assignment </a></li>
                     <li class="add-user-btn">Material Information</li>
                     <li class="add-user-btn">Transaction</li>
                     <li class="add-user-btn">Statistic</li>
@@ -228,14 +227,14 @@
                     <a href="AddUser.jsp">+ Add User</a>
                 </button>
 
-                <form action="UserFilterServlet" method="get" class="filter-bar">
+                <form action="userfilter" method="get" class="filter-bar">
                     <div class="filter-bar">
                         <select id="role" name="role">
                             <option value="Admin">Admin</option>
-                            <option value="Warehouse Manager">Warehouse Manager</option>
-                            <option value="Warehouse Staff">Warehouse Staff</option>
-                            <option value="Company Director">Company Director</option>
-                            <option value="Company Employee">Company Employee</option>
+                            <option value="1">Warehouse Manager</option>
+                            <option value="2">Warehouse Staff</option>
+                            <option value="3">Company Employee</option>
+                            <option value="4">Company Director</option>
                         </select>
 
 
@@ -252,7 +251,7 @@
                 </form>
 
                 <table>
-                    <thead  readonly style="background-color: #eee;">
+                    <thead style="background-color: #eee;">
                         <tr>
                             <th>ID</th>
                             <th>Username</th>
@@ -284,20 +283,32 @@
                             </tr>
                         </c:forEach>
                         <c:if test="${empty userList}">
-                            <tr><td colspan="6">No users found.</td></tr>
+                            <tr><td colspan="7">No users found.</td></tr>
                         </c:if>
                     </tbody>
                 </table>
-
                 <div class="pagination">
-                    <button>&lt;</button>
-                    <button class="active">1</button>
-                    <button>2</button>
-                    <button>...</button>
-                    <button>9</button>
-                    <button>10</button>
-                    <button>&gt;</button>
+                    <p>Total pages: ${totalPages}</p>
+                    <c:if test="${totalPages > 1}">
+                        <c:if test="${currentPage > 1}">
+                            <a href="admin?page=${currentPage - 1}">&lt; Prev</a>
+                        </c:if>
+                        <c:forEach begin="1" end="${totalPages}" var="i">
+                            <c:choose>
+                                <c:when test="${i == currentPage}">
+                                    <button class="active">${i}</button>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="admin?page=${i}">${i}</a>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:forEach>
+                        <c:if test="${currentPage < totalPages}">
+                            <a href="admin?page=${currentPage + 1}">Next &gt;</a>
+                        </c:if>
+                    </c:if>
                 </div>
+
             </div>
         </div>
     </body>

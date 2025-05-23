@@ -115,8 +115,8 @@
                             <select id="role" name="role" required style="width: 100%;">
                                 <option value="">-- Select Role --</option>
                                 <option value="2" ${user.roleName == 'Warehouse Staff' ? 'selected' : ''}>Warehouse Staff</option>
-                                <option value="3" ${user.roleName == 'Company Director' ? 'selected' : ''}>Company Director</option>
-                                <option value="4" ${user.roleName == 'Company Employee' ? 'selected' : ''}>Company Employee</option>
+                                <option value="3" ${user.roleName == 'Company Employee' ? 'selected' : ''}>Company Director</option>
+                                <option value="4" ${user.roleName == 'Company Director' ? 'selected' : ''}>Company Employee</option>
                             </select>
                         </td>
 

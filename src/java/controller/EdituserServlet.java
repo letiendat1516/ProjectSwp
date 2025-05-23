@@ -45,7 +45,6 @@ public class EdituserServlet extends HttpServlet {
         }
     }
 
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -103,6 +102,7 @@ public class EdituserServlet extends HttpServlet {
             request.getRequestDispatcher("EditUser.jsp").forward(request, response);
         }
     }
+
     @Override
     public String getServletInfo() {
         return "Short description";
