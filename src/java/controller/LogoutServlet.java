@@ -40,7 +40,7 @@ public class LogoutServlet extends HttpServlet {
     if (session != null) {
         session.invalidate();  // Xoá toàn bộ session
     }
-    response.sendRedirect("login.jsp");
+    response.sendRedirect("JSP/User/login.jsp");
 }
 
 

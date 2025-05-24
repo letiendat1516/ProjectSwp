@@ -65,7 +65,7 @@ public class EdituserServlet extends HttpServlet {
             }
 
             request.setAttribute("user", user);
-            request.getRequestDispatcher("EditUser.jsp").forward(request, response);
+            request.getRequestDispatcher("JSP/Admin/edituser.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
             response.sendRedirect("admin");
@@ -99,7 +99,7 @@ public class EdituserServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Update user failed: " + e.getMessage());
-            request.getRequestDispatcher("EditUser.jsp").forward(request, response);
+            request.getRequestDispatcher("JSP/Admin/edituser.jsp").forward(request, response);
         }
     }
 

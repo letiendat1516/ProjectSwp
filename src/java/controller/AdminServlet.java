@@ -74,7 +74,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     request.setAttribute("totalPages", totalPages);
     request.setAttribute("currentPage", pageIndex);
 
-    request.getRequestDispatcher("Admin.jsp").forward(request, response);
+    request.getRequestDispatcher("JSP/Admin/admin.jsp").forward(request, response);
 }
 
 

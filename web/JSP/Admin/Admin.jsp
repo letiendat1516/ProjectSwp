@@ -207,8 +207,8 @@
             <div class="sidebar">
                 <h2>Warehouse<br>Manager</h2>
                 <ul >
-                    <li class="add-user-btn"><a href="Admin.jsp">User Manager</a></li>
-                    <li class="add-user-btn"><a href="EditUser.jsp"> Role Assignment </a></li>
+                    <li class="add-user-btn"><a href="JSP/Admin/admin.jsp">User Manager</a></li>
+                    <li class="add-user-btn"><a href="JSP/Admin/edituser.jsp"> Role Assignment </a></li>
                     <li class="add-user-btn">Material Information</li>
                     <li class="add-user-btn">Transaction</li>
                     <li class="add-user-btn">Statistic</li>
@@ -219,12 +219,12 @@
                 <div class="header">
                     <div><h2>Setting List</h2></div>
                     <div class="admin-logout">
-                        <strong>Admin</strong> <a href="login.jsp">Log out</a>
+                        <strong>Admin</strong> <a href="JSP/User/login.jsp">Log out</a>
                     </div>
                 </div>
 
                 <button class="add-user-btn">
-                    <a href="AddUser.jsp">+ Add User</a>
+                    <a href="JSP/Admin/adduser.jsp">+ Add User</a>
                 </button>
 
                 <form action="userfilter" method="get" class="filter-bar">

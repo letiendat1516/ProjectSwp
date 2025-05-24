@@ -52,7 +52,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("login.jsp").forward(request, response);
+        request.getRequestDispatcher("JSP/User/login.jsp").forward(request, response);
     }
 
     /**
@@ -78,13 +78,13 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("user", user);
 
             if (username.equals("admin") && password.equals("123")) {
-                response.sendRedirect("Admin.jsp");
+                response.sendRedirect("JSP/Admin/Admin.jsp");
             } else {
                 response.sendRedirect("homepage.jsp");
             }
         } else {
             request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng.");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            request.getRequestDispatcher("JSP/User/login.jsp").forward(request, response);
         }
 
     }

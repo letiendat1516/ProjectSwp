@@ -26,11 +26,11 @@ public class CategoryController extends HttpServlet {
         
         if (pathInfo == null || pathInfo.equals("/") || pathInfo.equals("/list")) {
             listCategories(request, response);
-        } else if (pathInfo.equals("/create")) {
+        } else if (pathInfo.equals("create")) {
             showCreateForm(request, response);
-        } else if (pathInfo.equals("/edit")) {
+        } else if (pathInfo.equals("edit")) {
             showEditForm(request, response);
-        } else if (pathInfo.equals("/delete")) {
+        } else if (pathInfo.equals("delete")) {
             deleteCategory(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -43,10 +43,10 @@ public class CategoryController extends HttpServlet {
         String pathInfo = request.getPathInfo();
         
         if (pathInfo == null || pathInfo.equals("/")) {
-            response.sendRedirect(request.getContextPath() + "/category/list");
-        } else if (pathInfo.equals("/create")) {
+            response.sendRedirect(request.getContextPath() + "list");
+        } else if (pathInfo.equals("create")) {
             createCategory(request, response);
-        } else if (pathInfo.equals("/edit")) {
+        } else if (pathInfo.equals("edit")) {
             updateCategory(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -86,7 +86,7 @@ public class CategoryController extends HttpServlet {
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("searchKeyword", searchKeyword);
         
-        request.getRequestDispatcher("/list.jsp").forward(request, response);
+        request.getRequestDispatcher("JSP/Category/list.jsp").forward(request, response);
     }
     
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
@@ -95,7 +95,7 @@ public class CategoryController extends HttpServlet {
         List<Category> parentCategories = categoryDAO.getAllCategoriesForDropdown();
         request.setAttribute("parentCategories", parentCategories);
         
-        request.getRequestDispatcher("/create.jsp").forward(request, response);
+        request.getRequestDispatcher("JSP/Category/create.jsp").forward(request, response);
     }
     
     private void createCategory(HttpServletRequest request, HttpServletResponse response)
@@ -167,7 +167,7 @@ public class CategoryController extends HttpServlet {
             request.setAttribute("parentCategories", parentCategories);
             request.setAttribute("category", category);
             
-            request.getRequestDispatcher("/edit.jsp").forward(request, response);
+            request.getRequestDispatcher("JSP/Category/edit.jsp").forward(request, response);
             
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/category/list?error=invalid_id");

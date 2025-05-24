@@ -95,10 +95,10 @@ public class AdduserServlet extends HttpServlet {
             session.setAttribute("message", "User added successfully!");
 
             // Redirect về lại trang AddUser.jsp (hoặc có thể về admin)
-            response.sendRedirect("AddUser.jsp");
+            response.sendRedirect("JSP/Admin/adduser.jsp");
         } catch (Exception e) {
             request.setAttribute("error", "Failed to add user: " + e.getMessage());
-            request.getRequestDispatcher("AddUser.jsp").forward(request, response);
+            request.getRequestDispatcher("JSP/Admin/adduser.jsp").forward(request, response);
         }
 
     }

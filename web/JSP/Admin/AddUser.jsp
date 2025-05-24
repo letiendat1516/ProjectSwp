@@ -138,7 +138,7 @@
                 <button type="submit" class="btn-submit">Add User</button>
             </form>
 
-            <a href="Admin.jsp" class="back-link">Back to User List</a>
+            <a href="JSP/Admin/admin.jsp" class="back-link">Back to User List</a>
         </div>
     </body>
 </html>
