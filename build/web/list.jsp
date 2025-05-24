@@ -178,6 +178,17 @@
                 background-color: #c82333;
                 border-color: #bd2130;
             }
+            
+            .btn-admin {
+                color: #fff;
+                background-color: #28a745;
+                border-color: #28a745;
+            }
+            
+            .btn-admin:hover {
+                background-color: #218838;
+                border-color: #1e7e34;
+            }
 
             .table-responsive {
                 overflow-x: auto;
@@ -387,6 +398,21 @@
             .icon-trash:before {
                 content: "🗑";
             }
+            
+            .icon-admin:before {
+                content: "👤";
+            }
+            
+            .action-buttons {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 20px;
+            }
+            
+            .left-buttons, .right-buttons {
+                display: flex;
+                gap: 10px;
+            }
 
             /* Responsive */
             @media (max-width: 768px) {
@@ -397,6 +423,15 @@
 
                 .text-end {
                     text-align: left;
+                }
+                
+                .action-buttons {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                
+                .left-buttons, .right-buttons {
+                    justify-content: center;
                 }
             }
         </style>
@@ -541,7 +576,14 @@
                     </ul>
                 </nav>
             </c:if>
-        </div>
+            
+            <!-- Nút quay lại -->
+                <div class="right-buttons">
+                    <a href="${pageContext.request.contextPath}/admin" class="btn btn-admin">
+                         Quay lại Trang Admin
+                    </a>
+                </div>
+            </div>
 
         <script>
             // Xử lý đóng alert sau 5 giây
