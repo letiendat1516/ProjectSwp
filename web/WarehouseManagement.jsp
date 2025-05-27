@@ -52,7 +52,7 @@
     <body>
 
         <h2>Nhập Kho - Xử lý đơn nhập</h2>
-        <form>
+        <form action="warehouse" method="get">
             <div class="section">
                 <h3>Thông tin đơn nhập kho</h3>
                 <table>
