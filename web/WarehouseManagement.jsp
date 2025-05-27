@@ -1,9 +1,4 @@
-<%-- 
-    Document   : WarehouseManagement
-    Created on : May 24, 2025, 4:47:55 PM
-    Author     : Dell
---%>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -52,7 +47,7 @@
     <body>
 
         <h2>Nhập Kho - Xử lý đơn nhập</h2>
-        <form action="warehouse" method="get">
+        <form>
             <div class="section">
                 <h3>Thông tin đơn nhập kho</h3>
                 <table>
@@ -138,4 +133,4 @@
             </div>
         </form>
     </body>
-</html>
+</html> 
