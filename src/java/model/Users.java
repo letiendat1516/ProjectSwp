@@ -5,6 +5,7 @@
 package model;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  *
@@ -13,6 +14,7 @@ import java.sql.Timestamp;
 public class Users {
     private int id;
     private String username;
+    private Date DoB;
     private String password;
     private String email;
     private String fullname;
@@ -23,10 +25,10 @@ public class Users {
     public Users() {
     }
 
-    
-    public Users(int id, String username, String password, String email, String fullname, String roleName, int activeFlag, Timestamp createDate) {
+    public Users(int id, String username, Date DoB, String password, String email, String fullname, String roleName, int activeFlag, Timestamp createDate) {
         this.id = id;
         this.username = username;
+        this.DoB = DoB;
         this.password = password;
         this.email = email;
         this.fullname = fullname;
@@ -49,6 +51,14 @@ public class Users {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Date getDoB() {
+        return DoB;
+    }
+
+    public void setDoB(Date DoB) {
+        this.DoB = DoB;
     }
 
     public String getPassword() {

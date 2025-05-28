@@ -14,12 +14,12 @@ import java.util.Date;
  */
 public class RequestInformationDAO {
 
-   public String addRequestInformationIntoDB(int user_id, Date day_request,
+   public String addRequestInformationIntoDB(int user_id, String role, Date day_request,
         String status, String reason, String supplier, String address, String phone, String email) {
     String generatedId = null;
 
-    String insertSql = "INSERT INTO request (user_id, day_request, status, reason, supplier, address, phone, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    String selectSql = "SELECT id FROM request WHERE user_id = ? AND day_request = ? AND status = ? AND reason = ? AND supplier = ? AND address = ? AND phone = ? AND email = ? ORDER BY id DESC LIMIT 1";
+    String insertSql = "INSERT INTO request (user_id, role, day_request, status, reason, supplier, address, phone, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    String selectSql = "SELECT id FROM request WHERE user_id = ? AND role = ? AND day_request = ? AND status = ? AND reason = ? AND supplier = ? AND address = ? AND phone = ? AND email = ? ORDER BY id DESC LIMIT 1";
 
     try (
         Connection con = Context.getJDBCConnection();
@@ -28,24 +28,26 @@ public class RequestInformationDAO {
     ) {
         // B1: Insert
         insertStmt.setInt(1, user_id);
-        insertStmt.setDate(2, new java.sql.Date(day_request.getTime()));
-        insertStmt.setString(3, status);
-        insertStmt.setString(4, reason);
-        insertStmt.setString(5, supplier);
-        insertStmt.setString(6, address);
-        insertStmt.setString(7, phone);
-        insertStmt.setString(8, email);
+        insertStmt.setString(2, role);
+        insertStmt.setDate(3, new java.sql.Date(day_request.getTime()));
+        insertStmt.setString(4, status);
+        insertStmt.setString(5, reason);
+        insertStmt.setString(6, supplier);
+        insertStmt.setString(7, address);
+        insertStmt.setString(8, phone);
+        insertStmt.setString(9, email);
         insertStmt.executeUpdate();
 
         // B2: Truy lại ID vừa chèn
         selectStmt.setInt(1, user_id);
-        selectStmt.setDate(2, new java.sql.Date(day_request.getTime()));
-        selectStmt.setString(3, status);
-        selectStmt.setString(4, reason);
-        selectStmt.setString(5, supplier);
-        selectStmt.setString(6, address);
-        selectStmt.setString(7, phone);
-        selectStmt.setString(8, email);
+        selectStmt.setString(2, role);
+        selectStmt.setDate(3, new java.sql.Date(day_request.getTime()));
+        selectStmt.setString(4, status);
+        selectStmt.setString(5, reason);
+        selectStmt.setString(6, supplier);
+        selectStmt.setString(7, address);
+        selectStmt.setString(8, phone);
+        selectStmt.setString(9, email);
 
         ResultSet rs = selectStmt.executeQuery();
         if (rs.next()) {

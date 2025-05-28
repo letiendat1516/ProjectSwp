@@ -13,6 +13,7 @@ import java.util.Date;
 public class Request {
     private String id;
     private int user_id;
+    private String role;
     private Date day_request;
     private String status;
     private String reason;
@@ -24,9 +25,10 @@ public class Request {
     public Request() {
     }
 
-    public Request(String id, int user_id, Date day_request, String status, String reason, String supplier, String address, String phone, String email) {
+    public Request(String id, int user_id, String role, Date day_request, String status, String reason, String supplier, String address, String phone, String email) {
         this.id = id;
         this.user_id = user_id;
+        this.role = role;
         this.day_request = day_request;
         this.status = status;
         this.reason = reason;
@@ -50,6 +52,14 @@ public class Request {
 
     public void setUser_id(int user_id) {
         this.user_id = user_id;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public Date getDay_request() {

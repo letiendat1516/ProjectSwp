@@ -4,17 +4,25 @@
  */
 package controller;
 
+import dao.ProductInfoDAO;
 import dao.RequestInformationDAO;
 import dao.RequestItemsDAO;
+import dao.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
+import java.time.Period;
+import java.util.List;
+import model.ProductInfo;
+import model.Users;
 
 /**
  *
@@ -60,9 +68,39 @@ public class LoadingRequestServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        RequestInformationDAO dao = new RequestInformationDAO();
-        String nextID = dao.getNextRequestId();
+        HttpSession session = request.getSession(false);
+        Users currentUser = (Users) session.getAttribute("user");
+
+        
+
+        UserDAO dao = new UserDAO();
+        String fullname = dao.getFullName(currentUser.getId());
+        Date DoB = dao.getDoB(currentUser.getId());
+        RequestInformationDAO requestInfo = new RequestInformationDAO();
+        ProductInfoDAO product = new ProductInfoDAO();
+        String nextID = requestInfo.getNextRequestId();
+        if (currentUser != null) {
+            Date dob = DoB;
+
+            if (dob != null) {
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                cal.setTime(dob);
+                int yearOfBirth = cal.get(java.util.Calendar.YEAR);
+                int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+                int age = currentYear - yearOfBirth;
+
+                request.setAttribute("age", age);
+            } else {
+                System.out.println("DOB is null for user: " + currentUser.getId());
+            }
+        } else {
+            System.out.println("currentUser is null in session");
+        }
+        List<ProductInfo> products_list = product.getAllProducts();
         request.setAttribute("nextID", nextID);
+        request.setAttribute("products_list", products_list);
+        session.setAttribute("currentUser", fullname);
+        session.setAttribute("DoB", DoB);
         request.getRequestDispatcher("ItemsSupplyRequestForm.jsp").forward(request, response);
     }
 
@@ -78,7 +116,9 @@ public class LoadingRequestServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+
         //Lay du lieu tu form
+        String role = request.getParameter("role");
         String dayRequestStr = request.getParameter("day_request");
         String reason = request.getParameter("reason");
         String supplier = request.getParameter("supplier");
@@ -107,11 +147,11 @@ public class LoadingRequestServlet extends HttpServlet {
             } catch (NumberFormatException e) {
             }
         }
-        
+
         RequestItemsDAO requestitemsDAO = new RequestItemsDAO();
         RequestInformationDAO requestInformationDAO = new RequestInformationDAO();
 
-        String request_id = requestInformationDAO.addRequestInformationIntoDB(12, dayRequest, "pending", reason, supplier, address, phone, email);
+        String request_id = requestInformationDAO.addRequestInformationIntoDB(12, role, dayRequest, "pending", reason, supplier, address, phone, email);
         requestitemsDAO.addItemsIntoDB(request_id, productNameArr, productCodeArr, unitArr, quantityIntArr, noteArr, reasonDetail);
         response.sendRedirect("RequestSuccessNotification.jsp");
     }
