@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -8,13 +9,13 @@ import java.util.Date;
 
 /**
  *
- * @author Dell
+ * @author Admin
  */
 public class Request {
-
-private String id;
-    private int userId;
-    private Date dayRequest;
+    private String id;
+    private int user_id;
+    private String role;
+    private Date day_request;
     private String status;
     private String reason;
     private String supplier;
@@ -25,10 +26,11 @@ private String id;
     public Request() {
     }
 
-    public Request(String id, int userId, Date dayRequest, String status, String reason, String supplier, String address, String phone, String email) {
+    public Request(String id, int user_id, String role, Date day_request, String status, String reason, String supplier, String address, String phone, String email) {
         this.id = id;
-        this.userId = userId;
-        this.dayRequest = dayRequest;
+        this.user_id = user_id;
+        this.role = role;
+        this.day_request = day_request;
         this.status = status;
         this.reason = reason;
         this.supplier = supplier;
@@ -45,20 +47,28 @@ private String id;
         this.id = id;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getUser_id() {
+        return user_id;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
     }
 
-    public Date getDayRequest() {
-        return dayRequest;
+    public String getRole() {
+        return role;
     }
 
-    public void setDayRequest(Date dayRequest) {
-        this.dayRequest = dayRequest;
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public Date getDay_request() {
+        return day_request;
+    }
+
+    public void setDay_request(Date day_request) {
+        this.day_request = day_request;
     }
 
     public String getStatus() {
@@ -108,6 +118,6 @@ private String id;
     public void setEmail(String email) {
         this.email = email;
     }
-
-
+    
 }
+
