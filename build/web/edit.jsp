@@ -85,14 +85,6 @@
             font-weight: bold;
         }
         
-        .text-danger {
-            color: #dc3545;
-        }
-        
-        .text-success {
-            color: #28a745;
-        }
-        
         .text-muted {
             color: #6c757d;
             font-size: 0.9em;
@@ -296,13 +288,13 @@
                             <div class="radio-item">
                                 <input class="radio-input" type="radio" name="activeFlag" id="activeTrue" value="1" ${category.activeFlag ? 'checked' : ''}>
                                 <label for="activeTrue">
-                                    <span class="text-success"><span class="icon icon-check-circle"></span> Hoạt động</span>
+                                    <span class="text-success"><span class=""></span> Hoạt động</span>
                                 </label>
                             </div>
                             <div class="radio-item">
                                 <input class="radio-input" type="radio" name="activeFlag" id="activeFalse" value="0" ${!category.activeFlag ? 'checked' : ''}>
                                 <label for="activeFalse">
-                                    <span class="text-danger"><span class="icon icon-x-circle"></span> Không hoạt động</span>
+                                    <span class="text-danger"><span class=""></span> Không hoạt động</span>
                                 </label>
                             </div>
                         </div>
@@ -313,7 +305,7 @@
                             <span class="icon icon-arrow-left"></span> Quay lại
                         </a>
                         <button type="submit" class="btn btn-warning">
-                            <span class="icon icon-save"></span> Cập nhật
+                            <span class=""></span> Cập nhật
                         </button>
                     </div>
                 </form>
