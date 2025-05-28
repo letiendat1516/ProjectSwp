@@ -51,21 +51,21 @@
             <div class="section">
                 <h3>Thông tin đơn nhập kho</h3>
                 <table>
-                    <tr><th>Mã đơn nhập</th><td>PNK12345</td></tr>
-                    <tr><th>Ngày tạo đơn</th><td>2025-05-23</td></tr>
-                    <tr><th>Người tạo đơn</th><td>Nguyễn Văn A</td></tr>
-                    <tr><th>Trạng thái</th><td>Đã duyệt</td></tr>
-                    <tr><th>Lý do nhập kho</th><td>Nhập hàng hoa tươi mùa hè</td></tr>
+                    <tr><th>Mã đơn nhập</th><td><input type="text" name="id" value="${p.getId()}"></td></tr>
+                    <tr><th>Ngày tạo đơn</th><td><input type="text" name="id" value="${p.getDayRequest()}"></td></tr>
+                    <tr><th>Người tạo đơn</th><td><input type="text" name="id" value="${p.getUserId()}"></td></tr>
+                    <tr><th>Trạng thái</th><td><input type="text" name="id" value="${p.getId()}"></td></tr>
+                    <tr><th>Lý do nhập kho</th><td><input type="text" name="id" value="${p.getReason()}"></td></tr>
                 </table>
             </div>
 
             <div class="section">
                 <h3>Thông tin nhà cung cấp</h3>
                 <table>
-                    <tr><th>Tên nhà cung cấp</th><td>Hoa Sài Gòn</td></tr>
-                    <tr><th>Địa chỉ</th><td>123 Đường Lê Lợi, TP.HCM</td></tr>
-                    <tr><th>Điện thoại</th><td>0909 123 456</td></tr>
-                    <tr><th>Email</th><td>hoasaigon@example.com</td></tr>
+                    <tr><th>Tên nhà cung cấp</th><td><input type="text" name="id" value="${p.getSupplier()}"></td></tr>
+                    <tr><th>Địa chỉ</th><td><input type="text" name="id" value="${p.getAddress()}"></td></tr>
+                    <tr><th>Điện thoại</th><td><input type="text" name="id" value="${p.getPhone()}"></td></tr>
+                    <tr><th>Email</th><td><input type="text" name="id" value="${p.getEmail()}"></td></tr>
                 </table>
             </div>
 
@@ -86,24 +86,14 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>VT001</td>
-                                <td>Hoa hồng đỏ</td>
-                                <td>Chục</td>
-                                <td>50</td>
-                                <td>20</td>
+                                <td><input type="text" name="id" value="${p.getEmail()}"></td>
+                                <td><input type="text" name="id" value="${p.getEmail()}"></td>
+                                <td><input type="text" name="id" value="${p.getEmail()}"></td>
+                                <td><input type="text" name="id" value="${p.getEmail()}"></td>
+                                <td><input type="text" name="id" value="${p.getEmail()}"></td>
                                 <td><input type="number" name="qty_VT001" min="0" max="30" required></td>
                                 <td><input type="text" name="note_VT001"></td>
                             </tr>
-                            <tr>
-                                <td>VT002</td>
-                                <td>Hoa lan tím</td>
-                                <td>Chục</td>
-                                <td>30</td>
-                                <td>10</td>
-                                <td><input type="number" name="qty_VT002" min="0" max="20" required></td>
-                                <td><input type="text" name="note_VT002"></td>
-                            </tr>
-                            <!-- Thêm dòng vật tư khác nếu cần -->
                         </tbody>
                     </table>
 

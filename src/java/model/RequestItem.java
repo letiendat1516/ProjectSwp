@@ -10,47 +10,80 @@ package model;
  */
 public class RequestItem {
 
-    private int id;
-    private int requestId;
-    private int productId;
-    private double quantity;
+    private String requestId;
+    private String productName;
+    private String productCode;
+    private String unit;
+    private int quantity;
+    private String note;
+    private String reasonDetail;
 
-    public RequestItem(int id, int requestId, int productId, double quantity) {
-        this.id = id;
+    public RequestItem() {
+    }
+
+    public RequestItem(String requestId, String productName, String productCode, String unit, int quantity, String note, String reasonDetail) {
         this.requestId = requestId;
-        this.productId = productId;
+        this.productName = productName;
+        this.productCode = productCode;
+        this.unit = unit;
         this.quantity = quantity;
+        this.note = note;
+        this.reasonDetail = reasonDetail;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getRequestId() {
+    public String getRequestId() {
         return requestId;
     }
 
-    public void setRequestId(int requestId) {
+    public void setRequestId(String requestId) {
         this.requestId = requestId;
     }
 
-    public int getProductId() {
-        return productId;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setProductId(int productId) {
-        this.productId = productId;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
-    public double getQuantity() {
+    public String getProductCode() {
+        return productCode;
+    }
+
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(double quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public String getReasonDetail() {
+        return reasonDetail;
+    }
+
+    public void setReasonDetail(String reasonDetail) {
+        this.reasonDetail = reasonDetail;
     }
 }

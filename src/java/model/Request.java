@@ -12,44 +12,53 @@ import java.util.Date;
  */
 public class Request {
 
-    private int id;
-    private String userName; // From user table
-    private String type;
+private String id;
+    private int userId;
+    private Date dayRequest;
     private String status;
     private String reason;
-    private Date createdAt;
+    private String supplier;
+    private String address;
+    private String phone;
+    private String email;
 
-    public Request(int id, String userName, String type, String status, String reason, Date createdAt) {
-        this.id = id;
-        this.userName = userName;
-        this.type = type;
-        this.status = status;
-        this.reason = reason;
-        this.createdAt = createdAt;
+    public Request() {
     }
 
-    public int getId() {
+    public Request(String id, int userId, Date dayRequest, String status, String reason, String supplier, String address, String phone, String email) {
+        this.id = id;
+        this.userId = userId;
+        this.dayRequest = dayRequest;
+        this.status = status;
+        this.reason = reason;
+        this.supplier = supplier;
+        this.address = address;
+        this.phone = phone;
+        this.email = email;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public String getType() {
-        return type;
+    public Date getDayRequest() {
+        return dayRequest;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setDayRequest(Date dayRequest) {
+        this.dayRequest = dayRequest;
     }
 
     public String getStatus() {
@@ -68,11 +77,37 @@ public class Request {
         this.reason = reason;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public String getSupplier() {
+        return supplier;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setSupplier(String supplier) {
+        this.supplier = supplier;
     }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+
 }
