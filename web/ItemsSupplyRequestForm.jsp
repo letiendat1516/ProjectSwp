@@ -81,6 +81,7 @@
                 background-color: #f8f9fa;
                 cursor: not-allowed;
             }
+
             .information-user {
                 display: flex;
                 flex-wrap: wrap;
@@ -194,19 +195,49 @@
             }
 
             .submit-btn {
-                display: block;
-                width: 5cm;
+                width: 150px; /* Kích thước đồng bộ */
                 padding: 12px;
                 background: #007bff;
                 color: #fff;
                 border: none;
                 border-radius: 8px;
                 cursor: pointer;
-                font-size: 16px;
+                font-size: 14px;
                 transition: background 0.3s;
-                margin-left: auto;
-                margin-right: auto;
             }
+
+            .back-btn {
+                width: 150px; /* Kích thước đồng bộ */
+                padding: 12px;
+                background: #6c757d; /* Màu xám để phân biệt */
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 14px;
+                text-align: center;
+                text-decoration: none;
+                transition: background 0.3s;
+            }
+
+            .submit-btn:hover {
+                background: #0056b3;
+            }
+
+            .back-btn:hover {
+                background: #5a6268;
+            }
+
+            /* Container để căn giữa hai nút */
+            .button-container {
+                display: flex;
+                justify-content: center; /* Căn giữa ngang */
+                align-items: center; /* Căn giữa dọc */
+                gap: 15px; /* Khoảng cách giữa hai nút */
+                margin-top: 20px;
+                flex-wrap: wrap; /* Đảm bảo nút không bị tràn trên màn hình nhỏ */
+            }
+
             .items-table table td:nth-child(1),
             .items-table table td:nth-child(3),
             .items-table table td:nth-child(4),
@@ -214,15 +245,11 @@
                 text-align: center;
             }
 
-            /* Căn giữa nội dung trong textarea và input của các cột này */
             .items-table textarea[name="stt"],
             .items-table input[name="product_code"],
             .items-table textarea[name="unit"],
             .items-table textarea[name="quantity"] {
                 text-align: center;
-            }
-            .submit-btn:hover {
-                background: #0056b3;
             }
 
             @media (max-width: 768px) {
@@ -241,6 +268,17 @@
 
                 .items-table th, .items-table td {
                     padding: 8px;
+                }
+
+                .submit-btn, .back-btn {
+                    width: 150px;
+                    font-size: 12px;
+                }
+
+                .button-container {
+                    flex-direction: column; /* Xếp dọc trên mobile */
+                    align-items: center; /* Căn giữa dọc */
+                    display: flex;
                 }
             }
         </style>
@@ -266,6 +304,7 @@
                     <div class="form-group">
                         <label>Vai trò</label>
                         <select name="role" required>
+                            <option value="" disabled selected>-- Chọn vai trò --</option>
                             <option value="Nhân viên">Nhân viên</option>
                             <option value="Giám đốc">Giám đốc</option>
                             <option value="Admin">Admin</option>
@@ -351,7 +390,10 @@
                         <textarea rows="3" name="reason_detail" style="width: 100%; border: 1px solid #ddd; resize: none;" oninput="autoResize(this)" required></textarea>
                     </div>
                 </div>
-                <button type="submit" class="submit-btn">Gửi yêu cầu</button>
+                <div class="button-container">
+                    <button type="submit" class="submit-btn">Gửi yêu cầu</button>
+                    <a href="admin" class="back-btn">Quay lại</a>
+                </div>
             </form>
         </div>
         <script>
