@@ -14,7 +14,11 @@ public class Context {
     public static Connection getJDBCConnection() {
         String url = "jdbc:mysql://localhost:3306/swp?serverTimezone=UTC";
         String user = "root";
+<<<<<<< HEAD
         String password = "admin";
+=======
+        String password = "tunganh2005";
+>>>>>>> f612dfe5bab1a5395fd7d907bc30f7dec66e78c4
         
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
