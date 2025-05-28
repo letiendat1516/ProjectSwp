@@ -268,6 +268,7 @@
                         <select name="role" required>
                             <option value="Nhân viên">Nhân viên</option>
                             <option value="Giám đốc">Giám đốc</option>
+                            <option value="Admin">Admin</option>
                         </select>
                     </div>
                     <div class="form-group">

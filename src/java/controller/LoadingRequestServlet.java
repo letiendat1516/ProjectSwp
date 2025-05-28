@@ -147,11 +147,14 @@ public class LoadingRequestServlet extends HttpServlet {
             } catch (NumberFormatException e) {
             }
         }
-
+        HttpSession session = request.getSession(false);
+        Users currentUser = (Users) session.getAttribute("user");
+        UserDAO user = new UserDAO();
+        int user_id = currentUser.getId();
         RequestItemsDAO requestitemsDAO = new RequestItemsDAO();
         RequestInformationDAO requestInformationDAO = new RequestInformationDAO();
 
-        String request_id = requestInformationDAO.addRequestInformationIntoDB(12, role, dayRequest, "pending", reason, supplier, address, phone, email);
+        String request_id = requestInformationDAO.addRequestInformationIntoDB(user_id, role, dayRequest, "pending", reason, supplier, address, phone, email);
         requestitemsDAO.addItemsIntoDB(request_id, productNameArr, productCodeArr, unitArr, quantityIntArr, noteArr, reasonDetail);
         response.sendRedirect("RequestSuccessNotification.jsp");
     }
