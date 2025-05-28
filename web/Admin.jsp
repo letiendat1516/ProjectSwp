@@ -120,8 +120,8 @@
             <div class="sidebar">
                 <h2>Warehouse<br>Manager</h2>
                 <ul >
-                    <li class="add-user-btn"><a href="UserManager.jsp">User Manager</a></li>
-                    <li class="add-user-btn"><a href="EditUser.jsp"> Role Assignment </a></li>
+                    <li class="add-user-btn"><a href="admin">User Manager</a></li>
+                    <li class="add-user-btn"><a href=""> Role Assignment </a></li>
                     <li class="add-user-btn">Material Information</li>
                     <li class="add-user-btn">Transaction</li>
                     <li class="add-user-btn">Statistic</li>
