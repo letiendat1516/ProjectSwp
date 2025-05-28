@@ -56,4 +56,12 @@
         <servlet-name>UserFilterServlet</servlet-name>
         <url-pattern>/userfilter</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>LoadingRequestServlet</servlet-name>
+        <servlet-class>controller.LoadingRequestServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoadingRequestServlet</servlet-name>
+        <url-pattern>/loadingrequest</url-pattern>
+    </servlet-mapping>
 </web-app>

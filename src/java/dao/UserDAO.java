@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import model.Users;
 
@@ -19,8 +20,7 @@ public class UserDAO extends Context {
                 + "LEFT JOIN user_role ur ON u.id = ur.user_id "
                 + "LEFT JOIN role r ON ur.role_id = r.id";
 
-        try (Connection connection = Context.getJDBCConnection();
-                PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Users user = new Users();
@@ -87,8 +87,7 @@ public class UserDAO extends Context {
                 + "LEFT JOIN user_role ur ON u.id = ur.user_id "
                 + "LEFT JOIN role r ON ur.role_id = r.id "
                 + "WHERE u.id = ?";
-        try (Connection connection = Context.getJDBCConnection();
-                PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -178,8 +177,7 @@ public class UserDAO extends Context {
             params.add(kw);
         }
 
-        try (Connection connection = Context.getJDBCConnection();
-                PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 stmt.setObject(i + 1, params.get(i));
             }
@@ -202,57 +200,52 @@ public class UserDAO extends Context {
         }
         return list;
     }
-    
-    
+
     public List<Users> getUsersByPage(int pageIndex, int pageSize) {
-    List<Users> list = new ArrayList<>();
-    String sql = "SELECT u.*, r.role_name " +
-                 "FROM users u " +
-                 "LEFT JOIN user_role ur ON u.id = ur.user_id " +
-                 "LEFT JOIN role r ON ur.role_id = r.id " +
-                 "ORDER BY u.id " +
-                 "LIMIT ? OFFSET ?";
+        List<Users> list = new ArrayList<>();
+        String sql = "SELECT u.*, r.role_name "
+                + "FROM users u "
+                + "LEFT JOIN user_role ur ON u.id = ur.user_id "
+                + "LEFT JOIN role r ON ur.role_id = r.id "
+                + "ORDER BY u.id "
+                + "LIMIT ? OFFSET ?";
 
-    int offset = (pageIndex - 1) * pageSize;
+        int offset = (pageIndex - 1) * pageSize;
 
-    try (
-            Connection connection = Context.getJDBCConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-        stmt.setInt(1, pageSize);
-        stmt.setInt(2, offset);
-        try (ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                Users user = new Users();
-                user.setId(rs.getInt("id"));
-                user.setUsername(rs.getString("username"));
-                user.setFullname(rs.getString("fullname"));
-                user.setActiveFlag(rs.getInt("active_flag"));
-                user.setCreateDate(rs.getTimestamp("create_date"));
-                user.setRoleName(rs.getString("role_name"));
-                list.add(user);
+        try (
+                Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, pageSize);
+            stmt.setInt(2, offset);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Users user = new Users();
+                    user.setId(rs.getInt("id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setFullname(rs.getString("fullname"));
+                    user.setActiveFlag(rs.getInt("active_flag"));
+                    user.setCreateDate(rs.getTimestamp("create_date"));
+                    user.setRoleName(rs.getString("role_name"));
+                    list.add(user);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
 
 // Thêm hàm lấy tổng số user để tính tổng trang
-public int getTotalUserCount() {
-    String sql = "SELECT COUNT(*) FROM users";
-    try (Connection connection = Context.getJDBCConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql);
-         ResultSet rs = stmt.executeQuery()) {
-        if (rs.next()) {
-            return rs.getInt(1);
+    public int getTotalUserCount() {
+        String sql = "SELECT COUNT(*) FROM users";
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return 0;
     }
-    return 0;
-}
-
 
     public Users login(String username, String password) {
         String sql = "SELECT u.*, r.role_name "
@@ -261,7 +254,8 @@ public int getTotalUserCount() {
                 + "LEFT JOIN role r ON ur.role_id = r.id "
                 + "WHERE u.username = ? AND u.password = ? AND u.active_flag = 1";
 
-        try {Connection connection = Context.getJDBCConnection();
+        try {
+            Connection connection = Context.getJDBCConnection();
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, username);
             stmt.setString(2, password);
@@ -285,6 +279,45 @@ public int getTotalUserCount() {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String getFullName(int userId) {
+        String fullName = null;
+        String sql = "SELECT fullname FROM users WHERE id = ?";
+
+        try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    fullName = rs.getString("fullname");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return fullName;
+    }
+
+    public Date getDoB(int userId) {
+        Date dob = null;
+        String sql = "SELECT DoB FROM users WHERE id = ?";
+
+        try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    dob = rs.getDate("DoB");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dob;
     }
 
 }
