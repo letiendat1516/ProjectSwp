@@ -52,20 +52,20 @@
                 <h3>Thông tin đơn nhập kho</h3>
                 <table>
                     <tr><th>Mã đơn nhập</th><td><input type="text" name="id" value="${p.getId()}"></td></tr>
-                    <tr><th>Ngày tạo đơn</th><td><input type="text" name="id" value="${p.getDayRequest()}"></td></tr>
-                    <tr><th>Người tạo đơn</th><td><input type="text" name="id" value="${p.getUserId()}"></td></tr>
-                    <tr><th>Trạng thái</th><td><input type="text" name="id" value="${p.getId()}"></td></tr>
-                    <tr><th>Lý do nhập kho</th><td><input type="text" name="id" value="${p.getReason()}"></td></tr>
+                    <tr><th>Ngày tạo đơn</th><td><input type="text" name="dayRequest" value="${p.getDayRequest()}"></td></tr>
+                    <tr><th>Người tạo đơn</th><td><input type="text" name="userId" value="${p.getUserId()}"></td></tr>
+                    <tr><th>Trạng thái</th><td><input type="text" name="status" value="${p.getId()}"></td></tr>
+                    <tr><th>Lý do nhập kho</th><td><input type="text" name="reason" value="${p.getReason()}"></td></tr>
                 </table>
             </div>
 
             <div class="section">
                 <h3>Thông tin nhà cung cấp</h3>
                 <table>
-                    <tr><th>Tên nhà cung cấp</th><td><input type="text" name="id" value="${p.getSupplier()}"></td></tr>
-                    <tr><th>Địa chỉ</th><td><input type="text" name="id" value="${p.getAddress()}"></td></tr>
-                    <tr><th>Điện thoại</th><td><input type="text" name="id" value="${p.getPhone()}"></td></tr>
-                    <tr><th>Email</th><td><input type="text" name="id" value="${p.getEmail()}"></td></tr>
+                    <tr><th>Tên nhà cung cấp</th><td><input type="text" name="supplier" value="${p.getSupplier()}"></td></tr>
+                    <tr><th>Địa chỉ</th><td><input type="text" name="address" value="${p.getAddress()}"></td></tr>
+                    <tr><th>Điện thoại</th><td><input type="text" name="phone" value="${p.getPhone()}"></td></tr>
+                    <tr><th>Email</th><td><input type="text" name="email" value="${p.getEmail()}"></td></tr>
                 </table>
             </div>
 
