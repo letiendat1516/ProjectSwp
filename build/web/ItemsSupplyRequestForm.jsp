@@ -4,6 +4,7 @@
     Author     : Admin
 --%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -80,7 +81,6 @@
                 background-color: #f8f9fa;
                 cursor: not-allowed;
             }
-
             .information-user {
                 display: flex;
                 flex-wrap: wrap;
@@ -207,7 +207,20 @@
                 margin-left: auto;
                 margin-right: auto;
             }
+            .items-table table td:nth-child(1),
+            .items-table table td:nth-child(3),
+            .items-table table td:nth-child(4),
+            .items-table table td:nth-child(5) {
+                text-align: center;
+            }
 
+            /* Căn giữa nội dung trong textarea và input của các cột này */
+            .items-table textarea[name="stt"],
+            .items-table input[name="product_code"],
+            .items-table textarea[name="unit"],
+            .items-table textarea[name="quantity"] {
+                text-align: center;
+            }
             .submit-btn:hover {
                 background: #0056b3;
             }
@@ -235,28 +248,32 @@
     <body>
         <div class="container">
             <h1>ĐƠN YÊU CẦU NHẬP KHO</h1>
-            <form id="myForm">
+            <form id="myForm" action="loadingrequest" method="post">
                 <h3>Thông tin</h3>
                 <div class="information-user">
                     <div class="form-group">
                         <label>Người dùng</label>
-                        <input type="text" value="QuocMDB" readonly>
+                        <input type="text" value="${sessionScope.currentUser}" readonly> 
                     </div>
                     <div class="form-group">
                         <label>Tuổi</label>
-                        <input type="text" value="21" readonly>
+                        <input type="text" value="${age}" readonly>
                     </div>
                     <div class="form-group">
                         <label>Ngày tháng năm sinh</label>
-                        <input type="text" value="20/09/2004" readonly>
+                        <input type="text" value="${sessionScope.DoB}" readonly>
                     </div>
                     <div class="form-group">
                         <label>Vai trò</label>
-                        <input type="text" value="Nhân viên" readonly>
+                        <select name="role" required>
+                            <option value="Nhân viên">Nhân viên</option>
+                            <option value="Giám đốc">Giám đốc</option>
+                            <option value="Admin">Admin</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Ngày yêu cầu</label>
-                        <input type="date" required>
+                        <input type="date" name="day_request" required>
                     </div>
                 </div>
                 <h3>Chi tiết</h3>
@@ -264,29 +281,29 @@
                     <div class="row">
                         <div class="form-group">
                             <label>ID</label>
-                            <textarea rows="1" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <textarea rows="1" name="request_id" style="width: 100%; resize: none;overflow: hidden;background-color: #f8f9fa; cursor: not-allowed;" oninput="autoResize(this)" readonly>${requestScope.nextID}</textarea>
                         </div>
                         <div class="form-group">
                             <label>Mục đích</label>
-                            <textarea rows="1" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <textarea rows="1" name="reason" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
                         </div>
                         <div class="form-group">
                             <label>Tên nhà cung cấp</label>
-                            <textarea rows="1" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <textarea rows="1" name="supplier" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group">
                             <label>Địa chỉ</label>
-                            <textarea rows="1" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <textarea rows="1" name="address" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
                         </div>
                         <div class="form-group">
                             <label>Điện thoại</label>
-                            <textarea rows="1" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <textarea rows="1" name="phone" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
                         </div>
                         <div class="form-group">
                             <label>Email</label>
-                            <textarea rows="1" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <textarea rows="1" name="email" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
                         </div>
                     </div>
                 </div>
@@ -298,7 +315,7 @@
                             <tr>
                                 <th>STT</th>
                                 <th>Tên mặt hàng</th>
-                                <th>ID</th>
+                                <th>Code</th>
                                 <th>Đơn vị</th>
                                 <th>Số lượng</th>
                                 <th>Ghi chú</th>
@@ -306,18 +323,32 @@
                         </thead>
                         <tbody id="itemsTableBody">
                             <tr>
-                                <td><textarea rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
-                                <td><textarea rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
-                                <td><textarea rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
-                                <td><textarea rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
-                                <td><textarea rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
-                                <td><textarea rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
+                                <td><textarea name="stt" rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
+                                <!-- Dropdown chọn tên sản phẩm -->
+                                <td>
+                                    <select name="product_name" onchange="updateProductInfo(this)" style="width: 100%;">
+                                        <option value="" disabled selected>-- Chọn sản phẩm --</option>
+                                        <c:forEach var="p" items="${products_list}">
+                                            <option 
+                                                value="${p.id}" 
+                                                data-code="${p.code}" 
+                                                data-unit="${p.unit_id}">
+                                                ${p.name}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                </td>
+                                <!-- Code tương ứng đễ readonly -->
+                                <td><input type="text" name="product_code" readonly style="width: 100%;" /></td>
+                                <td><textarea name="unit" rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
+                                <td><textarea name="quantity" rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
+                                <td><textarea name="note" rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
                             </tr>
                         </tbody>
                     </table>
                     <div class="form-group">
                         <label>Lý do chi tiết</label>
-                        <textarea rows="3" style="width: 100%; border: 1px solid #ddd; resize: none;" oninput="autoResize(this)" required></textarea>
+                        <textarea rows="3" name="reason_detail" style="width: 100%; border: 1px solid #ddd; resize: none;" oninput="autoResize(this)" required></textarea>
                     </div>
                 </div>
                 <button type="submit" class="submit-btn">Gửi yêu cầu</button>
@@ -331,22 +362,54 @@
 
             function addRow() {
                 const tbody = document.getElementById('itemsTableBody');
+                const firstSelect = document.querySelector("select[name='product_id']");
+
                 const newRow = document.createElement('tr');
+
+                // Copy danh sách sản phẩm từ select đầu tiên
+                let productOptions = "";
+                if (firstSelect) {
+                    productOptions = [...firstSelect.options].map(opt =>
+                            `<option value="${opt.value}" data-code="${opt.getAttribute('data-code')}" data-unit="${opt.getAttribute('data-unit')}">
+            ${opt.text}
+             </option>`).join('');
+                }
+
                 newRow.innerHTML = `
-                    <td><textarea rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
-                    <td><textarea rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
-                    <td><textarea rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
-                    <td><textarea rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
-                    <td><textarea rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
-                    <td><textarea rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
-                `;
+        <td><textarea name="stt" rows="1" style="width: 100%; resize: none;" oninput="autoResize(this)"></textarea></td>
+
+        <td>
+            <select name="product_name" onchange="updateProductInfo(this)" style="width: 100%;">
+                   <option value="" disabled selected>-- Chọn sản phẩm --</option>
+            <c:forEach var="p" items="${products_list}">
+                              <option 
+                              value="${p.id}" 
+                              data-code="${p.code}" 
+                              data-unit="${p.unit_id}">
+                ${p.name}
+                              </option>
+            </c:forEach>
+            </select>
+        </td>
+
+        <td><input type="text" name="product_code" readonly style="width: 100%;" /></td>
+
+        <td><textarea name="unit" rows="1" style="width: 100%; resize: none;" oninput="autoResize(this)"></textarea></td>
+
+        <td><textarea name="quantity" rows="1" style="width: 100%; resize: none;" oninput="autoResize(this)"></textarea></td>
+
+        <td><textarea name="note" rows="1" style="width: 100%; resize: none;" oninput="autoResize(this)"></textarea></td>
+    `;
+
                 tbody.appendChild(newRow);
             }
+            function updateProductInfo(selectElement) {
+                const selectedOption = selectElement.options[selectElement.selectedIndex];
+                const code = selectedOption.getAttribute("data-code");
 
-            document.getElementById('myForm').addEventListener('submit', function (e) {
-                e.preventDefault();
-                alert('Gửi yêu cầu thành công!');
-            });
+                const row = selectElement.closest("tr");
+                row.querySelector("input[name='product_code']").value = code;
+            }
         </script>
     </body>
 </html>
