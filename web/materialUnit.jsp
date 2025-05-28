@@ -6,7 +6,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Material Units</title>
+    <title>Đơn vị vật tư</title>
         <style>
         .container {
     width: 80%;
@@ -188,7 +188,7 @@ tr:nth-child(even) {
 </head>
 <body>
     <div class="container">
-        <h1>Material Units Management</h1>
+        <h1>Quản lí đơn vị vật tư</h1>
       
         
         <!-- Hiển thị thông báo lỗi nếu có -->
@@ -200,18 +200,18 @@ tr:nth-child(even) {
         <div class="search-container">
             <form method="get" action="materialUnit">
                 <input type="hidden" name="action" value="search" />
-                <input type="text" id="searchInput" name="searchTerm" placeholder="Search by name or symbol..." value="${searchTerm}" />
-                <button type="submit" class="btn-primary">Search</button>
+                <input type="text" id="searchInput" name="searchTerm" placeholder="Tên, kí hiệu,..." value="${searchTerm}" />
+                <button type="submit" class="btn-primary">Tìm kiếm</button>
             </form>
-            <a href="createMaterialUnit" class="btn-primary">Add New Material Unit</a>
+            <a href="createMaterialUnit" class="btn-primary">Thêm đơn vị mới</a>
         </div>
         
         <!-- Thanh lọc trạng thái -->
         <div class="search-container">
             <select id="statusFilter" onchange="filterByStatus(this.value)">
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+                <option value="all">Tất cả</option>
+                <option value="active">Hoạt động</option>
+                <option value="inactive">Không hoạt động</option>
             </select>
         </div>
 
@@ -279,18 +279,18 @@ tr:nth-child(even) {
             <thead>
                 <tr>
                     <th onclick="sortTable(0)" style="cursor: pointer;">ID ↕</th>
-                    <th onclick="sortTable(1)" style="cursor: pointer;">Name ↕</th>
-                    <th onclick="sortTable(2)" style="cursor: pointer;">Symbol ↕</th>
-                    <th onclick="sortTable(3)" style="cursor: pointer;">Description ↕</th>
-                    <th onclick="sortTable(4)" style="cursor: pointer;">Status ↕</th>
-                    <th>Actions</th>
+                    <th onclick="sortTable(1)" style="cursor: pointer;">Tên ↕</th>
+                    <th onclick="sortTable(2)" style="cursor: pointer;">Kí hiệu ↕</th>
+                    <th onclick="sortTable(3)" style="cursor: pointer;">Mô tả ↕</th>
+                    <th onclick="sortTable(4)" style="cursor: pointer;">Trạng thái ↕</th>
+                    <th>Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 <c:choose>
                     <c:when test="${empty materialUnits}">
                         <tr>
-                            <td colspan="6" class="no-data">No material units found.</td>
+                            <td colspan="6" class="no-data">Không tìm thấy đơn vị nào.</td>
                         </tr>
                     </c:when>
                     <c:otherwise>
@@ -303,7 +303,7 @@ tr:nth-child(even) {
                                 <td>${unit.status}</td>
                                 <td>
                                     <a href="editMaterialUnit?id=${unit.id}" class="btn-edit">Edit</a>
-                                    <button onclick="if(confirm('Are you sure you want to delete this unit?')) window.location.href='deleteMaterialUnit?id=${unit.id}'" class="btn-edit btn-delete" style="background-color: #ff4444; border-color: #ff4444;">Delete</button>
+                                    <button onclick="if(confirm('Bạn có muốn xóa đơn vị này không?')) window.location.href='deleteMaterialUnit?id=${unit.id}'" class="btn-edit btn-delete" style="background-color: #ff4444; border-color: #ff4444;">Xóa</button>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -319,17 +319,17 @@ tr:nth-child(even) {
 <div class="pagination">
     <c:choose>
         <c:when test="${requestScope.currentPage gt 1}">
-            <a href="materialUnit?page=${requestScope.currentPage - 1}&action=${param.action}&searchTerm=${searchTerm}">Previous</a>
+            <a href="materialUnit?page=${requestScope.currentPage - 1}&action=${param.action}&searchTerm=${searchTerm}">Trước</a>
         </c:when>
     </c:choose>
 
     <span class="page-number">
-        Page ${requestScope.currentPage} / ${requestScope.totalPages}
+        Trang ${requestScope.currentPage} / ${requestScope.totalPages}
     </span>
 
     <c:choose>
         <c:when test="${requestScope.currentPage lt requestScope.totalPages}">
-            <a href="materialUnit?page=${requestScope.currentPage + 1}&action=${param.action}&searchTerm=${searchTerm}">Next</a>
+            <a href="materialUnit?page=${requestScope.currentPage + 1}&action=${param.action}&searchTerm=${searchTerm}">Sau</a>
         </c:when>
     </c:choose>
 </div>

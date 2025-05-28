@@ -72,14 +72,14 @@ h1 {
 </head>
 <body>
     <div class="container">
-        <h1>Edit Material Unit</h1>
+        <h1>Thay đổi dữ liệu của đơn vị</h1>
         
         <c:if test="${not empty errorMessage}">
             <div class="error-message">${errorMessage}</div>
         </c:if>
         
         <c:if test="${empty unit}">
-            <div class="error-message">Material unit not found. <a href="materialUnit">Return to list</a></div>
+            <div class="error-message">Không tìm thấy đơn vị. <a href="materialUnit">Quay về danh sách.</a></div>
         </c:if>
         
         <c:if test="${not empty unit}">
@@ -87,31 +87,31 @@ h1 {
                 <input type="hidden" name="id" value="${unit.id}">
                 
                 <div class="form-group">
-                    <label for="name">Name:</label>
+                    <label for="name">Tên:</label>
                     <input type="text" id="name" name="name" value="${unit.name}" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="symbol">Symbol:</label>
+                    <label for="symbol">Kí hiệu:</label>
                     <input type="text" id="symbol" name="symbol" value="${unit.symbol}" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="description">Description:</label>
+                    <label for="description">Mô tả:</label>
                     <textarea id="description" name="description" rows="4">${unit.description}</textarea>
                 </div>
                 
                 <div class="form-group">
-                    <label for="status">Status:</label>
+                    <label for="status">Trạng thái:</label>
                     <select id="status" name="status">
-                        <option value="active" ${unit.status == 'active' ? 'selected' : ''}>Active</option>
-                        <option value="inactive" ${unit.status == 'inactive' ? 'selected' : ''}>Inactive</option>
+                        <option value="active" ${unit.status == 'active' ? 'selected' : ''}>Hoạt động</option>
+                        <option value="inactive" ${unit.status == 'inactive' ? 'selected' : ''}>Không hoạt động</option>
                     </select>
                 </div>
                 
                 <div class="form-buttons">
-                    <button type="submit" class="btn-primary">Update</button>
-                    <a href="materialUnit" class="btn-secondary">Cancel</a>
+                    <button type="submit" class="btn-primary">Cập nhật</button>
+                    <a href="materialUnit" class="btn-secondary">Hủy bỏ</a>
                 </div>
             </form>
         </c:if>

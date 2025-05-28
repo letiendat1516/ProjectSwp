@@ -72,35 +72,35 @@ h1 {
 </head>
 <body>
     <div class="container">
-        <h1>Create New Material Unit</h1>
+        <h1>Thêm đơn vị mới</h1>
         
         <form action="createMaterialUnit" method="post">
             <div class="form-group">
-                <label for="name">Name:</label>
+                <label for="name">Tên:</label>
                 <input type="text" id="name" name="name" required>
             </div>
             
             <div class="form-group">
-                <label for="symbol">Symbol:</label>
+                <label for="symbol">Kí hiệu:</label>
                 <input type="text" id="symbol" name="symbol" required>
             </div>
             
             <div class="form-group">
-                <label for="description">Description:</label>
+                <label for="description">Mô tả:</label>
                 <textarea id="description" name="description" rows="4"></textarea>
             </div>
             
             <div class="form-group">
-                <label for="status">Status:</label>
+                <label for="status">Trạng thái</label>
                 <select id="status" name="status">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="active">Hoạt động</option>
+                    <option value="inactive">Không hoạt động</option>
                 </select>
             </div>
             
             <div class="form-buttons">
-                <button type="submit" class="btn-primary">Save</button>
-                <a href="materialUnit" class="btn-secondary">Cancel</a>
+                <button type="submit" class="btn-primary">Lưu</button>
+                <a href="materialUnit" class="btn-secondary">Hủy bỏ</a>
             </div>
         </form>
     </div>
