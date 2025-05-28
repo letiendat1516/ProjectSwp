@@ -1,6 +1,6 @@
 <%-- 
     Document   : UserManager
-    Created on : 28 thg 5, 2025, 14:39:06
+    Created on : 27 thg 5, 2025, 14:39:06
     Author     : phucn
 --%>
 
@@ -27,14 +27,15 @@
     }
 %>
 
+
         <%
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
     response.setHeader("Pragma", "no-cache"); // HTTP 1.0
     response.setDateHeader("Expires", 0); // Proxies
 %>
-    
+
 <html>
-<head>
+    <head>
         <title>Admin Dashboard</title>
         <style>
             body {
