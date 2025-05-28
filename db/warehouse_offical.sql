@@ -36,7 +36,12 @@ CREATE TABLE category (
 -- UNIT
 CREATE TABLE unit (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE
+    name VARCHAR(50) NOT NULL UNIQUE,
+    symbol VARCHAR(10) NOT NULL UNIQUE,
+    description TEXT,
+    active_flag TINYINT(1) DEFAULT 1,
+    UNIQUE KEY uk_symbol (symbol),
+    UNIQUE KEY uk_name (name)
 );
 
 -- PRODUCT INFO
@@ -106,3 +111,14 @@ CREATE TABLE request_items (
     FOREIGN KEY (request_id) REFERENCES request(id),
     FOREIGN KEY (product_id) REFERENCES product_info(id)
 );
+-- SUPPLIER
+CREATE TABLE supplier (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    address TEXT,
+    note TEXT,
+    active_flag TINYINT(1) DEFAULT 1,
+    create_date DATETIME DEFAULT CURRENT_TIMESTAMP
+); 
