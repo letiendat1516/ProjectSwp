@@ -4,7 +4,6 @@
  */
 package dao;
 
-
 import DBContext.Context;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,20 +17,20 @@ import model.Supplier;
  *
  * @author Fpt06
  */
-public class SupplierDAO{
-    
+public class SupplierDAO {
+
     private Connection conn = null;
     private PreparedStatement ps = null;
     private ResultSet rs = null;
-    
-    public List<Supplier> getLishSupplier(){
-        String sql = "select * from swp.supplier";
+
+    public List<Supplier> getLishSupplier() {
+        String sql = "select * from swp.supplier where active_flag = 1";
         List<Supplier> list = new ArrayList<>();
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
             rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 Supplier s = new Supplier();
                 s.setSupplierID(rs.getInt("id"));
                 s.setActiveFlag(rs.getInt("active_flag"));
@@ -47,15 +46,15 @@ public class SupplierDAO{
         }
         return list;
     }
-    
-    public List<Supplier> searchLishSupplierByName(String name){
+
+    public List<Supplier> searchLishSupplierByName(String name) {
         List<Supplier> list = new ArrayList<>();
-        String sql = "select * from swp.supplier where name like '%"+name+"%'";
+        String sql = "select * from swp.supplier where name like '%" + name + "%' and active_flag = 1";
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
             rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 Supplier s = new Supplier();
                 s.setSupplierID(rs.getInt("id"));
                 s.setActiveFlag(rs.getInt("active_flag"));
@@ -71,13 +70,73 @@ public class SupplierDAO{
         }
         return list;
     }
-    
+
+    public void AddNewSupplier(String name, String phone, String email, String address, String note) {
+        String sql = "INSERT INTO `swp`.`supplier` (\n"
+                + "    `name`,\n"
+                + "    `phone`,\n"
+                + "    `email`,\n"
+                + "    `address`,\n"
+                + "    `note`,\n"
+                + "    `active_flag`,\n"
+                + "    `create_date`\n"
+                + ") VALUES (?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP);";
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, name);
+            ps.setString(2, phone);
+            ps.setString(3, email);
+            ps.setString(4, address);
+            ps.setString(5, note);
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+        }
+    }
+
+    public void updateSupplier(String id, String name, String phone, String email, String address, String note) {
+        String sql = "UPDATE `swp`.`supplier`\n"
+                + "SET\n"
+                + "`name` = ?,\n"
+                + "`phone` = ?,\n"
+                + "`email` = ?,\n"
+                + "`address` = ?,\n"
+                + "`note` = ?\n"
+                + "WHERE `id` = " + id;
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, name);
+            ps.setString(2, phone);
+            ps.setString(3, email);
+            ps.setString(4, address);
+            ps.setString(5, note);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+        }
+    }
+
+    public void deleteSupplier(String id) {
+        String sql = "UPDATE `swp`.`supplier`\n"
+           + "SET `active_flag` = 0\n"
+           + "WHERE `id` = " + id;
+
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+        }
+    }
+
     public static void main(String[] args) {
         SupplierDAO sd = new SupplierDAO();
         List<Supplier> l = sd.searchLishSupplierByName("tnhh");
-        for(int i=0;i<l.size();i++){
+        for (int i = 0; i < l.size(); i++) {
             System.out.println(l.get(i).getSupplierID());
             System.out.println(l.get(i).getName());
         }
+        
     }
 }

@@ -21,8 +21,16 @@ public class Supplier {
     public Supplier() {
     }
     
+    public Supplier(String name, String phone, String email, String address, String note, int activeFlag, Date createDate) {
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+        this.note = note;
+        this.activeFlag = activeFlag;
+        this.createDate = createDate;
+    }
     
-
     public Supplier(int supplierID, String name, String phone, String email, String address, String note, int activeFlag, Date createDate) {
         this.supplierID = supplierID;
         this.name = name;

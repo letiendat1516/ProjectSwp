@@ -147,7 +147,7 @@
                 transform: scale(1.05);
             }
 
-            .LishHead a[href="url"],
+            .LishHead a[href="AddNewSupplier.jsp"],
             .but {
                 display: inline-block;
                 margin-top: 20px;
@@ -159,7 +159,7 @@
                 font-weight: 500;
                 transition: all 0.3s ease;
             }
-            .LishHead a[href="url"]:hover,
+            .LishHead a[href="AddNewSupplier.jsp"]:hover,
             .but:hover {
                 background-color: #007bff;
                 color: white;
@@ -177,7 +177,7 @@
                 <input type="text"placeholder="Nhập Tên nhà cung cấp"  name="name">
                 <input type="submit" value="Search" name="name">
             </form>
-            <a href="url">+ Thêm Nhà Cung Cấp Mới</a>
+            <a href="AddNewSupplier.jsp">+ Thêm Nhà Cung Cấp Mới</a>
         </div>
         <div class="LishBody">
             <c:if test="${not empty listSupplier}">
@@ -201,8 +201,9 @@
                             <td>${listItem.address}</td>
                             <td>${listItem.note}</td>
                             <td>
-                                <a href="url">Sửa</a>
-                                <a href="url">Xoá</a>
+                                <a href="UpdateSupplier.jsp?id=${listItem.supplierID}&name=${listItem.name}&phone=${listItem.phone}&email=${listItem.email}&address=${listItem.address}&note=${listItem.note}">Sửa</a>
+                                <a href="DeleteSupplier?id=${listItem.supplierID}" 
+                                   onclick="return confirm('Bạn có chắc chắn muốn xoá nhà cung cấp này không?')">Xoá</a>
                             </td>
                         </tr>
                     </c:forEach>
