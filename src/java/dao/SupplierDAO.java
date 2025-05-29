@@ -24,7 +24,7 @@ public class SupplierDAO {
     private ResultSet rs = null;
 
     public List<Supplier> getLishSupplier() {
-        String sql = "select * from swp.supplier where active_flag = 1";
+        String sql = "select * from supplier where active_flag = 1";
         List<Supplier> list = new ArrayList<>();
         try {
             conn = new Context().getJDBCConnection();
@@ -49,7 +49,7 @@ public class SupplierDAO {
 
     public List<Supplier> searchLishSupplierByName(String name) {
         List<Supplier> list = new ArrayList<>();
-        String sql = "select * from swp.supplier where name like '%" + name + "%' and active_flag = 1";
+        String sql = "select * from supplier where name like '%" + name + "%' and active_flag = 1";
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
@@ -72,7 +72,7 @@ public class SupplierDAO {
     }
 
     public void AddNewSupplier(String name, String phone, String email, String address, String note) {
-        String sql = "INSERT INTO `swp`.`supplier` (\n"
+        String sql = "INSERT INTO `supplier` (\n"
                 + "    `name`,\n"
                 + "    `phone`,\n"
                 + "    `email`,\n"
@@ -96,7 +96,7 @@ public class SupplierDAO {
     }
 
     public void updateSupplier(String id, String name, String phone, String email, String address, String note) {
-        String sql = "UPDATE `swp`.`supplier`\n"
+        String sql = "UPDATE `supplier`\n"
                 + "SET\n"
                 + "`name` = ?,\n"
                 + "`phone` = ?,\n"
@@ -118,7 +118,7 @@ public class SupplierDAO {
     }
 
     public void deleteSupplier(String id) {
-        String sql = "UPDATE `swp`.`supplier`\n"
+        String sql = "UPDATE `supplier`\n"
            + "SET `active_flag` = 0\n"
            + "WHERE `id` = " + id;
 
