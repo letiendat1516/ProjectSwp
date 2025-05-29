@@ -46,7 +46,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     // Kiểm tra session và quyền admin
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect("login.jsp");  // Nếu không đăng nhập, chuyển hướng về login
+            response.sendRedirect("login.jsp");
             return;
         }
     
@@ -77,7 +77,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
 }
 
 
-    // Bạn có thể bổ sung doPost nếu cần xử lý POST request
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
