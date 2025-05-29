@@ -7,183 +7,200 @@
 <head>
     <meta charset="UTF-8">
     <title>Đơn vị vật tư</title>
-        <style>
+         <style>
         .container {
-    width: 80%;
-    margin: 0 auto;
-    padding: 20px;
-}
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-h1 {
-    color: #333;
-    margin-bottom: 20px;
-}
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
 
-.form-group {
-    margin-bottom: 15px;
-}
+        .form-group {
+            margin-bottom: 15px;
+        }
 
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
 
-.form-group input[type="text"],
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
+        .form-group input[type="text"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
 
-.form-buttons {
-    margin-top: 20px;
-}
+        .form-buttons {
+            margin-top: 20px;
+        }
 
-.btn-primary {
-    display: inline-block;
-    background-color: #4CAF50;
-    color: white;
-    padding: 8px 16px;
-    text-decoration: none;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-}
+        .btn-primary {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
 
-.btn-secondary {
-    display: inline-block;
-    background-color: #f44336;
-    color: white;
-    padding: 8px 16px;
-    text-decoration: none;
-    border-radius: 4px;
-    margin-left: 10px;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
+        .btn-secondary {
+            display: inline-block;
+            background-color: #f44336;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
 
-table, th, td {
-    border: 1px solid #ddd;
-}
+        table, th, td {
+            border: 1px solid #ddd;
+        }
 
-th, td {
-    padding: 12px;
-    text-align: left;
-}
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
 
-th {
-    background-color: #f2f2f2;
-}
+        th {
+            background-color: #f2f2f2;
+        }
 
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
 
-.btn-edit {
-    display: inline-block;
-    background-color: #2196F3;
-    color: white;
-    padding: 5px 10px;
-    text-decoration: none;
-    border-radius: 4px;
-    margin-right: 5px;
-}
+        .btn-edit {
+            display: inline-block;
+            background-color: #2196F3;
+            color: white;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
 
-.status-button {
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-right: 5px;
-}
+        .status-button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
 
-.active-button {
-    background-color: #4CAF50;
-    color: white;
-}
+        .active-button {
+            background-color: #4CAF50;
+            color: white;
+        }
 
-.inactive-button {
-    background-color: #f44336;
-    color: white;
-}
+        .inactive-button {
+            background-color: #f44336;
+            color: white;
+        }
 
-.disabled-button {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
+        .disabled-button {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
-/* Styles cho thanh tìm kiếm */
-.search-container {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-}
+        /* Styles cho thanh tìm kiếm */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: nowrap;
+        }
 
-#searchInput {
-    padding: 8px;
-    width: 60%;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
+        #searchInput {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
 
-.no-data {
-    text-align: center;
-    padding: 20px;
-    font-style: italic;
-    color: #757575;
-}
+        #statusFilter {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 150px;
+        }
 
-.view-options {
-    margin: 20px 0;
-    text-align: center;
-}
+        /* Add this new style for the form */
+        .search-form {
+            display: flex;
+            align-items: center;
+        }
 
-.view-options .btn {
-    padding: 8px 16px;
-    margin: 0 5px;
-    text-decoration: none;
-    border: 1px solid #ddd;
-    color: #333;
-    border-radius: 4px;
-}
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #757575;
+        }
 
-.view-options .btn.active {
-    background-color: #4CAF50;
-    color: white;
-    border-color: #4CAF50;
-}
+        .view-options {
+            margin: 20px 0;
+            text-align: center;
+        }
 
-.view-options .btn:hover:not(.active) {
-    background-color: #ddd;
-}
-.pagination {
-    text-align: center;
-    margin-top: 20px;
-}
-.pagination a, .pagination span.page-number {
-    display: inline-block;
-    padding: 8px 16px;
-    margin: 0 5px;
-    background-color: #007BFF;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-}
-.pagination a:hover {
-    background-color: #0056b3;
-}
-.pagination span.page-number {
-    background-color: #6c757d;
-    cursor: default;
-}
+        .view-options .btn {
+            padding: 8px 16px;
+            margin: 0 5px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            color: #333;
+            border-radius: 4px;
+        }
+
+        .view-options .btn.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        .view-options .btn:hover:not(.active) {
+            background-color: #ddd;
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination a, .pagination span.page-number {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 0 5px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .pagination a:hover {
+            background-color: #0056b3;
+        }
+        .pagination span.page-number {
+            background-color: #6c757d;
+            cursor: default;
+        }
     </style>
 </head>
 <body>
@@ -198,21 +215,17 @@ tr:nth-child(even) {
         
         <!-- Thanh tìm kiếm và nút tạo mới -->
         <div class="search-container">
-            <form method="get" action="materialUnit">
+            <form method="get" action="materialUnit" class="search-form">
                 <input type="hidden" name="action" value="search" />
                 <input type="text" id="searchInput" name="searchTerm" placeholder="Tên, kí hiệu,..." value="${searchTerm}" />
                 <button type="submit" class="btn-primary">Tìm kiếm</button>
             </form>
-            <a href="createMaterialUnit" class="btn-primary">Thêm đơn vị mới</a>
-        </div>
-        
-        <!-- Thanh lọc trạng thái -->
-        <div class="search-container">
             <select id="statusFilter" onchange="filterByStatus(this.value)">
                 <option value="all">Tất cả</option>
                 <option value="active">Hoạt động</option>
                 <option value="inactive">Không hoạt động</option>
             </select>
+            <a href="createMaterialUnit" class="btn-primary">Thêm đơn vị mới</a>
         </div>
 
         <script>
