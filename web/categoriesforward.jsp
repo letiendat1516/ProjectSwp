@@ -203,7 +203,7 @@
           </div>
           <h4 class="card-title">Quản lý Đơn vị Tính</h4>
           <p class="card-text">Quản lý các đơn vị đo lường và tính toán cho vật liệu và sản phẩm.</p>
-          <a href="unit-categories.jsp" class="btn btn-primary">
+          <a href="materialUnit.jsp" class="btn btn-primary">
             Truy cập <span class="material-icons btn-icon">arrow_forward</span>
           </a>
         </div>

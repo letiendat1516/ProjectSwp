@@ -12,9 +12,16 @@ import java.util.logging.Logger;
 
 public class Context {
     public static Connection getJDBCConnection() {
+<<<<<<< HEAD
         String url = "jdbc:mysql://localhost:3306/swp";
         String user = "root";
         String password = "123456";
+=======
+        String url = "jdbc:mysql://localhost:3306/swp?serverTimezone=UTC";
+        String user = "root";
+        String password = "tunganh2005";
+
+>>>>>>> 9fea14487c16ddecd59badef499efd316ef4a8e2
         
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");

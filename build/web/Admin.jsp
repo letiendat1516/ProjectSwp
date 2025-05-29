@@ -210,7 +210,7 @@
                     <li class="add-user-btn"><a href="Admin.jsp">User Manager</a></li>
                     <li class="add-user-btn"><a href="EditUser.jsp"> Role Assignment </a></li>
                     <li class="add-user-btn"><a href="categoriesforward.jsp"> Material Information </a></li>
-                    <li class="add-user-btn">Transaction</li>
+                    <li class="add-user-btn"><a href="RequestForward.jsp" >Transaction</a></li>
                     <li class="add-user-btn">Statistic</li>
                 </ul>
             </div>

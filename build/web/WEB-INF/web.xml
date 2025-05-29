@@ -5,8 +5,8 @@
         <servlet-class>controller.CategoryServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>loginservlet</servlet-name>
-        <servlet-class>controller.loginservlet</servlet-class>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>controller.LoginServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LogoutServlet</servlet-name>
@@ -28,6 +28,15 @@
         <servlet-name>UserFilterServlet</servlet-name>
         <servlet-class>controller.UserFilterServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>WarehouseController</servlet-name>
+        <servlet-class>controller.WarehouseController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LoadingRequestServlet</servlet-name>
+        <servlet-class>controller.LoadingRequestServlet</servlet-class>
+    </servlet>
+    
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
         <url-pattern>/CategoryServlet</url-pattern>
@@ -55,5 +64,13 @@
     <servlet-mapping>
         <servlet-name>UserFilterServlet</servlet-name>
         <url-pattern>/userfilter</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>WarehouseController</servlet-name>
+        <url-pattern>/warehouse</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoadingRequestServlet</servlet-name>
+        <url-pattern>/loadingrequest</url-pattern>
     </servlet-mapping>
 </web-app>
