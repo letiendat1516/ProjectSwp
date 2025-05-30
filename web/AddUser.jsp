@@ -5,7 +5,23 @@
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@page import="model.Users"%>
 <!DOCTYPE html>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
+
+    
+    <%
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
+
 <html>
     <head>
         <title>Add New User</title>
