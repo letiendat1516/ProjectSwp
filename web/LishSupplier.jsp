@@ -51,7 +51,7 @@
                     opacity: 1;
                 }
             }
-
+            
             .LishHead h1 {
                 margin-bottom: 20px;
                 color: #0d6efd;
@@ -165,16 +165,58 @@
                 color: white;
                 transform: translateY(-2px);
             }
+            .pagination-container {
+                text-align: center;
+                margin-top: 20px;
+            }
+
+            .pagination-link {
+                display: inline-block;
+                margin: 0 4px;
+                padding: 8px 14px;
+                background-color: #f0f0f0;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+                color: #333;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .pagination-link:hover {
+                background-color: #007bff;
+                color: white;
+            }
+
+            .pagination-link.active-page {
+                background-color: #007bff;
+                color: white;
+                font-weight: bold;
+                border-color: #0056b3;
+            }
+            
+            .filter{
+                height: 35px;
+                width: 100px;
+            }
+
 
         </style>
 
     </head>
     <body>
-        <c:set var="listSupplier" value="${sessionScope.listSupplier}" />
+        <c:set var="listSupplier" value="${listSupplier}" />
+        <c:set var="option" value="${requestScope.filter}"/>
+        <c:set var="status" value="${requestScope.status}"/>
+        <c:set var="name" value="${requestScope.name}"/>
         <div class="LishHead">
             <h1>List Supplier</h1>
             <form action="SearchListSupplier">
-                <input type="text"placeholder="Nhập Tên nhà cung cấp"  name="name">
+                <select class="filter" name="status">
+                    <option value="all" ${status == 'all' ? 'selected="selected"' : ''}>all</option>
+                    <option value="1" ${status == '1' ? 'selected="selected"' : ''}>Active</option>
+                    <option value="0" ${status == '0' ? 'selected="selected"' : ''}>Inactive</option>
+                </select>
+                <input type="text"placeholder="Nhập Tên nhà cung cấp" value="${name}"  name="name">
                 <input type="submit" value="Search" name="name">
             </form>
             <a href="AddNewSupplier.jsp">+ Thêm Nhà Cung Cấp Mới</a>
@@ -189,6 +231,8 @@
                         <td>Email</td>
                         <td>Address</td>
                         <td>Note</td>
+                        <td>Status</td>
+                        <td>Date Create</td>
                         <td colspan="3">Option</td>
 
                     </tr>
@@ -200,6 +244,15 @@
                             <td>${listItem.email}</td>
                             <td>${listItem.address}</td>
                             <td>${listItem.note}</td>
+                            <c:choose>
+                                <c:when test="${listItem.activeFlag == 1}">
+                                    <td>Active</td>
+                                </c:when>
+                                <c:otherwise>
+                                    <td>Inactive</td>
+                                </c:otherwise>
+                            </c:choose>
+                            <td>${listItem.createDate}</td>      
                             <td>
                                 <a href="UpdateSupplier.jsp?id=${listItem.supplierID}&name=${listItem.name}&phone=${listItem.phone}&email=${listItem.email}&address=${listItem.address}&note=${listItem.note}">Sửa</a>
                                 <a href="DeleteSupplier?id=${listItem.supplierID}" 
@@ -210,6 +263,26 @@
                 </table>
             </c:if>
         </div>
-        <a class="but" href="url">Back</a>
+        <c:if test="${empty option }">
+            <c:if test="${totalPages > 1}">
+                <div class="pagination-container">
+                    <c:forEach var="i" begin="1" end="${totalPages}">
+                        <a class="pagination-link ${i == currentPage ? 'active-page' : ''}" 
+                           href="LishSupplier?page=${i}">${i}</a>
+                    </c:forEach>
+                </div>
+            </c:if>
+        </c:if>
+        <c:if test="${not empty option}">
+            <c:if test="${totalPages > 1}">
+                <div class="pagination-container">
+                    <c:forEach var="i" begin="1" end="${totalPages}">
+                        <a class="pagination-link ${i == currentPage ? 'active-page' : ''}" 
+                           href="SearchListSupplier?status=${status}&name=${name}&page=${i}">${i}</a>
+                    </c:forEach>
+                </div>
+            </c:if>
+        </c:if>
+        <a class="but" href="categoriesforward.jsp">Back</a>
     </body>
 </html>

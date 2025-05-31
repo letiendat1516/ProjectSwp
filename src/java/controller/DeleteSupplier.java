@@ -65,7 +65,7 @@ public class DeleteSupplier extends HttpServlet {
         sd.deleteSupplier(id);
         List<Supplier> list = sd.getLishSupplier();
         session.setAttribute("listSupplier", list);
-        request.getRequestDispatcher("LishSupplier.jsp").forward(request, response);
+        request.getRequestDispatcher("LishSupplier").forward(request, response);
     } 
 
     /** 
