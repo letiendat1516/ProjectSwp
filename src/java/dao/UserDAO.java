@@ -148,61 +148,78 @@ public class UserDAO extends Context {
         }
     }
 
-    public List<Users> filterUsers(Integer roleId, String status, String keyword) {
-        List<Users> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder(
-                "SELECT u.*, r.role_name FROM users u "
-                + "LEFT JOIN user_role ur ON u.id = ur.user_id "
-                + "LEFT JOIN role r ON ur.role_id = r.id WHERE 1=1 ");
+    public List<Users> filterUsers(Integer roleId, String status, String keyword, boolean includeAdmin) {
+    List<Users> list = new ArrayList<>();
+    StringBuilder sql = new StringBuilder(
+        "SELECT u.*, r.role_name FROM users u "
+        + "LEFT JOIN user_role ur ON u.id = ur.user_id "
+        + "LEFT JOIN role r ON ur.role_id = r.id "
+        + "WHERE 1=1 "
+    + "AND r.role_name != 'Admin'");
 
-        List<Object> params = new ArrayList<>();
+    if (!includeAdmin) {
+        sql.append(" AND r.role_name != 'Admin' ");
+    }
 
-        if (roleId != null) {
-            sql.append(" AND r.id = ? ");
-            params.add(roleId);
+    if (roleId != null) {
+        sql.append(" AND r.id = ? ");
+    }
+
+    if (status != null && !status.isEmpty()) {
+        if ("active".equalsIgnoreCase(status)) {
+            sql.append(" AND u.active_flag = 1 ");
+        } else if ("inactive".equalsIgnoreCase(status)) {
+            sql.append(" AND u.active_flag = 0 ");
+        }
+    }
+
+    if (keyword != null && !keyword.trim().isEmpty()) {
+        sql.append(" AND (u.username LIKE ? OR u.fullname LIKE ? OR u.email LIKE ?) ");
+    }
+
+    try (   Connection connection = Context.getJDBCConnection();
+            PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+        int paramIndex = 1;
+
+        if (!includeAdmin) {
+            // no param
         }
 
-        if (status != null && !status.isEmpty()) {
-            if ("active".equalsIgnoreCase(status)) {
-                sql.append(" AND u.active_flag = 1 ");
-            } else if ("inactive".equalsIgnoreCase(status)) {
-                sql.append(" AND u.active_flag = 0 ");
-            }
+        if (roleId != null) {
+            stmt.setInt(paramIndex++, roleId);
         }
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (u.username LIKE ? OR u.fullname LIKE ? OR u.email LIKE ?) ");
             String kw = "%" + keyword.trim() + "%";
-            params.add(kw);
-            params.add(kw);
-            params.add(kw);
+            stmt.setString(paramIndex++, kw);
+            stmt.setString(paramIndex++, kw);
+            stmt.setString(paramIndex++, kw);
         }
 
-        try (Connection connection = Context.getJDBCConnection();
-                PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) {
-                stmt.setObject(i + 1, params.get(i));
-            }
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Users user = new Users();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullname(rs.getString("fullname"));
+                user.setEmail(rs.getString("email"));
+                user.setActiveFlag(rs.getInt("active_flag"));
+                user.setCreateDate(rs.getTimestamp("create_date"));
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Users user = new Users();
-                    user.setId(rs.getInt("id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setFullname(rs.getString("fullname"));
-                    user.setEmail(rs.getString("email"));
-                    user.setActiveFlag(rs.getInt("active_flag"));
-                    user.setCreateDate(rs.getTimestamp("create_date"));
-                    user.setRoleName(rs.getString("role_name"));
-                    list.add(user);
-                }
+                String roleName = rs.getString("role_name");
+                if (roleName == null) roleName = "No Role";
+                user.setRoleName(roleName);
+
+                list.add(user);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return list;
+    } catch (Exception e) {
+        e.printStackTrace();
     }
-    
+
+    return list;
+}
+
     
     public List<Users> getUsersByPage(int pageIndex, int pageSize) {
     List<Users> list = new ArrayList<>();
