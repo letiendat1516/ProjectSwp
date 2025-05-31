@@ -347,7 +347,9 @@
     </c:choose>
 </div>
 </c:if>
-
+<div style="text-align: center; margin-top: 30px;">
+    <a href="Admin.jsp" class="btn-primary" style="background-color: #6c757d;">Quay lại trang Admin</a>
+</div>
     </div>
 </body>
 </html>
