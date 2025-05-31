@@ -66,7 +66,7 @@ public class LishSupplier extends HttpServlet {
 
         String pageRaw = request.getParameter("page");
         int pageIndex = 1;
-        int pageSize = 10;
+        int pageSize = 7;
 
         if (pageRaw != null) {
             try {

@@ -131,6 +131,19 @@ public class SupplierDAO {
         }
     }
 
+    public void activeSupplier(String id) {
+        String sql = "UPDATE `supplier`\n"
+                + "SET `active_flag` = 1\n"
+                + "WHERE `id` = " + id;
+
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+        }
+    }
+
     public List<Supplier> getSuppliersByPage(int pageIndex, int pageSize) {
         List<Supplier> list = new ArrayList<>();
         String sql = "SELECT * FROM supplier ORDER BY id LIMIT ?, ?";
@@ -194,12 +207,13 @@ public class SupplierDAO {
         }
 
         sql.append(" ORDER BY id LIMIT ?, ?");
-        System.out.println(sql);
+
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql.toString());
             ps.setInt(1, (pageIndex - 1) * pageSize);
             ps.setInt(2, pageSize);
+            System.out.println(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
                 list.add(new Supplier(
@@ -221,17 +235,17 @@ public class SupplierDAO {
 
     public int countTotalSuppliersFilter(String status, String name) {
         String filter = "";
-        if(status.equalsIgnoreCase("all")){
-            if(name != null && name.length()>0){
-                filter += " where name like '%"+name+"%' ";
+        if (status.equalsIgnoreCase("all")) {
+            if (name != null && name.length() > 0) {
+                filter += " where name like '%" + name + "%' ";
             }
-        }else{
-            filter = "where active_flag = "+status+"  ";
-            if(name != null&& name.length()>0){
-                filter += " and name like'%"+name+"%' ";
+        } else {
+            filter = "where active_flag = " + status + "  ";
+            if (name != null && name.length() > 0) {
+                filter += " and name like'%" + name + "%' ";
             }
         }
-        String sql = "SELECT COUNT(*) FROM supplier "+filter;
+        String sql = "SELECT COUNT(*) FROM supplier " + filter;
         System.out.println(sql);
         try {
             conn = new Context().getJDBCConnection();
@@ -248,12 +262,11 @@ public class SupplierDAO {
 
     public static void main(String[] args) {
         SupplierDAO sd = new SupplierDAO();
-        System.out.println(sd.countTotalSuppliersFilter("1", "TNHH"));
-        List<Supplier> l = sd.getSuppliersByPageFilter(1, 10, "0", "TNHH");
-        
-        
+
+        // limit (offset),(limit)
+        List<Supplier> l = sd.getSuppliersByPageFilter(2, 10, "all", "");
         for (int i = 0; i < l.size(); i++) {
-            System.out.println(l.get(i).getCreateDate());
+            System.out.println(l.get(i).getSupplierID());
         }
 
     }
