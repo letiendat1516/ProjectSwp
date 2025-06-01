@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.Supplier;
+import java.sql.Date;
 
 /**
  *
@@ -119,8 +120,8 @@ public class SupplierDAO {
 
     public void deleteSupplier(String id) {
         String sql = "UPDATE `supplier`\n"
-           + "SET `active_flag` = 0\n"
-           + "WHERE `id` = " + id;
+                + "SET `active_flag` = 0\n"
+                + "WHERE `id` = " + id;
 
         try {
             conn = new Context().getJDBCConnection();
@@ -130,13 +131,143 @@ public class SupplierDAO {
         }
     }
 
+    public void activeSupplier(String id) {
+        String sql = "UPDATE `supplier`\n"
+                + "SET `active_flag` = 1\n"
+                + "WHERE `id` = " + id;
+
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+        }
+    }
+
+    public List<Supplier> getSuppliersByPage(int pageIndex, int pageSize) {
+        List<Supplier> list = new ArrayList<>();
+        String sql = "SELECT * FROM supplier ORDER BY id LIMIT ?, ?";
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, (pageIndex - 1) * pageSize);
+            ps.setInt(2, pageSize);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(new Supplier(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("phone"),
+                        rs.getString("email"),
+                        rs.getString("address"),
+                        rs.getString("note"),
+                        rs.getInt("active_flag"),
+                        rs.getDate("create_date")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int countTotalSuppliers() {
+        String sql = "SELECT COUNT(*) FROM supplier";
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    //
+
+    public List<Supplier> getSuppliersByPageFilter(int pageIndex, int pageSize, String status, String name) {
+        List<Supplier> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM supplier");
+
+        List<String> conditions = new ArrayList<>();
+
+        if (!"all".equalsIgnoreCase(status)) {
+            conditions.add("active_flag = " + status);
+        }
+
+        if (name != null && !name.trim().isEmpty()) {
+            conditions.add("name LIKE '%" + name.trim() + "%'");
+        }
+
+        if (!conditions.isEmpty()) {
+            sql.append(" WHERE ");
+            sql.append(String.join(" AND ", conditions));
+        }
+
+        sql.append(" ORDER BY id LIMIT ?, ?");
+
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql.toString());
+            ps.setInt(1, (pageIndex - 1) * pageSize);
+            ps.setInt(2, pageSize);
+            System.out.println(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(new Supplier(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("phone"),
+                        rs.getString("email"),
+                        rs.getString("address"),
+                        rs.getString("note"),
+                        rs.getInt("active_flag"),
+                        rs.getDate("create_date")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int countTotalSuppliersFilter(String status, String name) {
+        String filter = "";
+        if (status.equalsIgnoreCase("all")) {
+            if (name != null && name.length() > 0) {
+                filter += " where name like '%" + name + "%' ";
+            }
+        } else {
+            filter = "where active_flag = " + status + "  ";
+            if (name != null && name.length() > 0) {
+                filter += " and name like'%" + name + "%' ";
+            }
+        }
+        String sql = "SELECT COUNT(*) FROM supplier " + filter;
+        System.out.println(sql);
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public static void main(String[] args) {
         SupplierDAO sd = new SupplierDAO();
-        List<Supplier> l = sd.searchLishSupplierByName("tnhh");
+
+        // limit (offset),(limit)
+        List<Supplier> l = sd.getSuppliersByPageFilter(2, 10, "all", "");
         for (int i = 0; i < l.size(); i++) {
             System.out.println(l.get(i).getSupplierID());
-            System.out.println(l.get(i).getName());
         }
-        
+
     }
 }

@@ -20,8 +20,8 @@ import model.Supplier;
  *
  * @author Fpt06
  */
-@WebServlet(name = "SearchListSupplier", urlPatterns = {"/SearchListSupplier"})
-public class SearchListSupplier extends HttpServlet {
+@WebServlet(name = "ActiveSupplier", urlPatterns = {"/ActiveSupplier"})
+public class ActiveSupplier extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,10 +40,10 @@ public class SearchListSupplier extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet SearchListSupplier</title>");
+            out.println("<title>Servlet ActiveSupplier</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet SearchListSupplier at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet ActiveSupplier at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -61,39 +61,24 @@ public class SearchListSupplier extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        String status = request.getParameter("status");
-        String name = request.getParameter("name");
-        String line = request.getParameter("line");
-        if(name==null){
-            name = "";
-        }
+        String id = request.getParameter("id");
+        String filter = request.getParameter("filter");
+        HttpSession session = request.getSession();
         SupplierDAO sd = new SupplierDAO();
-        String pageRaw = request.getParameter("page");
-        int pageIndex = 1;
-        int pageSize = Integer.parseInt(line);
-
-        if (pageRaw != null) {
-            try {
-                pageIndex = Integer.parseInt(pageRaw);
-            } catch (NumberFormatException e) {
-                pageIndex = 1;
-            }
+        sd.activeSupplier(id);
+        List<Supplier> list = sd.getLishSupplier();
+        session.setAttribute("listSupplier", list);
+        if (filter == null || filter.length() ==0) {
+            request.getRequestDispatcher("LishSupplier").forward(request, response);
+        } else {
+            String status = request.getParameter("status");
+            String name = request.getParameter("name");
+            String line = request.getParameter("line");
+            request.setAttribute("status", status);
+            request.setAttribute("name", name);
+            request.setAttribute("line", line);
+            request.getRequestDispatcher("SearchListSupplier").forward(request, response);
         }
-
-        int totalSuppliers = sd.countTotalSuppliersFilter(status, name);
-        int totalPages = (int) Math.ceil((double) totalSuppliers / pageSize);
-
-        List<Supplier> listSupplier = sd.getSuppliersByPageFilter(pageIndex, pageSize,status,name);
-        request.setAttribute("filter", "option");
-        request.setAttribute("status", status);
-        request.setAttribute("name", name);
-        request.setAttribute("line", line);
-        request.setAttribute("listSupplier", listSupplier);
-        request.setAttribute("currentPage", pageIndex);
-        request.setAttribute("totalPages", totalPages);
-
-        request.getRequestDispatcher("LishSupplier.jsp").forward(request, response);
     }
 
     /**

@@ -169,7 +169,7 @@
                 <input type="submit" value="Cập nhật">
             </form>
             <div style="text-align: center;">
-                <a href="LishSupplier.jsp">← Back</a>
+                <a href="LishSupplier">← Back</a>
             </div>
         </div>
     </body>

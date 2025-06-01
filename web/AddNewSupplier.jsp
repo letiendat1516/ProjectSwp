@@ -179,7 +179,7 @@
                 </div>
                 <button type="submit" class="submit-btn">Add</button>
             </form>
-            <a href="LishSupplier.jsp" class="back-btn"><i class="material-icons">arrow_back</i> Back</a>
+            <a href="LishSupplier" class="back-btn"><i class="material-icons">arrow_back</i> Back</a>
         </div>
 
     </body>

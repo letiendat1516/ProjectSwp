@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
@@ -23,3 +24,21 @@
 >>>>>>> 52ff8b9e79d4f6dc87b7c6be1b708468cf50f0ec
     </open-files>
 </project-private>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/model/Supplier.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/controller/SearchListSupplier.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/controller/ActiveSupplier.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/controller/DeleteSupplier.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/controller/AdminServlet.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/web/LishSupplier.jsp</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/dao/SupplierDAO.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/controller/LishSupplier.java</file>
+        </group>
+    </open-files>
+</project-private>
+>>>>>>> 59b5477b78528437f9e409f90138705ad568787b
