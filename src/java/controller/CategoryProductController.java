@@ -7,16 +7,16 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import dao.CategoryDAO;
+import dao.CategoryProductDAO;
 import model.Category;
 
 @WebServlet(name = "CategoryController", urlPatterns = {"/category/*"})
-public class CategoryController extends HttpServlet {
-    private CategoryDAO categoryDAO;
+public class CategoryProductController extends HttpServlet {
+    private CategoryProductDAO categoryDAO;
     
     @Override
     public void init() {
-        categoryDAO = new CategoryDAO();
+        categoryDAO = new CategoryProductDAO();
     }
     
     @Override
