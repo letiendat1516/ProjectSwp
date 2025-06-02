@@ -121,7 +121,7 @@
                 <h2>Warehouse<br>Manager</h2>
                 <ul >
                     <li class="add-user-btn"><a href="admin">User Manager</a></li>
-                    <li class="add-user-btn"><a href=""> Role Assignment </a></li>
+                    <li class="add-user-btn"><a href="roleAssignment"> Role Assignment </a></li>
                     <li class="add-user-btn"><a href="categoriesforward.jsp">Material Information</a></li>
                     <li class="add-user-btn">Transaction</li>
                     <li class="add-user-btn">Statistic</li>
