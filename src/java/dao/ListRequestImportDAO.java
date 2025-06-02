@@ -1,4 +1,4 @@
-// Updated DAO with new fields for Request and RequestItem
+
 package dao;
 
 import DBContext.Context;

@@ -16,8 +16,7 @@ public class RequestItem {
     public RequestItem() {
     }
 
-    public RequestItem(String id, String requestId, String productName, String productCode, String unit,
-            double quantity, double importedQty, String note, String reasonDetail) {
+    public RequestItem(String id, String requestId, String productName, String productCode, String unit, double quantity, double importedQty, String note, String reasonDetail) {
         this.id = id;
         this.requestId = requestId;
         this.productName = productName;
@@ -28,15 +27,6 @@ public class RequestItem {
         this.note = note;
         this.reasonDetail = reasonDetail;
     }
-
-    public double getImportedQty() {
-        return importedQty;
-    }
-
-    public void setImportedQty(double importedQty) {
-        this.importedQty = importedQty;
-    }
-    
 
     public String getId() {
         return id;
@@ -86,6 +76,14 @@ public class RequestItem {
         this.quantity = quantity;
     }
 
+    public double getImportedQty() {
+        return importedQty;
+    }
+
+    public void setImportedQty(double importedQty) {
+        this.importedQty = importedQty;
+    }
+
     public String getNote() {
         return note;
     }
@@ -101,4 +99,8 @@ public class RequestItem {
     public void setReasonDetail(String reasonDetail) {
         this.reasonDetail = reasonDetail;
     }
+
+
+
+ 
 }

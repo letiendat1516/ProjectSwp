@@ -31,9 +31,7 @@ public class Request {
     public Request() {
     }
 
-    public Request(String id, int user_id, String role, Date day_request, String status, String reason,
-            String supplier, String address, String phone, String email,
-            String approve_by, String warehouse, ArrayList<RequestItem> items) {
+    public Request(String id, int user_id, String role, Date day_request, String status, String reason, String supplier, String address, String phone, String email, String approve_by, String warehouse, ArrayList<RequestItem> items) {
         this.id = id;
         this.user_id = user_id;
         this.role = role;
@@ -48,6 +46,7 @@ public class Request {
         this.warehouse = warehouse;
         this.items = items;
     }
+
 
     public String getApprove_by() {
         return approve_by;
@@ -64,7 +63,7 @@ public class Request {
     public void setWarehouse(String warehouse) {
         this.warehouse = warehouse;
     }
- 
+
     public ArrayList<RequestItem> getItems() {
         return items;
     }
