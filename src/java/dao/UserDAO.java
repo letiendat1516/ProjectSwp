@@ -18,9 +18,11 @@ public class UserDAO extends Context {
         String sql = "SELECT u.*, r.role_name "
                 + "FROM users u "
                 + "LEFT JOIN user_role ur ON u.id = ur.user_id "
-                + "LEFT JOIN role r ON ur.role_id = r.id";
+                + "LEFT JOIN role r ON ur.role_id = r.id"
+                + "WHERE r.role_name != 'Admin'";
 
-        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+        try (Connection connection = Context.getJDBCConnection();
+                PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Users user = new Users();
@@ -37,6 +39,63 @@ public class UserDAO extends Context {
         }
         return list;
     }
+    
+    public List<Users> getAllUsersExcludeAdmin() {
+    List<Users> list = new ArrayList<>();
+    String sql = "SELECT u.*, r.role_name "
+            + "FROM users u "
+            + "LEFT JOIN user_role ur ON u.id = ur.user_id "
+            + "LEFT JOIN role r ON ur.role_id = r.id "
+            + "WHERE r.role_name != 'Admin'";
+
+    try (Connection connection = Context.getJDBCConnection();
+            PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+        while (rs.next()) {
+            Users user = new Users();
+            user.setId(rs.getInt("id"));
+            user.setUsername(rs.getString("username"));
+            user.setFullname(rs.getString("fullname"));
+            user.setEmail(rs.getString("email"));
+            user.setActiveFlag(rs.getInt("active_flag"));
+            user.setCreateDate(rs.getTimestamp("create_date"));
+            user.setRoleName(rs.getString("role_name"));
+            list.add(user);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
+    
+    public void updateUserRole(int userId, int roleId) throws SQLException {
+    // Kiểm tra user đã có record trong user_role chưa
+    String checkSql = "SELECT COUNT(*) FROM user_role WHERE user_id = ?";
+    try (Connection connection = Context.getJDBCConnection();
+            PreparedStatement checkStmt = connection.prepareStatement(checkSql)) {
+        checkStmt.setInt(1, userId);
+        ResultSet rs = checkStmt.executeQuery();
+        if (rs.next() && rs.getInt(1) > 0) {
+            // Nếu đã có -> UPDATE
+            String updateSql = "UPDATE user_role SET role_id = ? WHERE user_id = ?";
+            try (PreparedStatement updateStmt = connection.prepareStatement(updateSql)) {
+                updateStmt.setInt(1, roleId);
+                updateStmt.setInt(2, userId);
+                updateStmt.executeUpdate();
+            }
+        } else {
+            // Chưa có -> INSERT
+            String insertSql = "INSERT INTO user_role (user_id, role_id) VALUES (?, ?)";
+            try (PreparedStatement insertStmt = connection.prepareStatement(insertSql)) {
+                insertStmt.setInt(1, userId);
+                insertStmt.setInt(2, roleId);
+                insertStmt.executeUpdate();
+            }
+        }
+    }
+}
+
 
     // Thêm user mới và gán role (giả sử roleId lấy từ tham số)
     public void addUser(Users user, int roleId) throws SQLException {
@@ -87,7 +146,8 @@ public class UserDAO extends Context {
                 + "LEFT JOIN user_role ur ON u.id = ur.user_id "
                 + "LEFT JOIN role r ON ur.role_id = r.id "
                 + "WHERE u.id = ?";
-        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = Context.getJDBCConnection();
+                PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -147,109 +207,165 @@ public class UserDAO extends Context {
         }
     }
 
-    public List<Users> filterUsers(Integer roleId, String status, String keyword) {
-        List<Users> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder(
-                "SELECT u.*, r.role_name FROM users u "
-                + "LEFT JOIN user_role ur ON u.id = ur.user_id "
-                + "LEFT JOIN role r ON ur.role_id = r.id WHERE 1=1 ");
+    public List<Users> filterUsers(Integer roleId, String status, String keyword, boolean includeAdmin) {
+    List<Users> list = new ArrayList<>();
+    StringBuilder sql = new StringBuilder(
+        "SELECT u.*, r.role_name FROM users u "
+        + "LEFT JOIN user_role ur ON u.id = ur.user_id "
+        + "LEFT JOIN role r ON ur.role_id = r.id "
+        + "WHERE 1=1 "
+    + "AND r.role_name != 'Admin'");
 
-        List<Object> params = new ArrayList<>();
+    if (!includeAdmin) {
+        sql.append(" AND r.role_name != 'Admin' ");
+    }
 
-        if (roleId != null) {
-            sql.append(" AND r.id = ? ");
-            params.add(roleId);
+    if (roleId != null) {
+        sql.append(" AND r.id = ? ");
+    }
+
+    if (status != null && !status.isEmpty()) {
+        if ("active".equalsIgnoreCase(status)) {
+            sql.append(" AND u.active_flag = 1 ");
+        } else if ("inactive".equalsIgnoreCase(status)) {
+            sql.append(" AND u.active_flag = 0 ");
+        }
+    }
+
+    if (keyword != null && !keyword.trim().isEmpty()) {
+        sql.append(" AND (u.username LIKE ? OR u.fullname LIKE ? OR u.email LIKE ?) ");
+    }
+
+    try (   Connection connection = Context.getJDBCConnection();
+            PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+        int paramIndex = 1;
+
+        if (!includeAdmin) {
+            // no param
         }
 
-        if (status != null && !status.isEmpty()) {
-            if ("active".equalsIgnoreCase(status)) {
-                sql.append(" AND u.active_flag = 1 ");
-            } else if ("inactive".equalsIgnoreCase(status)) {
-                sql.append(" AND u.active_flag = 0 ");
-            }
+        if (roleId != null) {
+            stmt.setInt(paramIndex++, roleId);
         }
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (u.username LIKE ? OR u.fullname LIKE ? OR u.email LIKE ?) ");
             String kw = "%" + keyword.trim() + "%";
-            params.add(kw);
-            params.add(kw);
-            params.add(kw);
+            stmt.setString(paramIndex++, kw);
+            stmt.setString(paramIndex++, kw);
+            stmt.setString(paramIndex++, kw);
         }
 
-        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) {
-                stmt.setObject(i + 1, params.get(i));
-            }
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Users user = new Users();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullname(rs.getString("fullname"));
+                user.setEmail(rs.getString("email"));
+                user.setActiveFlag(rs.getInt("active_flag"));
+                user.setCreateDate(rs.getTimestamp("create_date"));
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Users user = new Users();
-                    user.setId(rs.getInt("id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setFullname(rs.getString("fullname"));
-                    user.setEmail(rs.getString("email"));
-                    user.setActiveFlag(rs.getInt("active_flag"));
-                    user.setCreateDate(rs.getTimestamp("create_date"));
-                    user.setRoleName(rs.getString("role_name"));
-                    list.add(user);
-                }
+                String roleName = rs.getString("role_name");
+                if (roleName == null) roleName = "No Role";
+                user.setRoleName(roleName);
+
+                list.add(user);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return list;
+    } catch (Exception e) {
+        e.printStackTrace();
     }
 
+    return list;
+}
+
+    
     public List<Users> getUsersByPage(int pageIndex, int pageSize) {
-        List<Users> list = new ArrayList<>();
+    List<Users> list = new ArrayList<>();
+    String sql = "SELECT u.*, r.role_name " +
+                 "FROM users u " +
+                 "LEFT JOIN user_role ur ON u.id = ur.user_id " +
+                 "LEFT JOIN role r ON ur.role_id = r.id " +
+                 "WHERE r.role_name != 'Admin'" +
+                 "ORDER BY u.id " +
+                 "LIMIT ? OFFSET ?";
+
+    int offset = (pageIndex - 1) * pageSize;
+
+    try (
+            Connection connection = Context.getJDBCConnection();
+            PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setInt(1, pageSize);
+        stmt.setInt(2, offset);
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Users user = new Users();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullname(rs.getString("fullname"));
+                user.setActiveFlag(rs.getInt("active_flag"));
+                user.setCreateDate(rs.getTimestamp("create_date"));
+                user.setRoleName(rs.getString("role_name"));
+                list.add(user);
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
+// Thêm hàm lấy tổng số user để tính tổng trang
+public int getTotalUserCount() {
+    String sql = "SELECT COUNT(*) FROM users";
+    try (Connection connection = Context.getJDBCConnection();
+            PreparedStatement stmt = connection.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+
+    public Users login(String username, String password) {
         String sql = "SELECT u.*, r.role_name "
                 + "FROM users u "
                 + "LEFT JOIN user_role ur ON u.id = ur.user_id "
                 + "LEFT JOIN role r ON ur.role_id = r.id "
-                + "ORDER BY u.id "
-                + "LIMIT ? OFFSET ?";
+                + "WHERE u.username = ? AND u.password = ? AND u.active_flag = 1";
 
-        int offset = (pageIndex - 1) * pageSize;
+        try {Connection connection = Context.getJDBCConnection();
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            ResultSet rs = stmt.executeQuery();
 
-        try (
-                Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, pageSize);
-            stmt.setInt(2, offset);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Users user = new Users();
-                    user.setId(rs.getInt("id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setFullname(rs.getString("fullname"));
-                    user.setActiveFlag(rs.getInt("active_flag"));
-                    user.setCreateDate(rs.getTimestamp("create_date"));
-                    user.setRoleName(rs.getString("role_name"));
-                    list.add(user);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-// Thêm hàm lấy tổng số user để tính tổng trang
-    public int getTotalUserCount() {
-        String sql = "SELECT COUNT(*) FROM users";
-        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
-                return rs.getInt(1);
+                Users user = new Users();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
+                user.setEmail(rs.getString("email"));
+                user.setFullname(rs.getString("fullname"));
+                user.setActiveFlag(rs.getInt("active_flag"));
+                user.setCreateDate(rs.getTimestamp("create_date"));
+                user.setRoleName(rs.getString("role_name")); // Lấy role
+                return user;
             }
+            rs.close();
+            stmt.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return 0;
+        return null;
     }
 
-
-
-    public String getFullName(int userId) {
+    
+     public String getFullName(int userId) {
         String fullName = null;
         String sql = "SELECT fullname FROM users WHERE id = ?";
 
@@ -286,40 +402,6 @@ public class UserDAO extends Context {
         }
 
         return dob;
-    }
-    
-    public Users login(String username, String password) {
-        String sql = "SELECT u.*, r.role_name "
-                + "FROM users u "
-                + "LEFT JOIN user_role ur ON u.id = ur.user_id "
-                + "LEFT JOIN role r ON ur.role_id = r.id "
-                + "WHERE u.username = ? AND u.password = ? AND u.active_flag = 1";
-
-        try {
-            Connection conn = Context.getJDBCConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                Users user = new Users();
-                user.setId(rs.getInt("id"));
-                user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password"));
-                user.setEmail(rs.getString("email"));
-                user.setFullname(rs.getString("fullname"));
-                user.setActiveFlag(rs.getInt("active_flag"));
-                user.setCreateDate(rs.getTimestamp("create_date"));
-                user.setRoleName(rs.getString("role_name")); // Lấy role
-                return user;
-            }
-            rs.close();
-            stmt.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
 }

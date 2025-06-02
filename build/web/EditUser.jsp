@@ -106,7 +106,6 @@
                 <div class="success-message">
                     ${sessionScope.message}
                 </div>
-                <%-- Xóa thông báo sau khi hiển thị --%>
                 <c:remove var="message"/>
             </c:if>
 
