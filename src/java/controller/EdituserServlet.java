@@ -64,7 +64,7 @@ public class EdituserServlet extends HttpServlet {
                 return;
             }
 
-            request.setAttribute("user", user);
+            request.setAttribute("editUser", user);
             request.getRequestDispatcher("EditUser.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
@@ -74,34 +74,36 @@ public class EdituserServlet extends HttpServlet {
 
     // POST: Nhận dữ liệu form, cập nhật user, redirect về danh sách
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        int id = Integer.parseInt(request.getParameter("id"));
+        String username = request.getParameter("username");
+        String fullname = request.getParameter("fullname");
+        String email = request.getParameter("email");
+        int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
+        int roleId = Integer.parseInt(request.getParameter("role"));
 
-        try {
-            int id = Integer.parseInt(request.getParameter("id"));
-            String username = request.getParameter("username");
-            String fullname = request.getParameter("fullname");
-            String email = request.getParameter("email");
-            int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
-            int roleId = Integer.parseInt(request.getParameter("role"));
+        Users user = new Users();
+        user.setId(id);
+        user.setUsername(username);
+        user.setFullname(fullname);
+        user.setEmail(email);
+        user.setActiveFlag(activeFlag);
 
-            Users user = new Users();
-            user.setId(id);
-            user.setUsername(username);
-            user.setFullname(fullname);
-            user.setEmail(email);
-            user.setActiveFlag(activeFlag);
+        UserDAO userDAO = new UserDAO();
+        userDAO.updateUser(user, roleId); // Cập nhật user vào DB
 
-            UserDAO userDAO = new UserDAO();
-            userDAO.updateUser(user, roleId);
+        // Lưu thông báo thành công vào session
+        request.getSession().setAttribute("message", "User updated successfully!");
 
-            response.sendRedirect("admin");
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Update user failed: " + e.getMessage());
-            request.getRequestDispatcher("EditUser.jsp").forward(request, response);
-        }
+        response.sendRedirect("admin"); // Sau khi cập nhật, redirect về trang admin
+    } catch (Exception e) {
+        e.printStackTrace();
+        request.setAttribute("error", "Error updating user: " + e.getMessage());
+        request.getRequestDispatcher("EditUser.jsp").forward(request, response);
     }
+}
 
     @Override
     public String getServletInfo() {

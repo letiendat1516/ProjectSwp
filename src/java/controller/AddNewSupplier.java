@@ -68,9 +68,6 @@ public class AddNewSupplier extends HttpServlet {
         String note = request.getParameter("note");
         SupplierDAO sd = new SupplierDAO();
         sd.AddNewSupplier(name, phone, email, address, note);
-        HttpSession session = request.getSession();
-        List<Supplier> list = sd.getLishSupplier();
-        session.setAttribute("listSupplier", list);
         request.setAttribute("mess", "Addsuccessfully !!!");
         request.getRequestDispatcher("AddNewSupplier.jsp").forward(request, response);
     }

@@ -60,7 +60,7 @@ public class UserFilterServlet extends HttpServlet {
         List<Users> filteredUsers = userDAO.filterUsers(roleId, status, keyword);
 
         request.setAttribute("userList", filteredUsers);
-        request.getRequestDispatcher("Admin.jsp").forward(request, response);
+        request.getRequestDispatcher("UserManager.jsp").forward(request, response);
     }
 
 }

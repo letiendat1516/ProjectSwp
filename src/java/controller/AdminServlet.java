@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Users;
 
@@ -20,15 +21,6 @@ import model.Users;
  */
 public class AdminServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -51,6 +43,13 @@ public class AdminServlet extends HttpServlet {
     @Override
 protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
+    // Kiểm tra session và quyền admin
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+    
     UserDAO userDAO = new UserDAO();
 
     String pageParam = request.getParameter("page");
@@ -74,11 +73,11 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     request.setAttribute("totalPages", totalPages);
     request.setAttribute("currentPage", pageIndex);
 
-    request.getRequestDispatcher("Admin.jsp").forward(request, response);
+    request.getRequestDispatcher("UserManager.jsp").forward(request, response);
 }
 
 
-    // Bạn có thể bổ sung doPost nếu cần xử lý POST request
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
