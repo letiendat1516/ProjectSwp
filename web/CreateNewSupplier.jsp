@@ -1,7 +1,7 @@
 <%-- 
-    Document   : logout
-    Created on : 22 thg 5, 2025, 18:57:57
-    Author     : phucn
+    Document   : CreateNewSupplier
+    Created on : 28 thg 5, 2025, 14:08:17
+    Author     : Fpt06
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -9,9 +9,9 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Create New Supplier</title>
     </head>
     <body>
-        <a href="logout">Log out</a>
+        
     </body>
 </html>
