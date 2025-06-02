@@ -153,16 +153,21 @@
         <div class="form-container">
             <h1>Add New Supplier</h1>
             <c:set var="mess" value="${requestScope.mess}"/>
+            <c:set var="invalid" value="${requestScope.invalid}"/>
             <c:if test="${not empty mess}">
                 <p style="color: red;font-size: larger" >${mess}</p>
             </c:if>
-                <form action="AddNewSupplier" method="get">
+            <form action="AddNewSupplier" method="get">
                 <div class="input-group">
                     <label><i class="material-icons">business</i> Tên nhà cung cấp</label>
                     <input type="text" name="nameSupplier" required>
                 </div>
+
                 <div class="input-group">
                     <label><i class="material-icons">phone</i> Số điện thoại</label>
+                    <c:if test="${not empty invalid}">
+                        <label style="color: red" >${invalid}</label>
+                    </c:if>
                     <input type="number" name="phone" required>
                 </div>
                 <div class="input-group">
