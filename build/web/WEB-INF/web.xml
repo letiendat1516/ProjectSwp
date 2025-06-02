@@ -39,6 +39,10 @@
     <servlet>
         <servlet-name>ImportConfirmController</servlet-name>
         <servlet-class>controller.ImportConfirmController</servlet-class>
+        </servlet>
+        <servlet>
+        <servlet-name>RoleAssignmentServlet</servlet-name>
+        <servlet-class>controller.RoleAssignmentServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
@@ -69,6 +73,7 @@
         <url-pattern>/userfilter</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+
         <servlet-name>LoadingRequestServlet</servlet-name>
         <url-pattern>/loadingrequest</url-pattern>
     </servlet-mapping>
@@ -80,6 +85,12 @@
         <servlet-name>ImportConfirmController</servlet-name>
         <url-pattern>/import-confirm</url-pattern>
     </servlet-mapping>
-    
-
+        <servlet-mapping>
+        <servlet-name>RoleAssignmentServlet</servlet-name>
+        <url-pattern>/roleAssignment</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>15</session-timeout>
+        <!-- 15 phút -->
+    </session-config>
 </web-app>
