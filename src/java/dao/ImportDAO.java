@@ -128,36 +128,4 @@ public class ImportDAO {
         }
         return requests;
     }
-    
-//    public static void main(String[] args) {
-//        ListRequestImportDAO dao = new ListRequestImportDAO();
-//
-//        // Gọi hàm: page = 1, pageSize = 10, không tìm kiếm, sắp xếp theo day_request giảm dần
-//        List<Request> requests = dao.getApprovedRequestsWithItems(1, 10, "", "day_request", "desc");
-//
-//        for (Request req : requests) {
-//            System.out.println("===== REQUEST ID: " + req.getId() + " =====");
-//            System.out.println("User ID: " + req.getUser_id());
-//            System.out.println("Date Request: " + req.getDay_request());
-//            System.out.println("Status: " + req.getStatus());
-//            System.out.println("Reason: " + req.getReason());
-//            System.out.println("Supplier: " + req.getSupplier());
-//            System.out.println("Address: " + req.getAddress());
-//            System.out.println("Phone: " + req.getPhone());
-//            System.out.println("Email: " + req.getEmail());
-//
-//            System.out.println("---- Request Items ----");
-//            for (RequestItem item : req.getItems()) {
-//                System.out.println("  Product Name: " + item.getProductName());
-//                System.out.println("  Product Code: " + item.getProductCode());
-//                System.out.println("  Unit: " + item.getUnit());
-//                System.out.println("  Quantity: " + item.getQuantity());
-//                System.out.println("  Note: " + item.getNote());
-//                System.out.println("  Reason Detail: " + item.getReasonDetail());
-//                System.out.println("  --------------------");
-//            }
-//
-//            System.out.println();
-//        }
-//    }
 }
