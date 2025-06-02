@@ -1,34 +1,49 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-/**
- *
- * @author Dell
- */
 public class RequestItem {
 
+    private String id;
     private String requestId;
     private String productName;
     private String productCode;
     private String unit;
-    private int quantity;
+    private double quantity; // Sửa từ int thành double
+    private double importedQty; // mới
+
     private String note;
     private String reasonDetail;
 
     public RequestItem() {
     }
 
-    public RequestItem(String requestId, String productName, String productCode, String unit, int quantity, String note, String reasonDetail) {
+    public RequestItem(String id, String requestId, String productName, String productCode, String unit,
+            double quantity, double importedQty, String note, String reasonDetail) {
+        this.id = id;
         this.requestId = requestId;
         this.productName = productName;
         this.productCode = productCode;
         this.unit = unit;
         this.quantity = quantity;
+        this.importedQty = importedQty;
         this.note = note;
         this.reasonDetail = reasonDetail;
+    }
+
+    public double getImportedQty() {
+        return importedQty;
+    }
+
+    public void setImportedQty(double importedQty) {
+        this.importedQty = importedQty;
+    }
+    
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getRequestId() {
@@ -63,11 +78,11 @@ public class RequestItem {
         this.unit = unit;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
 

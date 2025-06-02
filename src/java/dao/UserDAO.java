@@ -270,7 +270,7 @@ public class UserDAO extends Context {
                 user.setFullname(rs.getString("fullname"));
                 user.setActiveFlag(rs.getInt("active_flag"));
                 user.setCreateDate(rs.getTimestamp("create_date"));
-                user.setRoleName(rs.getString("role_name")); // Lấy role
+                user.setRoleName(rs.getString("role_name"));
                 return user;
             }
             rs.close();

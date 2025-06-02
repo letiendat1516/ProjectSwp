@@ -29,14 +29,17 @@
         <servlet-class>controller.UserFilterServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>WarehouseController</servlet-name>
-        <servlet-class>controller.WarehouseController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>LoadingRequestServlet</servlet-name>
         <servlet-class>controller.LoadingRequestServlet</servlet-class>
     </servlet>
-    
+    <servlet>
+        <servlet-name>ListRequestImportController</servlet-name>
+        <servlet-class>controller.ListRequestImportController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ImportConfirmController</servlet-name>
+        <servlet-class>controller.ImportConfirmController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
         <url-pattern>/CategoryServlet</url-pattern>
@@ -66,11 +69,15 @@
         <url-pattern>/userfilter</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>WarehouseController</servlet-name>
-        <url-pattern>/warehouse</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>LoadingRequestServlet</servlet-name>
         <url-pattern>/loadingrequest</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ListRequestImportController</servlet-name>
+        <url-pattern>/import</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImportConfirmController</servlet-name>
+        <url-pattern>/import-confirm</url-pattern>
     </servlet-mapping>
 </web-app>
