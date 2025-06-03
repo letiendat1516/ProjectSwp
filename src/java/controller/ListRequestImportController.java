@@ -1,6 +1,5 @@
 package controller;
 
-
 import dao.ListRequestImportDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -18,8 +17,11 @@ public class ListRequestImportController extends HttpServlet {
         // Tạo instance của DAO
         ListRequestImportDAO dao = new ListRequestImportDAO();
 
-        // Lấy danh sách RequestItem
-        List<ApprovedRequestItem> approvedItems = dao.getApprovedRequestItems();
+        // Lấy tham số tìm kiếm từ request
+        String search = request.getParameter("search");
+
+        // Lấy danh sách RequestItem với tham số tìm kiếm
+        List<ApprovedRequestItem> approvedItems = dao.getApprovedRequestItems(search);
 
         if (approvedItems == null || approvedItems.isEmpty()) {
             System.out.println("Không có yêu cầu nào đã được duyệt.");
@@ -27,8 +29,9 @@ public class ListRequestImportController extends HttpServlet {
             System.out.println("Số lượng yêu cầu đã duyệt: " + approvedItems.size());
         }
 
-        // Gửi danh sách sang JSP
+        // Gửi danh sách và tham số tìm kiếm sang JSP
         request.setAttribute("items", approvedItems);
+        request.setAttribute("search", search);
         request.getRequestDispatcher("ListRequestImport.jsp").forward(request, response);
     }
 
