@@ -810,13 +810,6 @@
                 document.body.style.overflow = ''; // Cho phép cuộn trang khi modal đóng
             }
 
-            // Đóng modal khi click bên ngoài
-            window.onclick = function (event) {
-                if (event.target.className === 'modal') {
-                    event.target.style.display = 'none';
-                    document.body.style.overflow = ''; // Cho phép cuộn trang khi modal đóng
-                }
-            };
         </script>
     </body>
 </html>
