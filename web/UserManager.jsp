@@ -9,7 +9,7 @@
 <%@ page import="model.Users" session="true" %> 
 <!DOCTYPE html>
 
-    <%@page import="model.Users"%>
+<%@page import="model.Users"%>
 <%
     Users user = (Users) session.getAttribute("user");
     if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
@@ -18,15 +18,15 @@
     }
 %>
 
-    
-        <%
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-    response.setDateHeader("Expires", 0); // Proxies
+
+<%
+response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+response.setDateHeader("Expires", 0); // Proxies
 %>
 
 <html>
-<head>
+    <head>
         <title>Admin Dashboard</title>
         <style>
             body {
@@ -41,11 +41,18 @@
                 min-height: 100vh;
             }
             .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
                 width: 250px;
+                height: 100vh; /* chiếm full chiều cao viewport */
                 background-color: #2c3e50;
                 color: white;
                 padding: 20px;
+                overflow-y: auto; /* nếu menu dài thì có scrollbar riêng */
+                box-sizing: border-box;
             }
+
             .sidebar h2 {
                 text-align: center;
                 font-size: 24px;
@@ -66,9 +73,11 @@
                 background-color: #34495e;
             }
             .main-content {
-                flex: 1;
+                margin-left: 250px;
                 padding: 20px;
+                flex: 1;
             }
+
             .header {
                 display: flex;
                 justify-content: space-between;
@@ -297,8 +306,8 @@
                         </c:if>
                     </tbody>
                 </table>
-                
-                
+
+
                 <div class="pagination">
                     <p>Total pages: ${totalPages}</p>
                     <c:if test="${totalPages > 1}">

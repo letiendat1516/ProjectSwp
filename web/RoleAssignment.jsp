@@ -84,8 +84,9 @@
                 </div>
             </div>
 
-            <c:if test="${not empty message}">
-                <div class="message">${message}</div>
+            <c:if test="${not empty sessionScope.message}">
+                <div class="message">${sessionScope.message}</div>
+                <c:remove var="message" scope="session"/>
             </c:if>
 
             <table>

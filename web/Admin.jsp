@@ -42,11 +42,18 @@
                 min-height: 100vh;
             }
             .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
                 width: 250px;
+                height: 100vh;
                 background-color: #2c3e50;
                 color: white;
                 padding: 20px;
+                overflow-y: auto;
+                box-sizing: border-box;
             }
+
             .sidebar h2 {
                 text-align: center;
                 font-size: 24px;
@@ -67,9 +74,11 @@
                 background-color: #34495e;
             }
             .main-content {
-                flex: 1;
+                margin-left: 250px;
                 padding: 20px;
+                flex: 1;
             }
+
             .header {
                 display: flex;
                 justify-content: space-between;
@@ -110,8 +119,8 @@
             .add-user-btn:hover {
                 background-color: #2980b9;
             }
-            
-            
+
+
 
         </style>
     </head>

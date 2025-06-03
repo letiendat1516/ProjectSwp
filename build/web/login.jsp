@@ -29,7 +29,7 @@
         }
 
         .card-header {
-            background-color: #007bff;
+            background-color: green;
             color: #fff;
             text-align: center;
             font-size: 1.5rem;
@@ -64,14 +64,14 @@
             padding: 10px;
             border: none;
             border-radius: 20px;
-            background-color: #007bff;
+            background-color: green;
             color: white;
             font-size: 1rem;
             cursor: pointer;
         }
 
         .btn:hover {
-            background-color: #0056b3;
+            background-color: greenyellow;
         }
 
         .card-footer {
@@ -82,7 +82,7 @@
         }
 
         .card-footer a {
-            color: #007bff;
+            color: green;
             text-decoration: none;
         }
 
