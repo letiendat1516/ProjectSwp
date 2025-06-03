@@ -69,24 +69,39 @@ public class EditMaterialUnitServlet extends HttpServlet {
             String name = request.getParameter("name");
             String symbol = request.getParameter("symbol");
             String description = request.getParameter("description");
-            String status = request.getParameter("status");
-            
+            String type = request.getParameter("type");
+
+            // Kiểm tra trùng tên hoặc ký hiệu (bỏ qua chính nó)
+            if (materialUnitDAO.isDuplicateNameOrSymbol(name, symbol, id)) {
+                MaterialUnit unit = new MaterialUnit();
+                unit.setId(id);
+                unit.setName(name);
+                unit.setSymbol(symbol);
+                unit.setDescription(description);
+                unit.setType(type);
+                request.setAttribute("unit", unit);
+                request.setAttribute("errorMessage", "Tên hoặc ký hiệu đã tồn tại. Vui lòng nhập giá trị khác.");
+                request.getRequestDispatcher("/editMaterialUnit.jsp").forward(request, response);
+                return;
+            }
+
             // In log để debug
             System.out.println("Updating unit: " + id + " - " + name);
-            
+
             // Tạo đối tượng MaterialUnit
             MaterialUnit unit = new MaterialUnit();
             unit.setId(id);
             unit.setName(name);
             unit.setSymbol(symbol);
             unit.setDescription(description);
-            unit.setStatus(status);
-            
+            unit.setType(type);
+
             // Cập nhật vào database
             boolean updated = materialUnitDAO.updateMaterialUnit(unit);
-            
+
             if (updated) {
-                // Nếu cập nhật thành công, chuyển hướng về trang danh sách
+                // Nếu cập nhật thành công, thông báo thành công và chuyển hướng
+                request.getSession().setAttribute("successMessage", "Cập nhật đơn vị thành công!");
                 response.sendRedirect("materialUnit");
             } else {
                 // Nếu cập nhật thất bại, hiển thị lại form với thông báo lỗi

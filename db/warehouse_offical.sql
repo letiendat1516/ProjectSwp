@@ -1,4 +1,5 @@
 -- USERS
+Use swp;
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -39,7 +40,7 @@ CREATE TABLE unit (
     name VARCHAR(50) NOT NULL UNIQUE,
     symbol VARCHAR(10) NOT NULL UNIQUE,
     description TEXT,
-    active_flag TINYINT(1) DEFAULT 1,
+    type ENUM('Khối lượng', 'Độ dài', 'Số lượng') NOT NULL,
     UNIQUE KEY uk_symbol (symbol),
     UNIQUE KEY uk_name (name)
 );
@@ -122,3 +123,10 @@ CREATE TABLE supplier (
     active_flag TINYINT(1) DEFAULT 1,
     create_date DATETIME DEFAULT CURRENT_TIMESTAMP
 ); 
+
+ALTER TABLE request
+ADD COLUMN approve_by VARCHAR(100) DEFAULT NULL,
+ADD COLUMN warehouse VARCHAR(100) DEFAULT NULL;
+ALTER TABLE request_items
+ADD COLUMN imported_qty DECIMAL(10,2) DEFAULT 0;
+ALTER TABLE request MODIFY status ENUM('pending', 'approved', 'rejected', 'completed');
