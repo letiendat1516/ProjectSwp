@@ -47,7 +47,7 @@
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: space-between;
-                gap: 20px;
+                gap: 10px;
             }
 
             .card {
@@ -55,8 +55,8 @@
                 border-radius: 10px;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 transition: transform 0.3s, box-shadow 0.3s;
-                width: calc(33.333% - 20px);
-                margin-bottom: 20px;
+                width: calc(50% - 5px);
+                margin-bottom: 10px;
             }
 
             .card:hover {
@@ -69,6 +69,7 @@
                 color: white;
                 border-radius: 10px 10px 0 0;
                 padding: 15px;
+                text-align: center;
             }
 
             .card-header h3 {
@@ -141,6 +142,9 @@
             .footer {
                 text-align: center;
                 margin-top: 30px;
+                display: flex;
+                justify-content: center;
+                gap: 15px;
             }
 
             .btn-icon {
@@ -151,52 +155,6 @@
 
             .back-btn-icon {
                 margin-right: 5px;
-            }
-            .card-container {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: space-between;
-                gap: 10px; /* From previous change */
-            }
-
-            .card {
-                background-color: #fff;
-                border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                transition: transform 0.3s, box-shadow 0.3s;
-                width: calc(50% - 5px); /* From previous change */
-                margin-bottom: 10px; /* From previous change */
-            }
-
-            .card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            }
-
-            .card-header {
-                background-color: #3f51b5;
-                color: white;
-                border-radius: 10px 10px 0 0;
-                padding: 15px;
-                text-align: center; /* Center the text */
-            }
-
-            .card-header h3 {
-                margin: 0;
-                font-size: 1.2rem;
-            }
-
-            /* Responsive styles */
-            @media (max-width: 900px) {
-                .card {
-                    width: calc(50% - 5px);
-                }
-            }
-
-            @media (max-width: 600px) {
-                .card {
-                    width: 100%;
-                }
             }
 
             /* Responsive styles */
@@ -209,6 +167,10 @@
             @media (max-width: 600px) {
                 .card {
                     width: 100%;
+                }
+                .footer {
+                    flex-direction: column;
+                    gap: 10px;
                 }
             }
         </style>
@@ -250,6 +212,23 @@
                         <h4 class="card-title">Đơn yêu cầu xuất kho</h4>
                         <p class="card-text">Yêu cầu xuất kho một số sản phẩm nhất định.</p>
                         <a href="" class="btn btn-primary">
+                            Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Request list -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Danh sách yêu cầu nhập</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-container">
+                            <span class="material-icons">list</span>
+                        </div>
+                        <h4 class="card-title">Danh sách yêu cầu nhập kho</h4>
+                        <p class="card-text">Xem danh sách các yêu cầu nhập kho.</p>
+                        <a href="import" class="btn btn-primary">
                             Truy cập <span class="material-icons btn-icon">arrow_forward</span>
                         </a>
                     </div>

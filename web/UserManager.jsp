@@ -219,8 +219,8 @@
                 <h2>Warehouse<br>Manager</h2>
                 <ul >
                     <li class="add-user-btn"><a href="admin">User Manager</a></li>
-                    <li class="add-user-btn"><a href=""> Role Assignment </a></li>
-                    <li class="add-user-btn">Material Information</li>
+                    <li class="add-user-btn"><a href="roleAssignment"> Role Assignment </a></li>
+                    <li class="add-user-btn"><a href="categoriesforward.jsp">Material Information</a></li>
                     <li class="add-user-btn">Transaction</li>
                     <li class="add-user-btn">Statistic</li>
                 </ul>
@@ -241,6 +241,7 @@
                 <form action="userfilter" method="get" class="filter-bar">
                     <div class="filter-bar">
                         <select id="role" name="role">
+                            <option value="all" selected>All Roles</option>
                             <option value="2">Warehouse Staff</option>
                             <option value="3">Company Employee</option>
                             <option value="4">Company Director</option>
