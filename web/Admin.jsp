@@ -28,7 +28,7 @@
 
 <html>
     <head>
-        <title>Admin Dashboard</title>
+        <title>Admin</title>
         <style>
             body {
                 font-family: Arial, sans-serif;

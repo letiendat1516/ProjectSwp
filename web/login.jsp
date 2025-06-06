@@ -29,7 +29,7 @@
         }
 
         .card-header {
-            background-color: green;
+            background-color: #007bff;
             color: #fff;
             text-align: center;
             font-size: 1.5rem;
@@ -46,8 +46,8 @@
         }
 
         .card-body {
-    padding: 20px;
-}
+            padding: 20px;
+        }
 
         input[type="text"], input[type="password"] {
             width: 100%;
@@ -64,14 +64,14 @@
             padding: 10px;
             border: none;
             border-radius: 20px;
-            background-color: green;
+            background-color: #007bff;
             color: white;
             font-size: 1rem;
             cursor: pointer;
         }
 
         .btn:hover {
-            background-color: greenyellow;
+            background-color: lightskyblue;
         }
 
         .card-footer {
