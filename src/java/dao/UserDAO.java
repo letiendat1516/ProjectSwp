@@ -247,39 +247,7 @@ public class UserDAO extends Context {
         return 0;
     }
 
-    public Users login(String username, String password) {
-        String sql = "SELECT u.*, r.role_name "
-                + "FROM users u "
-                + "LEFT JOIN user_role ur ON u.id = ur.user_id "
-                + "LEFT JOIN role r ON ur.role_id = r.id "
-                + "WHERE u.username = ? AND u.password = ? AND u.active_flag = 1";
 
-        try {
-            Connection connection = Context.getJDBCConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                Users user = new Users();
-                user.setId(rs.getInt("id"));
-                user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password"));
-                user.setEmail(rs.getString("email"));
-                user.setFullname(rs.getString("fullname"));
-                user.setActiveFlag(rs.getInt("active_flag"));
-                user.setCreateDate(rs.getTimestamp("create_date"));
-                user.setRoleName(rs.getString("role_name")); // Lấy role
-                return user;
-            }
-            rs.close();
-            stmt.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     public String getFullName(int userId) {
         String fullName = null;
@@ -319,5 +287,43 @@ public class UserDAO extends Context {
 
         return dob;
     }
+    
+    public Users login(String username, String password) {
+        String sql = "SELECT u.*, r.role_name "
+                + "FROM users u "
+                + "LEFT JOIN user_role ur ON u.id = ur.user_id "
+                + "LEFT JOIN role r ON ur.role_id = r.id "
+                + "WHERE u.username = ? AND u.password = ? AND u.active_flag = 1";
 
+        try {
+            Connection conn = Context.getJDBCConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Users user = new Users();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
+                user.setEmail(rs.getString("email"));
+                user.setFullname(rs.getString("fullname"));
+                user.setActiveFlag(rs.getInt("active_flag"));
+                user.setCreateDate(rs.getTimestamp("create_date"));
+                user.setRoleName(rs.getString("role_name")); // Lấy role
+                return user;
+            }
+            rs.close();
+            stmt.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static void main(String[] args) {
+        UserDAO ud = new UserDAO();
+        Users u = ud.login("admin", "123");
+        System.out.println(u.getId());
+    }
 }

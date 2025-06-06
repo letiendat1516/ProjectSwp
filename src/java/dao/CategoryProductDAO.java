@@ -10,7 +10,7 @@ import java.util.List;
 import model.Category;
 import DBContext.Context;
 
-public class CategoryDAO {
+public class CategoryProductDAO {
     private Connection conn = null;
     private PreparedStatement ps = null;
     private ResultSet rs = null;
