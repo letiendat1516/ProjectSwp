@@ -258,13 +258,13 @@ response.setDateHeader("Expires", 0); // Proxies
 
 
                         <select name="status">
-                            <option>All Statuses</option>
+                            <option value="">All Statuses</option>
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                         </select>
 
                         <input type="text" name="keyword" placeholder="Enter keyword(s) to search">
-
+                        <input type="hidden" name="page" value="usermanager" /> <!-- Phân biệt trang -->
                         <button class="search-btn">Search</button>
                     </div>
                 </form>
@@ -306,7 +306,6 @@ response.setDateHeader("Expires", 0); // Proxies
                         </c:if>
                     </tbody>
                 </table>
-
 
                 <div class="pagination">
                     <p>Total pages: ${totalPages}</p>

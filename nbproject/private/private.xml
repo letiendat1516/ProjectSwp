@@ -3,9 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/DBContext/Context.java</file>
-            <file>file:/E:/VSCODE/swp/ProjectSwp/web/Admin.jsp</file>
-            <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/controller/LoginServlet.java</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/web/EditProfile.jsp</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/controller/EditProfileServlet.java</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/dao/UserDAO.java</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/web/Profile.jsp</file>
         </group>
     </open-files>
 </project-private>
