@@ -195,7 +195,7 @@
             }
 
             .submit-btn {
-                width: 150px; /* Kích thước đồng bộ */
+                width: 150px;
                 padding: 12px;
                 background: #007bff;
                 color: #fff;
@@ -207,9 +207,9 @@
             }
 
             .back-btn {
-                width: 150px; /* Kích thước đồng bộ */
+                width: 150px;
                 padding: 12px;
-                background: #6c757d; /* Màu xám để phân biệt */
+                background: #6c757d;
                 color: #fff;
                 border: none;
                 border-radius: 8px;
@@ -276,8 +276,8 @@
                 }
 
                 .button-container {
-                    flex-direction: column; /* Xếp dọc trên mobile */
-                    align-items: center; /* Căn giữa dọc */
+                    flex-direction: column;
+                    align-items: center;
                     display: flex;
                 }
             }
@@ -338,7 +338,7 @@
                         </div>
                         <div class="form-group">
                             <label>Điện thoại</label>
-                            <textarea rows="1" name="phone" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <input rows="1" name="phone" id="phone" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" pattern="0[0-9]{9}" title="Số điện thoại phải bắt đầu bằng 0 và có đúng 10 chữ số" required>
                         </div>
                         <div class="form-group">
                             <label>Email</label>
@@ -369,7 +369,7 @@
                                         <option value="" disabled selected>-- Chọn sản phẩm --</option>
                                         <c:forEach var="p" items="${products_list}">
                                             <option 
-                                                value="${p.id}" 
+                                                value="${p.name}" 
                                                 data-code="${p.code}" 
                                                 data-unit="${p.unit_id}">
                                                 ${p.name}
@@ -404,11 +404,11 @@
 
             function addRow() {
                 const tbody = document.getElementById('itemsTableBody');
-                const firstSelect = document.querySelector("select[name='product_id']");
+                const firstSelect = document.querySelector("select[name='product_name']");
 
                 const newRow = document.createElement('tr');
 
-                // Copy danh sách sản phẩm từ select đầu tiên
+                //Copy danh sách sản phẩm từ select đầu tiên
                 let productOptions = "";
                 if (firstSelect) {
                     productOptions = [...firstSelect.options].map(opt =>
