@@ -8,6 +8,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page import="model.Users" %>
 
+<%@page import="model.Users"%>
+<%
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
     <head>

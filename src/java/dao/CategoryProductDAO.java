@@ -10,25 +10,45 @@ import java.util.List;
 import model.Category;
 import DBContext.Context;
 
-public class CategoryDAO {
+public class CategoryProductDAO {
     private Connection conn = null;
     private PreparedStatement ps = null;
     private ResultSet rs = null;
     
-    // Lấy danh sách danh mục có phân trang và tìm kiếm
-    public List<Category> getAllCategories(int page, int pageSize, String searchKeyword) {
+    // Lấy danh sách danh mục có phân trang, tìm kiếm và sắp xếp
+    public List<Category> getAllCategories(int page, int pageSize, String searchKeyword, String sortField, String sortDir) {
         List<Category> list = new ArrayList<>();
-        String query = "SELECT * FROM category WHERE 1=1";
+        StringBuilder query = new StringBuilder("SELECT * FROM category WHERE 1=1");
         
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            query += " AND name LIKE ?";
+            query.append(" AND name LIKE ?");
         }
         
-        query += " ORDER BY id LIMIT ?, ?";
+        // Thêm phần sắp xếp
+        if (sortField != null && !sortField.trim().isEmpty()) {
+            // Đảm bảo sortField hợp lệ để tránh SQL Injection
+            String validSortField = "id"; // Mặc định là id
+            if ("name".equalsIgnoreCase(sortField)) {
+                validSortField = "name";
+            }
+            
+            // Đảm bảo sortDir hợp lệ
+            String validSortDir = "asc"; // Mặc định là asc
+            if ("desc".equalsIgnoreCase(sortDir)) {
+                validSortDir = "desc";
+            }
+            
+            query.append(" ORDER BY ").append(validSortField).append(" ").append(validSortDir);
+        } else {
+            // Sắp xếp mặc định nếu không có trường sắp xếp
+            query.append(" ORDER BY id ASC");
+        }
+        
+        query.append(" LIMIT ?, ?");
         
         try {
             conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query);
+            ps = conn.prepareStatement(query.toString());
             
             int paramIndex = 1;
             if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
@@ -53,6 +73,12 @@ public class CategoryDAO {
             closeResources();
         }
         return list;
+    }
+    
+    // Phương thức overload để tương thích ngược
+    public List<Category> getAllCategories(int page, int pageSize, String searchKeyword) {
+        // Gọi phương thức mới với sắp xếp mặc định
+        return getAllCategories(page, pageSize, searchKeyword, "id", "asc");
     }
     
     // Đếm tổng số danh mục (dùng cho phân trang)
@@ -163,7 +189,6 @@ public class CategoryDAO {
         if (isCategoryUsedAsParent(id)) {
             return false; // Không thể xóa nếu đang được sử dụng làm danh mục cha
         }
-        
         // Kiểm tra xem danh mục có được sử dụng trong bảng product_info không
         if (isCategoryUsedInProduct(id)) {
             return false; // Không thể xóa nếu đang được sử dụng trong sản phẩm

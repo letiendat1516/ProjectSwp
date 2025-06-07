@@ -1,5 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="model.Users" session="true" %> 
 <!DOCTYPE html>
+<%@page import="model.Users"%>
+<%
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
+
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
@@ -166,6 +176,7 @@
       }
     }
   </style>
+
 </head>
 <body>
   <div class="container">
@@ -203,7 +214,7 @@
           </div>
           <h4 class="card-title">Quản lý Đơn vị Tính</h4>
           <p class="card-text">Quản lý các đơn vị đo lường và tính toán cho vật liệu và sản phẩm.</p>
-          <a href="unit-categories.jsp" class="btn btn-primary">
+          <a href="materialUnit.jsp" class="btn btn-primary">
             Truy cập <span class="material-icons btn-icon">arrow_forward</span>
           </a>
         </div>
@@ -220,7 +231,7 @@
           </div>
           <h4 class="card-title">Quản lý Nhà cung cấp</h4>
           <p class="card-text">Thêm, sửa, xóa và xem thông tin về các nhà cung cấp vật liệu.</p>
-          <a href="supplier-categories.jsp" class="btn btn-primary">
+          <a href="LishSupplier" class="btn btn-primary">
             Truy cập <span class="material-icons btn-icon">arrow_forward</span>
           </a>
         </div>

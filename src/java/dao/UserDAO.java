@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import model.Users;
 
@@ -361,6 +362,46 @@ public int getTotalUserCount() {
             e.printStackTrace();
         }
         return null;
+    }
+
+    
+     public String getFullName(int userId) {
+        String fullName = null;
+        String sql = "SELECT fullname FROM users WHERE id = ?";
+
+        try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    fullName = rs.getString("fullname");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return fullName;
+    }
+
+    public Date getDoB(int userId) {
+        Date dob = null;
+        String sql = "SELECT DoB FROM users WHERE id = ?";
+
+        try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    dob = rs.getDate("DoB");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dob;
     }
 
 }

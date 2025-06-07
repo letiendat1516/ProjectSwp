@@ -86,7 +86,7 @@ public class LoginServlet extends HttpServlet {
                 break;
             case "Nhân viên công ty":
                 response.sendRedirect("categoriesforward.jsp");
-                break;    
+                break;
             default:
                 response.sendRedirect("homepage.jsp");
         }

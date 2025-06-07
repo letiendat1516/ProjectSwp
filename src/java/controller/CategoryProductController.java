@@ -7,16 +7,16 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import dao.CategoryDAO;
+import dao.CategoryProductDAO;
 import model.Category;
 
 @WebServlet(name = "CategoryController", urlPatterns = {"/category/*"})
-public class CategoryController extends HttpServlet {
-    private CategoryDAO categoryDAO;
+public class CategoryProductController extends HttpServlet {
+    private CategoryProductDAO categoryDAO;
     
     @Override
     public void init() {
-        categoryDAO = new CategoryDAO();
+        categoryDAO = new CategoryProductDAO();
     }
     
     @Override
@@ -74,17 +74,42 @@ public class CategoryController extends HttpServlet {
         // Xử lý tìm kiếm
         String searchKeyword = request.getParameter("search");
         
-        // Lấy danh sách danh mục theo phân trang và tìm kiếm
-        List<Category> categories = categoryDAO.getAllCategories(page, pageSize, searchKeyword);
+        // Xử lý sắp xếp
+        String sortField = request.getParameter("sortField");
+        String sortDir = request.getParameter("sortDir");
+        
+        // Giá trị mặc định cho sắp xếp
+        if (sortField == null || sortField.trim().isEmpty()) {
+            sortField = "id"; // Mặc định sắp xếp theo ID
+        }
+        
+        if (sortDir == null || sortDir.trim().isEmpty()) {
+            sortDir = "asc"; // Mặc định sắp xếp tăng dần
+        }
+        
+        // Lấy danh sách danh mục theo phân trang, tìm kiếm và sắp xếp
+        List<Category> categories = categoryDAO.getAllCategories(page, pageSize, searchKeyword, sortField, sortDir);
         
         // Đếm tổng số danh mục để tính số trang
         int totalCategories = categoryDAO.countCategories(searchKeyword);
         int totalPages = (int) Math.ceil((double) totalCategories / pageSize);
         
+        // Tính toán thông tin phân trang
+        int startPage = Math.max(1, page - 2);
+        int endPage = Math.min(totalPages, page + 2);
+        
+        // Đảo ngược hướng sắp xếp cho lần click tiếp theo
+        String reverseSortDir = sortDir.equals("asc") ? "desc" : "asc";
+        
         request.setAttribute("categories", categories);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("startPage", startPage);
+        request.setAttribute("endPage", endPage);
         request.setAttribute("searchKeyword", searchKeyword);
+        request.setAttribute("sortField", sortField);
+        request.setAttribute("sortDir", sortDir);
+        request.setAttribute("reverseSortDir", reverseSortDir);
         
         request.getRequestDispatcher("/list.jsp").forward(request, response);
     }
