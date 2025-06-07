@@ -327,22 +327,22 @@
                             <textarea rows="1" name="reason" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Tên nhà cung cấp</label>
-                            <textarea rows="1" name="supplier" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <label>Gợi ý nhà cung cấp</label>
+                            <textarea rows="1" name="supplier" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)"></textarea>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group">
                             <label>Địa chỉ</label>
-                            <textarea rows="1" name="address" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <textarea rows="1" name="address" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)"></textarea>
                         </div>
                         <div class="form-group">
                             <label>Điện thoại</label>
-                            <input rows="1" name="phone" id="phone" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" pattern="0[0-9]{9}" title="Số điện thoại phải bắt đầu bằng 0 và có đúng 10 chữ số" required>
+                            <input rows="1" name="phone" id="phone" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" pattern="0[0-9]{9}" title="Số điện thoại phải bắt đầu bằng 0 và có đúng 10 chữ số">
                         </div>
                         <div class="form-group">
                             <label>Email</label>
-                            <textarea rows="1" name="email" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <textarea rows="1" name="email" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)"></textarea>
                         </div>
                     </div>
                 </div>
