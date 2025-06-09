@@ -213,6 +213,12 @@
             <div class="error-message">${errorMessage}</div>
         </c:if>
         
+        <!-- Hiển thị thông báo thành công nếu có -->
+        <c:if test="${not empty successMessage}">
+            <div class="success-message" style="color: green; margin-bottom: 10px;">${successMessage}</div>
+            <c:remove var="successMessage" scope="session"/>
+        </c:if>
+        
         <!-- Thanh tìm kiếm và nút tạo mới -->
         <div class="search-container">
             <form method="get" action="materialUnit" class="search-form">
@@ -220,23 +226,24 @@
                 <input type="text" id="searchInput" name="searchTerm" placeholder="Tên, kí hiệu,..." value="${searchTerm}" />
                 <button type="submit" class="btn-primary">Tìm kiếm</button>
             </form>
-            <select id="statusFilter" onchange="filterByStatus(this.value)">
-                <option value="all">Tất cả</option>
-                <option value="active">Hoạt động</option>
-                <option value="inactive">Không hoạt động</option>
+            <select id="typeFilter" onchange="filterByType(this.value)" style="padding: 8px; width: 300px; border: 1px solid #ddd; border-radius: 4px; margin-right: 10px;">
+                <option value="all">Tất cả loại</option>
+                <option value="Khối lượng">Khối lượng</option>
+                <option value="Độ dài">Độ dài</option>
+                <option value="Số lượng">Số lượng</option>
             </select>
             <a href="createMaterialUnit" class="btn-primary">Thêm đơn vị mới</a>
         </div>
 
         <script>
-        function filterByStatus(status) {
+        function filterByType(type) {
             var table = document.getElementById("materialUnitTable");
             var tr = table.getElementsByTagName("tr");
             for (var i = 1; i < tr.length; i++) {
-                var statusCell = tr[i].getElementsByTagName("td")[4];
-                if (statusCell) {
-                    var statusText = statusCell.textContent || statusCell.innerText;
-                    if (status === 'all' || statusText.toLowerCase() === status) {
+                var typeCell = tr[i].getElementsByTagName("td")[4];
+                if (typeCell) {
+                    var typeText = typeCell.textContent || typeCell.innerText;
+                    if (type === 'all' || typeText === type) {
                         tr[i].style.display = "";
                     } else {
                         tr[i].style.display = "none";
@@ -295,7 +302,7 @@
                     <th onclick="sortTable(1)" style="cursor: pointer;">Tên ↕</th>
                     <th onclick="sortTable(2)" style="cursor: pointer;">Kí hiệu ↕</th>
                     <th onclick="sortTable(3)" style="cursor: pointer;">Mô tả ↕</th>
-                    <th onclick="sortTable(4)" style="cursor: pointer;">Trạng thái ↕</th>
+                    <th onclick="sortTable(4)" style="cursor: pointer;">Loại đơn vị ↕</th>
                     <th>Thao tác</th>
                 </tr>
             </thead>
@@ -313,9 +320,9 @@
                                 <td>${unit.name}</td>
                                 <td>${unit.symbol}</td>
                                 <td>${unit.description}</td>
-                                <td>${unit.status}</td>
+                                <td>${unit.type}</td>
                                 <td>
-                                    <a href="editMaterialUnit?id=${unit.id}" class="btn-edit">Edit</a>
+                                    <a href="editMaterialUnit?id=${unit.id}" class="btn-edit">Thay đổi</a> 
                                     <button onclick="if(confirm('Bạn có muốn xóa đơn vị này không?')) window.location.href='deleteMaterialUnit?id=${unit.id}'" class="btn-edit btn-delete" style="background-color: #ff4444; border-color: #ff4444;">Xóa</button>
                                 </td>
                             </tr>
