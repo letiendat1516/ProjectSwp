@@ -16,18 +16,18 @@ public class MaterialUnit {
     private String name;
     private String symbol;
     private String description;
-    private String status;
+    private String type;
     private Timestamp createdAt;
     
     public MaterialUnit() {
     }
     
-    public MaterialUnit(int id, String name, String symbol, String description, String status, Timestamp createdAt) {
+    public MaterialUnit(int id, String name, String symbol, String description, String type, Timestamp createdAt) {
         this.id = id;
         this.name = name;
         this.symbol = symbol;
         this.description = description;
-        this.status = status;
+        this.type = type;
         this.createdAt = createdAt;
     }
     
@@ -64,12 +64,12 @@ public class MaterialUnit {
         this.description = description;
     }
     
-    public String getStatus() {
-        return status;
+    public String getType() {
+        return type;
     }
     
-    public void setStatus(String status) {
-        this.status = status;
+    public void setType(String type) {
+        this.type = type;
     }
     
     public Timestamp getCreatedAt() {

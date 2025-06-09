@@ -1,13 +1,12 @@
 <%-- 
-    Document   : UserManager
-    Created on : 27 thg 5, 2025, 14:39:06
+    Document   : RoleAssignment
+    Created on : 31 thg 5, 2025, 16:29:22
     Author     : phucn
 --%>
 
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="model.Users" session="true" %> 
-<!DOCTYPE html>
+<%@ page import="model.Users" %>
 
 <%@page import="model.Users"%>
 <%
@@ -17,24 +16,18 @@
         return;
     }
 %>
-
-
-<%
-response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
-response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-response.setDateHeader("Expires", 0); // Proxies
-%>
-
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
-        <title>Admin Dashboard</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Role Assignment</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
                 margin: 0;
                 padding: 0;
                 background-color: #f4f4f9;
-                color: #333;
             }
             .container {
                 display: flex;
@@ -72,6 +65,22 @@ response.setDateHeader("Expires", 0); // Proxies
             .sidebar ul li:hover {
                 background-color: #34495e;
             }
+            .add-user-btn {
+                background-color: #3498db;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-bottom: 20px;
+            }
+            .add-user-btn a {
+                color: white;
+                text-decoration: none;
+            }
+            .add-user-btn:hover {
+                background-color: #2980b9;
+            }
             .main-content {
                 margin-left: 250px;
                 padding: 20px;
@@ -101,22 +110,6 @@ response.setDateHeader("Expires", 0); // Proxies
             }
             .admin-logout a:hover {
                 text-decoration: underline;
-            }
-            .add-user-btn {
-                background-color: #3498db;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 5px;
-                cursor: pointer;
-                margin-bottom: 20px;
-            }
-            .add-user-btn a {
-                color: white;
-                text-decoration: none;
-            }
-            .add-user-btn:hover {
-                background-color: #2980b9;
             }
             .filter-bar {
                 display: flex;
@@ -148,78 +141,34 @@ response.setDateHeader("Expires", 0); // Proxies
             table {
                 width: 100%;
                 border-collapse: collapse;
-                background-color: #fff;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                margin-top: 20px;
             }
             th, td {
-                padding: 12px 15px;
+                padding: 12px;
                 text-align: left;
                 border-bottom: 1px solid #ddd;
             }
             th {
-                background-color: #ecf0f1;
-                font-weight: bold;
+                background-color: #f2f2f2;
             }
-            tr:hover {
-                background-color: #f9f9f9;
+            select, button {
+                padding: 8px;
+                font-size: 14px;
             }
-            .status-active {
-                color: #2ecc71;
-                font-weight: bold;
-            }
-            .status-inactive {
-                color: #e74c3c;
-                font-weight: bold;
-            }
-            .action-btn {
-                padding: 5px 10px;
-                border: none;
-                border-radius: 3px;
-                cursor: pointer;
-                margin-right: 5px;
-                text-decoration: none;
-            }
-            .edit-btn {
+            .btn {
                 background-color: #3498db;
                 color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
             }
-            .edit-btn:hover {
+            .btn:hover {
                 background-color: #2980b9;
             }
-            .activate-btn {
-                background-color: #2ecc71;
-                color: white;
+            .message {
+                color: green;
+                margin-bottom: 20px;
             }
-            .activate-btn:hover {
-                background-color: #27ae60;
-            }
-            .deactivate-btn {
-                background-color: #e74c3c;
-                color: white;
-            }
-            .deactivate-btn:hover {
-                background-color: #c0392b;
-            }
-            .pagination a, .pagination button {
-                padding: 8px 12px;
-                margin: 0 2px;
-                border: 1px solid #ddd;
-                text-decoration: none;
-                color: #3498db;
-                border-radius: 3px;
-                cursor: pointer;
-            }
-
-            .pagination button.active {
-                background-color: #3498db;
-                color: white;
-                border-color: #3498db;
-            }
-
-            .pagination a:hover {
-                background-color: #ecf0f1;
-            }
-
         </style>
     </head>
     <body>
@@ -243,10 +192,6 @@ response.setDateHeader("Expires", 0); // Proxies
                     </div>
                 </div>
 
-                <button class="add-user-btn">
-                    <a href="AddUser.jsp">+ Add User</a>
-                </button>
-
                 <form action="userfilter" method="get" class="filter-bar">
                     <div class="filter-bar">
                         <select id="role" name="role">
@@ -264,72 +209,54 @@ response.setDateHeader("Expires", 0); // Proxies
                         </select>
 
                         <input type="text" name="keyword" placeholder="Enter keyword(s) to search">
-                        <input type="hidden" name="page" value="usermanager" /> <!-- Phân biệt trang -->
+                        <input type="hidden" name="page" value="roleassignment" />
                         <button class="search-btn">Search</button>
                     </div>
                 </form>
 
+                
+                <c:if test="${not empty sessionScope.message}">
+                    <div class="message">${sessionScope.message}</div>
+                    <c:remove var="message" scope="session"/>
+                </c:if>
+
                 <table>
-                    <thead style="background-color: #eee;">
+                    <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Username</th>
-                            <th>Fullname</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Created Date</th>
-                            <th>Action</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Current Role</th>
+                            <th>New Role</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:forEach var="user" items="${userList}">
                             <tr>
-                                <td>${user.id}</td>
                                 <td>${user.username}</td>
                                 <td>${user.fullname}</td>
+                                <td>${user.email}</td>
                                 <td>${user.roleName}</td>
                                 <td>
-                                    <c:choose>
-                                        <c:when test="${user.activeFlag == 1}">Active</c:when>
-                                        <c:otherwise>Inactive</c:otherwise>
-                                    </c:choose>
-                                </td>
-                                <td>${user.createDate}</td>
-                                <td>
-                                    <a href="edituser?id=${user.id}">Edit</a>
-                                </td>
-
+                                    <form action="roleAssignment" method="post">
+                                        <input type="hidden" name="userId" value="${user.id}"/>
+                                        <select name="role">                                           
+                                            <option value="2" ${user.roleName == 'Warehouse Staff' ? 'selected' : ''}>Warehouse Staff</option>
+                                            <option value="3" ${user.roleName == 'Company Employee' ? 'selected' : ''}>Company Employee</option>
+                                            <option value="4" ${user.roleName == 'Company Director' ? 'selected' : ''}>Company Director</option>
+                                        </select>
+                                        <button type="submit" class="btn">Assign Role</button>
+                                    </form>
+                                </td>                           
                             </tr>
                         </c:forEach>
-                        <c:if test="${empty userList}">
-                            <tr><td colspan="7">No users found.</td></tr>
-                        </c:if>
                     </tbody>
                 </table>
-
-                <div class="pagination">
-                    <p>Total pages: ${totalPages}</p>
-                    <c:if test="${totalPages > 1}">
-                        <c:if test="${currentPage > 1}">
-                            <a href="admin?page=${currentPage - 1}">&lt; Prev</a>
-                        </c:if>
-                        <c:forEach begin="1" end="${totalPages}" var="i">
-                            <c:choose>
-                                <c:when test="${i == currentPage}">
-                                    <button class="active">${i}</button>
-                                </c:when>
-                                <c:otherwise>
-                                    <a href="admin?page=${i}">${i}</a>
-                                </c:otherwise>
-                            </c:choose>
-                        </c:forEach>
-                        <c:if test="${currentPage < totalPages}">
-                            <a href="admin?page=${currentPage + 1}">Next &gt;</a>
-                        </c:if>
-                    </c:if>
-                </div>
-
             </div>
         </div>
+
+                
+            
     </body>
 </html>
+

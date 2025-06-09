@@ -52,47 +52,39 @@ public class MaterialUnitServlet extends HttpServlet {
         doGet(request, response);
     }
     
+    // Change all status references to type
     private void listMaterialUnits(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         int page = 1;
         int recordsPerPage = 10; // Increased to 20
-        
         if(request.getParameter("page") != null) {
             page = Integer.parseInt(request.getParameter("page"));
         }
-        
         List<MaterialUnit> materialUnits = materialUnitDAO.getMaterialUnitsWithPaging((page-1)*recordsPerPage, recordsPerPage);
         int totalRecords = materialUnitDAO.getTotalRecords();
         int totalPages = (int) Math.ceil(totalRecords * 1.0 / recordsPerPage);
-        
         request.setAttribute("materialUnits", materialUnits);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         System.out.println("listMaterialUnits: materialUnits size=" + materialUnits.size() + ", page=" + page + ", totalRecords=" + totalRecords + ", totalPages=" + totalPages);
         request.getRequestDispatcher("/materialUnit.jsp").forward(request, response);
     }
-    
     private void searchMaterialUnits(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         String searchTerm = request.getParameter("searchTerm");
         if (searchTerm == null) {
             searchTerm = "";
         }
-        
         int page = 1;
         int recordsPerPage = 10; // Increased to 20
-        
         if (request.getParameter("page") != null) {
             page = Integer.parseInt(request.getParameter("page"));
         }
-        
         List<MaterialUnit> materialUnits = materialUnitDAO.searchMaterialUnitsWithPaging(
             searchTerm, (page - 1) * recordsPerPage, recordsPerPage
         );
-        
         int totalRecords = materialUnitDAO.getTotalSearchRecords(searchTerm);
         int totalPages = (int) Math.ceil(totalRecords * 1.0 / recordsPerPage);
-        
         request.setAttribute("materialUnits", materialUnits);
         request.setAttribute("searchTerm", searchTerm);
         request.setAttribute("currentPage", page);
@@ -100,20 +92,16 @@ public class MaterialUnitServlet extends HttpServlet {
         System.out.println("searchMaterialUnits: materialUnits size=" + materialUnits.size() + ", searchTerm=" + searchTerm + ", page=" + page + ", totalRecords=" + totalRecords + ", totalPages=" + totalPages);
         request.getRequestDispatcher("/materialUnit.jsp").forward(request, response);
     }
-
     private void paginateMaterialUnits(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException, IOException {
         int page = 1;
         int recordsPerPage = 10; // Increased to 20
-        
         if(request.getParameter("page") != null) {
             page = Integer.parseInt(request.getParameter("page"));
         }
-        
         List<MaterialUnit> materialUnits = materialUnitDAO.getMaterialUnitsWithPaging((page-1)*recordsPerPage, recordsPerPage);
         int totalRecords = materialUnitDAO.getTotalRecords();
         int totalPages = (int) Math.ceil(totalRecords * 1.0 / recordsPerPage);
-        
         request.setAttribute("materialUnits", materialUnits);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);

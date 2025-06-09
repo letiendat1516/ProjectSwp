@@ -38,43 +38,42 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
-    private static final int PAGE_SIZE = 10; // số bản ghi mỗi trang
+    private static final int PAGE_SIZE = 10;
 
     @Override
-protected void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    // Kiểm tra session và quyền admin
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login.jsp");
             return;
         }
-    
-    UserDAO userDAO = new UserDAO();
 
-    String pageParam = request.getParameter("page");
-    int pageIndex = 1;
-    int pageSize = 10;
+        String pageParam = request.getParameter("page");
+        int pageIndex = 1;
+        int pageSize = 10;
 
-    if (pageParam != null) {
-        try {
-            pageIndex = Integer.parseInt(pageParam);
-            if (pageIndex < 1) pageIndex = 1;
-        } catch (NumberFormatException e) {
-            pageIndex = 1;
+        if (pageParam != null) {
+            try {
+                pageIndex = Integer.parseInt(pageParam);
+                if (pageIndex < 1) {
+                    pageIndex = 1;
+                }
+            } catch (NumberFormatException e) {
+                pageIndex = 1;
+            }
         }
+        UserDAO userDAO = new UserDAO();
+        List<Users> userList = userDAO.getUsersByPage(pageIndex, pageSize);
+        int totalUsers = userDAO.getTotalUserCount();
+        int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+
+        request.setAttribute("userList", userList);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("currentPage", pageIndex);
+
+        request.getRequestDispatcher("UserManager.jsp").forward(request, response);
     }
-
-    List<Users> userList = userDAO.getUsersByPage(pageIndex, pageSize);
-    int totalUsers = userDAO.getTotalUserCount();
-    int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
-
-    request.setAttribute("userList", userList);
-    request.setAttribute("totalPages", totalPages);
-    request.setAttribute("currentPage", pageIndex);
-
-    request.getRequestDispatcher("UserManager.jsp").forward(request, response);
-}
 
 
 
