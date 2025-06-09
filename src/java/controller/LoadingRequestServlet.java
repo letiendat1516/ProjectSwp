@@ -17,7 +17,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
+import java.time.Period;
 import java.util.List;
 import model.ProductInfo;
 import model.Users;
@@ -68,8 +70,6 @@ public class LoadingRequestServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         Users currentUser = (Users) session.getAttribute("user");
-
-        
 
         UserDAO dao = new UserDAO();
         String fullname = dao.getFullName(currentUser.getId());
