@@ -8,7 +8,6 @@ package controller;
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +15,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import dao.MaterialUnitDAO;
 import model.MaterialUnit;
 
-@WebServlet("/createMaterialUnit")
 public class CreateMaterialUnitServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private MaterialUnitDAO materialUnitDAO;
@@ -28,7 +26,7 @@ public class CreateMaterialUnitServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         // Hiển thị form tạo mới
-        request.getRequestDispatcher("/createMaterialUnit.jsp").forward(request, response);
+        request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
     }
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
@@ -50,7 +48,7 @@ public class CreateMaterialUnitServlet extends HttpServlet {
                 unit.setDescription(description);
                 unit.setType(type);
                 request.setAttribute("unit", unit);
-                request.getRequestDispatcher("/createMaterialUnit.jsp").forward(request, response);
+                request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
                 return;
             }
 
@@ -69,7 +67,7 @@ public class CreateMaterialUnitServlet extends HttpServlet {
             response.sendRedirect("materialUnit");
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("materialUnit");
+            response.sendRedirect("/material_unit/materialUnit");
         }
     }
 }
