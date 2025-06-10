@@ -50,7 +50,9 @@ public class UserDAO extends Context {
                 + "LEFT JOIN role r ON ur.role_id = r.id "
                 + "WHERE r.role_name != 'Admin'";
 
-        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+        try (Connection connection = Context.getJDBCConnection(); 
+                PreparedStatement stmt = connection.prepareStatement(sql); 
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Users user = new Users();
@@ -73,7 +75,8 @@ public class UserDAO extends Context {
 
     public void updateUserRole(int userId, int roleId) throws SQLException {
         String checkSql = "SELECT COUNT(*) FROM user_role WHERE user_id = ?";
-        try (Connection connection = Context.getJDBCConnection(); PreparedStatement checkStmt = connection.prepareStatement(checkSql)) {
+        try (Connection connection = Context.getJDBCConnection(); 
+                PreparedStatement checkStmt = connection.prepareStatement(checkSql)) {
             checkStmt.setInt(1, userId);
             ResultSet rs = checkStmt.executeQuery();
             if (rs.next() && rs.getInt(1) > 0) {
@@ -150,6 +153,7 @@ public class UserDAO extends Context {
                     Users user = new Users();
                     user.setId(rs.getInt("id"));
                     user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
                     user.setDob(rs.getDate("dob"));
                     user.setPhone(rs.getString("phone"));
                     user.setFullname(rs.getString("fullname"));

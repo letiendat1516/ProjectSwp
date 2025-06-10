@@ -270,6 +270,9 @@
                     Logout
                 </a>
             </div>
+            <div>
+                <a href="ItemsSupplyRequestForm.jsp">Transaction</a>
+            </div>
         </div>
     </body>
 </html>
