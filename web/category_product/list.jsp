@@ -282,13 +282,13 @@
 <body>
   <div class="container">
       <div class="page-header">
-          <h1 class="page-title">Quản lý danh mục sản phẩm</h1>
+          <h1 class="page-title">Quản lý danh mục loại sản phẩm</h1>
       </div>
 
       <!-- Navigation Buttons -->
       <div class="nav-buttons">
           <a href="/ProjectWarehouse/categoriesforward.jsp" class="btn btn-info">← Quay lại trang trước</a>
-          <a href="${pageContext.request.contextPath}/category-parent/list" class="btn btn-success">Quản lý danh mục cha</a>
+          <a href="${pageContext.request.contextPath}/category-parent/list" class="btn btn-success">Quản lý danh mục</a>
       </div>
 
       <!-- Thông báo -->
@@ -319,7 +319,7 @@
 
       <!-- Thanh công cụ -->
       <div class="toolbar">
-          <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">Thêm danh mục</a>
+          <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">Thêm danh mục loại sản phẩm</a>
           <form method="get" class="search-form">
               <input type="text" name="search" class="form-input" 
                      placeholder="Tìm kiếm danh mục..." value="${searchKeyword}">
@@ -341,12 +341,12 @@
                               </th>
                               <th>
                                   <a href="?sortField=name&sortDir=${sortField eq 'name' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
-                                      Tên danh mục ${sortField eq 'name' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
+                                      Tên ${sortField eq 'name' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
                                   </a>
                               </th>
                               <th>
                                   <a href="?sortField=parent_name&sortDir=${sortField eq 'parent_name' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
-                                      Danh mục cha ${sortField eq 'parent_name' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
+                                      Danh mục ${sortField eq 'parent_name' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
                                   </a>
                               </th>
                               <th>Trạng thái</th>
@@ -391,7 +391,7 @@
                   <div class="empty-state">
                       <h3>Không có danh mục nào</h3>
                       <p>Hãy thêm danh mục đầu tiên của bạn</p>
-                      <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">Thêm danh mục</a>
+                      <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">Thêm danh mục loại sản phẩm</a>
                   </div>
               </c:otherwise>
           </c:choose>
