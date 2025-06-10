@@ -6,10 +6,12 @@
             <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ExportRequestDAO.java</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/web/ExportRequest.jsp</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ExportRequestController.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/web/WEB-INF/web.xml</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/RequestItemsDAO.java</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ExportRequestItemsDAO.java</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/LoadingRequestServlet.java</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/RequestInformationDAO.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/DBContext/Context.java</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/ExportRequest.java</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/web/ItemsSupplyRequestForm.jsp</file>
         </group>
