@@ -388,12 +388,6 @@
 <body>
     <div class="container">
         <!-- User Info Header -->
-        <div class="user-info-header">
-            <div class="user-welcome">
-                Chào mừng, <strong>Admin</strong>
-            </div>
-            <a href="logout" class="logout-btn">Đăng xuất</a>
-        </div>
 
         <div class="page-header">
             <h1 class="page-title">Quản lý người dùng</h1>
