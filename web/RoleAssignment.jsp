@@ -9,7 +9,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ page import="model.Users" %>
 
-<%@page import="model.Users"%>
 <%
   Users user = (Users) session.getAttribute("user");
   if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
@@ -376,8 +375,7 @@
 </head>
 <body>
   <div class="container">
-      <!-- User Info Header -->
-
+      <!-- Page Header -->
       <div class="page-header">
           <h1 class="page-title">Quản lý phân quyền</h1>
       </div>
@@ -388,7 +386,7 @@
           <a href="admin" class="btn btn-primary">Quản lý người dùng</a>
       </div>
 
-      <!-- Thông báo -->
+      <!-- Success Messages -->
       <c:if test="${not empty sessionScope.message}">
           <div class="alert alert-success">
               ${sessionScope.message}
@@ -397,6 +395,7 @@
           </div>
       </c:if>
 
+      <!-- Error Messages -->
       <c:if test="${not empty param.error}">
           <div class="alert alert-danger">
               <c:choose>
@@ -447,7 +446,7 @@
           </form>
       </div>
 
-      <!-- Thanh công cụ -->
+      <!-- Toolbar -->
       <div class="toolbar">
           <div class="search-form">
               <span class="text-muted">
@@ -458,7 +457,7 @@
           </div>
       </div>
 
-      <!-- Bảng danh sách -->
+      <!-- User Table -->
       <div class="table-container">
           <c:choose>
               <c:when test="${not empty userList}">
