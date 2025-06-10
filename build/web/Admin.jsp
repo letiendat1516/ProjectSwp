@@ -121,9 +121,15 @@
                 <h2>Warehouse<br>Manager</h2>
                 <ul >
                     <li class="add-user-btn"><a href="admin">User Manager</a></li>
+<<<<<<< HEAD
                     <li class="add-user-btn"><a href=""> Role Assignment </a></li>
                     <li class="add-user-btn"><a href="categoriesforward.jsp">material Information</a></li>
                     <li class="add-user-btn">Transaction</li>
+=======
+                    <li class="add-user-btn"><a href="roleAssignment"> Role Assignment </a></li>
+                    <li class="add-user-btn"><a href="categoriesforward.jsp">Material Information</a></li>
+                    <li class="add-user-btn"><a href="RequestForward.jsp" >Transaction</a></li>
+>>>>>>> 2b6e81ddddeda52d5cd39bd59c65cba42934ef8e
                     <li class="add-user-btn">Statistic</li>
                 </ul>
             </div>

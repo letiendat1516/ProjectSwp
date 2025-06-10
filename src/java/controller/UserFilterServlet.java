@@ -43,22 +43,27 @@ public class UserFilterServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        String roleStr = request.getParameter("role");
-        String status = request.getParameter("status");
-        String keyword = request.getParameter("keyword");
+        String roleParam = request.getParameter("role");
+    String status = request.getParameter("status");
+    String keyword = request.getParameter("keyword");
 
-        Integer roleId = null;
-        if (roleStr != null && !roleStr.isEmpty()) {
+    boolean includeAdmin = false;
+    Integer roleId = null;
+
+    if (roleParam != null) {
+        if ("all".equalsIgnoreCase(roleParam)) {
+            includeAdmin = true;
+        } else {
             try {
-                roleId = Integer.parseInt(roleStr);
+                roleId = Integer.parseInt(roleParam);
             } catch (NumberFormatException e) {
                 roleId = null;
             }
         }
+    }
 
-        UserDAO userDAO = new UserDAO();
-        List<Users> filteredUsers = userDAO.filterUsers(roleId, status, keyword);
-
+    UserDAO userDAO = new UserDAO();
+    List<Users> filteredUsers = userDAO.filterUsers(roleId, status, keyword, includeAdmin);
         request.setAttribute("userList", filteredUsers);
         request.getRequestDispatcher("UserManager.jsp").forward(request, response);
     }
