@@ -2,21 +2,20 @@ package model;
 
 public class RequestItem {
 
-    private String id;
+    private int id;
     private String requestId;
     private String productName;
     private String productCode;
     private String unit;
     private double quantity; // Sửa từ int thành double
     private double importedQty; // mới
-
     private String note;
     private String reasonDetail;
 
     public RequestItem() {
     }
 
-    public RequestItem(String id, String requestId, String productName, String productCode, String unit, double quantity, double importedQty, String note, String reasonDetail) {
+    public RequestItem(int id, String requestId, String productName, String productCode, String unit, double quantity, double importedQty, String note, String reasonDetail) {
         this.id = id;
         this.requestId = requestId;
         this.productName = productName;
@@ -28,11 +27,11 @@ public class RequestItem {
         this.reasonDetail = reasonDetail;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -100,7 +99,6 @@ public class RequestItem {
         this.reasonDetail = reasonDetail;
     }
 
-
-
+  
  
 }

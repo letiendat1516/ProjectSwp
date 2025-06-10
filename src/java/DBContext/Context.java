@@ -11,16 +11,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Context {
+
     public static Connection getJDBCConnection() {
 
         String url = "jdbc:mysql://localhost:3306/swp";
         String user = "root";
         String password = "123456";
-        
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            
+
             return DriverManager.getConnection(url, user, password);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Context.class.getName()).log(Level.SEVERE, null, ex);
@@ -29,9 +29,10 @@ public class Context {
         }
         return null;
     }
+
     public static void main(String[] args) {
         Connection conn = getJDBCConnection();
-        if(conn != null){
+        if (conn != null) {
             System.out.println("success");
         } else {
             System.out.println("fail");

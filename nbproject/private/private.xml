@@ -3,10 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/controller/AdminServlet.java</file>
-            <file>file:/E:/VSCODE/swp/ProjectSwp/web/forgot.jsp</file>
-            <file>file:/E:/VSCODE/swp/ProjectSwp/web/AddUser.jsp</file>
-            <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/controller/LoginServlet.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/PRJ/ProjectSwp/web/LishSupplier.jsp</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/PRJ/ProjectSwp/web/SupplierEvaluation.jsp</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/PRJ/ProjectSwp/src/java/model/SupplierEvaluation.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/PRJ/ProjectSwp/src/java/DBContext/Context.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/PRJ/ProjectSwp/src/java/controller/TableSupplierEvaluation.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/PRJ/ProjectSwp/src/java/dao/SupplierEvaluationDAO.java</file>
         </group>
     </open-files>
 </project-private>
