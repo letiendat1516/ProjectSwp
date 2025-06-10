@@ -74,6 +74,10 @@ h1 {
     <div class="container">
         <h1>Thêm đơn vị mới</h1>
         
+        <c:if test="${not empty errorMessage}">
+        <div class="error-message" style="color: red; margin-bottom: 10px;">${errorMessage}</div>
+    </c:if>
+        
         <form action="createMaterialUnit" method="post">
             <div class="form-group">
                 <label for="name">Tên:</label>
@@ -91,10 +95,11 @@ h1 {
             </div>
             
             <div class="form-group">
-                <label for="status">Trạng thái</label>
-                <select id="status" name="status">
-                    <option value="active">Hoạt động</option>
-                    <option value="inactive">Không hoạt động</option>
+                <label for="type">Loại đơn vị</label>
+                <select id="type" name="type" required>
+                    <option value="Khối lượng">Khối lượng</option>
+                    <option value="Độ dài">Độ dài</option>
+                    <option value="Số lượng">Số lượng</option>
                 </select>
             </div>
             

@@ -47,7 +47,7 @@ public class ListRequestImportDAO {
             rs = ps.executeQuery();
             while (rs.next()) {
                 RequestItem item = new RequestItem();
-                item.setId(rs.getString("id"));
+                item.setId(rs.getInt("id"));
                 item.setRequestId(rs.getString("request_id"));
                 item.setProductName(rs.getString("product_name"));
                 item.setProductCode(rs.getString("product_code"));
@@ -156,7 +156,7 @@ public class ListRequestImportDAO {
             rs = ps.executeQuery();
             while (rs.next()) {
                 RequestItem item = new RequestItem();
-                item.setId(rs.getString("id"));
+                item.setId(rs.getInt("id"));
                 item.setRequestId(rs.getString("request_id"));
                 item.setProductName(rs.getString("product_name"));
                 item.setProductCode(rs.getString("product_code"));
