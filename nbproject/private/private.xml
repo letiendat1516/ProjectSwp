@@ -3,15 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/web/login.jsp</file>
-            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/web/UserManager.jsp</file>
-            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/web/Admin.jsp</file>
-            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/controller/LoginServlet.java</file>
-            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/web/LishSupplier.jsp</file>
-            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/dao/UserDAO.java</file>
-            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/DBContext/Context.java</file>
-            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/web/AddUser.jsp</file>
-            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/model/Users.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/dao/SupplierEvaluationDAO.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/web/SupplierEvaluation.jsp</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/SWP391/projectSWP/ProjectSwp/src/java/controller/TableSupplierEvaluation.java</file>
         </group>
     </open-files>
 </project-private>

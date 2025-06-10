@@ -104,8 +104,5 @@
         <servlet-name>EditProfileServlet</servlet-name>
         <url-pattern>/editprofile</url-pattern>
     </servlet-mapping>
-    <session-config>
-        <session-timeout>15</session-timeout>
-        <!-- 15 phút -->
-    </session-config>
+
 </web-app>

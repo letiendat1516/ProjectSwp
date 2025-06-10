@@ -23,6 +23,29 @@ public class SupplierDAO {
     private Connection conn = null;
     private PreparedStatement ps = null;
     private ResultSet rs = null;
+    
+    public Supplier getSupplierByID(int id){
+        String sql = "select * from swp.supplier where id=  "+id;
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            if(rs.next()){
+                Supplier s = new Supplier();
+                s.setSupplierID(rs.getInt("id"));
+                s.setActiveFlag(rs.getInt("active_flag"));
+                s.setAddress(rs.getString("address"));
+                s.setCreateDate(rs.getDate("create_date"));
+                s.setEmail(rs.getString("email"));
+                s.setName(rs.getString("name"));
+                s.setNote(rs.getString("note"));
+                s.setPhone(rs.getString("phone"));
+                return s;
+            }
+        } catch (SQLException e) {
+        }
+        return null;
+    }
 
     public List<Supplier> getLishSupplier() {
         String sql = "select * from supplier where active_flag = 1";
@@ -264,10 +287,12 @@ public class SupplierDAO {
         SupplierDAO sd = new SupplierDAO();
 
         // limit (offset),(limit)
-        List<Supplier> l = sd.getSuppliersByPageFilter(2, 10, "all", "");
-        for (int i = 0; i < l.size(); i++) {
-            System.out.println(l.get(i).getSupplierID());
-        }
+//        List<Supplier> l = sd.getSuppliersByPageFilter(2, 10, "all", "");
+//        for (int i = 0; i < l.size(); i++) {
+//            System.out.println(l.get(i).getSupplierID());
+//        }
+        Supplier s = sd.getSupplierByID(1);
+        System.out.println(s.getName());
 
     }
 }

@@ -214,7 +214,7 @@
 
     </head>
     <body>
-
+        
         <c:set var="currentPage" value="${requestScope.currentPage}"/>
         <c:set var="listSupplier" value="${listSupplier}" />
         <c:set var="option" value="${requestScope.filter}"/>
@@ -285,6 +285,11 @@
                                            >Active</a>
                                     </c:otherwise>
                                 </c:choose>
+                            </td>
+                            <td>
+                                <a style="background-color: aquamarine;border: 1px solid #bd2130; color: #0d6efd;"
+                                   href="TableSupplierEvaluation?id=${listItem.supplierID}" 
+                                   >Evaluation</a>
                             </td>
                         </tr>
                     </c:forEach>
