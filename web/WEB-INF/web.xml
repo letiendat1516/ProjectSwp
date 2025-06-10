@@ -39,10 +39,30 @@
     <servlet>
         <servlet-name>ImportConfirmController</servlet-name>
         <servlet-class>controller.ImportConfirmController</servlet-class>
-        </servlet>
-        <servlet>
+    </servlet>
+    <servlet>
         <servlet-name>RoleAssignmentServlet</servlet-name>
         <servlet-class>controller.RoleAssignmentServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MaterialUnitServlet</servlet-name>
+        <servlet-class>controller.MaterialUnitServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CreateMaterialUnitServlet</servlet-name>
+        <servlet-class>controller.CreateMaterialUnitServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditMaterialUnitServlet</servlet-name>
+        <servlet-class>controller.EditMaterialUnitServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeleteMaterialUnitServlet</servlet-name>
+        <servlet-class>controller.DeleteMaterialUnitServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExportRequestController</servlet-name>
+        <servlet-class>controller.ExportRequestController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
@@ -73,7 +93,6 @@
         <url-pattern>/userfilter</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-
         <servlet-name>LoadingRequestServlet</servlet-name>
         <url-pattern>/loadingrequest</url-pattern>
     </servlet-mapping>
@@ -85,9 +104,29 @@
         <servlet-name>ImportConfirmController</servlet-name>
         <url-pattern>/import-confirm</url-pattern>
     </servlet-mapping>
-        <servlet-mapping>
+    <servlet-mapping>
         <servlet-name>RoleAssignmentServlet</servlet-name>
         <url-pattern>/roleAssignment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/materialUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/createMaterialUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/editMaterialUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/deleteMaterialUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExportRequestController</servlet-name>
+        <url-pattern>/exportRequest</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>15</session-timeout>

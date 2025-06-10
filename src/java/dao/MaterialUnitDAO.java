@@ -29,7 +29,7 @@ public class MaterialUnitDAO {
                 unit.setName(resultSet.getString("name"));
                 unit.setSymbol(resultSet.getString("symbol"));
                 unit.setDescription(resultSet.getString("description"));
-                unit.setStatus(resultSet.getBoolean("active_flag") ? "active" : "inactive");
+                unit.setType(resultSet.getString("type"));
                 materialUnits.add(unit);
             }
             
@@ -59,7 +59,7 @@ public class MaterialUnitDAO {
                     unit.setName(rs.getString("name"));
                     unit.setSymbol(rs.getString("symbol"));
                     unit.setDescription(rs.getString("description"));
-                    unit.setStatus(rs.getBoolean("active_flag") ? "active" : "inactive");
+                    unit.setType(rs.getString("type"));
                     units.add(unit);
                 }
             }
@@ -85,7 +85,7 @@ public class MaterialUnitDAO {
                     unit.setName(rs.getString("name"));
                     unit.setSymbol(rs.getString("symbol"));
                     unit.setDescription(rs.getString("description"));
-                    unit.setStatus(rs.getBoolean("active_flag") ? "active" : "inactive");
+                    unit.setType(rs.getString("type"));
                 }
             }
         } catch (SQLException e) {
@@ -96,28 +96,25 @@ public class MaterialUnitDAO {
     }
     
     public boolean addMaterialUnit(MaterialUnit unit) {
-        String sql = "INSERT INTO unit (name, symbol, description, active_flag) VALUES (?, ?, ?, ?)";
-        
+        String sql = "INSERT INTO unit (name, symbol, description, type) VALUES (?, ?, ?, ?)";
         try (Connection conn = Context.getJDBCConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-        
-        pstmt.setString(1, unit.getName());
-        pstmt.setString(2, unit.getSymbol());
-        pstmt.setString(3, unit.getDescription());
-        pstmt.setBoolean(4, unit.getStatus().equalsIgnoreCase("active"));
-        
-        int affectedRows = pstmt.executeUpdate();
-        System.out.println("addMaterialUnit: Added unit, name=" + unit.getName() + ", affectedRows=" + affectedRows);
-        return affectedRows > 0;
-    } catch (SQLException e) {
-        System.err.println("addMaterialUnit: Error - " + e.getMessage());
-        e.printStackTrace();
-        return false;
+            pstmt.setString(1, unit.getName());
+            pstmt.setString(2, unit.getSymbol());
+            pstmt.setString(3, unit.getDescription());
+            pstmt.setString(4, unit.getType());
+            int affectedRows = pstmt.executeUpdate();
+            System.out.println("addMaterialUnit: Added unit, name=" + unit.getName() + ", affectedRows=" + affectedRows);
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            System.err.println("addMaterialUnit: Error - " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
-}
   
     public boolean updateMaterialUnit(MaterialUnit unit) {
-        String sql = "UPDATE unit SET name = ?, symbol = ?, description = ?, active_flag = ? WHERE id = ?";
+        String sql = "UPDATE unit SET name = ?, symbol = ?, description = ?, type = ? WHERE id = ?";
         
         try (Connection conn = Context.getJDBCConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -125,7 +122,7 @@ public class MaterialUnitDAO {
             pstmt.setString(1, unit.getName());
             pstmt.setString(2, unit.getSymbol());
             pstmt.setString(3, unit.getDescription());
-            pstmt.setBoolean(4, unit.getStatus().equalsIgnoreCase("active"));
+            pstmt.setString(4, unit.getType());
             pstmt.setInt(5, unit.getId());
             
             int affectedRows = pstmt.executeUpdate();
@@ -174,81 +171,79 @@ public class MaterialUnitDAO {
     }
     
     public List<MaterialUnit> getMaterialUnitsWithPaging(int offset, int recordsPerPage) {
-    List<MaterialUnit> units = new ArrayList<>();
-    String query = "SELECT * FROM unit ORDER BY id LIMIT ?, ?";
-    
-    try (Connection conn = Context.getJDBCConnection();
-         PreparedStatement ps = conn.prepareStatement(query)) {
-        ps.setInt(1, offset);
-        ps.setInt(2, recordsPerPage);
-        ResultSet rs = ps.executeQuery();
+        List<MaterialUnit> units = new ArrayList<>();
+        String query = "SELECT * FROM unit ORDER BY id LIMIT ?, ?";
         
-        while (rs.next()) {
-            MaterialUnit unit = new MaterialUnit();
-            unit.setId(rs.getInt("id"));
-            unit.setName(rs.getString("name"));
-            unit.setSymbol(rs.getString("symbol"));
-            unit.setDescription(rs.getString("description"));
-            unit.setStatus(rs.getBoolean("active_flag") ? "active" : "inactive");
-            units.add(unit);
-        }
-        System.out.println("getMaterialUnitsWithPaging: Fetched " + units.size() + " units, offset=" + offset + ", limit=" + recordsPerPage);
-    } catch (SQLException e) {
-        System.err.println("getMaterialUnitsWithPaging: Error - " + e.getMessage());
-        e.printStackTrace();
-    }
-    return units;
-}
-
-public List<MaterialUnit> searchMaterialUnitsWithPaging(String searchTerm, int offset, int recordsPerPage) {
-    List<MaterialUnit> units = new ArrayList<>();
-    String sql = "SELECT * FROM unit WHERE name LIKE ? OR symbol LIKE ? ORDER BY id LIMIT ?, ?";
-    
-    Connection conn = null;
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
-    
-    try {
-        conn = Context.getJDBCConnection();
-        if (conn == null) {
-            System.err.println("searchMaterialUnitsWithPaging: Database connection is null");
-            return units;
-        }
-        
-        pstmt = conn.prepareStatement(sql);
-        String searchPattern = "%" + searchTerm + "%";
-        pstmt.setString(1, searchPattern);
-        pstmt.setString(2, searchPattern);
-        pstmt.setInt(3, offset);
-        pstmt.setInt(4, recordsPerPage);
-        
-        rs = pstmt.executeQuery();
-        while (rs.next()) {
-            MaterialUnit unit = new MaterialUnit();
-            unit.setId(rs.getInt("id"));
-            unit.setName(rs.getString("name"));
-            unit.setSymbol(rs.getString("symbol"));
-            unit.setDescription(rs.getString("description"));
-            unit.setStatus(rs.getBoolean("active_flag") ? "active" : "inactive");
-            units.add(unit);
-        }
-        System.out.println("searchMaterialUnitsWithPaging: Fetched " + units.size() + " units for searchTerm='" + searchTerm + "', offset=" + offset + ", limit=" + recordsPerPage);
-        
-    } catch (SQLException e) {
-        System.err.println("searchMaterialUnitsWithPaging: Database error - " + e.getMessage());
-        e.printStackTrace();
-    } finally {
-        try {
-            if (rs != null) rs.close();
-            if (pstmt != null) pstmt.close();
-            if (conn != null) conn.close();
+        try (Connection conn = Context.getJDBCConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, offset);
+            pstmt.setInt(2, recordsPerPage);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    MaterialUnit unit = new MaterialUnit();
+                    unit.setId(rs.getInt("id"));
+                    unit.setName(rs.getString("name"));
+                    unit.setSymbol(rs.getString("symbol"));
+                    unit.setDescription(rs.getString("description"));
+                    unit.setType(rs.getString("type"));
+                    units.add(unit);
+                }
+            }
         } catch (SQLException e) {
-            System.err.println("Error closing database resources: " + e.getMessage());
+            e.printStackTrace();
         }
+        return units;
     }
-    
-    return units;
-}
+
+    public List<MaterialUnit> searchMaterialUnitsWithPaging(String searchTerm, int offset, int recordsPerPage) {
+        List<MaterialUnit> units = new ArrayList<>();
+        String sql = "SELECT * FROM unit WHERE name LIKE ? OR symbol LIKE ? ORDER BY id LIMIT ?, ?";
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = Context.getJDBCConnection();
+            if (conn == null) {
+                System.err.println("searchMaterialUnitsWithPaging: Database connection is null");
+                return units;
+            }
+            
+            pstmt = conn.prepareStatement(sql);
+            String searchPattern = "%" + searchTerm + "%";
+            pstmt.setString(1, searchPattern);
+            pstmt.setString(2, searchPattern);
+            pstmt.setInt(3, offset);
+            pstmt.setInt(4, recordsPerPage);
+            
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                MaterialUnit unit = new MaterialUnit();
+                unit.setId(rs.getInt("id"));
+                unit.setName(rs.getString("name"));
+                unit.setSymbol(rs.getString("symbol"));
+                unit.setDescription(rs.getString("description"));
+                unit.setType(rs.getString("type"));
+                units.add(unit);
+            }
+            System.out.println("searchMaterialUnitsWithPaging: Fetched " + units.size() + " units for searchTerm='" + searchTerm + "', offset=" + offset + ", limit=" + recordsPerPage);
+            
+        } catch (SQLException e) {
+            System.err.println("searchMaterialUnitsWithPaging: Database error - " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing database resources: " + e.getMessage());
+            }
+        }
+        
+        return units;
+    }
     
     public int getTotalRecords() {
         int count = 0;
@@ -300,5 +295,26 @@ public List<MaterialUnit> searchMaterialUnitsWithPaging(String searchTerm, int o
             }
         }
         return count;
+    }
+
+    // Check for duplicate name or symbol (excluding current id)
+    public boolean isDuplicateNameOrSymbol(String name, String symbol, Integer excludeId) {
+        String sql = "SELECT COUNT(*) FROM unit WHERE (name = ? OR symbol = ?)" + (excludeId != null ? " AND id <> ?" : "");
+        try (Connection conn = Context.getJDBCConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.setString(2, symbol);
+            if (excludeId != null) {
+                pstmt.setInt(3, excludeId);
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

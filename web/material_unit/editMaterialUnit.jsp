@@ -75,7 +75,7 @@ h1 {
         <h1>Thay đổi dữ liệu của đơn vị</h1>
         
         <c:if test="${not empty errorMessage}">
-            <div class="error-message">${errorMessage}</div>
+            <div class="error-message" style="color: red; margin-bottom: 10px;">${errorMessage}</div>
         </c:if>
         
         <c:if test="${empty unit}">
@@ -102,10 +102,11 @@ h1 {
                 </div>
                 
                 <div class="form-group">
-                    <label for="status">Trạng thái:</label>
-                    <select id="status" name="status">
-                        <option value="active" ${unit.status == 'active' ? 'selected' : ''}>Hoạt động</option>
-                        <option value="inactive" ${unit.status == 'inactive' ? 'selected' : ''}>Không hoạt động</option>
+                    <label for="type">Loại đơn vị</label>
+                    <select id="type" name="type" required>
+                        <option value="Khối lượng" ${unit.type == 'Khối lượng' ? 'selected' : ''}>Khối lượng</option>
+                        <option value="Độ dài" ${unit.type == 'Độ dài' ? 'selected' : ''}>Độ dài</option>
+                        <option value="Số lượng" ${unit.type == 'Số lượng' ? 'selected' : ''}>Số lượng</option>
                     </select>
                 </div>
                 

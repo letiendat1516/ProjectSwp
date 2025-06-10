@@ -8,7 +8,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import dao.CategoryProductDAO;
-import model.Category;
+import model.CategoryProduct;
+import model.CategoryProductParent;
 
 @WebServlet(name = "CategoryController", urlPatterns = {"/category/*"})
 public class CategoryProductController extends HttpServlet {
@@ -87,8 +88,8 @@ public class CategoryProductController extends HttpServlet {
             sortDir = "asc"; // Mặc định sắp xếp tăng dần
         }
         
-        // Lấy danh sách danh mục theo phân trang, tìm kiếm và sắp xếp
-        List<Category> categories = categoryDAO.getAllCategories(page, pageSize, searchKeyword, sortField, sortDir);
+        // ✅ SỬA: Sử dụng method có JOIN để lấy thông tin parent
+        List<CategoryProduct> categories = categoryDAO.getAllCategoriesWithParent(page, pageSize, searchKeyword, sortField, sortDir);
         
         // Đếm tổng số danh mục để tính số trang
         int totalCategories = categoryDAO.countCategories(searchKeyword);
@@ -111,16 +112,16 @@ public class CategoryProductController extends HttpServlet {
         request.setAttribute("sortDir", sortDir);
         request.setAttribute("reverseSortDir", reverseSortDir);
         
-        request.getRequestDispatcher("/list.jsp").forward(request, response);
+        request.getRequestDispatcher("/category_product/list.jsp").forward(request, response);
     }
     
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy danh sách danh mục để hiển thị dropdown danh mục cha
-        List<Category> parentCategories = categoryDAO.getAllCategoriesForDropdown();
+        // ✅ SỬA: Lấy danh sách category parent thay vì category
+        List<CategoryProductParent> parentCategories = categoryDAO.getCategoryParentsForDropdown();
         request.setAttribute("parentCategories", parentCategories);
         
-        request.getRequestDispatcher("/create.jsp").forward(request, response);
+        request.getRequestDispatcher("/category_product/create.jsp").forward(request, response);
     }
     
     private void createCategory(HttpServletRequest request, HttpServletResponse response)
@@ -137,8 +138,8 @@ public class CategoryProductController extends HttpServlet {
             return;
         }
         
-        // Tạo đối tượng Category
-        Category category = new Category();
+        // Tạo đối tượng CategoryProduct
+        CategoryProduct category = new CategoryProduct();
         category.setName(name.trim());
         
         // Xử lý parentId
@@ -180,19 +181,21 @@ public class CategoryProductController extends HttpServlet {
         
         try {
             int id = Integer.parseInt(idStr);
-            Category category = categoryDAO.getCategoryById(id);
+            
+            // ✅ SỬA: Sử dụng method có JOIN để lấy thông tin parent
+            CategoryProduct category = categoryDAO.getCategoryWithParentById(id);
             
             if (category == null) {
                 response.sendRedirect(request.getContextPath() + "/category/list?error=category_not_found");
                 return;
             }
             
-            // Lấy danh sách danh mục để hiển thị dropdown danh mục cha
-            List<Category> parentCategories = categoryDAO.getAllCategoriesForDropdown();
+            // ✅ SỬA: Lấy danh sách category parent thay vì category
+            List<CategoryProductParent> parentCategories = categoryDAO.getCategoryParentsForDropdown();
             request.setAttribute("parentCategories", parentCategories);
             request.setAttribute("category", category);
             
-            request.getRequestDispatcher("/edit.jsp").forward(request, response);
+            request.getRequestDispatcher("/category_product/edit.jsp").forward(request, response);
             
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/category/list?error=invalid_id");
@@ -216,8 +219,8 @@ public class CategoryProductController extends HttpServlet {
         try {
             int id = Integer.parseInt(idStr);
             
-            // Tạo đối tượng Category
-            Category category = new Category();
+            // Tạo đối tượng CategoryProduct
+            CategoryProduct category = new CategoryProduct();
             category.setId(id);
             category.setName(name.trim());
             
@@ -225,9 +228,10 @@ public class CategoryProductController extends HttpServlet {
             if (parentIdStr != null && !parentIdStr.trim().isEmpty() && !parentIdStr.equals("0")) {
                 try {
                     int parentId = Integer.parseInt(parentIdStr);
-                    // Kiểm tra không cho phép chọn chính nó làm danh mục cha
-                    if (parentId == id) {
-                        request.setAttribute("error", "Không thể chọn chính danh mục này làm danh mục cha");
+                    // ✅ SỬA: Kiểm tra parent_id hợp lệ thay vì kiểm tra tự tham chiếu
+                    // (vì parent_id tham chiếu đến bảng category_parent, không phải category)
+                    if (!categoryDAO.isValidParentId(parentId)) {
+                        request.setAttribute("error", "Danh mục cha không hợp lệ");
                         showEditForm(request, response);
                         return;
                     }
