@@ -8,7 +8,6 @@ package controller;
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import dao.MaterialUnitDAO;
 import model.MaterialUnit;
 
-@WebServlet("/editMaterialUnit")
+
 public class EditMaterialUnitServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private MaterialUnitDAO materialUnitDAO;
@@ -37,7 +36,7 @@ public class EditMaterialUnitServlet extends HttpServlet {
             // Kiểm tra xem unit có tồn tại không
             if (unit == null) {
                 // Nếu không tìm thấy, chuyển hướng về trang chính
-                response.sendRedirect("materialUnit");
+                response.sendRedirect("/material_unit/materialUnit");
                 return;
             }
             
@@ -48,16 +47,16 @@ public class EditMaterialUnitServlet extends HttpServlet {
             System.out.println("Editing unit: " + unit.getId() + " - " + unit.getName());
             
             // Chuyển đến trang edit
-            request.getRequestDispatcher("/editMaterialUnit.jsp").forward(request, response);
+            request.getRequestDispatcher("/material_unit/editMaterialUnit.jsp").forward(request, response);
         } catch (NumberFormatException e) {
             // Xử lý lỗi khi id không phải là số
             System.err.println("Invalid ID format: " + e.getMessage());
-            response.sendRedirect("materialUnit");
+            response.sendRedirect("/material_unit/materialUnit");
         } catch (Exception e) {
             // Xử lý các lỗi khác
             System.err.println("Error in EditMaterialUnitServlet.doGet: " + e.getMessage());
             e.printStackTrace();
-            response.sendRedirect("materialUnit");
+            response.sendRedirect("/material_unit/materialUnit");
         }
     }
     
@@ -81,7 +80,7 @@ public class EditMaterialUnitServlet extends HttpServlet {
                 unit.setType(type);
                 request.setAttribute("unit", unit);
                 request.setAttribute("errorMessage", "Tên hoặc ký hiệu đã tồn tại. Vui lòng nhập giá trị khác.");
-                request.getRequestDispatcher("/editMaterialUnit.jsp").forward(request, response);
+                request.getRequestDispatcher("/material_unit/editMaterialUnit.jsp").forward(request, response);
                 return;
             }
 
@@ -102,18 +101,18 @@ public class EditMaterialUnitServlet extends HttpServlet {
             if (updated) {
                 // Nếu cập nhật thành công, thông báo thành công và chuyển hướng
                 request.getSession().setAttribute("successMessage", "Cập nhật đơn vị thành công!");
-                response.sendRedirect("materialUnit");
+                response.sendRedirect("/material_unit/materialUnit");
             } else {
                 // Nếu cập nhật thất bại, hiển thị lại form với thông báo lỗi
                 request.setAttribute("unit", unit);
                 request.setAttribute("errorMessage", "Failed to update material unit.");
-                request.getRequestDispatcher("/editMaterialUnit.jsp").forward(request, response);
+                request.getRequestDispatcher("/material_unit/editMaterialUnit.jsp").forward(request, response);
             }
         } catch (Exception e) {
             // Xử lý lỗi
             System.err.println("Error in EditMaterialUnitServlet.doPost: " + e.getMessage());
             e.printStackTrace();
-            response.sendRedirect("materialUnit");
+            response.sendRedirect("/material_unit/materialUnit");
         }
     }
 }

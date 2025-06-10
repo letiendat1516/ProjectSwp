@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.List;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +15,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import dao.MaterialUnitDAO;
 import model.MaterialUnit;
 
-@WebServlet("/materialUnit")
 public class MaterialUnitServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private MaterialUnitDAO materialUnitDAO;
@@ -67,7 +65,7 @@ public class MaterialUnitServlet extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         System.out.println("listMaterialUnits: materialUnits size=" + materialUnits.size() + ", page=" + page + ", totalRecords=" + totalRecords + ", totalPages=" + totalPages);
-        request.getRequestDispatcher("/materialUnit.jsp").forward(request, response);
+        request.getRequestDispatcher("/material_unit/materialUnit.jsp").forward(request, response);
     }
     private void searchMaterialUnits(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -90,7 +88,7 @@ public class MaterialUnitServlet extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         System.out.println("searchMaterialUnits: materialUnits size=" + materialUnits.size() + ", searchTerm=" + searchTerm + ", page=" + page + ", totalRecords=" + totalRecords + ", totalPages=" + totalPages);
-        request.getRequestDispatcher("/materialUnit.jsp").forward(request, response);
+        request.getRequestDispatcher("/material_unit/materialUnit.jsp").forward(request, response);
     }
     private void paginateMaterialUnits(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException, IOException {
@@ -108,6 +106,6 @@ public class MaterialUnitServlet extends HttpServlet {
         request.setAttribute("recordsPerPage", recordsPerPage);
         request.setAttribute("paginationMode", true);
         System.out.println("paginateMaterialUnits: materialUnits size=" + materialUnits.size() + ", page=" + page + ", totalRecords=" + totalRecords + ", totalPages=" + totalPages);
-        request.getRequestDispatcher("/materialUnit.jsp").forward(request, response);
+        request.getRequestDispatcher("/material_unit/materialUnit.jsp").forward(request, response);
     }
 }

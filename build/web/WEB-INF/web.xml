@@ -45,12 +45,29 @@
         <servlet-class>controller.RoleAssignmentServlet</servlet-class>
     </servlet>
     <servlet>
+<<<<<<< HEAD
         <servlet-name>ProfileServlet</servlet-name>
         <servlet-class>controller.ProfileServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>EditProfileServlet</servlet-name>
         <servlet-class>controller.EditProfileServlet</servlet-class>
+=======
+        <servlet-name>MaterialUnitServlet</servlet-name>
+        <servlet-class>controller.MaterialUnitServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CreateMaterialUnitServlet</servlet-name>
+        <servlet-class>controller.CreateMaterialUnitServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditMaterialUnitServlet</servlet-name>
+        <servlet-class>controller.EditMaterialUnitServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeleteMaterialUnitServlet</servlet-name>
+        <servlet-class>controller.DeleteMaterialUnitServlet</servlet-class>
+>>>>>>> ab14aaaef10bf31af5dd9fb036ff479f1fe1a5ae
     </servlet>
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
@@ -97,12 +114,29 @@
         <url-pattern>/roleAssignment</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+<<<<<<< HEAD
         <servlet-name>ProfileServlet</servlet-name>
         <url-pattern>/profile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>EditProfileServlet</servlet-name>
         <url-pattern>/editprofile</url-pattern>
+=======
+        <servlet-name>MaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/materialUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/createMaterialUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/editMaterialUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/deleteMaterialUnit</url-pattern>
+>>>>>>> ab14aaaef10bf31af5dd9fb036ff479f1fe1a5ae
     </servlet-mapping>
     <session-config>
         <session-timeout>15</session-timeout>

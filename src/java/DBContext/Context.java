@@ -15,7 +15,11 @@ public class Context {
 
         String url = "jdbc:mysql://localhost:3306/warehouses?serverTimezone=UTC";
         String user = "root";
+<<<<<<< HEAD
         String password = "PhuC2004";
+=======
+        String password = "tunganh2005";
+>>>>>>> ab14aaaef10bf31af5dd9fb036ff479f1fe1a5ae
         
 
         try {

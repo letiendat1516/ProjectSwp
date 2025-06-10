@@ -8,14 +8,13 @@ package controller;
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import dao.MaterialUnitDAO;
 
-@WebServlet("/deleteMaterialUnit")
+
 public class DeleteMaterialUnitServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private MaterialUnitDAO materialUnitDAO;
@@ -28,6 +27,6 @@ public class DeleteMaterialUnitServlet extends HttpServlet {
             throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         materialUnitDAO.deleteMaterialUnit(id);
-        response.sendRedirect("materialUnit");
+        response.sendRedirect("/material_unit/materialUnit");
     }
 }

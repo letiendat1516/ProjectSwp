@@ -271,5 +271,62 @@
                 </a>
             </div>
         </div>
+<<<<<<< HEAD
     </body>
+=======
+        <div class="card-body">
+          <div class="icon-container">
+            <span class="material-icons">category</span>
+          </div>
+          <h4 class="card-title">Quản lý Danh mục Sản phẩm</h4>
+          <p class="card-text">Thêm, sửa, xóa và xem các danh mục sản phẩm trong hệ thống.</p>
+          <a href="category/list" class="btn btn-primary">
+            Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Categories Unit -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Danh mục Đơn vị</h3>
+        </div>
+        <div class="card-body">
+          <div class="icon-container">
+            <span class="material-icons">straighten</span>
+          </div>
+          <h4 class="card-title">Quản lý Đơn vị Tính</h4>
+          <p class="card-text">Quản lý các đơn vị đo lường và tính toán cho vật liệu và sản phẩm.</p>
+          <a href="material_unit/materialUnit.jsp" class="btn btn-primary">
+            Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Categories Supplier -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Danh mục Nhà cung cấp</h3>
+        </div>
+        <div class="card-body">
+          <div class="icon-container">
+            <span class="material-icons">business</span>
+          </div>
+          <h4 class="card-title">Quản lý Nhà cung cấp</h4>
+          <p class="card-text">Thêm, sửa, xóa và xem thông tin về các nhà cung cấp vật liệu.</p>
+          <a href="LishSupplier" class="btn btn-primary">
+            Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <a href="admin" class="btn btn-secondary">
+         Quay lại Trang chủ
+      </a>
+    </div>
+  </div>
+</body>
+>>>>>>> ab14aaaef10bf31af5dd9fb036ff479f1fe1a5ae
 </html>
