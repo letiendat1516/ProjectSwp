@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="model.Request"%>
@@ -310,7 +311,7 @@
             <button type="submit" class="filter-button">
                 <span class="material-icons">filter_alt</span> Lọc
             </button>
-            <button type="submit" class="clear-filter-button" name="action" value="clear">
+            <button type="button" class="clear-filter-button" onclick="clearFilters()">
                 <span class="material-icons">clear</span> Xóa
             </button>
         </form>
@@ -518,11 +519,16 @@
             }
         }
 
-        window.onload = function () {
-            <c:if test="${param.action == 'clear'}">
-                document.getElementById('filterForm').reset();
-            </c:if>
-        };
+        function clearFilters() {
+            // Xóa tất cả giá trị trong form
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('requestIdFilter').value = '';
+            
+            // Gửi request để hiển thị tất cả yêu cầu
+            window.location.href = 'approvepurchaserequest';
+        }
     </script>
 </body>
 </html>

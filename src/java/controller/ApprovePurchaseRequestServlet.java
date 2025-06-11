@@ -25,18 +25,19 @@ public class ApprovePurchaseRequestServlet extends HttpServlet {
             String endDateStr = request.getParameter("endDate");
             String statusFilter = request.getParameter("statusFilter");
             String requestIdFilter = request.getParameter("requestIdFilter");
-            String action = request.getParameter("action");
 
-            // Xử lý hành động xóa lọc
-            if ("clear".equals(action)) {
+            // Kiểm tra và làm sạch các tham số rỗng
+            if (startDateStr != null && startDateStr.trim().isEmpty()) {
                 startDateStr = null;
+            }
+            if (endDateStr != null && endDateStr.trim().isEmpty()) {
                 endDateStr = null;
+            }
+            if (statusFilter != null && statusFilter.trim().isEmpty()) {
                 statusFilter = null;
+            }
+            if (requestIdFilter != null && requestIdFilter.trim().isEmpty()) {
                 requestIdFilter = null;
-                request.setAttribute("startDate", null);
-                request.setAttribute("endDate", null);
-                request.setAttribute("statusFilter", null);
-                request.setAttribute("requestIdFilter", null);
             }
 
             // Tính tổng số yêu cầu và số trang
@@ -44,6 +45,9 @@ public class ApprovePurchaseRequestServlet extends HttpServlet {
             int endPage = countPage / 10;
             if (countPage % 10 != 0) {
                 endPage++;
+            }
+            if (endPage == 0) {
+                endPage = 1; // Đảm bảo có ít nhất 1 trang
             }
             request.setAttribute("endPage", endPage);
 
@@ -79,54 +83,109 @@ public class ApprovePurchaseRequestServlet extends HttpServlet {
         String action = request.getParameter("action");
         GetStatusOfPurchaseRequestInformationDAO dao = new GetStatusOfPurchaseRequestInformationDAO();
 
-        if ("delete".equals(action)) {
-            String requestId = request.getParameter("requestId");
-            if (requestId != null && !requestId.isEmpty()) {
-                boolean isDeleted = dao.deleteRequest(requestId);
-                if (isDeleted) {
-                    response.sendRedirect("approvepurchaserequest");
-                    return;
+        try {
+            if ("delete".equals(action)) {
+                String requestId = request.getParameter("requestId");
+                if (requestId != null && !requestId.isEmpty()) {
+                    boolean isDeleted = dao.deleteRequest(requestId);
+                    if (isDeleted) {
+                        // Redirect về trang hiện tại với các tham số lọc
+                        String redirectUrl = buildRedirectUrl(request);
+                        response.sendRedirect(redirectUrl);
+                        return;
+                    }
+                }
+            } else if ("approve".equals(action)) {
+                String requestId = request.getParameter("requestId");
+                if (requestId != null && !requestId.isEmpty()) {
+                    boolean isApproved = dao.updateApprovedStatus(requestId);
+                    if (isApproved) {
+                        String redirectUrl = buildRedirectUrl(request);
+                        response.sendRedirect(redirectUrl);
+                        return;
+                    }
+                }
+            } else if ("reject".equals(action)) {
+                String requestId = request.getParameter("requestId");
+                if (requestId != null && !requestId.isEmpty()) {
+                    boolean isRejected = dao.updateRejectedStatus(requestId);
+                    if (isRejected) {
+                        String redirectUrl = buildRedirectUrl(request);
+                        response.sendRedirect(redirectUrl);
+                        return;
+                    }
+                }
+            } else if ("approve-all".equals(action)) {
+                String requestId = request.getParameter("requestId");
+                if (requestId != null && !requestId.isEmpty()) {
+                    boolean isApproved = dao.updateApprovedStatus(requestId);
+                    if (isApproved) {
+                        String redirectUrl = buildRedirectUrl(request);
+                        response.sendRedirect(redirectUrl);
+                        return;
+                    }
+                }
+            } else if ("reject-all".equals(action)) {
+                String requestId = request.getParameter("requestId");
+                if (requestId != null && !requestId.isEmpty()) {
+                    boolean isRejected = dao.updateRejectedStatus(requestId);
+                    if (isRejected) {
+                        String redirectUrl = buildRedirectUrl(request);
+                        response.sendRedirect(redirectUrl);
+                        return;
+                    }
                 }
             }
-        } else if ("approve".equals(action)) {
-            String requestId = request.getParameter("requestId");
-            if (requestId != null && !requestId.isEmpty()) {
-                boolean isApproved = dao.updateApprovedStatus(requestId);
-                if (isApproved) {
-                    response.sendRedirect("approvepurchaserequest");
-                    return;
-                }
-            }
-        } else if ("reject".equals(action)) {
-            String requestId = request.getParameter("requestId");
-            if (requestId != null && !requestId.isEmpty()) {
-                boolean isRejected = dao.updateRejectedStatus(requestId);
-                if (isRejected) {
-                    response.sendRedirect("approvepurchaserequest");
-                    return;
-                }
-            }
-        } else if ("approve-all".equals(action)) {
-            String requestId = request.getParameter("requestId");
-            if (requestId != null && !requestId.isEmpty()) {
-                boolean isApproved = dao.updateApprovedStatus(requestId);
-                if (isApproved) {
-                    response.sendRedirect("approvepurchaserequest");
-                    return;
-                }
-            }
-        } else if ("reject-all".equals(action)) {
-            String requestId = request.getParameter("requestId");
-            if (requestId != null && !requestId.isEmpty()) {
-                boolean isRejected = dao.updateRejectedStatus(requestId);
-                if (isRejected) {
-                    response.sendRedirect("approvepurchaserequest");
-                    return;
-                }
-            }
-        } else {
+            
+            // Nếu không có action đặc biệt, xử lý như request thông thường
             processRequest(request, response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Đã xảy ra lỗi khi xử lý yêu cầu: " + e.getMessage());
         }
+    }
+
+    /**
+     * Xây dựng URL redirect với các tham số lọc hiện tại
+     */
+    private String buildRedirectUrl(HttpServletRequest request) {
+        StringBuilder url = new StringBuilder("approvepurchaserequest");
+        boolean hasParams = false;
+
+        // Lấy các tham số lọc từ request (không phải từ action buttons)
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+        String statusFilter = request.getParameter("statusFilter");
+        String requestIdFilter = request.getParameter("requestIdFilter");
+        String currentIndex = request.getParameter("index");
+
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            url.append(hasParams ? "&" : "?").append("startDate=").append(startDate);
+            hasParams = true;
+        }
+
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            url.append(hasParams ? "&" : "?").append("endDate=").append(endDate);
+            hasParams = true;
+        }
+
+        if (statusFilter != null && !statusFilter.trim().isEmpty()) {
+            url.append(hasParams ? "&" : "?").append("statusFilter=").append(statusFilter);
+            hasParams = true;
+        }
+
+        if (requestIdFilter != null && !requestIdFilter.trim().isEmpty()) {
+            url.append(hasParams ? "&" : "?").append("requestIdFilter=").append(requestIdFilter);
+            hasParams = true;
+        }
+
+        if (currentIndex != null && !currentIndex.trim().isEmpty()) {
+            url.append(hasParams ? "&" : "?").append("index=").append(currentIndex);
+            hasParams = true;
+        }
+
+        return url.toString();
     }
 
     @Override

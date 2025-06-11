@@ -8,6 +8,7 @@
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ItemsSupplyRequestForm.jsp</file>
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/UserDAO.java</file>
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/model/RequestItems.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/LishSupplier.jsp</file>
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/Admin.jsp</file>
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ApprovePurchaseRequest.jsp</file>
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/ApprovePurchaseRequestServlet.java</file>
@@ -17,6 +18,7 @@
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/LoginServlet.java</file>
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/RequestForward.jsp</file>
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ApproveListForward.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/RequestInformationDAO.java</file>
         </group>
     </open-files>
 </project-private>
