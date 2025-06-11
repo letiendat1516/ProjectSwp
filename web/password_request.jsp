@@ -66,7 +66,6 @@
     <body>
         <div class="admin-container">
             <h2>Quản lý yêu cầu cấp lại mật khẩu</h2>
-            <!-- Có thể hiển thị thông báo thành công/thất bại ở đây -->
             <table>
                 <tr>
                     <th>ID</th>

@@ -180,6 +180,7 @@
                     <li class="add-user-btn"><a href="roleAssignment"> Role Assignment </a></li>
                     <li class="add-user-btn"><a href="categoriesforward.jsp">Material Information</a></li>
                     <li class="add-user-btn"><a href="RequestForward.jsp" >Transaction</a></li>
+                    <li class="add-user-btn"><a href="password_request.jsp">Password request</a></li>
                     <li class="add-user-btn">Statistic</li>
                 </ul>
             </div>
@@ -214,7 +215,7 @@
                     </div>
                 </form>
 
-                
+
                 <c:if test="${not empty sessionScope.message}">
                     <div class="message">${sessionScope.message}</div>
                     <c:remove var="message" scope="session"/>
@@ -255,8 +256,8 @@
             </div>
         </div>
 
-                
-            
+
+
     </body>
 </html>
 

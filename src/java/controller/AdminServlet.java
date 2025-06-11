@@ -15,10 +15,12 @@ import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Users;
 
+
 /**
  *
  * @author phucn
  */
+
 public class AdminServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -45,7 +47,7 @@ public class AdminServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("/login.jsp");
             return;
         }
 

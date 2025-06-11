@@ -231,6 +231,7 @@ response.setDateHeader("Expires", 0); // Proxies
                     <li class="add-user-btn"><a href="roleAssignment"> Role Assignment </a></li>
                     <li class="add-user-btn"><a href="categoriesforward.jsp">Material Information</a></li>
                     <li class="add-user-btn"><a href="RequestForward.jsp" >Transaction</a></li>
+                    <li class="add-user-btn"><a href="password_request.jsp">Password request</a></li>
                     <li class="add-user-btn">Statistic</li>
                 </ul>
             </div>
