@@ -9,7 +9,6 @@ public class RequestItem {
     private String unit;
     private double quantity; // Sửa từ int thành double
     private double importedQty; // mới
-
     private String note;
     private String reasonDetail;
 
@@ -100,5 +99,4 @@ public class RequestItem {
         this.reasonDetail = reasonDetail;
     }
 
-    
 }

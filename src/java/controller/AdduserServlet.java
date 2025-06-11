@@ -76,6 +76,8 @@ public class AdduserServlet extends HttpServlet {
         String password = request.getParameter("password");
         String fullname = request.getParameter("fullname");
         String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String dobStr = request.getParameter("dob");
         int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
         int roleId = Integer.parseInt(request.getParameter("role"));
 
@@ -84,23 +86,34 @@ public class AdduserServlet extends HttpServlet {
         user.setPassword(password);
         user.setFullname(fullname);
         user.setEmail(email);
+        user.setPhone(phone);
+
+        // Xử lý ngày sinh
+        java.sql.Date dob = null;
+        try {
+            if (dobStr != null && !dobStr.trim().isEmpty()) {
+                dob = java.sql.Date.valueOf(dobStr); // Format: yyyy-MM-dd
+            }
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("error", "Date of Birth is invalid!");
+            request.getRequestDispatcher("AddUser.jsp").forward(request, response);
+            return;
+        }
+        user.setDob(dob); // Đặt giá trị ngày sinh
+
         user.setActiveFlag(activeFlag);
 
         try {
             UserDAO userDAO = new UserDAO();
             userDAO.addUser(user, roleId);
 
-            // Lấy session, set thông báo thành công
             HttpSession session = request.getSession();
             session.setAttribute("message", "User added successfully!");
-
-            // Redirect về lại trang AddUser.jsp (hoặc có thể về admin)
             response.sendRedirect("AddUser.jsp");
         } catch (Exception e) {
             request.setAttribute("error", "Failed to add user: " + e.getMessage());
             request.getRequestDispatcher("AddUser.jsp").forward(request, response);
         }
-
     }
 
     /**

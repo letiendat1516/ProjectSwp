@@ -4,182 +4,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh sách phê duyệt</title>
+    <title>Danh Sách Phê Duyệt</title>
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Google Fonts: Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #e0e7ff, #f5f7fa);
-            padding: 40px 20px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background-color: #f5f5f5;
+            padding: 20px;
         }
 
         .container {
             max-width: 1200px;
-            width: 100%;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 15px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .page-title {
-            color: #1e3a8a;
-            font-size: 2.5rem;
-            font-weight: 600;
+            color: #3f51b5;
+            font-size: 2rem;
             margin-bottom: 10px;
-            letter-spacing: 0.5px;
         }
 
         .lead {
-            font-size: 1.1rem;
-            color: #4b5563;
-            font-weight: 300;
+            font-size: 1.2rem;
+            color: #666;
             margin-bottom: 20px;
-            line-height: 1.6;
         }
 
         .card-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            justify-items: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 10px;
         }
 
         .card {
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            width: 100%;
-            max-width: 360px;
-            overflow: hidden;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: calc(50% - 5px);
+            margin-bottom: 10px;
         }
 
         .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
 
         .card-header {
-            background: linear-gradient(90deg, #3b82f6, #1e3a8a);
-            color: #ffffff;
-            border-radius: 16px 16px 0 0;
-            padding: 20px;
+            background-color: #3f51b5;
+            color: white;
+            border-radius: 10px 10px 0 0;
+            padding: 15px;
             text-align: center;
         }
 
         .card-header h3 {
             margin: 0;
-            font-size: 1.4rem;
-            font-weight: 500;
+            font-size: 1.2rem;
         }
 
         .card-body {
-            padding: 30px;
+            padding: 25px;
             text-align: center;
         }
 
         .icon-container {
-            background: #eff6ff;
-            width: 80px;
-            height: 80px;
+            background-color: #eaecf4;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
-            transition: background 0.3s ease;
-        }
-
-        .card:hover .icon-container {
-            background: #dbeafe;
         }
 
         .material-icons {
-            font-size: 40px;
-            color: #1e40af;
+            font-size: 36px;
+            color: #3f51b5;
         }
 
         .card-title {
-            font-size: 1.25rem;
-            font-weight: 500;
-            color: #1f2937;
-            margin-bottom: 12px;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #333;
         }
 
         .card-text {
-            font-size: 0.95rem;
-            color: #6b7280;
-            margin-bottom: 25px;
-            line-height: 1.6;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
 
         .btn {
-            display: inline-flex;
-            align-items: center;
-            padding: 12px 24px;
-            border-radius: 8px;
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 5px;
             text-decoration: none;
-            font-size: 1rem;
-            font-weight: 500;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background-color 0.3s;
         }
 
         .btn-primary {
-            background: linear-gradient(90deg, #3b82f6, #1e40af);
-            color: #ffffff;
-            border: none;
+            background-color: #3f51b5;
+            color: white;
         }
 
         .btn-primary:hover {
-            background: linear-gradient(90deg, #2563eb, #1e3a8a);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background-color: #303f9f;
         }
 
         .btn-secondary {
-            background: #ffffff;
-            color: #4b5563;
-            border: 1px solid #d1d5db;
+            background-color: transparent;
+            color: #666;
+            border: 1px solid #ccc;
         }
 
         .btn-secondary:hover {
-            background: #f3f4f6;
-            color: #1f2937;
-            border-color: #9ca3af;
-            transform: translateY(-2px);
-        }
-
-        .btn-icon {
-            font-size: 18px;
-            vertical-align: middle;
-            margin-left: 8px;
-        }
-
-        .back-btn-icon {
-            margin-right: 8px;
+            background-color: #f0f0f0;
         }
 
         .footer {
             text-align: center;
-            margin-top: 50px;
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn-icon {
+            font-size: 16px;
+            vertical-align: text-bottom;
+            margin-left: 5px;
+        }
+
+        .back-btn-icon {
+            margin-right: 5px;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 900px) {
+            .card {
+                width: calc(50% - 15px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                width: 100%;
+            }
+            .footer {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -219,7 +211,7 @@
                     </div>
                     <h4 class="card-title">Phê Duyệt Đơn Báo Giá</h4>
                     <p class="card-text">Kiểm tra và phê duyệt các báo giá sản phẩm được đề xuất từ yêu cầu mua hàng.</p>
-                    <a href="#" class="btn btn-primary">
+                    <a href="materialUnit.jsp" class="btn btn-primary">
                         Truy Cập <span class="material-icons btn-icon">arrow_forward</span>
                     </a>
                 </div>
@@ -227,7 +219,7 @@
         </div>
 
         <div class="footer">
-            <a href="admin" class="btn btn-secondary">
+            <a href="Admin.jsp" class="btn btn-secondary">
                 <span class="material-icons back-btn-icon">arrow_back</span> Quay Lại Trang Chủ
             </a>
         </div>

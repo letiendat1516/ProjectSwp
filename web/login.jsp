@@ -46,8 +46,8 @@
         }
 
         .card-body {
-    padding: 20px;
-}
+            padding: 20px;
+        }
 
         input[type="text"], input[type="password"] {
             width: 100%;
@@ -71,7 +71,7 @@
         }
 
         .btn:hover {
-            background-color: #0056b3;
+            background-color: lightskyblue;
         }
 
         .card-footer {
@@ -82,7 +82,7 @@
         }
 
         .card-footer a {
-            color: #007bff;
+            color: green;
             text-decoration: none;
         }
 

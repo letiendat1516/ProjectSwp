@@ -286,6 +286,11 @@
                                     </c:otherwise>
                                 </c:choose>
                             </td>
+                            <td>
+                                <a style="background-color: aquamarine;border: 1px solid #bd2130; color: #0d6efd;"
+                                   href="TableSupplierEvaluation?id=${listItem.supplierID}" 
+                                   >Evaluation</a>
+                            </td>
                         </tr>
                     </c:forEach>
                 </table>

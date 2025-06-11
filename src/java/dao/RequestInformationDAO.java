@@ -78,7 +78,7 @@ public class RequestInformationDAO {
                 if (num < 999) {
                     num++;
                     return prefix + "-" + String.format("%03d", num);
-                } else {
+} else {
                     int prefixNum = Integer.parseInt(prefix.substring(2)) + 1;
                     return "NK" + prefixNum + "-000";
                 }
