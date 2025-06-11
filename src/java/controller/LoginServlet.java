@@ -49,6 +49,7 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -77,11 +78,21 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
 
-            if (username.equals("admin") && password.equals("123")) {
+            switch (user.getRoleName()) {
+            case "Admin":
                 response.sendRedirect("Admin.jsp");
-            } else {
+                break;
+            case "Nhân viên kho":
+                response.sendRedirect("categoriesforward.jsp");
+                break;
+            case "Nhân viên công ty":
+                response.sendRedirect("categoriesforward.jsp");
+                break;
+            default:
                 response.sendRedirect("homepage.jsp");
-            }
+        }
+
+            
         } else {
             request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng.");
             request.getRequestDispatcher("login.jsp").forward(request, response);

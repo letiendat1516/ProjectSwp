@@ -123,7 +123,8 @@
                     <li class="add-user-btn"><a href="admin">User Manager</a></li>
                     <li class="add-user-btn"><a href="roleAssignment"> Role Assignment </a></li>
                     <li class="add-user-btn"><a href="categoriesforward.jsp">Material Information</a></li>
-                    <li class="add-user-btn"><a href="RequestForward.jsp" >Transaction</a></li>
+                    <li class="add-user-btn"><a href="RequestForward.jsp" >Xuất nhập kho</a></li>
+                     <li class="add-user-btn"><a href="ApproveListForward.jsp" >Phê duyệt</a></li>
                     <li class="add-user-btn">Statistic</li>
                 </ul>
             </div>

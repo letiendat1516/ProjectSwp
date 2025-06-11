@@ -10,7 +10,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Đơn Yêu Cầu Nhập Kho</title>
+        <title>Đơn Yêu Cầu Mua Hàng</title>
         <style>
             * {
                 margin: 0;
@@ -285,7 +285,7 @@
     </head>
     <body>
         <div class="container">
-            <h1>ĐƠN YÊU CẦU NHẬP KHO</h1>
+            <h1>ĐƠN YÊU CẦU MUA HÀNG</h1>
             <form id="myForm" action="loadingrequest" method="post">
                 <h3>Thông tin</h3>
                 <div class="information-user">
@@ -327,22 +327,22 @@
                             <textarea rows="1" name="reason" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Tên nhà cung cấp</label>
-                            <textarea rows="1" name="supplier" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <label>Gợi ý nhà cung cấp</label>
+                            <textarea rows="1" name="supplier" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)"></textarea>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group">
                             <label>Địa chỉ</label>
-                            <textarea rows="1" name="address" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <textarea rows="1" name="address" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)"></textarea>
                         </div>
                         <div class="form-group">
                             <label>Điện thoại</label>
-                            <textarea rows="1" name="phone" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <textarea rows="1" name="phone" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" pattern="^0\d{9}$"></textarea>
                         </div>
                         <div class="form-group">
                             <label>Email</label>
-                            <textarea rows="1" name="email" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                            <textarea rows="1" name="email" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)"></textarea>
                         </div>
                     </div>
                 </div>
@@ -369,7 +369,7 @@
                                         <option value="" disabled selected>-- Chọn sản phẩm --</option>
                                         <c:forEach var="p" items="${products_list}">
                                             <option 
-                                                value="${p.id}" 
+                                                value="${p.name}" 
                                                 data-code="${p.code}" 
                                                 data-unit="${p.unit_id}">
                                                 ${p.name}
@@ -404,7 +404,7 @@
 
             function addRow() {
                 const tbody = document.getElementById('itemsTableBody');
-                const firstSelect = document.querySelector("select[name='product_id']");
+                const firstSelect = document.querySelector("select[name='product_name']");
 
                 const newRow = document.createElement('tr');
 
@@ -425,7 +425,7 @@
                    <option value="" disabled selected>-- Chọn sản phẩm --</option>
             <c:forEach var="p" items="${products_list}">
                               <option 
-                              value="${p.id}" 
+                              value="${p.name}" 
                               data-code="${p.code}" 
                               data-unit="${p.unit_id}">
                 ${p.name}

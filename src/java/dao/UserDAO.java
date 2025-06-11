@@ -332,37 +332,68 @@ public int getTotalUserCount() {
 
 
     public Users login(String username, String password) {
-        String sql = "SELECT u.*, r.role_name "
-                + "FROM users u "
-                + "LEFT JOIN user_role ur ON u.id = ur.user_id "
-                + "LEFT JOIN role r ON ur.role_id = r.id "
-                + "WHERE u.username = ? AND u.password = ? AND u.active_flag = 1";
+    String sql = "SELECT u.*, r.role_name "
+               + "FROM users u "
+               + "LEFT JOIN user_role ur ON u.id = ur.user_id "
+               + "LEFT JOIN role r ON ur.role_id = r.id "
+               + "WHERE u.username = ? AND u.password = ? AND u.active_flag = 1";
 
-        try {Connection connection = Context.getJDBCConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-            ResultSet rs = stmt.executeQuery();
+    Connection connection = null;
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
 
-            if (rs.next()) {
-                Users user = new Users();
-                user.setId(rs.getInt("id"));
-                user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password"));
-                user.setEmail(rs.getString("email"));
-                user.setFullname(rs.getString("fullname"));
-                user.setActiveFlag(rs.getInt("active_flag"));
-                user.setCreateDate(rs.getTimestamp("create_date"));
-                user.setRoleName(rs.getString("role_name")); // Lấy role
-                return user;
-            }
-            rs.close();
-            stmt.close();
-        } catch (Exception e) {
+    try {
+        System.out.println("DEBUG: Starting login for username = " + username);
+
+        connection = Context.getJDBCConnection();
+        if (connection == null) {
+            System.err.println("ERROR: Connection is null.");
+            return null;
+        }
+
+        stmt = connection.prepareStatement(sql);
+        stmt.setString(1, username);
+        stmt.setString(2, password);
+
+        System.out.println("DEBUG: Executing query: " + stmt.toString());
+
+        rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            System.out.println("DEBUG: User found, preparing user object.");
+
+            Users user = new Users();
+            user.setId(rs.getInt("id"));
+            user.setUsername(rs.getString("username"));
+            user.setPassword(rs.getString("password"));
+            user.setEmail(rs.getString("email"));
+            user.setFullname(rs.getString("fullname"));
+            user.setActiveFlag(rs.getInt("active_flag"));
+            user.setCreateDate(rs.getTimestamp("create_date"));
+            user.setRoleName(rs.getString("role_name"));
+
+            System.out.println("DEBUG: User login success: " + user.getUsername());
+            return user;
+        } else {
+            System.out.println("DEBUG: No user found with provided credentials.");
+        }
+    } catch (SQLException e) {
+        System.err.println("ERROR: Exception in login method.");
+        e.printStackTrace();
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            if (connection != null) connection.close();
+        } catch (SQLException e) {
+            System.err.println("ERROR: Exception while closing resources.");
             e.printStackTrace();
         }
-        return null;
     }
+
+    return null;
+}
+
 
     
      public String getFullName(int userId) {

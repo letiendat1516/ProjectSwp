@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Xuất Nhập Kho</title>
+    <title>Danh sách phê duyệt</title>
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Google Fonts: Poppins -->
@@ -186,57 +186,40 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="page-title">Quản Lý Xuất Nhập Kho</h1>
-            <p class="lead">Chọn danh mục để quản lý các yêu cầu nhập hoặc xuất kho một cách hiệu quả.</p>
+            <h1 class="page-title">Yêu Cầu Cần Phê Duyệt</h1>
+            <p class="lead">Chọn danh mục cần phê duyệt để xem chi tiết và xử lý các yêu cầu.</p>
         </div>
 
         <div class="card-container">
-            <!-- Request In -->
+            <!-- Purchase Request -->
             <div class="card">
                 <div class="card-header">
-                    <h3>Nhập Kho</h3>
+                    <h3>Yêu Cầu Mua Hàng</h3>
                 </div>
                 <div class="card-body">
                     <div class="icon-container">
-                        <span class="material-icons">add_shopping_cart</span>
+                        <span class="material-icons">attach_money</span>
                     </div>
-                    <h4 class="card-title">Yêu Cầu Nhập Kho</h4>
-                    <p class="card-text">Tạo và quản lý các yêu cầu nhập kho cho các sản phẩm cần bổ sung.</p>
-                    <a href="loadingrequest" class="btn btn-primary">
+                    <h4 class="card-title">Phê Duyệt Yêu Cầu Mua Hàng</h4>
+                    <p class="card-text">Xem và xử lý các yêu cầu mua hàng từ nhân viên, đảm bảo quy trình mua sắm hiệu quả.</p>
+                    <a href="approvepurchaserequest" class="btn btn-primary">
                         Truy Cập <span class="material-icons btn-icon">arrow_forward</span>
                     </a>
                 </div>
             </div>
 
-            <!-- Request Out -->
+            <!-- Purchase Order -->
             <div class="card">
                 <div class="card-header">
-                    <h3>Xuất Kho</h3>
+                    <h3>Đơn Báo Giá</h3>
                 </div>
                 <div class="card-body">
                     <div class="icon-container">
-                        <span class="material-icons">outbound</span>
+                        <span class="material-icons">request_quote</span>
                     </div>
-                    <h4 class="card-title">Yêu Cầu Xuất Kho</h4>
-                    <p class="card-text">Tạo và quản lý các yêu cầu xuất kho để cung cấp sản phẩm theo nhu cầu.</p>
-                    <a href="exportrequest" class="btn btn-primary">
-                        Truy Cập <span class="material-icons btn-icon">arrow_forward</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Request List -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>Danh Sách Yêu Cầu Nhập</h3>
-                </div>
-                <div class="card-body">
-                    <div class="icon-container">
-                        <span class="material-icons">list</span>
-                    </div>
-                    <h4 class="card-title">Danh Sách Yêu Cầu Nhập Kho</h4>
-                    <p class="card-text">Xem và kiểm tra tất cả các yêu cầu nhập kho đã được gửi lên.</p>
-                    <a href="import" class="btn btn-primary">
+                    <h4 class="card-title">Phê Duyệt Đơn Báo Giá</h4>
+                    <p class="card-text">Kiểm tra và phê duyệt các báo giá sản phẩm được đề xuất từ yêu cầu mua hàng.</p>
+                    <a href="#" class="btn btn-primary">
                         Truy Cập <span class="material-icons btn-icon">arrow_forward</span>
                     </a>
                 </div>

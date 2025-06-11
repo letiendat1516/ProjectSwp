@@ -93,4 +93,12 @@
         <session-timeout>15</session-timeout>
         <!-- 15 phút -->
     </session-config>
+    <servlet>
+        <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
+        <servlet-class>controller.ApprovePurchaseRequestServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
+        <url-pattern>/approvepurchaserequest</url-pattern>
+    </servlet-mapping>
 </web-app>
