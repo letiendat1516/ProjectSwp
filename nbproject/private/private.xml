@@ -3,12 +3,21 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/D:/Project%20SWP/ProjectSwp/web/ExportRequest.jsp</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ExportRequestDAO.java</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ExportRequestController.java</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ExportRequestItemsDAO.java</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/ExportRequestItem.java</file>
             <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/ExportRequest.java</file>
+=======
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/PRJ/ProjectSwp/web/LishSupplier.jsp</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/PRJ/ProjectSwp/web/SupplierEvaluation.jsp</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/PRJ/ProjectSwp/src/java/model/SupplierEvaluation.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/PRJ/ProjectSwp/src/java/DBContext/Context.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/PRJ/ProjectSwp/src/java/controller/TableSupplierEvaluation.java</file>
+            <file>file:/C:/Users/Fpt06/Downloads/SU2025/PRJ/ProjectSwp/src/java/dao/SupplierEvaluationDAO.java</file>
+>>>>>>> 056a6f1d4b22657ce712d648b002c7435a0746cc
         </group>
     </open-files>
 </project-private>
