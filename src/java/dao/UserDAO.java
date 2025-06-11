@@ -421,5 +421,5 @@ public class UserDAO extends Context {
 
         return dob;
     }
-
 }
+

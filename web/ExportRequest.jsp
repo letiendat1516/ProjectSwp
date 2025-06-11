@@ -340,7 +340,7 @@
                 </div>
                 <div class="button-container">
                     <button type="submit" class="submit-btn">Gửi yêu cầu</button>
-                    <a href="admin" class="back-btn">Quay lại</a>
+                    <a href="Admin.jsp" class="back-btn">Quay lại</a>
                 </div>
             </form>
         </div>
@@ -359,14 +359,14 @@
                     <td>
                         <select name="product_name" onchange="updateProductInfo(this)" style="width: 100%;">
                             <option value="" disabled selected>-- Chọn sản phẩm --</option>
-                            <c:forEach var="p" items="${products_list}">
+            <c:forEach var="p" items="${products_list}">
                                 <option 
                                     value="${p.id}" 
                                     data-code="${p.code}" 
                                     data-unit="${p.unit_id}">
-                                    ${p.name}
+                ${p.name}
                                 </option>
-                            </c:forEach>
+            </c:forEach>
                         </select>
                     </td>
                     <td><input type="text" name="product_code" readonly style="width: 100%;" /></td>
@@ -381,9 +381,11 @@
             function updateProductInfo(selectElement) {
                 const selectedOption = selectElement.options[selectElement.selectedIndex];
                 const code = selectedOption.getAttribute("data-code");
+                const unit = selectedOption.getAttribute("data-unit");
 
                 const row = selectElement.closest("tr");
-                row.querySelector("input[name='product_code']").value = code;
+                row.querySelector("input[name='product_code']").value = code || "";
+                row.querySelector("textarea[name='unit']").value = unit || "";
             }
         </script>
     </body>

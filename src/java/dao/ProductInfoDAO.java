@@ -13,10 +13,7 @@ public class ProductInfoDAO {
         String sql = "SELECT * FROM product_info";
 
         try (
-            Connection con = Context.getJDBCConnection();
-            PreparedStatement stmt = con.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-        ) {
+                Connection con = Context.getJDBCConnection(); PreparedStatement stmt = con.prepareStatement(sql); ResultSet rs = stmt.executeQuery();) {
             while (rs.next()) {
                 ProductInfo p = new ProductInfo();
                 p.setId(rs.getInt("id"));
@@ -35,4 +32,23 @@ public class ProductInfoDAO {
 
         return list;
     }
+
+    // Thêm method này vào ProductInfoDAO
+    public String getProductNameById(int productId) {
+        String sql = "SELECT name FROM product_info WHERE id = ?";
+        try (Connection con = Context.getJDBCConnection(); PreparedStatement stmt = con.prepareStatement(sql)) {
+
+            stmt.setInt(1, productId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("name");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
 }

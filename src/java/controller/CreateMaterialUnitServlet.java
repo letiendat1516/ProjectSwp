@@ -19,16 +19,19 @@ public class CreateMaterialUnitServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private MaterialUnitDAO materialUnitDAO;
     
+    @Override
     public void init() {
         materialUnitDAO = new MaterialUnitDAO();
     }
     
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         // Hiển thị form tạo mới
         request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
     }
     
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         try {

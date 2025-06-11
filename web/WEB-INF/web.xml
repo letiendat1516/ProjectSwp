@@ -97,6 +97,16 @@
         <servlet-name>LoadingRequestServlet</servlet-name>
         <url-pattern>/loadingrequest</url-pattern>
     </servlet-mapping>
+<<<<<<< HEAD
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error/error404.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error/error500.jsp</location>
+    </error-page>
+=======
     <servlet-mapping>
         <servlet-name>ListRequestImportController</servlet-name>
         <url-pattern>/import</url-pattern>
@@ -319,6 +329,5 @@
         <session-timeout>15</session-timeout>
         <!-- 15 phút -->
     </session-config>
-
 </web-app>
 
