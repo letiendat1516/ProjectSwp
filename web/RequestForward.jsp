@@ -211,7 +211,7 @@
                         </div>
                         <h4 class="card-title">Đơn yêu cầu xuất kho</h4>
                         <p class="card-text">Yêu cầu xuất kho một số sản phẩm nhất định.</p>
-                        <a href="" class="btn btn-primary">
+                        <a href="exportRequest" class="btn btn-primary">
                             Truy cập <span class="material-icons btn-icon">arrow_forward</span>
                         </a>
                     </div>

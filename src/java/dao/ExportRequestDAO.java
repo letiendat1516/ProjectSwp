@@ -1,65 +1,58 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dao;
+
 import DBContext.Context;
 import java.sql.*;
 import java.util.Date;
+
 public class ExportRequestDAO {
 
     public String addExportRequestIntoDB(int user_id, String role, Date day_request,
-            String status, String reason, String department, String recipient_name, 
+            String status, String reason, String department, String recipient_name,
             String recipient_phone, String recipient_email) {
-        String generatedId = null;
+        String generatedId = getNextExportRequestId(); // Tạo ID trước
+        
+        if (generatedId == null) {
+            System.out.println("Không thể tạo ID cho export request");
+            return null;
+        }
 
-        String insertSql = "INSERT INTO export_request (user_id, role, day_request, status, reason, department, recipient_name, recipient_phone, recipient_email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        String selectSql = "SELECT id FROM export_request WHERE user_id = ? AND role = ? AND day_request = ? AND status = ? AND reason = ? AND department = ? AND recipient_name = ? AND recipient_phone = ? AND recipient_email = ? ORDER BY id DESC LIMIT 1";
+        String insertSql = "INSERT INTO export_request (id, user_id, role, day_request, status, reason, department, recipient_name, recipient_phone, recipient_email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (
-            Connection con = Context.getJDBCConnection();
-            PreparedStatement insertStmt = con.prepareStatement(insertSql);
-            PreparedStatement selectStmt = con.prepareStatement(selectSql)
-        ) {
-            // B1: Insert
-            insertStmt.setInt(1, user_id);
-            insertStmt.setString(2, role);
-            insertStmt.setDate(3, new java.sql.Date(day_request.getTime()));
-            insertStmt.setString(4, status);
-            insertStmt.setString(5, reason);
-            insertStmt.setString(6, department);
-            insertStmt.setString(7, recipient_name);
-            insertStmt.setString(8, recipient_phone);
-            insertStmt.setString(9, recipient_email);
-            insertStmt.executeUpdate();
-
-            // B2: Truy lại ID vừa chèn
-            selectStmt.setInt(1, user_id);
-            selectStmt.setString(2, role);
-            selectStmt.setDate(3, new java.sql.Date(day_request.getTime()));
-            selectStmt.setString(4, status);
-            selectStmt.setString(5, reason);
-            selectStmt.setString(6, department);
-            selectStmt.setString(7, recipient_name);
-            selectStmt.setString(8, recipient_phone);
-            selectStmt.setString(9, recipient_email);
-
-            ResultSet rs = selectStmt.executeQuery();
-            if (rs.next()) {
-                generatedId = rs.getString("id");
+        try (Connection con = Context.getJDBCConnection(); 
+             PreparedStatement insertStmt = con.prepareStatement(insertSql)) {
+            
+            insertStmt.setString(1, generatedId);  // Thêm ID vào đây
+            insertStmt.setInt(2, user_id);
+            insertStmt.setString(3, role);
+            insertStmt.setDate(4, new java.sql.Date(day_request.getTime()));
+            insertStmt.setString(5, status);
+            insertStmt.setString(6, reason);
+            insertStmt.setString(7, department);
+            insertStmt.setString(8, recipient_name);
+            insertStmt.setString(9, recipient_phone);
+            insertStmt.setString(10, recipient_email);
+            
+            int rowsAffected = insertStmt.executeUpdate();
+            
+            if (rowsAffected > 0) {
+                System.out.println("Đã thêm export request thành công với ID: " + generatedId);
+                return generatedId;
+            } else {
+                System.out.println("Không thể thêm export request");
+                return null;
             }
 
         } catch (SQLException e) {
+            System.out.println("Lỗi SQL khi thêm export request: ");
             e.printStackTrace();
+            return null;
         }
-
-        return generatedId;
     }
 
     public String getNextExportRequestId() {
         String sql = "SELECT id FROM export_request WHERE id LIKE 'XK%-___' ORDER BY id DESC LIMIT 1";
-        try (Connection con = Context.getJDBCConnection();
-             PreparedStatement stmt = con.prepareStatement(sql);
+        try (Connection con = Context.getJDBCConnection(); 
+             PreparedStatement stmt = con.prepareStatement(sql); 
              ResultSet rs = stmt.executeQuery()) {
 
             if (!rs.next()) {
@@ -79,10 +72,9 @@ public class ExportRequestDAO {
             }
 
         } catch (Exception e) {
+            System.out.println("Lỗi khi tạo ID export request: ");
             e.printStackTrace();
         }
         return null;
     }
-    
-    
 }
