@@ -1,5 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="model.Users" session="true" %> 
 <!DOCTYPE html>
+<%@page import="model.Users"%>
+<%
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
+
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
@@ -29,6 +39,15 @@
             .header {
                 text-align: center;
                 margin-bottom: 30px;
+            }
+
+            .label {
+                color: #888;
+                width: 120px;
+            }
+            .value {
+                color: #222;
+                font-weight: bold;
             }
 
             .page-title {
@@ -130,10 +149,14 @@
 
             .btn-secondary {
                 background-color: transparent;
-                color: #666;
+                color: blue;
                 border: 1px solid #ccc;
             }
-
+            .btn-secondaries {
+                background-color: transparent;
+                color: red;
+                border: 1px solid #ccc;
+            }
             .btn-secondary:hover {
                 background-color: #f0f0f0;
             }
@@ -166,9 +189,19 @@
                 }
             }
         </style>
+
     </head>
     <body>
         <div class="container">
+            <div class="profile-info">
+                <label class="label">Employee Name:</label>
+                <span class="value"><%= user.getFullname() %></span>
+            </div>
+            <div class="profile-info">
+                <span class="value">
+                    <a href="Profile.jsp">Personal Information</a>
+                </span>
+            </div>
             <div class="header">
                 <h1 class="page-title">Quản lý Thông tin Vật liệu</h1>
                 <p class="lead">Chọn danh mục bạn muốn quản lý</p>
@@ -228,7 +261,7 @@
             </div>
 
             <div class="footer">
-                <a href="admin" class="btn btn-secondary">
+                <a href="Admin.jsp" class="btn btn-secondary">
                     Quay lại Trang chủ
                 </a>
             </div>

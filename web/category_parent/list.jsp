@@ -292,12 +292,12 @@
 <body>
   <div class="container">
       <div class="page-header">
-          <h1 class="page-title">Quản lý danh mục cha</h1>
+          <h1 class="page-title">Quản lý danh mục</h1>
       </div>
 
       <!-- Navigation Buttons -->
       <div class="nav-buttons">
-          <a href="${pageContext.request.contextPath}/category/list" class="btn btn-info">← Quay lại danh mục</a>
+          <a href="${pageContext.request.contextPath}/category/list" class="btn btn-info">← Quay lại</a>
       </div>
 
       <!-- Thông báo -->
@@ -317,7 +317,7 @@
 
       <!-- Thanh công cụ -->
       <div class="toolbar">
-          <a href="${pageContext.request.contextPath}/category-parent/create" class="btn btn-primary">Thêm danh mục cha</a>
+          <a href="${pageContext.request.contextPath}/category-parent/create" class="btn btn-primary">Thêm danh mục</a>
           <form method="get" class="search-form">
               <input type="text" name="search" class="form-input" 
                      placeholder="Tìm kiếm..." value="${searchKeyword}">
@@ -344,7 +344,7 @@
                               </th>
                               <th>Mô tả</th>
                               <th>Trạng thái</th>
-                              <th>Số danh mục con</th>
+                              <th>Số danh mục loại sản phẩm</th>
                               <th>Thao tác</th>
                           </tr>
                       </thead>
@@ -379,8 +379,8 @@
               </c:when>
               <c:otherwise>
                   <div class="empty-state">
-                      <h3>Không có danh mục cha nào</h3>
-                      <p>Hãy thêm danh mục cha đầu tiên của bạn</p>
+                      <h3>Không có danh mục nào</h3>
+                      <p>Hãy thêm danh mục đầu tiên của bạn</p>
                       <a href="${pageContext.request.contextPath}/category-parent/create" class="btn btn-primary">Thêm danh mục cha</a>
                   </div>
               </c:otherwise>

@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author phucn
  */
-public class ForgotPasswordServlet extends HttpServlet {
+public class ResetPasswordRequestServlet extends HttpServlet {
    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -33,50 +33,37 @@ public class ForgotPasswordServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ForgotPasswordServlet</title>");  
+            out.println("<title>Servlet ResetPasswordRequestServlet</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ForgotPasswordServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet ResetPasswordRequestServlet at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
     } 
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-     @Override
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("forgot.jsp").forward(req, resp);
+        ForgotPasswordDAO dao = new ForgotPasswordDAO();
+        List<ForgotPasswordRequest> requests = dao.getAllRequests();
+        req.setAttribute("requestList", requests);
+        req.getRequestDispatcher("AdminResetPasswordRequest.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String usernameOrEmail = req.getParameter("username");
-        String reason = req.getParameter("reason");
-
-        ForgotPasswordRequest request = new ForgotPasswordRequest();
-        request.setUsernameOrEmail(usernameOrEmail);
-        request.setReason(reason);
+        String action = req.getParameter("action");
+        int requestId = Integer.parseInt(req.getParameter("requestId"));
 
         ForgotPasswordDAO dao = new ForgotPasswordDAO();
-        boolean result = dao.createRequest(request);
-
-        if(result){
-            req.setAttribute("msg", "Yêu cầu cấp lại mật khẩu đã được gửi tới admin!");
-        } else {
-            req.setAttribute("err", "Không thể gửi yêu cầu. Vui lòng kiểm tra lại thông tin.");
+        if ("approve".equals(action)) {
+            // 1. Reset mật khẩu cho user (code mẫu, tuỳ logic)
+            // 2. Gửi email nếu muốn (bổ sung sau)
+            dao.updateStatus(requestId, "Đã xử lý"); // Đổi trạng thái sang đã xử lý
+        } else if ("deny".equals(action)) {
+            dao.updateStatus(requestId, "Từ chối");
         }
-        req.getRequestDispatcher("ForgotPassword.jsp").forward(req, resp);
+        resp.sendRedirect("resetPasswordRequests"); // refresh lại trang admin
     }
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
 
 }

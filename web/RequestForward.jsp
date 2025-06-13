@@ -236,7 +236,7 @@
             </div>
 
             <div class="footer">
-                <a href="admin" class="btn btn-secondary">
+                <a href="Admin.jsp" class="btn btn-secondary">
                     Quay lại Trang chủ
                 </a>
             </div>
