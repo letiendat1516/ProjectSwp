@@ -192,7 +192,7 @@
                         <div class="icon-container">
                             <span class="material-icons">add_shopping_cart</span>
                         </div>
-                        <h4 class="card-title">Đơn yêu cầu nhập kho</h4>
+                        <h4 class="card-title">Đơn yêu cầu mua hàng</h4>
                         <p class="card-text">Yêu cầu nhập kho một số sản phẩm nhất định.</p>
                         <a href="loadingrequest" class="btn btn-primary">
                             Truy cập <span class="material-icons btn-icon">arrow_forward</span>
