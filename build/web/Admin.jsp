@@ -487,10 +487,12 @@
                         <a href="roleAssignment" class="nav-item">
                             <span class="icon">🔐</span>
                             Role Assignment
-                        </a>
-                        <a href="categoriesforward.jsp" class="nav-item">
+                        </a>                        <a href="categoriesforward.jsp" class="nav-item">
                             <span class="icon">📦</span>
                             Material Information
+                        </a>                        <a href="product-list" class="nav-item">
+                            <span class="icon">📋</span>
+                            Danh Sách Sản Phẩm
                         </a>
                     </div>
                     

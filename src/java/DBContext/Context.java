@@ -10,11 +10,10 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Context {
-    public static Connection getJDBCConnection() {
-        String url = "jdbc:mysql://localhost:3306/warehouse_offical?serverTimezone=UTC";
+public class Context {    public static Connection getJDBCConnection() {
+        String url = "jdbc:mysql://localhost:3306/swp?serverTimezone=UTC";
         String user = "root";
-        String password = "root";
+        String password = "tunganh2005"; // Change this to your actual MySQL root password
         
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
