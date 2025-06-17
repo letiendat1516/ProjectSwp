@@ -137,7 +137,7 @@
                 <a href="admin" class="nav-item">User Manager</a>
                 <a href="roleAssignment" class="nav-item">Role Assignment</a>
                 <a href="categoriesforward.jsp" class="nav-item">Material Information</a>
-                <a href="password_request.jsp" class="nav-item">Password Request</a>
+                <a href="passwordrequest" class="nav-item">Password Request</a>
                 <a href="RequestForward.jsp" class="nav-item">Transaction</a>
                 <a href="#" class="nav-item">Statistic</a>
             </div>

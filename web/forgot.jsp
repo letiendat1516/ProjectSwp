@@ -4,79 +4,106 @@
     Author     : phucn
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    String msg = null;
+    if (session != null && session.getAttribute("msg") != null) {
+        msg = (String) session.getAttribute("msg");
+        session.removeAttribute("msg");
+    }
+%>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Forgot Password</title>
+        <title>Yêu cầu Reset Mật Khẩu</title>
         <style>
             body {
-                background: #f4f4f9;
+                background: #f3f6fb;
                 font-family: Arial, sans-serif;
             }
-            .forgot-container {
-                max-width: 400px;
-                margin: 60px auto;
+            .container {
+                width: 370px;
+                margin: 100px auto;
+                padding: 32px 28px;
                 background: #fff;
                 border-radius: 12px;
-                box-shadow: 0 6px 32px rgba(0,0,0,.1);
-                padding: 32px 28px 24px 28px;
+                box-shadow: 0 2px 16px rgba(0,0,0,0.08);
             }
             h2 {
+                margin-bottom: 24px;
                 text-align: center;
-                margin-bottom: 28px;
+                color: #1e3a5c;
             }
             label {
-                display: block;
-                margin-bottom: 6px;
-                font-weight: bold;
+                font-size: 16px;
+                color: #2b2b2b;
             }
-            input, textarea {
+            input[type="email"], textarea {
                 width: 100%;
-                padding: 10px;
-                margin-bottom: 16px;
-                border-radius: 5px;
-                border: 1px solid #ccc;
+                padding: 8px 10px;
+                margin-top: 10px;
+                margin-bottom: 22px;
+                border: 1px solid #b4bed2;
+                border-radius: 7px;
+                font-size: 15px;
+            }
+            textarea {
+                resize: vertical;
+                min-height: 50px;
             }
             button {
+                margin-top: 15px;
                 width: 100%;
-                background: #3498db;
-                color: #fff;
-                padding: 12px;
+                padding: 14px;
+                background-color: #3498db;
                 border: none;
-                border-radius: 6px;
-                font-size: 1.08rem;
+                border-radius: 5px;
+                color: white;
+                font-size: 1.18rem;
                 cursor: pointer;
             }
-            button:hover {
-                background: #2980b9;
+            
+            back {
+                margin-top: 15px;
+                width: 100%;
+                padding: 14px;
+                background-color: #3498db;
+                border: none;
+                border-radius: 5px;
+                color: white;
+                font-size: 1.18rem;
+                cursor: pointer;
             }
+
             .msg {
-                color: green;
                 text-align: center;
+                margin-top: 10px;
+                color: #148e08;
+                font-size: 15px;
+                min-height: 20px;
             }
-            .err {
-                color: red;
-                text-align: center;
+            .msg.err {
+                color: #c71e1e;
             }
         </style>
     </head>
     <body>
-        <div class="forgot-container">
-            <h2>Forgot Password</h2>
-            <!-- Có thể hiển thị thông báo thành công/thất bại ở đây -->
-            <form action="forgotPassword" method="post">
-                <label for="username">Username hoặc Email:</label>
-                <input type="text" id="username" name="username" required>
-
-                <label for="reason">Lý do (tuỳ chọn):</label>
-                <textarea id="reason" name="reason" rows="3"></textarea>
-
+        <div class="container">
+            <h2>Yêu cầu Reset Mật Khẩu</h2>
+            <form action="forgotpassword" method="post">
+                <label for="email">Email của bạn</label>
+                <input type="email" id="email" name="email" placeholder="Nhập email của bạn">
+                <label for="note">Lý do đổi mật khẩu</label>
+                <textarea id="note" name="note" placeholder="Nhập lý do đổi mật khẩu..."></textarea>
                 <button type="submit">Gửi yêu cầu</button>
+                <div class="back">
+                    <a href="login.jsp">Quay lại trang đăng nhập</a> 
+                    
+                </div>
             </form>
+            <div class="msg<%= (msg != null && msg.contains("không")) ? " err" : "" %>">
+                <%= (msg != null) ? msg : "" %>
+            </div>
         </div>
     </body>
 </html>
-
-
-
