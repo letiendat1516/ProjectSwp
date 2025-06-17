@@ -10,11 +10,15 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 public class Context {
+
     public static Connection getJDBCConnection() {
+
         String url = "jdbc:mysql://localhost:3306/swp";
         String user = "root";
         String password = "123456";
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             

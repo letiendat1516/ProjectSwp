@@ -63,11 +63,13 @@ public class TableSupplierEvaluation extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String id_raw = request.getParameter("id");
+        String seid = request.getParameter("seid");
         try {
             int id = Integer.parseInt(id_raw);
             SupplierDAO sd = new SupplierDAO();
             Supplier s = sd.getSupplierByID(id);
             request.setAttribute("supplier", s);
+            request.setAttribute("seid", seid);
             request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
         } catch (NumberFormatException e) {
         }
@@ -87,9 +89,10 @@ public class TableSupplierEvaluation extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
+        
         String sid_raw = request.getParameter("supplier");
         String dt_raw = request.getParameter("delivery_time");
-
+        String seid = request.getParameter("seid");
         String mpc_raw = request.getParameter("market_price_comparison");
         String tr_raw = request.getParameter("transparency_reputation");
         String sq_raw = request.getParameter("service_quality");
@@ -99,24 +102,44 @@ public class TableSupplierEvaluation extends HttpServlet {
         SupplierDAO sd = new SupplierDAO();
         Supplier s = sd.getSupplierByID(sid);
         request.setAttribute("supplier", s);
-        try {
-
-            
-            int dq = Integer.parseInt(dt_raw);
-
-            int mpc = Integer.parseInt(mpc_raw);
-            int tr = Integer.parseInt(tr_raw);
-            int sq = Integer.parseInt(sq_raw);
-            int uid = Integer.parseInt(uid_raw);
-            SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
-            sed.evaluation(sid, uid, dq, 0, mpc, tr, sq, comment);
-
-            request.setAttribute("mess", "successful supplier evaluation");
-            request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
-        } catch (NumberFormatException e) {
-
-            request.setAttribute("mess", "error");
-            request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+        
+        if (seid != null) {
+            try {
+                int id = Integer.parseInt(seid);
+                int dq = Integer.parseInt(dt_raw);
+                int mpc = Integer.parseInt(mpc_raw);
+                int tr = Integer.parseInt(tr_raw);
+                int sq = Integer.parseInt(sq_raw);
+                int uid = Integer.parseInt(uid_raw);
+                SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
+                
+                sed.editComment(id, dq, mpc, tr, sq, comment);
+                
+                request.setAttribute("mess", "Update success");
+                request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+            } catch (NumberFormatException e) {
+                request.setAttribute("mess", "error1");
+                request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+            }
+        } else {
+            try {
+                
+                int dq = Integer.parseInt(dt_raw);
+                
+                int mpc = Integer.parseInt(mpc_raw);
+                int tr = Integer.parseInt(tr_raw);
+                int sq = Integer.parseInt(sq_raw);
+                int uid = Integer.parseInt(uid_raw);
+                SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
+                sed.evaluation(sid, uid, dq, 0, mpc, tr, sq, comment);
+                
+                request.setAttribute("mess", "successful supplier evaluation");
+                request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+            } catch (NumberFormatException e) {
+                
+                request.setAttribute("mess", "error");
+                request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+            }
         }
     }
 

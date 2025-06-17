@@ -6,6 +6,8 @@
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ page import="model.Users" session="true" %> 
 <!DOCTYPE html>
 
@@ -18,317 +20,451 @@
     }
 %>
 
-
 <%
 response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
 response.setHeader("Pragma", "no-cache"); // HTTP 1.0
 response.setDateHeader("Expires", 0); // Proxies
 %>
 
-<html>
+<html lang="vi">
     <head>
-        <title>Admin Dashboard</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quản lý người dùng - Hệ thống kho</title>
         <style>
             body {
-                font-family: Arial, sans-serif;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: #f0f4f8;
+                color: #222;
                 margin: 0;
                 padding: 0;
-                background-color: #f4f4f9;
-                color: #333;
             }
             .container {
                 display: flex;
                 min-height: 100vh;
             }
             .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
                 width: 250px;
-                height: 100vh; /* chiếm full chiều cao viewport */
-                background-color: #2c3e50;
-                color: white;
-                padding: 20px;
-                overflow-y: auto; /* nếu menu dài thì có scrollbar riêng */
-                box-sizing: border-box;
+                background: #e6f0fa;
+                padding: 20px 0;
+                border-right: 1px solid #d6e0ef;
             }
-
             .sidebar h2 {
+                font-size: 1.4rem;
+                color: #1567c1;
                 text-align: center;
-                font-size: 24px;
-                margin-bottom: 30px;
+                margin-bottom: 20px;
             }
-            .sidebar ul {
-                list-style: none;
-                padding: 0;
+            .nav-item {
+                display: block;
+                padding: 10px 20px;
+                color: #214463;
+                text-decoration: none;
+                font-size: 1rem;
             }
-            .sidebar ul li {
-                padding: 15px;
-                font-size: 18px;
-                cursor: pointer;
-                border-radius: 5px;
-                margin-bottom: 10px;
-            }
-            .sidebar ul li:hover {
-                background-color: #34495e;
+            .nav-item:hover {
+                background: #c2e9fb;
+                color: #1567c1;
             }
             .main-content {
-                margin-left: 250px;
-                padding: 20px;
                 flex: 1;
+                padding: 20px;
             }
-
             .header {
+                background: #fff;
+                padding: 15px;
+                border-bottom: 1px solid #d6e0ef;
+                margin-bottom: 20px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                background-color: #fff;
-                padding: 15px 20px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                margin-bottom: 20px;
             }
-            .header h2 {
+            .header-title {
+                font-size: 1.8rem;
+                color: #1567c1;
                 margin: 0;
-                font-size: 24px;
-            }
-            .admin-logout {
-                font-size: 16px;
-            }
-            .admin-logout a {
-                color: #e74c3c;
-                text-decoration: none;
-                margin-left: 10px;
-            }
-            .admin-logout a:hover {
-                text-decoration: underline;
-            }
-            .add-user-btn {
-                background-color: #3498db;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 5px;
-                cursor: pointer;
-                margin-bottom: 20px;
-            }
-            .add-user-btn a {
-                color: white;
-                text-decoration: none;
-            }
-            .add-user-btn:hover {
-                background-color: #2980b9;
-            }
-            .filter-bar {
                 display: flex;
-                gap: 10px;
-                margin-bottom: 20px;
                 align-items: center;
             }
-            .filter-bar select, .filter-bar input {
-                padding: 8px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                font-size: 14px;
+            .header-user {
+                display: flex;
+                align-items: center;
             }
-            .filter-bar input {
-                flex: 1;
-                min-width: 200px;
+            .user-name {
+                font-size: 1rem;
+                color: #214463;
+                margin-right: 15px;
             }
-            .filter-bar button {
-                background-color: #3498db;
-                color: white;
+            .logout-btn {
+                background: #3a8dde;
+                color: #fff;
                 border: none;
-                padding: 8px 15px;
-                border-radius: 5px;
+                padding: 8px 16px;
+                border-radius: 4px;
                 cursor: pointer;
+                text-decoration: none;
             }
-            .filter-bar button:hover {
-                background-color: #2980b9;
+            .logout-btn:hover {
+                background: #1567c1;
+            }
+            .dashboard-content {
+                background: #fff;
+                padding: 20px;
+                border: 1px solid #d6e0ef;
+                border-radius: 8px;
+            }
+            .page-title {
+                font-size: 1.6rem;
+                color: #222e45;
+                margin-bottom: 10px;
+            }
+            .btn {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                text-decoration: none;
+                font-size: 14px;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.2s ease;
+                cursor: pointer;
+                background: #3a8dde;
+                color: #fff;
+            }
+            .btn:hover {
+                background: #1567c1;
+            }
+            .filter-section {
+                background: #fff;
+                border: 1px solid #d6e0ef;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            .filter-title {
+                font-size: 1.2rem;
+                color: #1567c1;
+                margin-bottom: 15px;
+            }
+            .filter-bar {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+                align-items: end;
+            }
+            .filter-group {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            .filter-label {
+                font-size: 0.9rem;
+                color: #5a7da0;
+            }
+            .filter-bar select, .filter-bar input[type="text"] {
+                padding: 10px;
+                border: 2px solid #e1e5e9;
+                border-radius: 4px;
+                font-size: 14px;
+                width: 95%;
+            }
+            .filter-bar select:focus, .filter-bar input[type="text"]:focus {
+                outline: none;
+                border-color: #3a8dde;
+            }
+            .search-btn {
+                background: #3a8dde;
+                color: #fff;
+                padding: 10px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+                height: 100%;
+                width: 95%;
+            }
+
+            .search-btn:hover {
+                background: #1567c1;
+            }
+            .table-container {
+                background: #fff;
+                border: 1px solid #d6e0ef;
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+            .table-header {
+                padding: 15px;
+                border-bottom: 1px solid #d6e0ef;
+            }
+            .table-title {
+                font-size: 1.3rem;
+                color: #222e45;
             }
             table {
                 width: 100%;
                 border-collapse: collapse;
-                background-color: #fff;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             }
-            th, td {
-                padding: 12px 15px;
+            table th, table td {
+                padding: 12px;
                 text-align: left;
-                border-bottom: 1px solid #ddd;
+                border-bottom: 1px solid #eee;
             }
-            th {
-                background-color: #ecf0f1;
-                font-weight: bold;
+            table th {
+                background: #e6f0fa;
+                color: #214463;
             }
-            tr:hover {
-                background-color: #f9f9f9;
+            .status-badge {
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 600;
             }
             .status-active {
-                color: #2ecc71;
-                font-weight: bold;
+                background: #d4edda;
+                color: #155724;
             }
             .status-inactive {
-                color: #e74c3c;
-                font-weight: bold;
+                background: #f8d7da;
+                color: #721c24;
             }
             .action-btn {
-                padding: 5px 10px;
+                background: #3a8dde;
+                color: #fff;
+                padding: 8px 16px;
                 border: none;
-                border-radius: 3px;
-                cursor: pointer;
-                margin-right: 5px;
+                border-radius: 4px;
                 text-decoration: none;
             }
-            .edit-btn {
-                background-color: #3498db;
-                color: white;
+            .action-btn:hover {
+                background: #1567c1;
             }
-            .edit-btn:hover {
-                background-color: #2980b9;
-            }
-            .activate-btn {
-                background-color: #2ecc71;
-                color: white;
-            }
-            .activate-btn:hover {
-                background-color: #27ae60;
-            }
-            .deactivate-btn {
-                background-color: #e74c3c;
-                color: white;
-            }
-            .deactivate-btn:hover {
-                background-color: #c0392b;
+            .pagination-container {
+                background: #fff;
+                border: 1px solid #d6e0ef;
+                border-radius: 8px;
+                padding: 15px;
+                display: flex;
+                justify-content: space-between;
             }
             .pagination a, .pagination button {
                 padding: 8px 12px;
-                margin: 0 2px;
-                border: 1px solid #ddd;
                 text-decoration: none;
-                color: #3498db;
-                border-radius: 3px;
-                cursor: pointer;
+                border: 2px solid #e1e5e9;
+                color: #3a8dde;
+                border-radius: 4px;
             }
-
-            .pagination button.active {
-                background-color: #3498db;
-                color: white;
-                border-color: #3498db;
+            .pagination a:hover, .pagination button:hover {
+                background: #e6f0fa;
             }
-
-            .pagination a:hover {
-                background-color: #ecf0f1;
+            .pagination .active {
+                background: #3a8dde;
+                color: #fff;
             }
-
+            .empty-state {
+                text-align: center;
+                padding: 40px;
+                color: #5a7da0;
+            }
+            @media (max-width: 900px) {
+                .container {
+                    flex-direction: column;
+                }
+                .sidebar {
+                    width: 100%;
+                }
+                .filter-bar {
+                    grid-template-columns: 1fr;
+                }
+            }
+            .loading {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                border: 3px solid #f3f3f3;
+                border-top: 3px solid #3a8dde;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="sidebar">
-                <h2>Warehouse<br>Manager</h2>
-                <ul >
-                    <li class="add-user-btn"><a href="admin">User Manager</a></li>
-                    <li class="add-user-btn"><a href="roleAssignment"> Role Assignment </a></li>
-                    <li class="add-user-btn"><a href="categoriesforward.jsp">Material Information</a></li>
-                    <li class="add-user-btn"><a href="RequestForward.jsp" >Transaction</a></li>
-                    <li class="add-user-btn">Statistic</li>
-                </ul>
+                <h2>Warehouse Manager</h2>
+                <a href="admin" class="nav-item">User Manager</a>
+                <a href="roleAssignment" class="nav-item">Role Assignment</a>
+                <a href="categoriesforward.jsp" class="nav-item">Material Information</a>
+                <a href="passwordrequest" class="nav-item">Password Request</a>
+                <a href="RequestForward.jsp" class="nav-item">Transaction</a>
+                <a href="#" class="nav-item">Statistic</a>
             </div>
-
             <div class="main-content">
                 <div class="header">
-                    <div><h2>Setting List</h2></div>
-                    <div class="admin-logout">
-                        <strong>Admin</strong> <a href="logout">Log out</a>
+                    <h1 class="header-title">Quản lý người dùng</h1>
+                    <div class="header-user">
+                        <span class="user-name">Admin</span>
+                        <a href="logout" class="logout-btn">Log out</a>
                     </div>
                 </div>
-
-                <button class="add-user-btn">
-                    <a href="AddUser.jsp">+ Add User</a>
-                </button>
-
-                <form action="userfilter" method="get" class="filter-bar">
-                    <div class="filter-bar">
-                        <select id="role" name="role">
-                            <option value="all" selected>All Roles</option>
-                            <option value="2">Warehouse Staff</option>
-                            <option value="3">Company Employee</option>
-                            <option value="4">Company Director</option>
-                        </select>
-
-
-                        <select name="status">
-                            <option value="">All Statuses</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-
-                        <input type="text" name="keyword" placeholder="Enter keyword(s) to search">
-                        <input type="hidden" name="page" value="usermanager" /> <!-- Phân biệt trang -->
-                        <button class="search-btn">Search</button>
+                <div class="dashboard-content">
+                    <div class="page-header">
+                        <h2 class="page-title">Quản lý người dùng</h2>
+                        <div class="header-actions">
+                            <a href="Admin.jsp" class="btn">Quay lại</a>
+                            <a href="AddUser.jsp" class="btn"> + Thêm người dùng</a>
+                        </div>
                     </div>
-                </form>
-
-                <table>
-                    <thead style="background-color: #eee;">
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Fullname</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Created Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach var="user" items="${userList}">
-                            <tr>
-                                <td>${user.id}</td>
-                                <td>${user.username}</td>
-                                <td>${user.fullname}</td>
-                                <td>${user.roleName}</td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${user.activeFlag == 1}">Active</c:when>
-                                        <c:otherwise>Inactive</c:otherwise>
-                                    </c:choose>
-                                </td>
-                                <td>${user.createDate}</td>
-                                <td>
-                                    <a href="edituser?id=${user.id}">Edit</a>
-                                </td>
-
-                            </tr>
-                        </c:forEach>
-                        <c:if test="${empty userList}">
-                            <tr><td colspan="7">No users found.</td></tr>
-                        </c:if>
-                    </tbody>
-                </table>
-
-                <div class="pagination">
-                    <p>Total pages: ${totalPages}</p>
+                    <div class="filter-section">
+                        <h3 class="filter-title">Tìm kiếm</h3>
+                        <form action="userfilter" method="get">
+                            <div class="filter-bar">
+                                <div class="filter-group">
+                                    <label class="filter-label">Vai trò</label>
+                                    <select id="role" name="role">
+                                        <option value="all" selected>Tất cả vai trò</option>
+                                        <option value="2">Nhân viên kho</option>
+                                        <option value="3">Nhân viên công ty</option>
+                                        <option value="4">Giám đốc công ty</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Trạng thái</label>
+                                    <select name="status">
+                                        <option value="">Tất cả trạng thái</option>
+                                        <option value="active">Đang hoạt động</option>
+                                        <option value="inactive">Không hoạt động</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Từ khóa</label>
+                                    <input type="text" name="keyword" placeholder="Tìm theo tên đăng nhập, họ tên...">
+                                </div>
+                                <div class="filter-group">
+                                    <button type="submit" class="search-btn">Tìm kiếm</button>
+                                </div>
+                            </div>
+                            <input type="hidden" name="page" value="usermanager" />
+                        </form>
+                    </div>
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3 class="table-title">Danh sách người dùng</h3>
+                            <div class="table-count">
+                                <c:set var="userCount" value="0" />
+                                <c:forEach var="user" items="${userList}">
+                                    <c:set var="userCount" value="${userCount + 1}"/>
+                                </c:forEach>
+                                <c:choose>
+                                    <c:when test="${userCount > 0}">
+                                        Hiện có ${userCount} người dùng
+                                    </c:when>
+                                    <c:otherwise>
+                                        Không tìm thấy người dùng
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </div>
+                        <c:choose>
+                            <c:when test="${not empty userList}">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Tên đăng nhập</th>
+                                            <th>Họ và tên</th>
+                                            <th>Vai trò</th>
+                                            <th>Trạng thái</th>
+                                            <th>Ngày tạo</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach var="user" items="${userList}">
+                                            <tr>
+                                                <td><strong>#${user.id}</strong></td>
+                                                <td><strong>${user.username}</strong></td>
+                                                <td>${user.fullname}</td>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${user.roleName == 'Warehouse Staff'}">
+                                                            Nhân viên kho
+                                                        </c:when>
+                                                        <c:when test="${user.roleName == 'Company Employee'}">
+                                                            Nhân viên công ty
+                                                        </c:when>
+                                                        <c:when test="${user.roleName == 'Company Director'}">
+                                                            Giám đốc công ty
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            ${user.roleName}
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${user.activeFlag == 1}">
+                                                            <span class="status-badge status-active">Hoạt động</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="status-badge status-inactive">Không hoạt động</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>
+                                                    <fmt:formatDate value="${user.createDate}" pattern="dd/MM/yyyy" />
+                                                </td>
+                                                <td>
+                                                    <a href="edituser?id=${user.id}" class="action-btn">Chỉnh sửa</a>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="empty-state">
+                                    <h3 class="empty-state-title">Không tìm thấy người dùng</h3>
+                                    <p class="empty-state-text">Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc thêm người dùng mới.</p>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
                     <c:if test="${totalPages > 1}">
-                        <c:if test="${currentPage > 1}">
-                            <a href="admin?page=${currentPage - 1}">&lt; Prev</a>
-                        </c:if>
-                        <c:forEach begin="1" end="${totalPages}" var="i">
-                            <c:choose>
-                                <c:when test="${i == currentPage}">
-                                    <button class="active">${i}</button>
-                                </c:when>
-                                <c:otherwise>
-                                    <a href="admin?page=${i}">${i}</a>
-                                </c:otherwise>
-                            </c:choose>
-                        </c:forEach>
-                        <c:if test="${currentPage < totalPages}">
-                            <a href="admin?page=${currentPage + 1}">Next &gt;</a>
-                        </c:if>
+                        <div class="pagination-container">
+                            <div class="pagination-info">Trang ${currentPage} / ${totalPages}</div>
+                            <div class="pagination">
+                                <c:if test="${currentPage > 1}">
+                                    <a href="admin?page=${currentPage - 1}">Trước</a>
+                                </c:if>
+                                <c:forEach begin="1" end="${totalPages}" var="i">
+                                    <c:choose>
+                                        <c:when test="${i == currentPage}">
+                                            <button class="active">${i}</button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="admin?page=${i}">${i}</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
+                                <c:if test="${currentPage < totalPages}">
+                                    <a href="admin?page=${currentPage + 1}">Sau</a>
+                                </c:if>
+                            </div>
+                        </div>
                     </c:if>
                 </div>
-
             </div>
         </div>
     </body>

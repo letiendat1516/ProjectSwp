@@ -1,6 +1,4 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -13,7 +11,6 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             /* CSS styles remain unchanged */
-            /* Reset và Base */
             * {
                 box-sizing: border-box;
                 margin: 0;
@@ -87,7 +84,6 @@
                 border-top: 1px solid var(--gray-200);
             }
 
-            /* Typography */
             h1, h2, h3, h4, h5, h6 {
                 color: var(--gray-900);
                 font-weight: 600;
@@ -107,7 +103,6 @@
                 margin-bottom: 1rem;
             }
 
-            /* Header & Branding */
             .app-header {
                 background-color: white;
                 box-shadow: var(--shadow);
@@ -153,7 +148,6 @@
                 color: var(--primary);
             }
 
-            /* Breadcrumbs */
             .breadcrumbs {
                 display: flex;
                 align-items: center;
@@ -181,7 +175,6 @@
                 font-weight: 500;
             }
 
-            /* Alerts */
             .alert {
                 padding: 1rem 1.25rem;
                 border-radius: var(--border-radius);
@@ -242,7 +235,6 @@
                 color: white;
             }
 
-            /* Forms */
             .form-group {
                 margin-bottom: 1.25rem;
             }
@@ -304,7 +296,6 @@
                 border-bottom-left-radius: 0;
             }
 
-            /* Buttons */
             .btn {
                 display: inline-block;
                 font-weight: 500;
@@ -416,7 +407,6 @@
                 gap: 0.5rem;
             }
 
-            /* Tables */
             .table-container {
                 margin-bottom: 1.5rem;
                 overflow-x: auto;
@@ -456,7 +446,6 @@
                 background-color: var(--gray-50);
             }
 
-            /* Badges */
             .badge {
                 display: inline-flex;
                 align-items: center;
@@ -500,7 +489,6 @@
                 background-color: #f1f5f9;
             }
 
-            /* Pagination */
             .pagination {
                 display: flex;
                 padding-left: 0;
@@ -555,7 +543,6 @@
                 box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
             }
 
-            /* Filter panel */
             .filter-panel {
                 background-color: white;
                 border-radius: var(--border-radius);
@@ -585,7 +572,6 @@
                 min-width: 200px;
             }
 
-            /* Utilities */
             .d-flex {
                 display: flex !important;
             }
@@ -698,7 +684,6 @@
                 font-size: 0.75rem !important;
             }
 
-            /* Footer */
             .footer {
                 margin-top: 3rem;
                 padding: 1.5rem 0;
@@ -732,7 +717,6 @@
                 color: var(--primary);
             }
 
-            /* Modal */
             .modal {
                 display: none;
                 position: fixed;
@@ -799,7 +783,6 @@
                 gap: 0.5rem;
             }
 
-            /* Responsive */
             @media (max-width: 768px) {
                 .filter-row {
                     flex-direction: column;
@@ -819,26 +802,10 @@
         </style>
     </head>
     <body>
-        <!-- Header -->
-        <header class="app-header">
-            <div class="app-header-inner">
-                <div class="brand">
-                    <div class="brand-logo">W</div>
-                    <div class="brand-text">Warehouse<span>Pro</span></div>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                    <span class="text-muted fs-sm">Xin chào, ${sessionScope.user.fullname}</span>
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fas fa-user-circle" style="font-size: 1.25rem; color: var(--gray-600);"></i>
-                    </div>
-                </div>
-            </div>
-        </header>
-
         <div class="container">
             <!-- Breadcrumbs -->
             <div class="breadcrumbs mb-4">
-                <a href="${pageContext.request.contextPath}/dashboard">Trang chủ</a>
+                <a href="${pageContext.request.contextPath}/Admin.jsp">Trang chủ</a>
                 <span class="separator"><i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i></span>
                 <span class="current">Danh sách yêu cầu nhập kho</span>
             </div>
@@ -894,10 +861,10 @@
                         <div class="filter-title">Tìm kiếm</div>
                         <div class="filter-row">
                             <div class="filter-item">
-                                <form action="${pageContext.request.contextPath}/request/list" method="get">
+                                <form action="${pageContext.request.contextPath}/import" method="get">
                                     <input type="hidden" name="type" value="purchase">
                                     <div class="input-group">
-                                        <input type="text" name="search" value="${param.search}" class="form-control" placeholder="Tìm kiếm theo mã yêu cầu hoặc tên sản phẩm...">
+                                        <input type="text" name="search" value="${param.search}" class="form-control" placeholder="Tìm kiếm theo tên sản phẩm...">
                                         <div class="input-group-append">
                                             <button type="submit" class="btn btn-primary">
                                                 <i class="fas fa-search"></i> Tìm kiếm
@@ -936,7 +903,7 @@
                                         <c:choose>
                                             <c:when test="${empty items}">
                                                 <tr>
-                                                    <td colspan="10" class="text-center py-4">
+                                                    <td colspan="11" class="text-center py-4">
                                                         <div style="color: gray;">
                                                             <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i>
                                                             <p>Không có dữ liệu để hiển thị.</p>
@@ -972,7 +939,6 @@
                         </div>
                     </div>
 
-
                     <!-- Phân trang -->
                     <c:if test="${totalPages > 1}">
                         <nav aria-label="Page navigation" class="d-flex justify-content-center">
@@ -1001,10 +967,10 @@
 
                 <div class="card-footer">
                     <div class="d-flex justify-content-between align-items-center">
-                        <button type="button" class="btn btn-secondary btn-icon" onclick="window.location.href = '${pageContext.request.contextPath}/request/list?type=purchase'">
+                        <button type="button" class="btn btn-secondary btn-icon" onclick="window.location.href = '${pageContext.request.contextPath}/import'">
                             <i class="fas fa-sync-alt"></i> Làm mới
                         </button>
-                        <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-primary btn-icon">
+                        <a href="${pageContext.request.contextPath}/Admin.jsp" class="btn btn-primary btn-icon">
                             <i class="fas fa-arrow-left"></i> Quay lại Trang chủ
                         </a>
                     </div>
@@ -1091,18 +1057,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="footer-content">
-                <div>© 2025 WarehousePro. Bản quyền thuộc về Công ty TNHH Quản lý Kho.</div>
-                <div class="footer-links">
-                    <a href="#">Trợ giúp</a>
-                    <a href="#">Điều khoản</a>
-                    <a href="#">Chính sách bảo mật</a>
-                </div>
-            </div>
-        </footer>
 
         <script>
             // Xử lý đóng alert sau 5 giây

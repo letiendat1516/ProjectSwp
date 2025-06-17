@@ -9,7 +9,7 @@ package model;
  * @author Admin
  */
 public class RequestItems {
-
+    private int id;
     private Request request_id;
     private String[] product_name;
     private String[] product_code;
@@ -21,7 +21,8 @@ public class RequestItems {
     public RequestItems() {
     }
 
-    public RequestItems(Request request_id, String[] product_name, String[] product_code, String[] unit, int[] quantity, String[] note, String reason_detail) {
+    public RequestItems(int id, Request request_id, String[] product_name, String[] product_code, String[] unit, int[] quantity, String[] note, String reason_detail) {
+        this.id = id;
         this.request_id = request_id;
         this.product_name = product_name;
         this.product_code = product_code;
@@ -29,6 +30,14 @@ public class RequestItems {
         this.quantity = quantity;
         this.note = note;
         this.reason_detail = reason_detail;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Request getRequest_id() {
@@ -86,5 +95,6 @@ public class RequestItems {
     public void setReason_detail(String reason_detail) {
         this.reason_detail = reason_detail;
     }
+
 
 }

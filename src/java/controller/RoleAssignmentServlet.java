@@ -86,4 +86,3 @@ public class RoleAssignmentServlet extends HttpServlet {
         response.sendRedirect("roleAssignment");
     }
 }
-

@@ -1,4 +1,3 @@
-
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -97,5 +96,88 @@ public class ProductInfo {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    
+    // Additional fields for enhanced product management
+    private int supplierId;
+    private java.sql.Date expirationDate;
+    private String storageLocation;
+    private String imageUrl;
+    private String additionalNotes;
+    private int createdBy;
+    private java.sql.Date createdDate;
+    private int updatedBy;
+    private java.sql.Date updatedDate;
+
+    public int getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(int supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public java.sql.Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(java.sql.Date expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public String getStorageLocation() {
+        return storageLocation;
+    }
+
+    public void setStorageLocation(String storageLocation) {
+        this.storageLocation = storageLocation;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getAdditionalNotes() {
+        return additionalNotes;
+    }
+
+    public void setAdditionalNotes(String additionalNotes) {
+        this.additionalNotes = additionalNotes;
+    }
+
+    public int getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(int createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public java.sql.Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(java.sql.Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public int getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(int updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public java.sql.Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(java.sql.Date updatedDate) {
+        this.updatedDate = updatedDate;
     }
 }

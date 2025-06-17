@@ -393,6 +393,7 @@
                                 </div>
                             </td>
                             <td>
+
                                 <div class="action-container">
                                     <a class="action-btn evaluation-btn"
                                        href="TableSupplierEvaluation?id=${listItem.supplierID}">
@@ -404,6 +405,7 @@
                                     </a>
                                 </div>
                             </td>    
+
                         </tr>
                     </c:forEach>
                 </table>

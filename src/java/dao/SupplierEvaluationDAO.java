@@ -230,8 +230,36 @@ public class SupplierEvaluationDAO {
             ps.setInt(6, tr);
             ps.setInt(7, sq);
             ps.setString(8, comment);
-            float avg_rate = (dt + pq + mpc + tr + sq) / 5.0f;
+            float avg_rate = (dt + mpc + tr + sq) / 4.0f;
             ps.setFloat(9, avg_rate);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+        }
+    }
+
+    public void editComment(int id, int dt, int mpc, int tr, int sq, String comment) {
+        String sql = "UPDATE `swp`.`supplier_evaluation`\n"
+                + "SET\n"
+                + "`expected_delivery_time` = ?,\n"
+                + "`market_price_comparison` = ?,\n"
+                + "`transparency_reputation` = ?,\n"
+                + "`service_quality` = ?,\n"
+                + "`comment` = ?,\n"
+                + "`avg_rate` = ?,\n"
+                + "`edit_count` = ?\n"
+                + "WHERE `id` = ?;";
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, dt);
+            ps.setInt(2, mpc);
+            ps.setInt(3, tr);
+            ps.setInt(4, sq);
+            ps.setString(5, comment);
+            float avg_rate = (dt + mpc + tr + sq) / 4.0f;
+            ps.setFloat(6, avg_rate);
+            ps.setInt(7, 1);
+            ps.setInt(8, id);
             ps.executeUpdate();
         } catch (SQLException e) {
         }
@@ -247,5 +275,6 @@ public class SupplierEvaluationDAO {
 //        for (int i = 0; i < listt.size(); i++) {
 //            System.out.println(listt.get(i).getSupplierID());
 //        }
+        sed.editComment(59, 1, 2, 3, 4, "ok");
     }
 }

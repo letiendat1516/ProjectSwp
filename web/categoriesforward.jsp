@@ -236,7 +236,7 @@
                         </div>
                         <h4 class="card-title">Quản lý Đơn vị Tính</h4>
                         <p class="card-text">Quản lý các đơn vị đo lường và tính toán cho vật liệu và sản phẩm.</p>
-                        <a href="materialUnit.jsp" class="btn btn-primary">
+                        <a href="material_unit/materialUnit.jsp" class="btn btn-primary">
                             Truy cập <span class="material-icons btn-icon">arrow_forward</span>
                         </a>
                     </div>
@@ -261,13 +261,8 @@
             </div>
 
             <div class="footer">
-                <a href="admin" class="btn btn-secondary">
-                    Quay lại Trang Admin (Admin only)
-                </a>
-            </div>
-            <div class="footer">
-                <a href="logout" class="btn btn-secondaries">
-                    Logout
+                <a href="Admin.jsp" class="btn btn-secondary">
+                    Quay lại Trang chủ
                 </a>
             </div>
         </div>

@@ -186,7 +186,7 @@
                 <div class="form-footer">
                     <button type="submit" name="action" value="confirm" class="btn btn-primary">Xác nhận nhập kho</button>
                     <button type="submit" name="action" value="reject" class="btn btn-danger">Từ chối nhập kho</button>
-                    <a href="list" class="btn btn-secondary">Quay lại danh sách</a>
+                    <a href="import" class="btn btn-secondary">Quay lại danh sách</a>
                 </div>
             </form>
         </div>

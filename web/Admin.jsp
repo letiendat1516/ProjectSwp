@@ -6,6 +6,7 @@
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ page import="model.Users" session="true" %> 
 <!DOCTYPE html>
 <%
@@ -23,128 +24,137 @@
     }
 %>
 
-
-
-
-<html>
+<html lang="vi">
     <head>
-        <title>Admin</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Dashboard - Warehouse Manager</title>
         <style>
             body {
-                font-family: Arial, sans-serif;
+                font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+                background: #f0f4f8;
+                color: #222;
                 margin: 0;
                 padding: 0;
-                background-color: #f4f4f9;
-                color: #333;
             }
             .container {
                 display: flex;
                 min-height: 100vh;
             }
             .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
                 width: 250px;
-                height: 100vh;
-                background-color: #2c3e50;
-                color: white;
-                padding: 20px;
-                overflow-y: auto;
-                box-sizing: border-box;
+                background: #e6f0fa;
+                padding: 20px 0;
+                border-right: 1px solid #d6e0ef;
             }
-
             .sidebar h2 {
+                font-size: 1.4rem;
+                color: #1567c1;
                 text-align: center;
-                font-size: 24px;
-                margin-bottom: 30px;
+                margin-bottom: 20px;
             }
-            .sidebar ul {
-                list-style: none;
-                padding: 0;
+            .nav-item {
+                display: block;
+                padding: 10px 20px;
+                color: #214463;
+                text-decoration: none;
+                font-size: 1rem;
             }
-            .sidebar ul li {
-                padding: 15px;
-                font-size: 18px;
-                cursor: pointer;
-                border-radius: 5px;
-                margin-bottom: 10px;
-            }
-            .sidebar ul li:hover {
-                background-color: #34495e;
+            .nav-item:hover {
+                background: #c2e9fb;
+                color: #1567c1;
             }
             .main-content {
-                margin-left: 250px;
-                padding: 20px;
                 flex: 1;
+                padding: 20px;
             }
-
             .header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background-color: #fff;
-                padding: 15px 20px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                margin-bottom: 20px;
+                background: #fff;
+                padding: 15px;
+        border-bottom: 1px solid #d6e0ef;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
             }
-            .header h2 {
+            .header-title {
+                font-size: 1.8rem;
+                color: #1567c1;
                 margin: 0;
-                font-size: 24px;
+                display: flex;
+                align-items: center;
             }
-            .admin-logout {
-                font-size: 16px;
+            .header-user {
+                display: flex;
+                align-items: center;
             }
-            .admin-logout a {
-                color: #e74c3c;
-                text-decoration: none;
-                margin-left: 10px;
+            .user-name {
+                font-size: 1rem;
+                color: #214463;
+                margin-right: 15px;
             }
-            .admin-logout a:hover {
-                text-decoration: underline;
-            }
-            .add-user-btn {
-                background-color: #3498db;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 5px;
+            .logout-btn {
+                background: red;
+                color: #fff;
+                border: #007BFF;
+                padding: 8px 16px;
+                border-radius: 4px;
                 cursor: pointer;
-                margin-bottom: 20px;
-            }
-            .add-user-btn a {
-                color: white;
                 text-decoration: none;
             }
-            .add-user-btn:hover {
-                background-color: #2980b9;
+            .logout-btn:hover {
+                background: orange;
             }
-
+            .dashboard-content {
+                background: #fff;
+                padding: 20px;
+                border: 1px solid #d6e0ef;
+                border-radius: 8px;
+            }
+            .page-title {
+                font-size: 1.6rem;
+                color: #222e45;
+                margin-bottom: 10px;
+            }
+            .notification {
+                color: #5a7da0;
+                font-size: 1.1rem;
+            }
+            @media (max-width: 900px) {
+                .container {
+                    flex-direction: column;
+                }
+                .sidebar {
+                    width: 100%;
+                }
+            }
 
         </style>
     </head>
     <body>
         <div class="container">
             <div class="sidebar">
-                <h2>Warehouse<br>Manager</h2>
-                <ul >
-                    <li class="add-user-btn"><a href="admin">User Manager</a></li>
-                    <li class="add-user-btn"><a href="roleAssignment"> Role Assignment </a></li>
-                    <li class="add-user-btn"><a href="categoriesforward.jsp">Material Information</a></li>
-                    <li class="add-user-btn"><a href="RequestForward.jsp" >Transaction</a></li>
-                    <li class="add-user-btn">Statistic</li>
-                </ul>
+                <h2>Warehouse Manager</h2>
+                <a href="admin" class="nav-item">User Manager</a>
+                <a href="roleAssignment" class="nav-item">Role Assignment</a>
+                <a href="categoriesforward.jsp" class="nav-item">Material Information</a>
+                <a href="passwordrequest" class="nav-item">Password Request</a>
+                <a href="RequestForward.jsp" class="nav-item">Transaction</a>
+                <a href="#" class="nav-item">Statistic</a>
             </div>
-
             <div class="main-content">
                 <div class="header">
-                    <div><h2>Admin Dashboard</h2></div>
-                    <div class="admin-logout">
-                        <strong>Admin</strong><a href="logout">Log out</a>
+                    <h1 class="header-title">Admin Dashboard</h1>
+                    <div class="header-user">
+                        <span class="user-name">Admin</span>
+                        <a href="logout" class="logout-btn">Log out</a>
                     </div>
+                </div>
+                <div class="dashboard-content">
+                    <h2 class="page-title">Admin Dashboard</h2>
+                    <p class="notification">Trang admin đã sẵn sàng hoạt động</p>
                 </div>
             </div>
         </div>
     </body>
 </html>
-

@@ -1,4 +1,3 @@
-
 package dao;
 
 import DBContext.Context;
@@ -8,7 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import model.Request;
 
 public class ListRequestImportDAO {
@@ -47,7 +47,7 @@ public class ListRequestImportDAO {
             rs = ps.executeQuery();
             while (rs.next()) {
                 RequestItem item = new RequestItem();
-                item.setId(rs.getString("id"));
+                item.setId(rs.getInt("id"));
                 item.setRequestId(rs.getString("request_id"));
                 item.setProductName(rs.getString("product_name"));
                 item.setProductCode(rs.getString("product_code"));
@@ -66,7 +66,7 @@ public class ListRequestImportDAO {
         return list;
     }
 
-    public List<ApprovedRequestItem> getApprovedRequestItems() {
+    public List<ApprovedRequestItem> getApprovedRequestItems(String search) {
         List<ApprovedRequestItem> list = new ArrayList<>();
         String sql = "SELECT r.id AS request_id, r.day_request, r.status, r.supplier, r.address, r.phone, r.email, "
                 + "ri.product_name, ri.product_code, pi.name AS product_full_name, pi.price, ri.unit, ri.quantity, "
@@ -75,11 +75,19 @@ public class ListRequestImportDAO {
                 + "JOIN request_items ri ON r.id = ri.request_id "
                 + "JOIN product_info pi ON ri.product_code = pi.code "
                 + "WHERE r.status = 'approved' "
-                + "ORDER BY r.id, ri.product_name";
+                + (search != null && !search.trim().isEmpty() 
+                    ? "AND (ri.product_code LIKE ? OR ri.product_name LIKE ?)" 
+                    : "")
+                + " ORDER BY r.id, ri.product_name";
 
         try {
             conn = Context.getJDBCConnection();
             ps = conn.prepareStatement(sql);
+            if (search != null && !search.trim().isEmpty()) {
+                String searchPattern = "%" + search.trim() + "%";
+                ps.setString(1, searchPattern);
+                ps.setString(2, searchPattern);
+            }
             rs = ps.executeQuery();
             while (rs.next()) {
                 ApprovedRequestItem item = new ApprovedRequestItem();
@@ -90,7 +98,6 @@ public class ListRequestImportDAO {
                 item.setAddress(rs.getString("address"));
                 item.setPhone(rs.getString("phone"));
                 item.setEmail(rs.getString("email"));
-
                 item.setProductName(rs.getString("product_name"));
                 item.setProductCode(rs.getString("product_code"));
                 item.setProductFullName(rs.getString("product_full_name"));
@@ -99,7 +106,6 @@ public class ListRequestImportDAO {
                 item.setQuantity(rs.getDouble("quantity"));
                 item.setNote(rs.getString("note"));
                 item.setReasonDetail(rs.getString("reason_detail"));
-
                 list.add(item);
             }
         } catch (SQLException e) {
@@ -150,7 +156,7 @@ public class ListRequestImportDAO {
             rs = ps.executeQuery();
             while (rs.next()) {
                 RequestItem item = new RequestItem();
-                item.setId(rs.getString("id"));
+                item.setId(rs.getInt("id"));
                 item.setRequestId(rs.getString("request_id"));
                 item.setProductName(rs.getString("product_name"));
                 item.setProductCode(rs.getString("product_code"));

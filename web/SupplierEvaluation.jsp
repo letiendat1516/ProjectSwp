@@ -1,6 +1,10 @@
 <%-- 
     Document   : SupplierEvaluation
+<<<<<<< HEAD
     Created on : 9 thg 6, 2025, 20:56:44
+=======
+    Created on : 11 thg 6, 2025, 01:38:28
+>>>>>>> 7880e13fcf6ab2eda880dd7a4c83aed3ce459e86
     Author     : Fpt06
 --%>
 
@@ -330,9 +334,11 @@
 
     </head>
     <body>
+
         <c:set var="supplier" value="${requestScope.supplier}"/>
         <c:set var="mess" value="${requestScope.mess}"/>
         <c:set var="user" value="${sessionScope.user}"/>
+        <c:set var="seid" value="${requestScope.seid}"/>
         <div class="container">
             <div class="left">
                 <h2>Supplier Information</h2>
@@ -352,6 +358,7 @@
                         <tr>
                             <td><input type="hidden" name="supplier" value="${supplier.supplierID}"></td>
                             <td><input type="hidden" name="uid" value="${user.id}"></td>
+                            <c:if test="${not empty seid}"><td><input type="hidden" name="seid" value="${seid}"></td></c:if>
                         </tr>
                         <tr>
                             <td>Delivery Time:</td>
@@ -388,7 +395,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Supply Reliability:</td>
+                            <td>Supply Ability:</td>
                             <td>
                                 <div class="star-rating">
                                     <input type="radio" id="transparency_reputation_star5" name="transparency_reputation" value="5" required />
@@ -440,3 +447,5 @@
     </body>
 
 </html>
+
+
