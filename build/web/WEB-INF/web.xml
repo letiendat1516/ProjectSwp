@@ -324,10 +324,10 @@
         <url-pattern>/exportRequest</url-pattern>
     </servlet-mapping>
 
-    <!-- Session Configuration -->
+     Session Configuration 
     <session-config>
-        <session-timeout>15</session-timeout>
-        <!-- 15 phút -->
+        <session-timeout>1500</session-timeout>
+         15 phút 
     </session-config>
 </web-app>
 
