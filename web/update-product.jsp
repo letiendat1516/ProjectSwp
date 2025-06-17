@@ -581,11 +581,21 @@
             });
         });        // Delete confirmation
         function confirmDelete() {
-            if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác.')) {
-                <c:if test="${not empty product}">
+            <c:if test="${not empty product}">
+                var productName = '${product.name}';
+                var productCode = '${product.code}';
+                
+                var confirmMessage = 'XÁC NHẬN XÓA SẢN PHẨM\n\n' +
+                    'Sản phẩm: ' + productName + '\n' +
+                    'Mã sản phẩm: ' + productCode + '\n\n' +
+                    'Bạn có chắc chắn muốn xóa sản phẩm này?\n' +
+                    'Hành động này không thể hoàn tác!\n\n' +
+                    'Lưu ý: Sản phẩm chỉ có thể xóa nếu không có trong kho hoặc yêu cầu nhập/xuất nào.';
+                
+                if (confirm(confirmMessage)) {
                     window.location.href = 'delete-product?id=${product.id}';
-                </c:if>
-            }
+                }
+            </c:if>
         }
 
         // Initialize image preview on page load

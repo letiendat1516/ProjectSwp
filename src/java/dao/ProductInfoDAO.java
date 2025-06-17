@@ -462,4 +462,63 @@ public ProductInfo getProductById(int productId) {
         }
         return false;
     }
+    
+    /**
+     * Delete a product by ID
+     * @param productId The ID of the product to delete
+     * @return true if deletion was successful, false otherwise
+     */    public boolean deleteProduct(int productId) {
+        String sql = "DELETE FROM product_info WHERE id = ?";
+        
+        System.out.println("ProductInfoDAO: Attempting to delete product with ID: " + productId);
+        
+        try (Connection con = Context.getJDBCConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            
+            stmt.setInt(1, productId);
+            int rowsAffected = stmt.executeUpdate();
+            
+            System.out.println("ProductInfoDAO: Delete operation affected " + rowsAffected + " rows");
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.out.println("ProductInfoDAO: Error deleting product - " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Check if a product can be safely deleted (no dependencies)
+     * @param productId The ID of the product to check
+     * @return true if product can be deleted, false if it has dependencies
+     */    public boolean canDeleteProduct(int productId) {
+        // Check if product is referenced in other tables
+        String[] dependencyTables = {
+            "product_in_stock",
+            "request_items", 
+            "invoice_detail"
+        };
+        
+        for (String table : dependencyTables) {
+            String sql = "SELECT COUNT(*) FROM " + table + " WHERE product_id = ?";
+            try (Connection con = Context.getJDBCConnection();
+                 PreparedStatement stmt = con.prepareStatement(sql)) {
+                
+                stmt.setInt(1, productId);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        System.out.println("ProductInfoDAO: Found " + rs.getInt(1) + " dependencies in table " + table);
+                        return false; // Found dependencies
+                    }
+                }
+            } catch (SQLException e) {
+                System.out.println("ProductInfoDAO: Error checking dependencies in table " + table + " - " + e.getMessage());
+                e.printStackTrace();
+                return false; // Error occurred, safer to not allow deletion
+            }
+        }
+        System.out.println("ProductInfoDAO: No dependencies found for product " + productId);
+        return true; // No dependencies found
+    }
 }
