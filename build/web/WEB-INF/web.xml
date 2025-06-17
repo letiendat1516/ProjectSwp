@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
-
-    <!-- Category Servlet -->
+<!-- Category Servlet -->
     <servlet>
         <servlet-name>CategoryServlet</servlet-name>
         <servlet-class>controller.CategoryServlet</servlet-class>
@@ -65,6 +64,16 @@
         <servlet-class>controller.EditProfileServlet</servlet-class>
     </servlet>
 
+    <!--forgot password-->
+    <servlet>
+        <servlet-name>ForgotPasswordServlet</servlet-name>
+        <servlet-class>controller.ForgotPasswordServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PasswordRequestServlet</servlet-name>
+        <servlet-class>controller.PasswordRequestServlet</servlet-class>
+    </servlet>
+
     <!-- Material Unit Management Servlets -->
     <servlet>
         <servlet-name>MaterialUnitServlet</servlet-name>
@@ -93,7 +102,8 @@
     <servlet>
         <servlet-name>AddProductController</servlet-name>
         <servlet-class>controller.AddProductController</servlet-class>
-    </servlet>    <servlet>
+    </servlet>
+    <servlet>
         <servlet-name>UpdateProductController</servlet-name>
         <servlet-class>controller.UpdateProductController</servlet-class>
     </servlet>
@@ -103,8 +113,6 @@
     </servlet>
 
     <!-- Servlet Mappings -->
-
-    <!-- Category Mapping -->
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
         <url-pattern>/CategoryServlet</url-pattern>
@@ -168,6 +176,16 @@
         <url-pattern>/editprofile</url-pattern>
     </servlet-mapping>
 
+    <!--Reset password-->
+    <servlet-mapping>
+        <servlet-name>ForgotPasswordServlet</servlet-name>
+        <url-pattern>/forgotpassword</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PasswordRequestServlet</servlet-name>
+        <url-pattern>/passwordrequest</url-pattern>
+    </servlet-mapping>
+
     <!-- Material Unit Management Mappings -->
     <servlet-mapping>
         <servlet-name>MaterialUnitServlet</servlet-name>
@@ -196,7 +214,8 @@
     <servlet-mapping>
         <servlet-name>AddProductController</servlet-name>
         <url-pattern>/add-product</url-pattern>
-    </servlet-mapping>    <servlet-mapping>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>UpdateProductController</servlet-name>
         <url-pattern>/update-product</url-pattern>
     </servlet-mapping>
@@ -210,6 +229,8 @@
         <session-timeout>15</session-timeout>
         <!-- 15 phút -->
     </session-config>
+
+    <!-- Approve Purchase Request -->
     <servlet>
         <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
         <servlet-class>controller.ApprovePurchaseRequestServlet</servlet-class>
@@ -218,18 +239,16 @@
         <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
         <url-pattern>/approvepurchaserequest</url-pattern>
     </servlet-mapping>
-    
-    <!-- Product List Controller -->
-<servlet>
-    <servlet-name>ProductListController</servlet-name>
-    <servlet-class>controller.ProductListController</servlet-class>
-</servlet>
 
-<!-- Product List Mapping -->
-<servlet-mapping>
-    <servlet-name>ProductListController</servlet-name>
-    <url-pattern>/product-list</url-pattern>
-</servlet-mapping>
+    <!-- Product List -->
+    <servlet>
+        <servlet-name>ProductListController</servlet-name>
+        <servlet-class>controller.ProductListController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProductListController</servlet-name>
+        <url-pattern>/product-list</url-pattern>
+    </servlet-mapping>
 
     <!-- UTF-8 Encoding Filter -->
     <filter>
@@ -244,11 +263,9 @@
             <param-value>false</param-value>
         </init-param>
     </filter>
-    
     <filter-mapping>
         <filter-name>encodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
 </web-app>
-

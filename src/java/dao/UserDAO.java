@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import model.ForgotPasswordRequest;
 import model.Users;
 
 public class UserDAO extends Context {
@@ -150,6 +151,7 @@ public class UserDAO extends Context {
                     Users user = new Users();
                     user.setId(rs.getInt("id"));
                     user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
                     user.setDob(rs.getDate("dob"));
                     user.setPhone(rs.getString("phone"));
                     user.setFullname(rs.getString("fullname"));
@@ -207,20 +209,19 @@ public class UserDAO extends Context {
             connection.setAutoCommit(true);
         }
     }
-    
-    public void updateUserProfile(Users user) throws SQLException {
-    Connection connection = Context.getJDBCConnection();
-    String sql = "UPDATE users SET fullname=?, email=?, phone=?, dob=? WHERE id=?";
-    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-        stmt.setString(1, user.getFullname());
-        stmt.setString(2, user.getEmail());
-        stmt.setString(3, user.getPhone());
-        stmt.setDate(4, user.getDob() == null ? null : new java.sql.Date(user.getDob().getTime()));
-        stmt.setInt(5, user.getId());
-        stmt.executeUpdate();
-    }
-}
 
+    public void updateUserProfile(Users user) throws SQLException {
+        Connection connection = Context.getJDBCConnection();
+        String sql = "UPDATE users SET fullname=?, email=?, phone=?, dob=? WHERE id=?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, user.getFullname());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getPhone());
+            stmt.setDate(4, user.getDob() == null ? null : new java.sql.Date(user.getDob().getTime()));
+            stmt.setInt(5, user.getId());
+            stmt.executeUpdate();
+        }
+    }
 
     public List<Users> filterUsers(Integer roleId, String status, String keyword, boolean includeAdmin) {
         List<Users> list = new ArrayList<>();
@@ -334,7 +335,7 @@ public class UserDAO extends Context {
         return list;
     }
 
-// Thêm hàm lấy tổng số user để tính tổng trang
+//hàm lấy tổng số user để tính tổng trang
     public int getTotalUserCount() {
         String sql = "SELECT COUNT(*) FROM users";
         try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
@@ -345,6 +346,73 @@ public class UserDAO extends Context {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public Integer getUserIdByEmail(String email) {
+        String sql = "SELECT id FROM users WHERE email = ?";
+        try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+// Thêm yêu cầu reset mật khẩu
+    public boolean insertPasswordResetRequest(int userId, String note) {
+        String sql = "INSERT INTO password_reset_requests (user_id, note) VALUES (?, ?)";
+        try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setString(2, note);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<ForgotPasswordRequest> getAllRequests() {
+        List<ForgotPasswordRequest> requests = new ArrayList<>();
+        String sql = "SELECT prr.id, u.username, u.email, prr.request_time, prr.note, prr.response_time, prr.status "
+                + "FROM password_reset_requests prr "
+                + "LEFT JOIN users u ON prr.user_id = u.id "
+                + "WHERE prr.status = 'pending' "
+                + "ORDER BY prr.request_time DESC";
+        try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                ForgotPasswordRequest req = new ForgotPasswordRequest();
+                req.setId(rs.getInt("id"));
+                req.setUsername(rs.getString("username"));
+                req.setEmail(rs.getString("email"));
+                req.setRequestTime(rs.getTimestamp("request_time"));
+                req.setNote(rs.getString("note"));
+                req.setResponseTime(rs.getTimestamp("response_time"));
+                req.setStatus(rs.getString("status"));
+                requests.add(req);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return requests;
+    }
+
+    // Duyệt (approve) hoặc từ chối (reject) yêu cầu
+    public boolean updateRequestStatus(int reqId, int adminId, String status) {
+        String sql = "UPDATE password_reset_requests SET status=?, admin_id=?, response_time=NOW() WHERE id=?";
+        try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, adminId);
+            ps.setInt(3, reqId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public Users login(String username, String password) {
@@ -401,7 +469,7 @@ public class UserDAO extends Context {
 
         return fullName;
     }
-    
+
     public Date getDoB(int userId) {
         Date dob = null;
         String sql = "SELECT DoB FROM users WHERE id = ?";
