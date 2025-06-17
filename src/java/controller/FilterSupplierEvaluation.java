@@ -13,16 +13,16 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import model.Supplier;
-import model.Users;
+import model.SupplierEvaluation;
 
 /**
  *
  * @author Fpt06
  */
-@WebServlet(name = "TableSupplierEvaluation", urlPatterns = {"/TableSupplierEvaluation"})
-public class TableSupplierEvaluation extends HttpServlet {
+@WebServlet(name = "FilterSupplierEvaluation", urlPatterns = {"/FilterSupplierEvaluation"})
+public class FilterSupplierEvaluation extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,10 +41,10 @@ public class TableSupplierEvaluation extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet TableSupplierEvaluation</title>");
+            out.println("<title>Servlet FilterSupplierEvaluation</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet TableSupplierEvaluation at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet FilterSupplierEvaluation at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -62,13 +62,43 @@ public class TableSupplierEvaluation extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String id_raw = request.getParameter("id");
+        String filter = request.getParameter("filter");
+        String sid = request.getParameter("sid");
         try {
-            int id = Integer.parseInt(id_raw);
+            int id = Integer.parseInt(sid);
             SupplierDAO sd = new SupplierDAO();
             Supplier s = sd.getSupplierByID(id);
             request.setAttribute("supplier", s);
-            request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+            if (filter.matches("star")) {
+                SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
+                List<SupplierEvaluation> list = sed.sortDescendingByStar(id);
+                request.setAttribute("listSED", list);
+                request.setAttribute("fl", filter);
+                float avg_rate = 0;
+                for (int i = 0; i < list.size(); i++) {
+                    avg_rate += list.get(i).getAvgRate();
+                }
+                avg_rate = avg_rate / list.size();
+                String avg = String.valueOf(avg_rate);
+                avg = avg.substring(0, 3);
+                request.setAttribute("avg", avg);
+                request.getRequestDispatcher("ViewSupplierEvaluation.jsp").forward(request, response);
+            } else {
+                SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
+                List<SupplierEvaluation> list = sed.sortDescendingByDate(id);
+                request.setAttribute("listSED", list);
+                request.setAttribute("fl", filter);
+                float avg_rate = 0;
+                for (int i = 0; i < list.size(); i++) {
+                    avg_rate += list.get(i).getAvgRate();
+                }
+                avg_rate = avg_rate / list.size();
+                String avg = String.valueOf(avg_rate);
+                avg = avg.substring(0, 3);
+                request.setAttribute("avg", avg);
+                request.getRequestDispatcher("ViewSupplierEvaluation.jsp").forward(request, response);
+            }
+
         } catch (NumberFormatException e) {
         }
     }
@@ -84,40 +114,7 @@ public class TableSupplierEvaluation extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html; charset=UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        String sid_raw = request.getParameter("supplier");
-        String dt_raw = request.getParameter("delivery_time");
-
-        String mpc_raw = request.getParameter("market_price_comparison");
-        String tr_raw = request.getParameter("transparency_reputation");
-        String sq_raw = request.getParameter("service_quality");
-        String comment = request.getParameter("comment");
-        String uid_raw = request.getParameter("uid");
-        int sid = Integer.parseInt(sid_raw);
-        SupplierDAO sd = new SupplierDAO();
-        Supplier s = sd.getSupplierByID(sid);
-        request.setAttribute("supplier", s);
-        try {
-
-            
-            int dq = Integer.parseInt(dt_raw);
-
-            int mpc = Integer.parseInt(mpc_raw);
-            int tr = Integer.parseInt(tr_raw);
-            int sq = Integer.parseInt(sq_raw);
-            int uid = Integer.parseInt(uid_raw);
-            SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
-            sed.evaluation(sid, uid, dq, 0, mpc, tr, sq, comment);
-
-            request.setAttribute("mess", "successful supplier evaluation");
-            request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
-        } catch (NumberFormatException e) {
-
-            request.setAttribute("mess", "error");
-            request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
-        }
+        processRequest(request, response);
     }
 
     /**

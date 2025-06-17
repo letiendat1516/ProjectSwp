@@ -13,16 +13,16 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import model.Supplier;
-import model.Users;
+import model.SupplierEvaluation;
 
 /**
  *
  * @author Fpt06
  */
-@WebServlet(name = "TableSupplierEvaluation", urlPatterns = {"/TableSupplierEvaluation"})
-public class TableSupplierEvaluation extends HttpServlet {
+@WebServlet(name = "DeleteSupplierEvaluation", urlPatterns = {"/DeleteSupplierEvaluation"})
+public class DeleteSupplierEvaluation extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,10 +41,10 @@ public class TableSupplierEvaluation extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet TableSupplierEvaluation</title>");
+            out.println("<title>Servlet DeleteSupplierEvaluation</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet TableSupplierEvaluation at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet DeleteSupplierEvaluation at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -63,13 +63,19 @@ public class TableSupplierEvaluation extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String id_raw = request.getParameter("id");
+        String sid_raw = request.getParameter("sid");
         try {
+            int sid = Integer.parseInt(sid_raw);
+            SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
             int id = Integer.parseInt(id_raw);
+            sed.deleteSupplierEvaluation(id);
+            List<SupplierEvaluation> list = sed.getSupplierEvaluationByID(sid);
+            request.setAttribute("listSED", list);
             SupplierDAO sd = new SupplierDAO();
-            Supplier s = sd.getSupplierByID(id);
-            request.setAttribute("supplier", s);
-            request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
-        } catch (NumberFormatException e) {
+            Supplier s = sd.getSupplierByID(sid);
+            request.setAttribute("supplier", s);         
+            request.getRequestDispatcher("ViewSupplierEvaluation.jsp").forward(request, response);
+        } catch (Exception e) {
         }
     }
 
@@ -84,40 +90,7 @@ public class TableSupplierEvaluation extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html; charset=UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        String sid_raw = request.getParameter("supplier");
-        String dt_raw = request.getParameter("delivery_time");
-
-        String mpc_raw = request.getParameter("market_price_comparison");
-        String tr_raw = request.getParameter("transparency_reputation");
-        String sq_raw = request.getParameter("service_quality");
-        String comment = request.getParameter("comment");
-        String uid_raw = request.getParameter("uid");
-        int sid = Integer.parseInt(sid_raw);
-        SupplierDAO sd = new SupplierDAO();
-        Supplier s = sd.getSupplierByID(sid);
-        request.setAttribute("supplier", s);
-        try {
-
-            
-            int dq = Integer.parseInt(dt_raw);
-
-            int mpc = Integer.parseInt(mpc_raw);
-            int tr = Integer.parseInt(tr_raw);
-            int sq = Integer.parseInt(sq_raw);
-            int uid = Integer.parseInt(uid_raw);
-            SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
-            sed.evaluation(sid, uid, dq, 0, mpc, tr, sq, comment);
-
-            request.setAttribute("mess", "successful supplier evaluation");
-            request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
-        } catch (NumberFormatException e) {
-
-            request.setAttribute("mess", "error");
-            request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
-        }
+        processRequest(request, response);
     }
 
     /**

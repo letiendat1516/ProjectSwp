@@ -209,12 +209,109 @@
                 width: 100px;
             }
 
+            .LishBody .action-btn {
+                display: inline-block;
+                padding: 8px 16px;
+                margin: 2px;
+                color: white;
+                text-decoration: none;
+                border-radius: 6px;
+                font-weight: 500;
+                text-align: center;
+                min-width: 80px;
+                font-size: 12px;
+                transition: all 0.3s ease;
+                border: 1px solid transparent;
+                box-sizing: border-box;
+            }
 
+            /* Nút Edit */
+            .LishBody .edit-btn {
+                background: linear-gradient(135deg, #ffc107, #ffb300);
+                color: #333;
+                border-color: #e0a800;
+            }
+
+            .LishBody .edit-btn:hover {
+                background: linear-gradient(135deg, #ffb300, #ff8f00);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+            }
+
+            /* Nút Delete */
+            .LishBody .delete-btn {
+                background: linear-gradient(135deg, #dc3545, #c82333);
+                color: white;
+                border-color: #bd2130;
+            }
+
+            .LishBody .delete-btn:hover {
+                background: linear-gradient(135deg, #c82333, #a71e2a);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+            }
+
+            /* Nút Active */
+            .LishBody .active-btn {
+                background: linear-gradient(135deg, #28a745, #20c997);
+                color: white;
+                border-color: #1e7e34;
+            }
+
+            .LishBody .active-btn:hover {
+                background: linear-gradient(135deg, #20c997, #17a2b8);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+            }
+
+            /* Nút Evaluation */
+            .LishBody .evaluation-btn {
+                background: linear-gradient(135deg, #17a2b8, #138496);
+                color: white;
+                border-color: #117a8b;
+            }
+
+            .LishBody .evaluation-btn:hover {
+                background: linear-gradient(135deg, #138496, #0f6674);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+            }
+
+            /* Nút View Evaluation */
+            .LishBody .view-evaluation-btn {
+                background: linear-gradient(135deg, #6f42c1, #5a32a3);
+                color: white;
+                border-color: #59359a;
+            }
+
+            .LishBody .view-evaluation-btn:hover {
+                background: linear-gradient(135deg, #5a32a3, #4c2a85);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3);
+            }
+
+            /* Container cho các nút để căn chỉnh đẹp hơn */
+            .LishBody .action-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                justify-content: center;
+                align-items: center;
+            }
+
+            /* Responsive cho mobile */
+            @media (max-width: 768px) {
+                .LishBody .action-btn {
+                    min-width: 70px;
+                    padding: 6px 12px;
+                    font-size: 11px;
+                }
+            }
         </style>
 
     </head>
     <body>
-        
+
         <c:set var="currentPage" value="${requestScope.currentPage}"/>
         <c:set var="listSupplier" value="${listSupplier}" />
         <c:set var="option" value="${requestScope.filter}"/>
@@ -272,25 +369,41 @@
                             </c:choose>
                             <td>${listItem.createDate}</td>      
                             <td>
-                                <a href="UpdateSupplier.jsp?id=${listItem.supplierID}&name=${listItem.name}&phone=${listItem.phone}&email=${listItem.email}&address=${listItem.address}&note=${listItem.note}">Edit</a>
-                                <c:choose>
-                                    <c:when test="${listItem.activeFlag == 1}">
-                                        <a href="DeleteSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}&currentPage=${currentPage}" 
-                                           onclick="return confirm('Bạn có chắc chắn muốn xoá nhà cung cấp này không?')">Delete</a>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <a style="background-color: green;border: 1px solid #bd2130; color: yellow;"
-                                           href="ActiveSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}"
-                                           onclick="return confirm('Bạn có chắc chắn muốn active nhà cung cấp này không?')"
-                                           >Active</a>
-                                    </c:otherwise>
-                                </c:choose>
+                                <div class="action-container">
+                                    <a class="action-btn edit-btn" 
+                                       href="UpdateSupplier.jsp?id=${listItem.supplierID}&name=${listItem.name}&phone=${listItem.phone}&email=${listItem.email}&address=${listItem.address}&note=${listItem.note}">
+                                        Edit
+                                    </a>
+                                    <c:choose>
+                                        <c:when test="${listItem.activeFlag == 1}">
+                                            <a class="action-btn delete-btn" 
+                                               href="DeleteSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}&currentPage=${currentPage}" 
+                                               onclick="return confirm('Bạn có chắc chắn muốn xoá nhà cung cấp này không?')">
+                                                Delete
+                                            </a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a class="action-btn active-btn"
+                                               href="ActiveSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}"
+                                               onclick="return confirm('Bạn có chắc chắn muốn active nhà cung cấp này không?')">
+                                                Active
+                                            </a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
                             </td>
                             <td>
-                                <a style="background-color: aquamarine;border: 1px solid #bd2130; color: #0d6efd;"
-                                   href="TableSupplierEvaluation?id=${listItem.supplierID}" 
-                                   >Evaluation</a>
-                            </td>
+                                <div class="action-container">
+                                    <a class="action-btn evaluation-btn"
+                                       href="TableSupplierEvaluation?id=${listItem.supplierID}">
+                                        Evaluation
+                                    </a>
+                                    <a class="action-btn view-evaluation-btn"
+                                       href="ViewSupplierEvaluation?supplierID=${listItem.supplierID}">
+                                        View Evaluation
+                                    </a>
+                                </div>
+                            </td>    
                         </tr>
                     </c:forEach>
                 </table>

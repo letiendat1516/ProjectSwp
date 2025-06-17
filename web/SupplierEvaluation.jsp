@@ -371,23 +371,6 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Product Quality:</td>
-                            <td>
-                                <div class="star-rating">
-                                    <input type="radio" id="product_quality_star5" name="product_quality" value="5" required />
-                                    <label for="product_quality_star5" title="5 stars">★<div class="star-num">5</div></label>
-                                    <input type="radio" id="product_quality_star4" name="product_quality" value="4" />
-                                    <label for="product_quality_star4" title="4 stars">★<div class="star-num">4</div></label>
-                                    <input type="radio" id="product_quality_star3" name="product_quality" value="3" />
-                                    <label for="product_quality_star3" title="3 stars">★<div class="star-num">3</div></label>
-                                    <input type="radio" id="product_quality_star2" name="product_quality" value="2" />
-                                    <label for="product_quality_star2" title="2 stars">★<div class="star-num">2</div></label>
-                                    <input type="radio" id="product_quality_star1" name="product_quality" value="1" />
-                                    <label for="product_quality_star1" title="1 star">★<div class="star-num">1</div></label>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
                             <td>Market Price Comparison:</td>
                             <td>
                                 <div class="star-rating">
@@ -405,7 +388,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Transparency Reputation:</td>
+                            <td>Supply Reliability:</td>
                             <td>
                                 <div class="star-rating">
                                     <input type="radio" id="transparency_reputation_star5" name="transparency_reputation" value="5" required />
