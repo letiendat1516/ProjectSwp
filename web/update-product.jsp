@@ -1,302 +1,603 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ page import="model.Users" session="true" %>
 <!DOCTYPE html>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+    
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+    
+    // Debug: Log what we have
+    Object productObj = request.getAttribute("product");
+    System.out.println("DEBUG - Product object in JSP: " + productObj);
+    System.out.println("DEBUG - Request parameters: " + request.getParameterMap());
+    System.out.println("DEBUG - Request attributes: " + request.getAttributeNames());
+%>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cập Nhật Sản Phẩm</title>
-  <style>
-      body { background-color: #f8f9fa; }
-      .container { max-width: 900px; }
-      .card { border: none; border-radius: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-      .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px 15px 0 0 !important; }
-      .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; }
-      .btn-primary:hover { background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%); }
-      .form-label { font-weight: 600; color: #495057; }
-      .required { color: #dc3545; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cập Nhật Sản Phẩm - Warehouse Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-label.required::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control.error {
+            border-color: #dc3545;
+        }        .form-control:disabled {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .form-control[readonly] {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .form-help {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .required-note {
+            color: #dc3545;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #495057;
+            margin: 30px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .product-info-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 20px;
+        }
+
+        .product-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .current-image {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 5px;
+            border: 2px solid #dee2e6;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+
+            .product-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container mt-4">
-      <!-- Navigation -->
-      <div class="row mb-4">
-          <div class="col-12">
-              <nav aria-label="breadcrumb">
-                  <ol class="breadcrumb">
-                      <li class="breadcrumb-item"><a href="Admin.jsp"><i class="fas fa-home"></i> Trang chủ</a></li>
-                      <li class="breadcrumb-item"><a href="product-list"><i class="fas fa-box"></i> Sản phẩm</a></li>
-                      <li class="breadcrumb-item active">Cập nhật sản phẩm</li>
-                  </ol>
-              </nav>
-          </div>
-      </div>      <!-- Alert Messages -->
-      <c:if test="${not empty error}">
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-              <i class="fas fa-exclamation-triangle me-2"></i>
-              <strong>Lỗi!</strong> ${error}
-              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-      </c:if>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Cập Nhật Sản Phẩm</h1>
+            <p>Chỉnh sửa thông tin sản phẩm trong hệ thống kho</p>
+        </div>        <div class="nav-buttons">
+            <a href="product-list" class="btn btn-primary">← Quay lại Danh Sách</a>
+            <a href="Admin.jsp" class="btn btn-secondary">🏠 Trang Admin</a>
+            <c:if test="${not empty product}">
+                <a href="product-detail?id=${product.id}" class="btn btn-secondary">👁️ Xem Chi Tiết</a>
+            </c:if>
+        </div>
 
-      <c:if test="${not empty success}">
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-              <i class="fas fa-check-circle me-2"></i>
-              <strong>Thành công!</strong> ${success}
-              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-      </c:if>      <!-- Debug Information (Development Only) -->
-      <c:if test="${pageContext.request.serverName == 'localhost' or pageContext.request.serverName == '127.0.0.1'}">
-          <div class="alert alert-warning">
-              <h6><i class="fas fa-bug me-2"></i>Debug Information (Development Only)</h6>
-              <p><strong>Product loaded:</strong> ${not empty product ? 'Yes - ' : 'No'}${product.name}</p>              <p><strong>Categories:</strong> ${not empty categories ? fn:length(categories) : '0'} found</p>
-              <p><strong>Units:</strong> ${not empty units ? fn:length(units) : '0'} found</p>
-              <p><strong>Suppliers:</strong> ${not empty suppliers ? fn:length(suppliers) : '0'} found</p>
-              <p><strong>Storage Locations:</strong> ${not empty storageLocations ? fn:length(storageLocations) : '0'} found</p>
-          </div>
-      </c:if>
+        <!-- Error/Success Messages -->
+        <c:if test="${not empty error}">
+            <div class="error-message">
+                <strong>❌ Lỗi:</strong> ${error}
+            </div>
+        </c:if>
 
-      <!-- Main Content -->
-      <c:choose>
-          <c:when test="${not empty product}">
-              <div class="card">
-                  <div class="card-header">
-                      <h4 class="mb-0">
-                          <i class="fas fa-edit me-2"></i>
-                          Cập Nhật Sản Phẩm: ${product.name}
-                      </h4>
-                  </div>
-                  <div class="card-body">
-                      <!-- Current Product Info -->
-                      <div class="alert alert-info">
-                          <h6><i class="fas fa-info-circle me-2"></i>Thông tin hiện tại:</h6>
-                          <div class="row">
-                              <div class="col-md-6">
-                                  <p><strong>ID:</strong> ${product.id}</p>
-                                  <p><strong>Mã:</strong> ${product.code}</p>
-                                  <p><strong>Tên:</strong> ${product.name}</p>
-                              </div>
-                              <div class="col-md-6">
-                                  <p><strong>Giá:</strong> 
-                                      <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="₫" groupingUsed="true"/>
-                                  </p>
-                                  <p><strong>Trạng thái:</strong> 
-                                      <span class="badge ${product.status == 'active' ? 'bg-success' : 'bg-secondary'}">
-                                          ${product.status == 'active' ? 'Hoạt động' : 'Không hoạt động'}
-                                      </span>
-                                  </p>
-                              </div>
-                          </div>
-                      </div>
+        <c:if test="${not empty success}">
+            <div class="success-message">
+                <strong>✅ Thành công:</strong> ${success}
+            </div>
+        </c:if>        <!-- Check if product exists -->
+        <c:choose>
+            <c:when test="${empty product}">
+                <div class="error-message">
+                    <strong>❌ Lỗi:</strong> Không tìm thấy sản phẩm. Vui lòng kiểm tra lại đường dẫn hoặc quay lại danh sách sản phẩm.
+                    <br><br>
+                    <strong>Debug Info:</strong><br>
+                    - Product object: ${product}<br>
+                    - Request URI: ${pageContext.request.requestURI}<br>
+                    - Query String: ${pageContext.request.queryString}<br>
+                    - Attributes: ${requestScope}<br>
+                </div>
+            </c:when>
+            <c:otherwise>
 
-                      <!-- Update Form -->
-                      <form action="update-product" method="post" class="needs-validation" novalidate>
-                          <input type="hidden" name="id" value="${product.id}">
-                          
-                          <div class="row">
-                              <!-- Basic Information -->
-                              <div class="col-md-6">
-                                  <h6 class="text-primary mb-3"><i class="fas fa-info-circle me-2"></i>Thông tin cơ bản</h6>
-                                  
-                                  <div class="mb-3">
-                                      <label for="name" class="form-label">Tên sản phẩm <span class="required">*</span></label>
-                                      <input type="text" class="form-control" id="name" name="name" 
-                                             value="${product.name}" required>
-                                      <div class="invalid-feedback">Vui lòng nhập tên sản phẩm.</div>
-                                  </div>
+        <!-- Current Product Information -->
+        <div class="product-info-card">
+            <h3 style="margin-bottom: 15px; color: #495057;">📦 Thông Tin Hiện Tại</h3>
+            <div class="product-info-grid">
+                <div class="info-item">
+                    <span class="info-label">Mã Sản Phẩm</span>
+                    <span class="info-value">${product.code}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Tên Sản Phẩm</span>
+                    <span class="info-value">${product.name}</span>
+                </div>                <div class="info-item">
+                    <span class="info-label">Danh Mục</span>
+                    <span class="info-value">
+                        <c:forEach var="category" items="${categories}">
+                            <c:if test="${product.cate_id == category.id}">
+                                ${category.name}
+                            </c:if>
+                        </c:forEach>
+                        <c:if test="${empty categories}">ID: ${product.cate_id}</c:if>
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Trạng Thái</span>
+                    <span class="info-value">
+                        <c:choose>
+                            <c:when test="${product.status == 'active'}">🟢 Hoạt động</c:when>
+                            <c:otherwise>🔴 Ngưng hoạt động</c:otherwise>
+                        </c:choose>
+                    </span>
+                </div>                <div class="info-item">
+                    <span class="info-label">Ngày Tạo</span>
+                    <span class="info-value">
+                        <fmt:formatDate value="${product.createdDate}" pattern="dd/MM/yyyy HH:mm"/>
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Cập Nhật Cuối</span>
+                    <span class="info-value">
+                        <fmt:formatDate value="${product.updatedDate}" pattern="dd/MM/yyyy HH:mm"/>
+                    </span>
+                </div>
+            </div>
+            <c:if test="${not empty product.imageUrl}">                <div style="margin-top: 15px;">
+                    <span class="info-label">Hình Ảnh Hiện Tại:</span><br>
+                    <img src="${product.imageUrl}" alt="Current Product" class="current-image" 
+                         onerror="this.style.display='none'">
+                </div>
+            </c:if>
+        </div>
 
-                                  <div class="mb-3">
-                                      <label for="code" class="form-label">Mã sản phẩm <span class="required">*</span></label>
-                                      <input type="text" class="form-control" id="code" name="code" 
-                                             value="${product.code}" required>
-                                      <div class="invalid-feedback">Vui lòng nhập mã sản phẩm.</div>
-                                  </div>
+        <div class="form-container">
+            <form method="post" action="update-product" enctype="application/x-www-form-urlencoded">
+                <input type="hidden" name="id" value="${product.id}">
+                
+                <div class="required-note">
+                    Các trường có dấu <span style="color: #dc3545;">*</span> là bắt buộc
+                </div>
 
-                                  <div class="mb-3">
-                                      <label for="price" class="form-label">Giá (VNĐ) <span class="required">*</span></label>
-                                      <input type="number" class="form-control" id="price" name="price" 
-                                             value="${product.price}" step="0.01" min="0" required>
-                                      <div class="invalid-feedback">Vui lòng nhập giá hợp lệ.</div>
-                                  </div>
+                <!-- Basic Information -->
+                <div class="section-title">📝 Thông Tin Cơ Bản</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label required" for="name">Tên Sản Phẩm</label>
+                        <input type="text" id="name" name="name" class="form-control" 
+                               value="${product.name}" maxlength="100" required>
+                        <div class="form-help">Tối đa 100 ký tự</div>
+                    </div>                    <div class="form-group">
+                        <label class="form-label" for="code">Mã Sản Phẩm</label>
+                        <input type="text" id="code" name="code" class="form-control" 
+                               value="${product.code}" maxlength="50" readonly>
+                        <div class="form-help">Mã sản phẩm không thể thay đổi</div>
+                    </div><div class="form-group">
+                        <label class="form-label required" for="categoryId">Danh Mục</label>
+                        <select id="categoryId" name="categoryId" class="form-control" required>
+                            <option value="">-- Chọn danh mục --</option>
+                            <c:forEach var="category" items="${categories}">
+                                <option value="${category.id}" 
+                                        ${product.cate_id == category.id ? 'selected' : ''}>
+                                    ${category.name}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
 
-                                  <div class="mb-3">
-                                      <label for="status" class="form-label">Trạng thái</label>
-                                      <select class="form-select" id="status" name="status">
-                                          <option value="active" ${product.status == 'active' ? 'selected' : ''}>
-                                              <i class="fas fa-check-circle"></i> Hoạt động
-                                          </option>
-                                          <option value="inactive" ${product.status == 'inactive' ? 'selected' : ''}>
-                                              <i class="fas fa-times-circle"></i> Không hoạt động
-                                          </option>
-                                      </select>
-                                  </div>
-                              </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="unitId">Đơn Vị Tính</label>
+                        <select id="unitId" name="unitId" class="form-control" required>
+                            <option value="">-- Chọn đơn vị --</option>
+                            <c:forEach var="unit" items="${units}">
+                                <option value="${unit.id}" 
+                                        ${product.unit_id == unit.id ? 'selected' : ''}>
+                                    ${unit.name} (${unit.symbol})
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
 
-                              <!-- Categories and Relationships -->
-                              <div class="col-md-6">
-                                  <h6 class="text-primary mb-3"><i class="fas fa-tags me-2"></i>Phân loại & Quan hệ</h6>                                  <!-- Category Dropdown -->
-                                  <div class="mb-3">
-                                      <label for="categoryId" class="form-label">Danh mục</label>
-                                      <select class="form-select" id="categoryId" name="categoryId">
-                                          <option value="">-- Chọn danh mục --</option>
-                                          <c:forEach var="category" items="${categories}">
-                                              <option value="${category.id}" 
-                                                      ${product.cate_id == category.id ? 'selected' : ''}>
-                                                  ${category.name}
-                                              </option>
-                                          </c:forEach>
-                                      </select>
-                                  </div>                                  <!-- Unit Dropdown -->
-                                  <div class="mb-3">
-                                      <label for="unitId" class="form-label">Đơn vị tính</label>
-                                      <select class="form-select" id="unitId" name="unitId">
-                                          <option value="">-- Chọn đơn vị --</option>
-                                          <c:forEach var="unit" items="${units}">
-                                              <option value="${unit.id}" 
-                                                      ${product.unit_id == unit.id ? 'selected' : ''}>
-                                                  ${unit.name} (${unit.symbol})
-                                              </option>
-                                          </c:forEach>
-                                      </select>
-                                  </div><!-- Supplier Dropdown - FIXED -->
-                                  <div class="mb-3">
-                                      <label for="supplierId" class="form-label">Nhà cung cấp</label>
-                                      <select class="form-select" id="supplierId" name="supplierId">
-                                          <option value="">-- Chọn nhà cung cấp --</option>
-                                          <c:choose>
-                                              <c:when test="${not empty suppliers}">
-                                                  <c:forEach var="supplier" items="${suppliers}">
-                                                      <option value="${supplier.supplierID}" 
-                                                              ${product.supplierId == supplier.supplierID ? 'selected' : ''}>
-                                                          ${supplier.name}
-                                                      </option>
-                                                  </c:forEach>
-                                              </c:when>
-                                              <c:otherwise>
-                                                  <option value="">Không có nhà cung cấp nào</option>
-                                              </c:otherwise>
-                                          </c:choose>
-                                      </select>
-                                  </div><!-- Storage Location Dropdown -->
-                                  <div class="mb-3">
-                                      <label for="storageLocation" class="form-label">Vị trí lưu trữ</label>
-                                      <select class="form-select" id="storageLocation" name="storageLocation">
-                                          <option value="">-- Chọn vị trí --</option>
-                                          <c:forEach var="location" items="${storageLocations}">
-                                              <option value="${location}" 
-                                                      ${product.storageLocation == location ? 'selected' : ''}>
-                                                  ${location}
-                                              </option>
-                                          </c:forEach>
-                                      </select>
-                                  </div>
-                              </div>
-                          </div>                          <!-- Description -->
-                          <div class="row">
-                              <div class="col-12">
-                                  <h6 class="text-primary mb-3"><i class="fas fa-file-text me-2"></i>Thông tin bổ sung</h6>
-                                  
-                                  <div class="mb-3">
-                                      <label for="description" class="form-label">Mô tả sản phẩm</label>
-                                      <textarea class="form-control" id="description" name="description" rows="3">${product.description}</textarea>
-                                  </div>
-                                  
-                                  <div class="row">
-                                      <div class="col-md-6">
-                                          <div class="mb-3">
-                                              <label for="expirationDate" class="form-label">Ngày hết hạn</label>
-                                              <input type="date" class="form-control" id="expirationDate" name="expirationDate" 
-                                                     value="${product.expirationDate}">
-                                          </div>
-                                      </div>
-                                      <div class="col-md-6">
-                                          <div class="mb-3">
-                                              <label for="imageUrl" class="form-label">URL hình ảnh</label>
-                                              <input type="url" class="form-control" id="imageUrl" name="imageUrl" 
-                                                     value="${product.imageUrl}" placeholder="https://example.com/image.jpg">
-                                          </div>
-                                      </div>
-                                  </div>
-                                  
-                                  <div class="mb-3">
-                                      <label for="additionalNotes" class="form-label">Ghi chú bổ sung</label>
-                                      <textarea class="form-control" id="additionalNotes" name="additionalNotes" rows="2">${product.additionalNotes}</textarea>
-                                  </div>
-                              </div>
-                          </div>
-                              <div class="col-12">
-                                  <h6 class="text-primary mb-3"><i class="fas fa-file-alt me-2"></i>Mô tả chi tiết</h6>
-                                  <div class="mb-3">
-                                      <label for="description" class="form-label">Mô tả sản phẩm</label>
-                                      <textarea class="form-control" id="description" name="description" 
-                                                rows="4" placeholder="Nhập mô tả chi tiết về sản phẩm...">${product.description}</textarea>
-                                  </div>
-                              </div>
-                          </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="price">Giá (VNĐ)</label>
+                        <input type="number" id="price" name="price" class="form-control" 
+                               value="${product.price}" min="0" step="0.01" required>
+                        <div class="form-help">Nhập giá bằng VNĐ</div>
+                    </div>
 
-                          <!-- Action Buttons -->
-                          <div class="row mt-4">
-                              <div class="col-12 text-center">
-                                  <button type="submit" class="btn btn-primary btn-lg me-3">
-                                      <i class="fas fa-save me-2"></i>Cập Nhật Sản Phẩm
-                                  </button>
-                                  <a href="product-list" class="btn btn-secondary btn-lg">
-                                      <i class="fas fa-times me-2"></i>Hủy
-                                  </a>
-                              </div>
-                          </div>
-                      </form>
-                  </div>
-              </div>
-          </c:when>
-          <c:otherwise>
-              <!-- No Product Found -->
-              <div class="card">
-                  <div class="card-body text-center">
-                      <i class="fas fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
-                      <h4 class="mt-3">Không tìm thấy sản phẩm</h4>
-                      <p class="text-muted">Sản phẩm có thể đã bị xóa hoặc không tồn tại trong hệ thống.</p>
-                      <a href="product-list" class="btn btn-primary">
-                          <i class="fas fa-arrow-left me-2"></i>Quay lại Danh sách
-                      </a>
-                  </div>
-              </div>
-          </c:otherwise>
-      </c:choose>
-  </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="status">Trạng Thái</label>
+                        <select id="status" name="status" class="form-control" required>
+                            <option value="">-- Chọn trạng thái --</option>
+                            <option value="active" ${product.status == 'active' ? 'selected' : ''}>Hoạt động</option>
+                            <option value="inactive" ${product.status == 'inactive' ? 'selected' : ''}>Ngưng hoạt động</option>
+                        </select>
+                    </div>
+                </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <!-- Form Validation -->
-  <script>
-      // Bootstrap form validation
-      (function() {
-          'use strict';
-          window.addEventListener('load', function() {
-              var forms = document.getElementsByClassName('needs-validation');
-              var validation = Array.prototype.filter.call(forms, function(form) {
-                  form.addEventListener('submit', function(event) {
-                      if (form.checkValidity() === false) {
-                          event.preventDefault();
-                          event.stopPropagation();
-                      }
-                      form.classList.add('was-validated');
-                  }, false);
-              });
-          }, false);
-      })();
+                <!-- Additional Information -->
+                <div class="section-title">📦 Thông Tin Bổ Sung</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="supplierId">Nhà Cung Cấp</label>
+                        <select id="supplierId" name="supplierId" class="form-control">
+                            <option value="">-- Chọn nhà cung cấp --</option>
+                            <c:forEach var="supplier" items="${suppliers}">
+                                <option value="${supplier.supplierID}" 
+                                        ${product.supplierId == supplier.supplierID ? 'selected' : ''}>
+                                    ${supplier.name}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
 
-      // Auto-dismiss alerts
-      setTimeout(function() {
-          var alerts = document.querySelectorAll('.alert');
-          alerts.forEach(function(alert) {
-              var bsAlert = new bootstrap.Alert(alert);
-              bsAlert.close();
-          });
-      }, 5000);
-  </script>
+                    <div class="form-group">
+                        <label class="form-label" for="expirationDate">Ngày Hết Hạn</label>
+                        <input type="date" id="expirationDate" name="expirationDate" class="form-control" 
+                               value="<fmt:formatDate value='${product.expirationDate}' pattern='yyyy-MM-dd'/>">
+                        <div class="form-help">Để trống nếu sản phẩm không có hạn sử dụng</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="storageLocation">Vị Trí Lưu Trữ</label>
+                        <select id="storageLocation" name="storageLocation" class="form-control">
+                            <option value="">-- Chọn vị trí lưu trữ --</option>
+                            <c:forEach var="location" items="${storageLocations}">
+                                <option value="${location}" 
+                                        ${product.storageLocation == location ? 'selected' : ''}>
+                                    ${location}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="imageUrl">URL Hình Ảnh</label>
+                        <input type="url" id="imageUrl" name="imageUrl" class="form-control" 
+                               value="${product.imageUrl}" placeholder="https://example.com/image.jpg">
+                        <div class="form-help">Link đến hình ảnh sản phẩm</div>
+                        <img id="imagePreview" class="image-preview" style="display: none;">
+                    </div>
+                </div>
+
+                <!-- Description and Notes -->
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label" for="description">Mô Tả Sản Phẩm</label>
+                        <textarea id="description" name="description" class="form-control" 
+                                  rows="4" placeholder="Nhập mô tả chi tiết về sản phẩm...">${product.description}</textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label" for="additionalNotes">Ghi Chú Bổ Sung</label>
+                        <textarea id="additionalNotes" name="additionalNotes" class="form-control" 
+                                  rows="3" placeholder="Ghi chú thêm về sản phẩm...">${product.additionalNotes}</textarea>
+                        <div class="form-help">Thông tin bổ sung, lưu ý đặc biệt về sản phẩm</div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div style="text-align: center; margin-top: 30px;">
+                    <button type="submit" class="btn btn-warning" style="padding: 15px 30px; font-size: 16px;">
+                        💾 Cập Nhật Sản Phẩm
+                    </button>
+                    <a href="product-list" class="btn btn-secondary" style="padding: 15px 30px; font-size: 16px; margin-left: 15px;">
+                        ❌ Hủy Bỏ
+                    </a>
+                    <button type="button" onclick="confirmDelete()" class="btn btn-danger" 
+                            style="padding: 15px 30px; font-size: 16px; margin-left: 15px;">
+                        🗑️ Xóa Sản Phẩm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Image preview functionality
+        document.getElementById('imageUrl').addEventListener('input', function() {
+            const url = this.value;
+            const preview = document.getElementById('imagePreview');
+            
+            if (url && isValidUrl(url)) {
+                preview.src = url;
+                preview.style.display = 'block';
+                preview.onerror = function() {
+                    this.style.display = 'none';
+                };
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const requiredFields = document.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('error');
+                    isValid = false;
+                } else {
+                    field.classList.remove('error');
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Vui lòng điền đầy đủ các trường bắt buộc.');
+            }
+        });
+
+        // Remove error styling on input
+        document.querySelectorAll('.form-control').forEach(field => {
+            field.addEventListener('input', function() {
+                this.classList.remove('error');
+            });
+        });        // Delete confirmation
+        function confirmDelete() {
+            if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác.')) {
+                <c:if test="${not empty product}">
+                    window.location.href = 'delete-product?id=${product.id}';
+                </c:if>
+            }
+        }
+
+        // Initialize image preview on page load
+        window.addEventListener('load', function() {
+            const imageUrlField = document.getElementById('imageUrl');
+            if (imageUrlField && imageUrlField.value) {
+                imageUrlField.dispatchEvent(new Event('input'));
+            }
+        });
+    </script>
+            </c:otherwise>
+        </c:choose>
+    </div>
 </body>
 </html>

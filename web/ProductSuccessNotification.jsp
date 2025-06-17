@@ -30,18 +30,6 @@
             text-align: center;
             max-width: 500px;
             width: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .success-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #4CAF50, #45a049);
         }
 
         .success-icon {
@@ -82,18 +70,23 @@
         .product-detail-item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
-            padding: 5px 0;
+            padding: 8px 0;
         }
 
         .product-detail-label {
             font-weight: 600;
             color: #495057;
+            font-size: 14px;
         }
 
         .product-detail-value {
-            color: #6c757d;
             font-weight: 500;
+            color: #2c3e50;
+            text-align: right;
+            max-width: 60%;
+            word-wrap: break-word;
         }
 
         .button-group {
@@ -128,17 +121,6 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .btn-secondary {
-            background: #f8f9fa;
-            color: #495057;
-            border: 2px solid #dee2e6;
-        }
-
-        .btn-secondary:hover {
-            background: #e9ecef;
-            transform: translateY(-2px);
-        }
-
         .btn-success {
             background: linear-gradient(45deg, #4CAF50, #45a049);
             color: white;
@@ -147,6 +129,16 @@
         .btn-success:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #5a6268);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
         }
 
         @media (max-width: 600px) {
@@ -171,25 +163,25 @@
 </head>
 <body>
     <div class="success-container">
-        <div class="success-icon">â</div>
-        <h1 class="success-title">ThÃ nh CÃ´ng!</h1>
+        <div class="success-icon">✅</div>
+        <h1 class="success-title">Thành Công!</h1>
         <p class="success-message">
             <% if(request.getAttribute("successMessage") != null) { %>
                 <%= request.getAttribute("successMessage") %>
             <% } else { %>
-                Thao tÃ¡c cá»§a báº¡n ÄÃ£ ÄÆ°á»£c thá»±c hiá»n thÃ nh cÃ´ng!
+                Thao tác của bạn đã được thực hiện thành công!
             <% } %>
         </p>
         
         <% if(request.getAttribute("productName") != null && request.getAttribute("productCode") != null) { %>
         <div class="product-details">
-            <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">Chi tiáº¿t sáº£n pháº©m</h3>
+            <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">Chi tiết sản phẩm</h3>
             <div class="product-detail-item">
-                <span class="product-detail-label">TÃªn sáº£n pháº©m:</span>
+                <span class="product-detail-label">Tên sản phẩm:</span>
                 <span class="product-detail-value"><%= request.getAttribute("productName") %></span>
             </div>
             <div class="product-detail-item">
-                <span class="product-detail-label">MÃ£ sáº£n pháº©m:</span>
+                <span class="product-detail-label">Mã sản phẩm:</span>
                 <span class="product-detail-value"><%= request.getAttribute("productCode") %></span>
             </div>
         </div>
@@ -197,13 +189,13 @@
         
         <div class="button-group">
             <a href="add-product" class="btn btn-primary">
-                â ThÃªm sáº£n pháº©m khÃ¡c
+                ➕ Thêm sản phẩm khác
             </a>
             <a href="product-list" class="btn btn-success">
-                ð Xem danh sÃ¡ch sáº£n pháº©m
+                📋 Xem danh sách sản phẩm
             </a>
             <a href="Admin.jsp" class="btn btn-secondary">
-                ð  Vá» trang chá»§
+                🏠 Về trang chủ
             </a>
         </div>
     </div>

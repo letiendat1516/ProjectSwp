@@ -1,8 +1,3 @@
--- DATABASE SETUP INSTRUCTIONS:
--- 1. Make sure MySQL is running on your system
--- 2. Create the database first: CREATE DATABASE swp;
--- 3. Update the password in DBContext/Context.java to match your MySQL root password
--- 4. Run this script to create tables and insert sample data
 -- USERS
 Use swp;
 CREATE TABLE users (

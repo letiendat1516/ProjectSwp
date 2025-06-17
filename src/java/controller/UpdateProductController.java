@@ -166,14 +166,14 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         String storageLocation = request.getParameter("storageLocation");
         String imageUrl = request.getParameter("imageUrl");
         String additionalNotes = request.getParameter("additionalNotes");
-        
-        // Basic validation
+          // Basic validation
         if (name == null || name.trim().isEmpty()) {
             return "Tên sản phẩm không được để trống!";
         }
         
         if (code == null || code.trim().isEmpty()) {
-            return "Mã sản phẩm không được để trống!";
+            // For updates, if code is missing, use the existing code
+            code = product.getCode();
         }
         
         // Check for duplicate product code (excluding current product)
