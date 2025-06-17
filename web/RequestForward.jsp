@@ -186,14 +186,14 @@
                 <!-- Request in -->
                 <div class="card">
                     <div class="card-header">
-                        <h3>Nhập kho</h3>
+                        <h3>Mua hàng</h3>
                     </div>
                     <div class="card-body">
                         <div class="icon-container">
                             <span class="material-icons">add_shopping_cart</span>
                         </div>
-                        <h4 class="card-title">Đơn yêu cầu nhập kho</h4>
-                        <p class="card-text">Yêu cầu nhập kho một số sản phẩm nhất định.</p>
+                        <h4 class="card-title">Đơn yêu cầu mua hàng</h4>
+                        <p class="card-text">Yêu cầu mua một số sản phẩm nhất định.</p>
                         <a href="loadingrequest" class="btn btn-primary">
                             Truy cập <span class="material-icons btn-icon">arrow_forward</span>
                         </a>

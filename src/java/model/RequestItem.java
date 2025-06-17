@@ -99,6 +99,4 @@ public class RequestItem {
         this.reasonDetail = reasonDetail;
     }
 
-  
- 
 }
