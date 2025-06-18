@@ -4,6 +4,7 @@
  */
 package controller;
 
+import dao.MaterialUnitDAO;
 import dao.ProductInfoDAO;
 import dao.RequestInformationDAO;
 import dao.RequestItemsDAO;
@@ -17,27 +18,20 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Date;
-import java.time.Period;
 import java.util.List;
+import model.MaterialUnit;
 import model.ProductInfo;
 import model.Users;
 
 /**
- *
+ * Servlet xử lý yêu cầu mua hàng: hiển thị form và xử lý submit
  * @author Admin
  */
 public class LoadingRequestServlet extends HttpServlet {
 
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * Xử lý request chung (không sử dụng)
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -58,30 +52,29 @@ public class LoadingRequestServlet extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * GET: Hiển thị form tạo yêu cầu mua hàng với dữ liệu cần thiết
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Lấy thông tin user từ session
         HttpSession session = request.getSession(false);
         Users currentUser = (Users) session.getAttribute("user");
 
-        
-
+        // Khởi tạo các DAO
         UserDAO dao = new UserDAO();
         String fullname = dao.getFullName(currentUser.getId());
         Date DoB = dao.getDoB(currentUser.getId());
         RequestInformationDAO requestInfo = new RequestInformationDAO();
         ProductInfoDAO product = new ProductInfoDAO();
+        
+        // Lấy ID yêu cầu tiếp theo
         String nextID = requestInfo.getNextRequestId();
+        
         if (currentUser != null) {
             Date dob = DoB;
 
+            // Tính tuổi từ ngày sinh
             if (dob != null) {
                 java.util.Calendar cal = java.util.Calendar.getInstance();
                 cal.setTime(dob);
@@ -90,34 +83,34 @@ public class LoadingRequestServlet extends HttpServlet {
                 int age = currentYear - yearOfBirth;
 
                 request.setAttribute("age", age);
-            } else {
-                System.out.println("DOB is null for user: " + currentUser.getId());
             }
-        } else {
-            System.out.println("currentUser is null in session");
         }
+        
+        // Lấy danh sách sản phẩm và đơn vị
         List<ProductInfo> products_list = product.getAllProducts();
+        MaterialUnitDAO unitDAO = new MaterialUnitDAO();
+        List<MaterialUnit> unit_list = unitDAO.getAllMaterialUnits();
+        
+        // Set attributes để hiển thị trên form
         request.setAttribute("nextID", nextID);
         request.setAttribute("products_list", products_list);
+        request.setAttribute("unit_list", unit_list);
         session.setAttribute("currentUser", fullname);
         session.setAttribute("DoB", DoB);
+        
+        // Chuyển đến trang form
         request.getRequestDispatcher("ItemsSupplyRequestForm.jsp").forward(request, response);
     }
 
     /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * POST: Xử lý submit form tạo yêu cầu mua hàng
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        //Lay du lieu tu form
+        // Lấy thông tin cơ bản từ form
         String role = request.getParameter("role");
         String dayRequestStr = request.getParameter("day_request");
         String reason = request.getParameter("reason");
@@ -125,6 +118,8 @@ public class LoadingRequestServlet extends HttpServlet {
         String address = request.getParameter("address");
         String phone = request.getParameter("phone");
         String email = request.getParameter("email");
+        
+        // Chuyển đổi string thành Date
         Date dayRequest = null;
         try {
             java.util.Date utilDate = new SimpleDateFormat("yyyy-MM-dd").parse(dayRequestStr);
@@ -132,14 +127,15 @@ public class LoadingRequestServlet extends HttpServlet {
         } catch (ParseException e) {
         }
 
-        // Các trường thông tin chi tiết mặt hàng (nhiều dòng → dùng getParameterValues)
-        String[] sttArr = request.getParameterValues("stt");
+        // Lấy thông tin chi tiết các mặt hàng (mảng từ multiple rows)
         String[] productNameArr = request.getParameterValues("product_name");
         String[] productCodeArr = request.getParameterValues("product_code");
         String[] unitArr = request.getParameterValues("unit");
         String[] quantityArr = request.getParameterValues("quantity");
         String[] noteArr = request.getParameterValues("note");
         String reasonDetail = request.getParameter("reason_detail");
+        
+        // Chuyển đổi quantity từ string sang int
         int[] quantityIntArr = new int[quantityArr.length];
         for (int i = 0; i < quantityArr.length; i++) {
             try {
@@ -147,15 +143,23 @@ public class LoadingRequestServlet extends HttpServlet {
             } catch (NumberFormatException e) {
             }
         }
+        
+        // Lấy user ID từ session
         HttpSession session = request.getSession(false);
         Users currentUser = (Users) session.getAttribute("user");
-        UserDAO user = new UserDAO();
         int user_id = currentUser.getId();
+        
+        // Khởi tạo DAO để lưu vào database
         RequestItemsDAO requestitemsDAO = new RequestItemsDAO();
         RequestInformationDAO requestInformationDAO = new RequestInformationDAO();
 
+        // Lưu thông tin yêu cầu chính và lấy request_id
         String request_id = requestInformationDAO.addRequestInformationIntoDB(user_id, role, dayRequest, "pending", reason, supplier, address, phone, email);
+        
+        // Lưu chi tiết các items của yêu cầu
         requestitemsDAO.addItemsIntoDB(request_id, productNameArr, productCodeArr, unitArr, quantityIntArr, noteArr, reasonDetail);
+        
+        // Redirect đến trang thông báo thành công
         response.sendRedirect("RequestSuccessNotification.jsp");
     }
 
