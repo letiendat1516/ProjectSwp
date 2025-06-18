@@ -3,6 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/GetStatusOfPurchaseRequestInformationDAO.java</file>
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/RequestItemsDAO.java</file>
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/ProductInfoDAO.java</file>
@@ -10,6 +11,13 @@
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/ApprovePurchaseRequestServlet.java</file>
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/RequestInformationDAO.java</file>
             <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/LoadingRequestServlet.java</file>
+=======
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/PurchaseOrderForm.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/GetStatusOfPurchaseRequestInformationDAO.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ItemsSupplyRequestForm.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ListPurchaseOrder.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ApprovePurchaseRequest.jsp</file>
+>>>>>>> 76a449b3ae2f1442020f58c299c3b0445812fb01
         </group>
     </open-files>
 </project-private>
