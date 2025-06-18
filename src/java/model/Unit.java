@@ -7,6 +7,7 @@ package model;
 public class Unit {
     private int id;
     private String name;
+    private String symbol;
     
     public Unit() {
     }
@@ -14,6 +15,12 @@ public class Unit {
     public Unit(int id, String name) {
         this.id = id;
         this.name = name;
+    }
+    
+    public Unit(int id, String name, String symbol) {
+        this.id = id;
+        this.name = name;
+        this.symbol = symbol;
     }
     
     public int getId() {
@@ -30,5 +37,13 @@ public class Unit {
     
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public String getSymbol() {
+        return symbol;
+    }
+    
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 }
