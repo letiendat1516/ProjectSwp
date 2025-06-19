@@ -35,11 +35,10 @@ public class ListRequestImportDAO {
 
     public List<RequestItem> getAllRequestItems() {
         List<RequestItem> list = new ArrayList<>();
-        String sql = "SELECT r.id AS request_id, p.name AS product_name, ri.product_code AS product_code, "
-                + "ri.unit AS unit, ri.quantity, ri.imported_qty, ri.id, ri.note, ri.reason_detail "
-                + "FROM request_items ri "
-                + "JOIN request r ON ri.request_id = r.id "
-                + "JOIN product_info p ON ri.product_code = p.code";
+        String sql = "SELECT poi.id AS request_id, poi.product_name, poi.product_code, "
+                + "poi.unit, poi.quantity, poi.note "
+                + "FROM purchase_order_items poi "
+                + "JOIN purchase_order_info po ON poi.purchase_id = po.id";
 
         try {
             conn = Context.getJDBCConnection();
@@ -53,9 +52,9 @@ public class ListRequestImportDAO {
                 item.setProductCode(rs.getString("product_code"));
                 item.setUnit(rs.getString("unit"));
                 item.setQuantity(rs.getDouble("quantity"));
-                item.setImportedQty(rs.getDouble("imported_qty"));
+                item.setImportedQty(0); // Not in schema
                 item.setNote(rs.getString("note"));
-                item.setReasonDetail(rs.getString("reason_detail"));
+                item.setReasonDetail(null); // Not in schema
                 list.add(item);
             }
         } catch (SQLException e) {
@@ -68,17 +67,16 @@ public class ListRequestImportDAO {
 
     public List<ApprovedRequestItem> getApprovedRequestItems(String search) {
         List<ApprovedRequestItem> list = new ArrayList<>();
-        String sql = "SELECT r.id AS request_id, r.day_request, r.status, r.supplier, r.address, r.phone, r.email, "
-                + "ri.product_name, ri.product_code, pi.name AS product_full_name, pi.price, ri.unit, ri.quantity, "
-                + "ri.note, ri.reason_detail "
-                + "FROM request r "
-                + "JOIN request_items ri ON r.id = ri.request_id "
-                + "JOIN product_info pi ON ri.product_code = pi.code "
-                + "WHERE r.status = 'approved' "
+        String sql = "SELECT po.id AS request_id, po.day_purchase AS day_request, po.status, po.supplier, po.address, po.phone, po.email, "
+                + "poi.product_name, poi.product_code, poi.product_name AS product_full_name, poi.price_per_unit AS price, poi.unit, poi.quantity, "
+                + "poi.note "
+                + "FROM purchase_order_info po "
+                + "LEFT JOIN purchase_order_items poi ON po.id = poi.purchase_id "
+                + "WHERE po.status = 'approved' "
                 + (search != null && !search.trim().isEmpty() 
-                    ? "AND (ri.product_code LIKE ? OR ri.product_name LIKE ?)" 
+                    ? "AND (COALESCE(poi.product_code, po.id) LIKE ? OR COALESCE(poi.product_name, po.id) LIKE ?)" 
                     : "")
-                + " ORDER BY r.id, ri.product_name";
+                + " ORDER BY po.day_purchase DESC";
 
         try {
             conn = Context.getJDBCConnection();
@@ -105,9 +103,60 @@ public class ListRequestImportDAO {
                 item.setUnit(rs.getString("unit"));
                 item.setQuantity(rs.getDouble("quantity"));
                 item.setNote(rs.getString("note"));
-                item.setReasonDetail(rs.getString("reason_detail"));
+                item.setReasonDetail(null); // Not in schema
                 list.add(item);
             }
+            System.out.println("Fetched approved items count: " + list.size() + ", Items: " + list);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            closeResources();
+        }
+        return list;
+    }
+
+    public List<ApprovedRequestItem> getCompletedRequestItems(String search) {
+        List<ApprovedRequestItem> list = new ArrayList<>();
+        String sql = "SELECT po.id AS request_id, po.day_purchase AS day_request, po.status, po.supplier, po.address, po.phone, po.email, "
+                + "poi.product_name, poi.product_code, poi.product_name AS product_full_name, poi.price_per_unit AS price, poi.unit, poi.quantity, "
+                + "poi.note "
+                + "FROM purchase_order_info po "
+                + "LEFT JOIN purchase_order_items poi ON po.id = poi.purchase_id "
+                + "WHERE po.status = 'completed' "
+                + (search != null && !search.trim().isEmpty() 
+                    ? "AND (COALESCE(poi.product_code, po.id) LIKE ? OR COALESCE(poi.product_name, po.id) LIKE ?)" 
+                    : "")
+                + " ORDER BY po.day_purchase DESC";
+
+        try {
+            conn = Context.getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            if (search != null && !search.trim().isEmpty()) {
+                String searchPattern = "%" + search.trim() + "%";
+                ps.setString(1, searchPattern);
+                ps.setString(2, searchPattern);
+            }
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                ApprovedRequestItem item = new ApprovedRequestItem();
+                item.setRequestId(rs.getString("request_id"));
+                item.setDayRequest(rs.getString("day_request"));
+                item.setStatus(rs.getString("status"));
+                item.setSupplier(rs.getString("supplier"));
+                item.setAddress(rs.getString("address"));
+                item.setPhone(rs.getString("phone"));
+                item.setEmail(rs.getString("email"));
+                item.setProductName(rs.getString("product_name"));
+                item.setProductCode(rs.getString("product_code"));
+                item.setProductFullName(rs.getString("product_full_name"));
+                item.setPrice(rs.getDouble("price"));
+                item.setUnit(rs.getString("unit"));
+                item.setQuantity(rs.getDouble("quantity"));
+                item.setNote(rs.getString("note"));
+                item.setReasonDetail(null); // Not in schema
+                list.add(item);
+            }
+            System.out.println("Fetched completed items count: " + list.size() + ", Items: " + list);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -118,7 +167,7 @@ public class ListRequestImportDAO {
 
     public Request getRequestById(String id) {
         Request req = null;
-        String sql = "SELECT * FROM request WHERE id = ?";
+        String sql = "SELECT * FROM purchase_order_info WHERE id = ?";
         try {
             conn = Context.getJDBCConnection();
             ps = conn.prepareStatement(sql);
@@ -127,16 +176,16 @@ public class ListRequestImportDAO {
             if (rs.next()) {
                 req = new Request();
                 req.setId(rs.getString("id"));
-                req.setUser_id(rs.getInt("user_id"));
-                req.setDay_request(rs.getDate("day_request"));
+                req.setUser_id(0); // Not in schema
+                req.setDay_request(rs.getDate("day_purchase"));
                 req.setStatus(rs.getString("status"));
                 req.setReason(rs.getString("reason"));
                 req.setSupplier(rs.getString("supplier"));
                 req.setAddress(rs.getString("address"));
                 req.setPhone(rs.getString("phone"));
                 req.setEmail(rs.getString("email"));
-                req.setApprove_by(rs.getString("approve_by"));
-                req.setWarehouse(rs.getString("warehouse"));
+                req.setApprove_by(null); // Not in schema
+                req.setWarehouse(null); // Not in schema
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -148,7 +197,7 @@ public class ListRequestImportDAO {
 
     public List<RequestItem> getRequestItemsByRequestId(String requestId) {
         List<RequestItem> list = new ArrayList<>();
-        String sql = "SELECT * FROM request_items WHERE request_id = ?";
+        String sql = "SELECT * FROM purchase_order_items WHERE purchase_id = ?";
         try {
             conn = Context.getJDBCConnection();
             ps = conn.prepareStatement(sql);
@@ -157,14 +206,14 @@ public class ListRequestImportDAO {
             while (rs.next()) {
                 RequestItem item = new RequestItem();
                 item.setId(rs.getInt("id"));
-                item.setRequestId(rs.getString("request_id"));
+                item.setRequestId(rs.getString("purchase_id"));
                 item.setProductName(rs.getString("product_name"));
                 item.setProductCode(rs.getString("product_code"));
                 item.setUnit(rs.getString("unit"));
                 item.setQuantity(rs.getDouble("quantity"));
-                item.setImportedQty(rs.getDouble("imported_qty"));
+                item.setImportedQty(0); // Not in schema
                 item.setNote(rs.getString("note"));
-                item.setReasonDetail(rs.getString("reason_detail"));
+                item.setReasonDetail(null); // Not in schema
                 list.add(item);
             }
         } catch (SQLException e) {
@@ -176,7 +225,7 @@ public class ListRequestImportDAO {
     }
 
     public void updateImportItem(String requestId, String productCode, int importQty, String note) throws SQLException {
-        String sql = "UPDATE request_items SET imported_qty = ?, note = ? WHERE request_id = ? AND product_code = ?";
+        String sql = "UPDATE purchase_order_items SET quantity = ?, note = ? WHERE purchase_id = ? AND product_code = ?";
         try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, importQty);
             ps.setString(2, note);
@@ -186,15 +235,18 @@ public class ListRequestImportDAO {
         }
     }
 
-    public void updateRequestStatus(String requestId, String status, String importDate, String receiver, String warehouse) throws SQLException {
-        String sql = "UPDATE request SET status = ?, day_request = ?, approve_by = ?, warehouse = ? WHERE id = ?";
+    public void updateRequestStatus(String requestId, String status, String importDate) throws SQLException {
+        String sql = "UPDATE purchase_order_info SET status = ?, day_purchase = ? WHERE id = ?";
         try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
-            ps.setString(2, importDate != null ? importDate : null);
-            ps.setString(3, receiver != null ? receiver : null);
-            ps.setString(4, warehouse != null ? warehouse : null);
-            ps.setString(5, requestId);
-            ps.executeUpdate();
+            ps.setString(2, importDate);
+            ps.setString(3, requestId);
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("No rows updated for requestId: " + requestId);
+            }
         }
     }
+    
+    
 }
