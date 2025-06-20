@@ -64,15 +64,16 @@ public class FilterSupplierEvaluation extends HttpServlet {
             throws ServletException, IOException {
         String filter = request.getParameter("filter");
         String sid = request.getParameter("sid");
+        String indexPage = request.getParameter("index");
         try {
             int id = Integer.parseInt(sid);
             SupplierDAO sd = new SupplierDAO();
             Supplier s = sd.getSupplierByID(id);
             request.setAttribute("supplier", s);
+
             if (filter.matches("star")) {
                 SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
                 List<SupplierEvaluation> list = sed.sortDescendingByStar(id);
-                request.setAttribute("listSED", list);
                 request.setAttribute("fl", filter);
                 float avg_rate = 0;
                 for (int i = 0; i < list.size(); i++) {
@@ -81,12 +82,26 @@ public class FilterSupplierEvaluation extends HttpServlet {
                 avg_rate = avg_rate / list.size();
                 String avg = String.valueOf(avg_rate);
                 avg = avg.substring(0, 3);
+                
+                //phan trang
+                int totalPage = (int) Math.ceil((double) list.size() / 5);
+                request.setAttribute("totalPage", totalPage);
+                int index = Integer.parseInt(indexPage);
+                if (index < totalPage) {
+                    list = list.subList((index - 1) * 5, (index - 1) * 5 + 5);
+                } else {
+                    list = list.subList((index - 1) * 5, list.size());
+                }
+                request.setAttribute("index", index);
+                request.setAttribute("listSED", list);
+                //
+                request.setAttribute("isFilter", "filter");
                 request.setAttribute("avg", avg);
                 request.getRequestDispatcher("ViewSupplierEvaluation.jsp").forward(request, response);
+
             } else {
                 SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
-                List<SupplierEvaluation> list = sed.sortDescendingByDate(id);
-                request.setAttribute("listSED", list);
+                List<SupplierEvaluation> list = sed.sortDescendingByDate(id);                            
                 request.setAttribute("fl", filter);
                 float avg_rate = 0;
                 for (int i = 0; i < list.size(); i++) {
@@ -95,8 +110,23 @@ public class FilterSupplierEvaluation extends HttpServlet {
                 avg_rate = avg_rate / list.size();
                 String avg = String.valueOf(avg_rate);
                 avg = avg.substring(0, 3);
+                
+                //phan trang
+                int totalPage = (int) Math.ceil((double) list.size() / 5);
+                request.setAttribute("totalPage", totalPage);
+                int index = Integer.parseInt(indexPage);
+                if (index < totalPage) {
+                    list = list.subList((index - 1) * 5, (index - 1) * 5 + 5);
+                } else {
+                    list = list.subList((index - 1) * 5, list.size());
+                }
+                request.setAttribute("index", index);
+                request.setAttribute("listSED", list);
+                //
+                request.setAttribute("isFilter", "filter");
                 request.setAttribute("avg", avg);
                 request.getRequestDispatcher("ViewSupplierEvaluation.jsp").forward(request, response);
+
             }
 
         } catch (NumberFormatException e) {

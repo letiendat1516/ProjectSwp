@@ -470,14 +470,162 @@
                     min-width: 160px;
                 }
             }
+            /* Pagination Container */
+            .pagination-container {
+                max-width: 900px;
+                margin: 20px auto;
+                padding: 20px 25px;
+                text-align: center;
+            }
+
+            /* Pagination Wrapper */
+            .pagination {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: white;
+                padding: 15px 20px;
+                border-radius: 50px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                border: 1px solid #e9ecef;
+            }
+
+            /* Pagination Links */
+            .pagination a {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                text-decoration: none;
+                color: #495057;
+                font-weight: 500;
+                font-size: 14px;
+                border-radius: 50%;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* Default state */
+            .pagination a:hover {
+                background-color: #e3f2fd;
+                color: #1976d2;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(25, 118, 210, 0.2);
+            }
+
+            /* Active page styling */
+            .pagination a.active {
+                background: linear-gradient(135deg, #3498db, #2980b9);
+                color: white;
+                box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+                transform: translateY(-1px);
+            }
+
+            .pagination a.active:hover {
+                background: linear-gradient(135deg, #2980b9, #1f618d);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+            }
+
+            /* Ripple effect */
+            .pagination a::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                background: rgba(52, 152, 219, 0.2);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                transition: width 0.3s, height 0.3s;
+            }
+
+            .pagination a:active::before {
+                width: 100%;
+                height: 100%;
+            }
+
+            /* First and Last page special styling */
+            .pagination a:first-child,
+            .pagination a:last-child {
+                font-weight: 600;
+            }
+
+            /* Disabled state (nếu cần) */
+            .pagination a.disabled {
+                color: #adb5bd;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .pagination-container {
+                    padding: 15px;
+                    margin: 15px auto;
+                }
+
+                .pagination {
+                    padding: 12px 15px;
+                    gap: 6px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+
+                .pagination a {
+                    width: 36px;
+                    height: 36px;
+                    font-size: 13px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .pagination a {
+                    width: 32px;
+                    height: 32px;
+                    font-size: 12px;
+                }
+
+                .pagination {
+                    gap: 4px;
+                    padding: 10px 12px;
+                }
+            }
+
+            /* Animation cho container */
+            .pagination-container {
+                animation: fadeInUp 0.6s ease-out;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
         </style>
     </head>
     <body>
+
         <c:set var="listVSE" value="${requestScope.listSED}"/>
         <c:set var="supplier" value="${requestScope.supplier}"/>
         <c:set var="user" value="${sessionScope.user}"/>
         <c:set var="avg" value="${requestScope.avg}"/>
         <c:set var="fl" value="${requestScope.fl}"/>
+        <c:set var="totalPage" value="${requestScope.totalPage}"/>
+        <c:set var="index" value="${requestScope.index}"/>
+        <c:set var="nameSearch" value="${requestScope.name}"/>
+        <!-- isFilter -->
+        <c:set var="isFilter" value="${requestScope.isFilter}"/>
+        <!-- isFilter -->
         <c:if test="${empty fl or fl == null}">
             <c:set var="fl" value="star"/>
         </c:if>
@@ -506,6 +654,7 @@
                         <option ${fl=="date"?'selected':''} value="date">Sort descending by date</option>
                     </select>
                     <input style="display:none" type="text" value="${supplier.supplierID}" name="sid">
+                    <input style="display:none" type="text" value="${index}" name="index">
                     <input type="submit" value="Apply Filter" name="x">
                 </form>
 
@@ -513,6 +662,7 @@
                     <span class="form-label">Search:</span>
                     <input style="display:none" type="text" value="${supplier.supplierID}" name="sid">
                     <input style="display:none" type="text" value="${fl}" name="fl">
+                    <input style="display:none" type="text" value="${index}" name="index">
                     <input type="text" placeholder="Enter user name to search..." name="name">
                     <input type="submit" value="Search" name="y">
                 </form>
@@ -561,7 +711,7 @@
 
                             </c:if>
                             <c:if test="${i.userID.id == user.id}">
-                                <a href="DeleteSupplierEvaluation?id=${i.supplierEvaluationID}&sid=${supplier.supplierID}" class="delete-button"
+                                <a href="DeleteSupplierEvaluation?id=${i.supplierEvaluationID}&sid=${supplier.supplierID}&index=${index}" class="delete-button"
                                    onclick="return confirm('Bạn có chắc chắn muốn xoá đánh giá nhà cung cấp này không?')">
                                     Delete</a>
                                 </c:if>
@@ -573,7 +723,36 @@
                 </div>
             </c:forEach>
         </div>
-
+        <c:if test="${empty isFilter}">
+            <div class="pagination-container">
+                <div class="pagination">
+                    <c:forEach var="i" begin="1" end="${totalPage}">
+                        <a href="ViewSupplierEvaluation?supplierID=${supplier.supplierID}&index=${i}" 
+                           class="${i == index ? 'active' : ''}">${i}</a>
+                    </c:forEach>
+                </div>
+            </div>
+        </c:if>
+        <c:if test="${isFilter eq 'filter'}">
+            <div class="pagination-container">
+                <div class="pagination">
+                    <c:forEach var="i" begin="1" end="${totalPage}">
+                        <a href="FilterSupplierEvaluation?index=${i}&filter=${fl}&sid=${supplier.supplierID}" 
+                           class="${i == index ? 'active' : ''}">${i}</a>
+                    </c:forEach>
+                </div>
+            </div>
+        </c:if>
+        <c:if test="${isFilter eq 'search'}">
+            <div class="pagination-container">
+                <div class="pagination">
+                    <c:forEach var="i" begin="1" end="${totalPage}">
+                        <a href="SearchSupplierEvaluation?index=${i}&fl=${fl}&sid=${supplier.supplierID}&name=${nameSearch}" 
+                           class="${i == index ? 'active' : ''}">${i}</a>
+                    </c:forEach>
+                </div>
+            </div>
+        </c:if>
         <div class="action-buttons">
             <a class="btn-back" href="LishSupplier">Back</a>
         </div>
