@@ -132,7 +132,7 @@ public class PurchaseOrderInfo {
     }
 
     public ArrayList<PurchaseOrderItems> getPurchaseItems() {
-return purchaseItems;
+        return purchaseItems;
     }
 
     public void setPurchaseItems(ArrayList<PurchaseOrderItems> purchaseItems) {

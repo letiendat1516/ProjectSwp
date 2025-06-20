@@ -330,114 +330,116 @@
 
     </head>
     <body>
-    <c:set var="supplier" value="${requestScope.supplier}"/>
-    <c:set var="mess" value="${requestScope.mess}"/>
-    <c:set var="user" value="${sessionScope.user}"/>
-    <div class="container">
-        <div class="left">
-            <h2>Supplier Information</h2>
-            <table>
-                <tr><td>Name:</td><td>${supplier.name}</td></tr>
-                <tr><td>Phone:</td><td>${supplier.phone}</td></tr>
-                <tr><td>Email:</td><td>${supplier.email}</td></tr>
-                <tr><td>Address:</td><td>${supplier.address}</td></tr>
-                <tr><td>Note:</td><td>${supplier.note}</td></tr>
-            </table>
-        </div>
-        <div class="right">
-            <h2>Supplier Evaluation</h2>
-            <label style="color: red;font-weight: bold" >${mess}</label>
-            <form action="TableSupplierEvaluation" method="post">
+        <c:set var="supplier" value="${requestScope.supplier}"/>
+        <c:set var="mess" value="${requestScope.mess}"/>
+        <c:set var="user" value="${sessionScope.user}"/>
+        <c:set var="seid" value="${requestScope.seid}"/>
+        <div class="container">
+            <div class="left">
+                <h2>Supplier Information</h2>
                 <table>
-                    <tr>
-                        <td><input type="hidden" name="supplier" value="${supplier.supplierID}"></td>
-                        <td><input type="hidden" name="uid" value="${user.id}"></td>
-                    </tr>
-                    <tr>
-                        <td>Delivery Time:</td>
-                        <td>
-                            <div class="star-rating">
-                                <input type="radio" id="delivery_time_star5" name="delivery_time" value="5" required />
-                                <label for="delivery_time_star5" title="5 stars">★<div class="star-num">5</div></label>
-                                <input type="radio" id="delivery_time_star4" name="delivery_time" value="4" />
-                                <label for="delivery_time_star4" title="4 stars">★<div class="star-num">4</div></label>
-                                <input type="radio" id="delivery_time_star3" name="delivery_time" value="3" />
-                                <label for="delivery_time_star3" title="3 stars">★<div class="star-num">3</div></label>
-                                <input type="radio" id="delivery_time_star2" name="delivery_time" value="2" />
-                                <label for="delivery_time_star2" title="2 stars">★<div class="star-num">2</div></label>
-                                <input type="radio" id="delivery_time_star1" name="delivery_time" value="1" />
-                                <label for="delivery_time_star1" title="1 star">★<div class="star-num">1</div></label>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Market Price Comparison:</td>
-                        <td>
-                            <div class="star-rating">
-                                <input type="radio" id="market_price_comparison_star5" name="market_price_comparison" value="5" required />
-                                <label for="market_price_comparison_star5" title="5 stars">★<div class="star-num">5</div></label>
-                                <input type="radio" id="market_price_comparison_star4" name="market_price_comparison" value="4" />
-                                <label for="market_price_comparison_star4" title="4 stars">★<div class="star-num">4</div></label>
-                                <input type="radio" id="market_price_comparison_star3" name="market_price_comparison" value="3" />
-                                <label for="market_price_comparison_star3" title="3 stars">★<div class="star-num">3</div></label>
-                                <input type="radio" id="market_price_comparison_star2" name="market_price_comparison" value="2" />
-                                <label for="market_price_comparison_star2" title="2 stars">★<div class="star-num">2</div></label>
-                                <input type="radio" id="market_price_comparison_star1" name="market_price_comparison" value="1" />
-                                <label for="market_price_comparison_star1" title="1 star">★<div class="star-num">1</div></label>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Supply Ability:</td>
-                        <td>
-                            <div class="star-rating">
-                                <input type="radio" id="transparency_reputation_star5" name="transparency_reputation" value="5" required />
-                                <label for="transparency_reputation_star5" title="5 stars">★<div class="star-num">5</div></label>
-                                <input type="radio" id="transparency_reputation_star4" name="transparency_reputation" value="4" />
-                                <label for="transparency_reputation_star4" title="4 stars">★<div class="star-num">4</div></label>
-                                <input type="radio" id="transparency_reputation_star3" name="transparency_reputation" value="3" />
-                                <label for="transparency_reputation_star3" title="3 stars">★<div class="star-num">3</div></label>
-                                <input type="radio" id="transparency_reputation_star2" name="transparency_reputation" value="2" />
-                                <label for="transparency_reputation_star2" title="2 stars">★<div class="star-num">2</div></label>
-                                <input type="radio" id="transparency_reputation_star1" name="transparency_reputation" value="1" />
-                                <label for="transparency_reputation_star1" title="1 star">★<div class="star-num">1</div></label>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Service Quality:</td>
-                        <td>
-                            <div class="star-rating">
-                                <input type="radio" id="service_quality_star5" name="service_quality" value="5" required />
-                                <label for="service_quality_star5" title="5 stars">★<div class="star-num">5</div></label>
-                                <input type="radio" id="service_quality_star4" name="service_quality" value="4" />
-                                <label for="service_quality_star4" title="4 stars">★<div class="star-num">4</div></label>
-                                <input type="radio" id="service_quality_star3" name="service_quality" value="3" />
-                                <label for="service_quality_star3" title="3 stars">★<div class="star-num">3</div></label>
-                                <input type="radio" id="service_quality_star2" name="service_quality" value="2" />
-                                <label for="service_quality_star2" title="2 stars">★<div class="star-num">2</div></label>
-                                <input type="radio" id="service_quality_star1" name="service_quality" value="1" />
-                                <label for="service_quality_star1" title="1 star">★<div class="star-num">1</div></label>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Comment:</td>
-                        <td>
-                            <textarea name="comment" rows="1" class="comment-box"></textarea>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="text-align: center;">
-                            <input type="submit" value="Save">
-                        </td>
-                    </tr>
+                    <tr><td>Name:</td><td>${supplier.name}</td></tr>
+                    <tr><td>Phone:</td><td>${supplier.phone}</td></tr>
+                    <tr><td>Email:</td><td>${supplier.email}</td></tr>
+                    <tr><td>Address:</td><td>${supplier.address}</td></tr>
+                    <tr><td>Note:</td><td>${supplier.note}</td></tr>
                 </table>
-            </form>
+            </div>
+            <div class="right">
+                <h2>Supplier Evaluation</h2>
+                <label style="color: red;font-weight: bold" >${mess}</label>
+                <form action="TableSupplierEvaluation" method="post">
+                    <table>
+                        <tr>
+                            <td><input type="hidden" name="supplier" value="${supplier.supplierID}"></td>
+                            <td><input type="hidden" name="uid" value="${user.id}"></td>
+                            <td><input type="hidden" name="seid" value="${seid}"></td>
+                        </tr>
+                        <tr>
+                            <td>Delivery Time:</td>
+                            <td>
+                                <div class="star-rating">
+                                    <input type="radio" id="delivery_time_star5" name="delivery_time" value="5" required />
+                                    <label for="delivery_time_star5" title="5 stars">★<div class="star-num">5</div></label>
+                                    <input type="radio" id="delivery_time_star4" name="delivery_time" value="4" />
+                                    <label for="delivery_time_star4" title="4 stars">★<div class="star-num">4</div></label>
+                                    <input type="radio" id="delivery_time_star3" name="delivery_time" value="3" />
+                                    <label for="delivery_time_star3" title="3 stars">★<div class="star-num">3</div></label>
+                                    <input type="radio" id="delivery_time_star2" name="delivery_time" value="2" />
+                                    <label for="delivery_time_star2" title="2 stars">★<div class="star-num">2</div></label>
+                                    <input type="radio" id="delivery_time_star1" name="delivery_time" value="1" />
+                                    <label for="delivery_time_star1" title="1 star">★<div class="star-num">1</div></label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Market Price Comparison:</td>
+                            <td>
+                                <div class="star-rating">
+                                    <input type="radio" id="market_price_comparison_star5" name="market_price_comparison" value="5" required />
+                                    <label for="market_price_comparison_star5" title="5 stars">★<div class="star-num">5</div></label>
+                                    <input type="radio" id="market_price_comparison_star4" name="market_price_comparison" value="4" />
+                                    <label for="market_price_comparison_star4" title="4 stars">★<div class="star-num">4</div></label>
+                                    <input type="radio" id="market_price_comparison_star3" name="market_price_comparison" value="3" />
+                                    <label for="market_price_comparison_star3" title="3 stars">★<div class="star-num">3</div></label>
+                                    <input type="radio" id="market_price_comparison_star2" name="market_price_comparison" value="2" />
+                                    <label for="market_price_comparison_star2" title="2 stars">★<div class="star-num">2</div></label>
+                                    <input type="radio" id="market_price_comparison_star1" name="market_price_comparison" value="1" />
+                                    <label for="market_price_comparison_star1" title="1 star">★<div class="star-num">1</div></label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Supply Ability:</td>
+                            <td>
+                                <div class="star-rating">
+                                    <input type="radio" id="transparency_reputation_star5" name="transparency_reputation" value="5" required />
+                                    <label for="transparency_reputation_star5" title="5 stars">★<div class="star-num">5</div></label>
+                                    <input type="radio" id="transparency_reputation_star4" name="transparency_reputation" value="4" />
+                                    <label for="transparency_reputation_star4" title="4 stars">★<div class="star-num">4</div></label>
+                                    <input type="radio" id="transparency_reputation_star3" name="transparency_reputation" value="3" />
+                                    <label for="transparency_reputation_star3" title="3 stars">★<div class="star-num">3</div></label>
+                                    <input type="radio" id="transparency_reputation_star2" name="transparency_reputation" value="2" />
+                                    <label for="transparency_reputation_star2" title="2 stars">★<div class="star-num">2</div></label>
+                                    <input type="radio" id="transparency_reputation_star1" name="transparency_reputation" value="1" />
+                                    <label for="transparency_reputation_star1" title="1 star">★<div class="star-num">1</div></label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Service Quality:</td>
+                            <td>
+                                <div class="star-rating">
+                                    <input type="radio" id="service_quality_star5" name="service_quality" value="5" required />
+                                    <label for="service_quality_star5" title="5 stars">★<div class="star-num">5</div></label>
+                                    <input type="radio" id="service_quality_star4" name="service_quality" value="4" />
+                                    <label for="service_quality_star4" title="4 stars">★<div class="star-num">4</div></label>
+                                    <input type="radio" id="service_quality_star3" name="service_quality" value="3" />
+                                    <label for="service_quality_star3" title="3 stars">★<div class="star-num">3</div></label>
+                                    <input type="radio" id="service_quality_star2" name="service_quality" value="2" />
+                                    <label for="service_quality_star2" title="2 stars">★<div class="star-num">2</div></label>
+                                    <input type="radio" id="service_quality_star1" name="service_quality" value="1" />
+                                    <label for="service_quality_star1" title="1 star">★<div class="star-num">1</div></label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Comment:</td>
+                            <td>
+                                <textarea name="comment" rows="1" class="comment-box"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: center;">
+                                <input type="submit" value="Save">
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
         </div>
-    </div>
-    <a href="LishSupplier" class="back-btn">Back</a>
-</body>
+        <a href="LishSupplier" class="back-btn">Back</a>
+    </body>
 
 </html>
 

@@ -287,10 +287,7 @@ public class SupplierDAO {
         SupplierDAO sd = new SupplierDAO();
 
         // limit (offset),(limit)
-        List<Supplier> l = sd.getSuppliersByPageFilter(2, 10, "all", "");
-        for (int i = 0; i < l.size(); i++) {
-            System.out.println(l.get(i).getSupplierID());
-        }
-
+//        List<Supplier> l = sd.getSuppliersByPageFilter(2, 10, "all", "");
+//        System.out.println(Math.ceil((double)l.size()/5));
     }
 }

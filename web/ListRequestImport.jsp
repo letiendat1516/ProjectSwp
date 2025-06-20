@@ -10,7 +10,6 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
-            /* CSS styles remain unchanged - copied from previous version */
             * {
                 box-sizing: border-box;
                 margin: 0;
@@ -572,6 +571,23 @@
                 min-width: 200px;
             }
 
+            .select-group {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .select-group .form-control {
+                flex: 1;
+                border-top-left-radius: var(--border-radius);
+                border-bottom-left-radius: var(--border-radius);
+            }
+
+            .select-group .btn {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+
             .d-flex {
                 display: flex !important;
             }
@@ -793,6 +809,20 @@
                     width: 100%;
                 }
 
+                .select-group {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .select-group .form-control {
+                    border-radius: var(--border-radius);
+                    margin-bottom: 0.5rem;
+                }
+
+                .select-group .btn {
+                    border-radius: var(--border-radius);
+                }
+
                 .footer-content {
                     flex-direction: column;
                     gap: 1rem;
@@ -867,13 +897,16 @@
                             <div class="filter-item">
                                 <form action="${pageContext.request.contextPath}/request/list" method="get">
                                     <input type="hidden" name="type" value="purchase">
-                                    <div class="input-group">
-                                        <input type="text" name="search" value="${param.search}" class="form-control" placeholder="Tìm kiếm theo tên sản phẩm...">
-                                        <div class="input-group-append">
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-search"></i> Tìm kiếm
-                                            </button>
-                                        </div>
+                                    <div class="select-group">
+                                        <select name="searchType" class="form-control" required>
+                                            <option value="requestId" ${param.searchType == 'requestId' ? 'selected' : ''}>Mã yêu cầu</option>
+                                            <option value="productName" ${param.searchType == 'productName' ? 'selected' : ''}>Tên sản phẩm</option>
+                                            <option value="productCode" ${param.searchType == 'productCode' ? 'selected' : ''}>Mã sản phẩm</option>
+                                        </select>
+                                        <input type="text" name="searchValue" value="${param.searchValue}" class="form-control" placeholder="Nhập giá trị tìm kiếm...">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search"></i> Tìm kiếm
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -948,19 +981,19 @@
                         <nav aria-label="Page navigation" class="d-flex justify-content-center">
                             <ul class="pagination">
                                 <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${currentPage - 1}&search=${param.search}" aria-label="Previous">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${currentPage - 1}&searchType=${param.searchType}&searchValue=${param.searchValue}" aria-label="Previous">
                                         <i class="fas fa-chevron-left"></i>
                                     </a>
                                 </li>
 
                                 <c:forEach begin="1" end="${totalPages}" var="i">
                                     <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${i}&search=${param.search}">${i}</a>
+                                        <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${i}&searchType=${param.searchType}&searchValue=${param.searchValue}">${i}</a>
                                     </li>
                                 </c:forEach>
 
                                 <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${currentPage + 1}&search=${param.search}" aria-label="Next">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${currentPage + 1}&searchType=${param.searchType}&searchValue=${param.searchValue}" aria-label="Next">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
