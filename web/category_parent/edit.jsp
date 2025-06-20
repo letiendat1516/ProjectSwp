@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chỉnh sửa danh mục cha</title>
+  <title>Chỉnh sửa danh mục</title>
   <style>
       * {
           margin: 0;
@@ -251,7 +251,7 @@
       <!-- Form chỉnh sửa -->
       <div class="card">
           <div class="card-header">
-              Chỉnh sửa danh mục cha
+              Chỉnh sửa danh mục
           </div>
           <div class="card-body">
               <!-- Thông báo lỗi -->
@@ -288,7 +288,7 @@
                   <div class="form-group">
                       <label for="description" class="form-label">Mô tả</label>
                       <textarea class="form-control" id="description" name="description" 
-                                rows="4" maxlength="1000" placeholder="Nhập mô tả cho danh mục cha...">${categoryParent.description}</textarea>
+                                rows="4" maxlength="1000" placeholder="Nhập mô tả cho danh mục...">${categoryParent.description}</textarea>
                   </div>
                   
                   <div class="form-group">
@@ -296,7 +296,7 @@
                           <input class="form-check-input" type="checkbox" id="activeFlag" 
                                  name="activeFlag" value="1" ${categoryParent.activeFlag ? 'checked' : ''}>
                           <label class="form-check-label" for="activeFlag">
-                              ✓ Kích hoạt danh mục cha
+                              ✓ Kích hoạt danh mục
                           </label>
                       </div>
                   </div>
@@ -315,7 +315,7 @@
           <h5 style="margin-bottom: 15px; color: #495057;">📋 Thông tin chi tiết</h5>
           
           <div class="info-item">
-              <span class="info-label">ID danh mục cha:</span>
+              <span class="info-label">ID danh mục:</span>
               <span class="info-value">#${categoryParent.id}</span>
           </div>
           
@@ -344,7 +344,7 @@
           
           <div style="margin-top: 15px; padding: 10px; background: #e9ecef; border-radius: 4px; font-size: 13px; color: #6c757d;">
               <strong>💡 Lưu ý:</strong> Nếu bạn thay đổi trạng thái thành "Không hoạt động", 
-              tất cả danh mục con thuộc danh mục cha này sẽ bị ảnh hưởng.
+              tất cả danh mục con thuộc danh mục này sẽ bị ảnh hưởng.
           </div>
       </div>
   </div>
@@ -365,7 +365,7 @@
           const name = document.getElementById('name').value.trim();
           if (!name) {
               e.preventDefault();
-              alert('Vui lòng nhập tên danh mục cha!');
+              alert('Vui lòng nhập tên danh mục!');
               document.getElementById('name').focus();
           }
       });

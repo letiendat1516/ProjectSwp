@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thêm danh mục cha</title>
+  <title>Thêm danh mục</title>
   <style>
       * {
           margin: 0;
@@ -304,7 +304,7 @@
       <!-- Form thêm mới -->
       <div class="card">
           <div class="card-header">
-              🏗️ Thêm danh mục cha mới
+              🏗️ Thêm danh mục mới
           </div>
           <div class="card-body">
               <!-- Thông báo lỗi -->
@@ -327,17 +327,17 @@
               
               <form method="post" action="${pageContext.request.contextPath}/category-parent/create" id="categoryParentForm">
                   <div class="form-group">
-                      <label for="name" class="form-label">Tên danh mục cha <span class="text-danger">*</span></label>
+                      <label for="name" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
                       <input type="text" class="form-control" id="name" name="name" 
                              value="${name}" required maxlength="255" 
-                             placeholder="Nhập tên danh mục cha...">
+                             placeholder="Nhập tên danh mục...">
                         </div>
                   
                   <div class="form-group">
-                      <label for="description" class="form-label">Mô tả danh mục cha</label>
+                      <label for="description" class="form-label">Mô tả danh mục</label>
                       <textarea class="form-control" id="description" name="description" 
                                 rows="4" maxlength="1000" 
-                                placeholder="Nhập mô tả chi tiết về danh mục cha này...">${description}</textarea>
+                                placeholder="Nhập mô tả chi tiết về danh mục này...">${description}</textarea>
                       </div>
                   
                   <div class="form-group">
@@ -345,7 +345,7 @@
                           <input class="form-check-input" type="checkbox" id="activeFlag" 
                                  name="activeFlag" value="1" ${activeFlag eq '1' ? 'checked' : 'checked'}>
                           <label class="form-check-label" for="activeFlag">
-                              ✅ Kích hoạt danh mục cha ngay sau khi tạo
+                              ✅ Kích hoạt danh mục ngay sau khi tạo
                           </label>
                       </div>
                   </div>
@@ -370,7 +370,7 @@
                   <div class="button-group">
                       <a href="${pageContext.request.contextPath}/category-parent/list" 
                          class="btn btn-secondary">← Hủy</a>
-                      <button type="submit" class="btn btn-primary">🏗️ Thêm danh mục cha</button>
+                      <button type="submit" class="btn btn-primary">🏗️ Thêm danh mục</button>
                   </div>
               </form>
           </div>
@@ -475,12 +475,12 @@
           
           if (!name) {
               nameInput.classList.add('error');
-              alert('⚠️ Vui lòng nhập tên danh mục cha!');
+              alert('⚠️ Vui lòng nhập tên danh mục!');
               nameInput.focus();
               hasError = true;
           } else if (name.length > 255) {
               nameInput.classList.add('error');
-              alert('⚠️ Tên danh mục cha không được vượt quá 255 ký tự!');
+              alert('⚠️ Tên danh mục không được vượt quá 255 ký tự!');
               nameInput.focus();
               hasError = true;
           }
