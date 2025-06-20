@@ -65,7 +65,7 @@ public class ListRequestImportDAO {
         return list;
     }
 
-    public List<ApprovedRequestItem> getApprovedRequestItems(String search) {
+    public List<ApprovedRequestItem> getApprovedRequestItems(String searchType, String searchValue) {
         List<ApprovedRequestItem> list = new ArrayList<>();
         String sql = "SELECT po.id AS request_id, po.day_purchase AS day_request, po.status, po.supplier, po.address, po.phone, po.email, "
                 + "poi.product_name, poi.product_code, poi.product_name AS product_full_name, poi.price_per_unit AS price, poi.unit, poi.quantity, "
@@ -73,18 +73,25 @@ public class ListRequestImportDAO {
                 + "FROM purchase_order_info po "
                 + "LEFT JOIN purchase_order_items poi ON po.id = poi.purchase_id "
                 + "WHERE po.status = 'approved' "
-                + (search != null && !search.trim().isEmpty() 
-                    ? "AND (COALESCE(poi.product_code, po.id) LIKE ? OR COALESCE(poi.product_name, po.id) LIKE ?)" 
+                + (searchValue != null && !searchValue.trim().isEmpty() 
+                    ? "AND (" 
+                    + (searchType != null && searchType.equals("requestId") ? "po.id LIKE ?" : "FALSE")
+                    + " OR " 
+                    + (searchType != null && searchType.equals("productName") ? "poi.product_name LIKE ?" : "FALSE")
+                    + " OR " 
+                    + (searchType != null && searchType.equals("productCode") ? "poi.product_code LIKE ?" : "FALSE")
+                    + ")" 
                     : "")
                 + " ORDER BY po.day_purchase DESC";
 
         try {
             conn = Context.getJDBCConnection();
             ps = conn.prepareStatement(sql);
-            if (search != null && !search.trim().isEmpty()) {
-                String searchPattern = "%" + search.trim() + "%";
-                ps.setString(1, searchPattern);
-                ps.setString(2, searchPattern);
+            if (searchValue != null && !searchValue.trim().isEmpty() && searchType != null) {
+                String searchPattern = "%" + searchValue.trim() + "%";
+                if (searchType.equals("requestId") || searchType.equals("productName") || searchType.equals("productCode")) {
+                    ps.setString(1, searchPattern);
+                }
             }
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -115,7 +122,7 @@ public class ListRequestImportDAO {
         return list;
     }
 
-    public List<ApprovedRequestItem> getCompletedRequestItems(String search) {
+    public List<ApprovedRequestItem> getCompletedRequestItems(String searchType, String searchValue) {
         List<ApprovedRequestItem> list = new ArrayList<>();
         String sql = "SELECT po.id AS request_id, po.day_purchase AS day_request, po.status, po.supplier, po.address, po.phone, po.email, "
                 + "poi.product_name, poi.product_code, poi.product_name AS product_full_name, poi.price_per_unit AS price, poi.unit, poi.quantity, "
@@ -123,18 +130,25 @@ public class ListRequestImportDAO {
                 + "FROM purchase_order_info po "
                 + "LEFT JOIN purchase_order_items poi ON po.id = poi.purchase_id "
                 + "WHERE po.status = 'completed' "
-                + (search != null && !search.trim().isEmpty() 
-                    ? "AND (COALESCE(poi.product_code, po.id) LIKE ? OR COALESCE(poi.product_name, po.id) LIKE ?)" 
+                + (searchValue != null && !searchValue.trim().isEmpty() 
+                    ? "AND (" 
+                    + (searchType != null && searchType.equals("requestId") ? "po.id LIKE ?" : "FALSE")
+                    + " OR " 
+                    + (searchType != null && searchType.equals("productName") ? "poi.product_name LIKE ?" : "FALSE")
+                    + " OR " 
+                    + (searchType != null && searchType.equals("productCode") ? "poi.product_code LIKE ?" : "FALSE")
+                    + ")" 
                     : "")
                 + " ORDER BY po.day_purchase DESC";
 
         try {
             conn = Context.getJDBCConnection();
             ps = conn.prepareStatement(sql);
-            if (search != null && !search.trim().isEmpty()) {
-                String searchPattern = "%" + search.trim() + "%";
-                ps.setString(1, searchPattern);
-                ps.setString(2, searchPattern);
+            if (searchValue != null && !searchValue.trim().isEmpty() && searchType != null) {
+                String searchPattern = "%" + searchValue.trim() + "%";
+                if (searchType.equals("requestId") || searchType.equals("productName") || searchType.equals("productCode")) {
+                    ps.setString(1, searchPattern);
+                }
             }
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -247,6 +261,4 @@ public class ListRequestImportDAO {
             }
         }
     }
-    
-    
 }

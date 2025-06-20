@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
-
-<!--    <servlet>
+    <!--    <servlet>
         <servlet-name>CategoryServlet</servlet-name>
         <servlet-class>controller.CategoryServlet</servlet-class>
     </servlet>
@@ -144,14 +143,11 @@
          15 phút 
     </session-config>
 </web-app>-->
-
-
     <!-- Category Servlet -->
     <servlet>
         <servlet-name>CategoryServlet</servlet-name>
         <servlet-class>controller.CategoryServlet</servlet-class>
     </servlet>
-
     <!-- Authentication Servlets -->
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
@@ -161,7 +157,6 @@
         <servlet-name>LogoutServlet</servlet-name>
         <servlet-class>controller.LogoutServlet</servlet-class>
     </servlet>
-
     <!-- User Management Servlets -->
     <servlet>
         <servlet-name>AdduserServlet</servlet-name>
@@ -179,7 +174,6 @@
         <servlet-name>UserFilterServlet</servlet-name>
         <servlet-class>controller.UserFilterServlet</servlet-class>
     </servlet>
-
     <!-- Request Management Servlets -->
     <servlet>
         <servlet-name>LoadingRequestServlet</servlet-name>
@@ -193,13 +187,11 @@
         <servlet-name>ImportConfirmController</servlet-name>
         <servlet-class>controller.ImportConfirmController</servlet-class>
     </servlet>
-
     <!-- Role Management Servlet -->
     <servlet>
         <servlet-name>RoleAssignmentServlet</servlet-name>
         <servlet-class>controller.RoleAssignmentServlet</servlet-class>
     </servlet>
-
     <!-- Profile Management Servlets -->
     <servlet>
         <servlet-name>ProfileServlet</servlet-name>
@@ -209,7 +201,6 @@
         <servlet-name>EditProfileServlet</servlet-name>
         <servlet-class>controller.EditProfileServlet</servlet-class>
     </servlet>
-
     <!-- Material Unit Management Servlets -->
     <servlet>
         <servlet-name>MaterialUnitServlet</servlet-name>
@@ -227,21 +218,29 @@
         <servlet-name>DeleteMaterialUnitServlet</servlet-name>
         <servlet-class>controller.DeleteMaterialUnitServlet</servlet-class>
     </servlet>
-
     <!-- Export Request -->
     <servlet>
         <servlet-name>ExportRequestController</servlet-name>
         <servlet-class>controller.ExportRequestController</servlet-class>
     </servlet>
-
     <!-- Servlet Mappings -->
-
     <!-- Category Mapping -->
+    <servlet>
+        <servlet-name>ListPurchaseOrderServlet</servlet-name>
+        <servlet-class>controller.ListPurchaseOrderServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PurchaseOrderFormServlet</servlet-name>
+        <servlet-class>controller.PurchaseOrderFormServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SubmitPurchaseOrderServlet</servlet-name>
+        <servlet-class>controller.SubmitPurchaseOrderServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
         <url-pattern>/CategoryServlet</url-pattern>
     </servlet-mapping>
-
     <!-- Authentication Mappings -->
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
@@ -251,7 +250,6 @@
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
-
     <!-- User Management Mappings -->
     <servlet-mapping>
         <servlet-name>AdduserServlet</servlet-name>
@@ -269,7 +267,6 @@
         <servlet-name>UserFilterServlet</servlet-name>
         <url-pattern>/userfilter</url-pattern>
     </servlet-mapping>
-
     <!-- Request Management Mappings -->
     <servlet-mapping>
         <servlet-name>LoadingRequestServlet</servlet-name>
@@ -283,13 +280,11 @@
         <servlet-name>ImportConfirmController</servlet-name>
         <url-pattern>/import-confirm</url-pattern>
     </servlet-mapping>
-
     <!-- Role Management Mapping -->
     <servlet-mapping>
         <servlet-name>RoleAssignmentServlet</servlet-name>
         <url-pattern>/roleAssignment</url-pattern>
     </servlet-mapping>
-
     <!-- Profile Management Mappings -->
     <servlet-mapping>
         <servlet-name>ProfileServlet</servlet-name>
@@ -299,7 +294,6 @@
         <servlet-name>EditProfileServlet</servlet-name>
         <url-pattern>/editprofile</url-pattern>
     </servlet-mapping>
-
     <!-- Material Unit Management Mappings -->
     <servlet-mapping>
         <servlet-name>MaterialUnitServlet</servlet-name>
@@ -317,14 +311,24 @@
         <servlet-name>DeleteMaterialUnitServlet</servlet-name>
         <url-pattern>/material_unit/deleteMaterialUnit</url-pattern>
     </servlet-mapping>
-
     <!-- Export Request Mapping -->
     <servlet-mapping>
         <servlet-name>ExportRequestController</servlet-name>
         <url-pattern>/exportRequest</url-pattern>
     </servlet-mapping>
-
     <!-- Session Configuration -->
+    <servlet-mapping>
+        <servlet-name>ListPurchaseOrderServlet</servlet-name>
+        <url-pattern>/listpurchaseorder</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PurchaseOrderFormServlet</servlet-name>
+        <url-pattern>/purchaseorderform</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SubmitPurchaseOrderServlet</servlet-name>
+        <url-pattern>/submitpurchaseorder</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>15</session-timeout>
         <!-- 15 phút -->
@@ -338,4 +342,3 @@
         <url-pattern>/approvepurchaserequest</url-pattern>
     </servlet-mapping>
 </web-app>
-

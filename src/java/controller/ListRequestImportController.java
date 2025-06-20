@@ -3,6 +3,7 @@ package controller;
 import dao.ListRequestImportDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.sql.SQLException;
 import model.ApprovedRequestItem;
 
+@WebServlet("/request/list")
 public class ListRequestImportController extends HttpServlet {
 
     @Override
@@ -19,11 +21,12 @@ public class ListRequestImportController extends HttpServlet {
         ListRequestImportDAO dao = new ListRequestImportDAO();
 
         // Lấy tham số tìm kiếm từ request
-        String search = request.getParameter("search");
+        String searchType = request.getParameter("searchType");
+        String searchValue = request.getParameter("searchValue");
 
         // Lấy danh sách ApprovedRequestItem với tham số tìm kiếm
-        List<ApprovedRequestItem> approvedItems = dao.getApprovedRequestItems(search);
-        List<ApprovedRequestItem> completedItems = dao.getCompletedRequestItems(search);
+        List<ApprovedRequestItem> approvedItems = dao.getApprovedRequestItems(searchType, searchValue);
+        List<ApprovedRequestItem> completedItems = dao.getCompletedRequestItems(searchType, searchValue);
 
         if (approvedItems == null || approvedItems.isEmpty()) {
             System.out.println("Không có yêu cầu nào đã được duyệt.");
@@ -40,7 +43,8 @@ public class ListRequestImportController extends HttpServlet {
         // Gửi danh sách và tham số tìm kiếm sang JSP
         request.setAttribute("items", approvedItems);
         request.setAttribute("historyItems", completedItems);
-        request.setAttribute("search", search);
+        request.setAttribute("searchType", searchType);
+        request.setAttribute("searchValue", searchValue);
         request.getRequestDispatcher("ListRequestImport.jsp").forward(request, response);
     }
 
@@ -55,7 +59,7 @@ public class ListRequestImportController extends HttpServlet {
         // Validate parameters
         if (requestId == null || requestId.trim().isEmpty() || approveDate == null || approveDate.trim().isEmpty()) {
             System.err.println("Invalid parameters: requestId=" + requestId + ", approveDate=" + approveDate);
-            response.sendRedirect(request.getContextPath() + "/request/list?type=purchase&error=invalid_data");
+            response.sendRedirect(request.getContextPath() + "/import?type=purchase&error=invalid_data");
             return;
         }
 
@@ -64,11 +68,11 @@ public class ListRequestImportController extends HttpServlet {
             dao.updateRequestStatus(requestId, "completed", approveDate);
 
             // Chuyển hướng về danh sách với thông báo thành công
-            response.sendRedirect(request.getContextPath() + "/request/list?type=purchase&message=approve_success");
+            response.sendRedirect(request.getContextPath() + "/import?type=purchase&message=approve_success");
         } catch (SQLException e) {
             e.printStackTrace();
             System.err.println("SQLException occurred while updating request status for requestId: " + requestId + ", Error: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/request/list?type=purchase&error=approve_failed");
+            response.sendRedirect(request.getContextPath() + "/import?type=purchase&error=approve_failed");
         }
     }
 }

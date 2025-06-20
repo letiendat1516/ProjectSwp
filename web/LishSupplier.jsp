@@ -290,6 +290,9 @@
                                 <a style="background-color: aquamarine;border: 1px solid #bd2130; color: #0d6efd;"
                                    href="TableSupplierEvaluation?id=${listItem.supplierID}" 
                                    >Evaluation</a>
+                                <a style="background-color: #ccc;border: 1px solid #bd2130; color: #0d6efd;"
+                                   href="ViewSupplierEvaluation?supplierID=${listItem.supplierID}" 
+                                   >View evaluation</a>
                             </td>
                         </tr>
                     </c:forEach>

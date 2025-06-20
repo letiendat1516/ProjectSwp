@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <title>Phê Duyệt Yêu Cầu Nhập Kho</title>
+    <title>Phê Duyệt Yêu Cầu Mua Hàng</title>
     <style>
         * {
             margin: 0;
@@ -110,24 +110,64 @@
             background-color: #007bff;
             color: #fff;
         }
-        .requests-table td button {
+        
+        /* Style cho action buttons trong table */
+        .action-buttons-cell {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .action-btn {
             padding: 6px 12px;
-            background: #007bff;
-            color: #fff;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: background 0.3s;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #fff;
         }
-        .requests-table td button:hover {
-            background: #0056b3;
+        .delete-btn {
+            background: #dc3545;
         }
+        .delete-btn:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+        .view-btn {
+            background: #17a2b8;
+        }
+        .view-btn:hover {
+            background: #138496;
+            transform: translateY(-1px);
+        }
+        .action-btn .material-icons {
+            font-size: 16px;
+        }
+        
         .status-approved {
-            background-color: #d4edda;
+             background-color: #fff3cd !important;
+                border-left: 4px solid #ffc107 !important;
+                color: #856404 !important;
+                font-weight: bold !important;
         }
         .status-rejected {
-            background-color: #f8d7da;
+            background-color: #f8d7da !important;
+                border-left: 4px solid #dc3545 !important;
+                color: #721c24 !important;
+                font-weight: bold !important;
         }
+        .status-completed {
+                background-color: #d4edda !important;
+                border-left: 4px solid #28a745 !important;
+                color: #155724 !important;
+                font-weight: bold !important;
+            }
         .detail-row {
             display: none;
         }
@@ -299,7 +339,8 @@
                 <label for="statusFilter">Trạng thái:</label>
                 <select id="statusFilter" name="statusFilter">
                     <option value="" ${empty param.statusFilter ? 'selected' : ''}>Tất cả</option>
-                    <option value="approved" ${param.statusFilter == 'approved' ? 'selected' : ''}>Đã duyệt</option>
+                     <option value="completed" ${param.statusFilter == 'completed' ? 'selected' : ''}>Đã xong</option>
+                    <option value="approved" ${param.statusFilter == 'approved' || param.statusFilter == 'quoted' || param.statusFilter == 'pending re-quote' ? 'selected' : ''}>Đã duyệt (chờ báo giá)</option>
                     <option value="rejected" ${param.statusFilter == 'rejected' ? 'selected' : ''}>Đã từ chối</option>
                     <option value="pending" ${param.statusFilter == 'pending' ? 'selected' : ''}>Đang chờ</option>
                 </select>
@@ -338,8 +379,20 @@
                                     <c:set var="status" value="Đang chờ" />
                                 </c:when>
                                 <c:when test="${req.status == 'approved'}">
-                                    <c:set var="status" value="Đã duyệt" />
+                                    <c:set var="status" value="Đã duyệt (chờ báo giá)" />
                                     <c:set var="rowClass" value="status-approved" />
+                                </c:when>
+                                <c:when test="${req.status == 'quoted'}">
+                                    <c:set var="status" value="Đã duyệt (chờ báo giá)" />
+                                    <c:set var="rowClass" value="status-approved" />
+                                </c:when>
+                                <c:when test="${req.status == 'pending re-quote'}">
+                                    <c:set var="status" value="Đã duyệt (chờ báo giá)" />
+                                    <c:set var="rowClass" value="status-approved" />
+                                </c:when>
+                                <c:when test="${req.status == 'completed'}">
+                                    <c:set var="status" value="Đã xong" />
+                                    <c:set var="rowClass" value="status-completed" />
                                 </c:when>
                                 <c:when test="${req.status == 'rejected'}">
                                     <c:set var="status" value="Đã từ chối" />
@@ -358,16 +411,29 @@
                                 <td>${status}</td>
                                 <td>${req.reason}</td>
                                 <td>
-                                    <form action="${pageContext.request.contextPath}/approvepurchaserequest" method="post" style="display:inline;">
-                                        <input type="hidden" name="requestId" value="${req.id}">
-                                        <input type="hidden" name="action" value="delete">
-                                        <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa đơn hàng này?')" style="background-color: #dc3545; color: #fff; border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer; transition: background 0.3s;">
-                                            <span class="material-icons">clear</span>
+                                    <div class="action-buttons-cell">
+                                        <!-- Nút xóa -->
+                                        <form action="${pageContext.request.contextPath}/approvepurchaserequest" method="post" style="display:inline;">
+                                            <input type="hidden" name="requestId" value="${req.id}">
+                                            <input type="hidden" name="action" value="delete">
+                                            <!-- Giữ lại filter params -->
+                                            <input type="hidden" name="startDate" value="${param.startDate}">
+                                            <input type="hidden" name="endDate" value="${param.endDate}">
+                                            <input type="hidden" name="statusFilter" value="${param.statusFilter}">
+                                            <input type="hidden" name="requestIdFilter" value="${param.requestIdFilter}">
+                                            <input type="hidden" name="index" value="${param.index}">
+                                            <button type="submit" class="action-btn delete-btn" onclick="return confirm('Bạn có chắc muốn xóa đơn hàng này?')">
+                                                <span class="material-icons">delete</span>
+                                                <span>Xóa</span>
+                                            </button>
+                                        </form>
+                                        
+                                        <!-- Nút xem chi tiết -->
+                                        <button onclick="toggleDetails(this)" class="action-btn view-btn">
+                                            <span class="material-icons">visibility</span>
+                                            <span>Chi tiết</span>
                                         </button>
-                                    </form>
-                                    <button onclick="toggleDetails(this)" style="margin-left: 5px;">
-                                        <span class="material-icons">visibility</span>
-                                    </button>
+                                    </div>
                                 </td>
                             </tr>
                             <tr class="detail-row">
@@ -513,9 +579,17 @@
             if (row.classList.contains('detail-row')) {
                 const isVisible = row.style.display === 'table-row';
                 row.style.display = isVisible ? 'none' : 'table-row';
-                button.innerHTML = isVisible
-                    ? '<span class="material-icons">visibility</span>'
-                    : '<span class="material-icons">visibility_off</span>';
+                
+                // Cập nhật icon và text
+                const icon = button.querySelector('.material-icons');
+                const text = button.querySelector('span:last-child');
+                if (isVisible) {
+                    icon.textContent = 'visibility';
+                    text.textContent = 'Chi tiết';
+                } else {
+                    icon.textContent = 'visibility_off';
+                    text.textContent = 'Ẩn';
+                }
             }
         }
 
