@@ -1,0 +1,142 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package model;
+
+import java.util.ArrayList;
+import java.util.Date;
+
+/**
+ *
+ * @author Admin
+ */
+public class PurchaseOrderInfo {
+    private String id;
+    private String fullname;
+    private Date doB;
+    private Date dayPurchase;
+    private String status;
+    private String reason;
+    private String supplier;
+    private String address;
+    private String phone;
+    private String email;
+    private String summary;
+    private ArrayList<PurchaseOrderItems> purchaseItems;
+
+    public PurchaseOrderInfo() {
+    }
+
+    public PurchaseOrderInfo(String id, String fullname, Date doB, Date dayPurchase, String status, String reason, String supplier, String address, String phone, String email, String summary, ArrayList<PurchaseOrderItems> purchaseItems) {
+        this.id = id;
+        this.fullname = fullname;
+        this.doB = doB;
+        this.dayPurchase = dayPurchase;
+        this.status = status;
+        this.reason = reason;
+        this.supplier = supplier;
+        this.address = address;
+        this.phone = phone;
+        this.email = email;
+        this.summary = summary;
+        this.purchaseItems = purchaseItems;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+
+    public Date getDoB() {
+        return doB;
+    }
+
+    public void setDoB(Date doB) {
+        this.doB = doB;
+    }
+
+    public Date getDayPurchase() {
+        return dayPurchase;
+    }
+
+    public void setDayPurchase(Date dayPurchase) {
+        this.dayPurchase = dayPurchase;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public String getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(String supplier) {
+        this.supplier = supplier;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public ArrayList<PurchaseOrderItems> getPurchaseItems() {
+        return purchaseItems;
+    }
+
+    public void setPurchaseItems(ArrayList<PurchaseOrderItems> purchaseItems) {
+        this.purchaseItems = purchaseItems;
+    }
+    
+}

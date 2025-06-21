@@ -32,81 +32,92 @@ response.setDateHeader("Expires", 0); // Proxies
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Quản lý người dùng - Hệ thống kho</title>
         <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: #f5f5f5;
-                color: #333;
-                line-height: 1.6;
+                background: #f0f4f8;
+                color: #222;
+                margin: 0;
+                padding: 0;
             }
-
             .container {
                 display: flex;
                 min-height: 100vh;
             }
-
-            /* Main Content */
-            .main-content {
-                flex: 1;
-                background: #f5f5f5;
-                display: flex;
-                flex-direction: column;
+            .sidebar {
+                width: 250px;
+                background: #e6f0fa;
+                padding: 20px 0;
+                border-right: 1px solid #d6e0ef;
             }
-
-            /* Header */
-            .header {
-                background: white;
-                padding: 20px 30px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 1px solid #ddd;
+            .sidebar h2 {
+                font-size: 1.4rem;
+                color: #1567c1;
+                text-align: center;
                 margin-bottom: 20px;
             }
-
-            .header-title {
-                font-size: 1.8rem;
-                font-weight: bold;
-                color: #333;
-                margin: 0;
+            .nav-item {
+                display: block;
+                padding: 10px 20px;
+                color: #214463;
+                text-decoration: none;
+                font-size: 1rem;
             }
-
-            .header-actions {
-                display: flex;
-                gap: 15px;
-                align-items: center;
+            .nav-item:hover {
+                background: #c2e9fb;
+                color: #1567c1;
             }
-
-            /* User Manager Content */
-            .user-manager-content {
+            .main-content {
                 flex: 1;
-                padding: 0 30px 30px;
-                max-width: 1400px;
-                margin: 0 auto;
-                width: 100%;
+                padding: 20px;
             }
-
-            .page-header {
+            .header {
+                background: #fff;
+                padding: 15px;
+                border-bottom: 1px solid #d6e0ef;
+                margin-bottom: 20px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-bottom: 30px;
-                padding-bottom: 20px;
-                border-bottom: 2px solid #eee;
             }
-
-            .page-title {
-                font-size: 2rem;
-                color: #333;
+            .header-title {
+                font-size: 1.8rem;
+                color: #1567c1;
                 margin: 0;
+                display: flex;
+                align-items: center;
             }
-
+            .header-user {
+                display: flex;
+                align-items: center;
+            }
+            .user-name {
+                font-size: 1rem;
+                color: #214463;
+                margin-right: 15px;
+            }
+            .logout-btn {
+                background: #3a8dde;
+                color: #fff;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 4px;
+                cursor: pointer;
+                text-decoration: none;
+            }
+            .logout-btn:hover {
+                background: #1567c1;
+            }
+            .dashboard-content {
+                background: #fff;
+                padding: 20px;
+                border: 1px solid #d6e0ef;
+                border-radius: 8px;
+            }
+            .page-title {
+                font-size: 1.6rem;
+                color: #222e45;
+                margin-bottom: 10px;
+            }
             .btn {
                 padding: 10px 20px;
                 border: none;
@@ -119,390 +130,205 @@ response.setDateHeader("Expires", 0); // Proxies
                 gap: 8px;
                 transition: all 0.2s ease;
                 cursor: pointer;
+                background: #3a8dde;
+                color: #fff;
             }
-
-            .btn-primary {
-                background: #007bff;
-                color: white;
+            .btn:hover {
+                background: #1567c1;
             }
-
-            .btn-primary:hover {
-                background: #0056b3;
-            }
-
-            .btn-success {
-                background: #28a745;
-                color: white;
-            }
-
-            .btn-success:hover {
-                background: #218838;
-            }
-
-            .btn-secondary {
-                background: #6c757d;
-                color: white;
-            }
-
-            .btn-secondary:hover {
-                background: #545b62;
-            }
-
-            /* Filter Section */
             .filter-section {
-                background: white;
-                border: 1px solid #ddd;
+                background: #fff;
+                border: 1px solid #d6e0ef;
                 border-radius: 8px;
-                padding: 25px;
-                margin-bottom: 25px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                padding: 20px;
+                margin-bottom: 20px;
             }
-
             .filter-title {
                 font-size: 1.2rem;
-                font-weight: bold;
-                color: #333;
-                margin-bottom: 20px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
+                color: #1567c1;
+                margin-bottom: 15px;
             }
-
             .filter-bar {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 20px;
+                gap: 15px;
                 align-items: end;
             }
-
             .filter-group {
                 display: flex;
                 flex-direction: column;
-                gap: 8px;
+                gap: 5px;
             }
-
             .filter-label {
                 font-size: 0.9rem;
-                color: #555;
-                font-weight: 600;
+                color: #5a7da0;
             }
-
-            .filter-bar select, 
-            .filter-bar input[type="text"] {
-                padding: 12px 15px;
+            .filter-bar select, .filter-bar input[type="text"] {
+                padding: 10px;
                 border: 2px solid #e1e5e9;
-                border-radius: 6px;
+                border-radius: 4px;
                 font-size: 14px;
-                transition: border-color 0.2s ease;
-                background: white;
+                width: 95%;
             }
-
-            .filter-bar select:focus,
-            .filter-bar input[type="text"]:focus {
+            .filter-bar select:focus, .filter-bar input[type="text"]:focus {
                 outline: none;
-                border-color: #007bff;
-                box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+                border-color: #3a8dde;
             }
-
             .search-btn {
-                background: #007bff;
-                color: white;
+                background: #3a8dde;
+                color: #fff;
+                padding: 10px;
                 border: none;
-                padding: 12px 25px;
-                border-radius: 6px;
+                border-radius: 4px;
                 cursor: pointer;
                 font-size: 14px;
-                font-weight: 600;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                transition: background-color 0.2s ease;
+                font-weight: 500;
+                height: 100%;
+                width: 95%;
             }
 
             .search-btn:hover {
-                background: #0056b3;
+                background: #1567c1;
             }
-
-            /* Table Styles */
             .table-container {
-                background: white;
-                border: 1px solid #ddd;
+                background: #fff;
+                border: 1px solid #d6e0ef;
                 border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                margin-bottom: 25px;
+                margin-bottom: 20px;
             }
-
             .table-header {
-                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                padding: 20px 25px;
-                border-bottom: 1px solid #ddd;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
+                padding: 15px;
+                border-bottom: 1px solid #d6e0ef;
             }
-
             .table-title {
                 font-size: 1.3rem;
-                color: #333;
-                margin: 0;
-                font-weight: bold;
-                display: flex;
-                align-items: center;
-                gap: 10px;
+                color: #222e45;
             }
-
-            .table-count {
-                font-size: 0.9rem;
-                color: #666;
-                background: #e9ecef;
-                padding: 5px 12px;
-                border-radius: 15px;
-                font-weight: 500;
-            }
-
             table {
                 width: 100%;
                 border-collapse: collapse;
-                background: white;
             }
-
-            table th, 
-            table td {
-                padding: 15px;
+            table th, table td {
+                padding: 12px;
                 text-align: left;
                 border-bottom: 1px solid #eee;
             }
-
             table th {
-                background: #f8f9fa;
-                font-weight: 600;
-                color: #555;
-                font-size: 0.9rem;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
+                background: #e6f0fa;
+                color: #214463;
             }
-
-            table tbody tr {
-                transition: all 0.2s ease;
-            }
-
-            table tbody tr:hover {
-                background: #f8f9fa;
-                transform: translateY(-1px);
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            }
-
-            table tr:last-child td {
-                border-bottom: none;
-            }
-
-            /* Status Badge */
             .status-badge {
                 padding: 6px 12px;
                 border-radius: 20px;
                 font-size: 0.8rem;
                 font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                display: inline-block;
             }
-
             .status-active {
-                background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+                background: #d4edda;
                 color: #155724;
-                border: 1px solid #c3e6cb;
             }
-
             .status-inactive {
-                background: linear-gradient(135deg, #f8d7da 0%, #f1b0b7 100%);
+                background: #f8d7da;
                 color: #721c24;
-                border: 1px solid #f1b0b7;
             }
-
-            /* Action Button */
             .action-btn {
-                background: #007bff;
-                color: white;
+                background: #3a8dde;
+                color: #fff;
                 padding: 8px 16px;
                 border: none;
-                border-radius: 5px;
+                border-radius: 4px;
                 text-decoration: none;
-                font-size: 12px;
-                font-weight: 500;
-                transition: all 0.2s ease;
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
             }
-
             .action-btn:hover {
-                background: #0056b3;
-                transform: translateY(-1px);
-                box-shadow: 0 2px 5px rgba(0,123,255,0.3);
+                background: #1567c1;
             }
-
-            /* Pagination */
             .pagination-container {
-                background: white;
-                border: 1px solid #ddd;
+                background: #fff;
+                border: 1px solid #d6e0ef;
                 border-radius: 8px;
-                padding: 20px 25px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                padding: 15px;
                 display: flex;
                 justify-content: space-between;
-                align-items: center;
             }
-
-            .pagination-info {
-                color: #666;
-                font-size: 0.9rem;
-                font-weight: 500;
-            }
-
-            .pagination {
-                display: flex;
-                gap: 8px;
-                align-items: center;
-            }
-
-            .pagination a, 
-            .pagination button {
-                display: inline-block;
-                padding: 10px 15px;
+            .pagination a, .pagination button {
+                padding: 8px 12px;
                 text-decoration: none;
                 border: 2px solid #e1e5e9;
-                color: #007bff;
-                border-radius: 6px;
-                background: white;
-                font-size: 14px;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                font-weight: 500;
+                color: #3a8dde;
+                border-radius: 4px;
             }
-
-            .pagination a:hover, 
-            .pagination button:hover {
-                background: #e9ecef;
-                border-color: #007bff;
-                transform: translateY(-1px);
+            .pagination a:hover, .pagination button:hover {
+                background: #e6f0fa;
             }
-
             .pagination .active {
-                background: #007bff;
-                color: white;
-                border-color: #007bff;
+                background: #3a8dde;
+                color: #fff;
             }
-
-            /* Empty State */
             .empty-state {
                 text-align: center;
-                padding: 80px 20px;
-                color: #666;
+                padding: 40px;
+                color: #5a7da0;
             }
-
-            .empty-state-icon {
-                font-size: 4rem;
-                margin-bottom: 20px;
-                opacity: 0.3;
-            }
-
-            .empty-state-title {
-                font-size: 1.4rem;
-                margin-bottom: 15px;
-                color: #333;
-                font-weight: 600;
-            }
-
-            .empty-state-text {
-                font-size: 1rem;
-                color: #666;
-            }
-
-            /* Responsive */
-            @media (max-width: 768px) {
-                .header {
-                    padding: 15px 20px;
+            @media (max-width: 900px) {
+                .container {
                     flex-direction: column;
-                    gap: 15px;
-                    align-items: stretch;
                 }
-                
-                .header-title {
-                    font-size: 1.5rem;
-                    text-align: center;
+                .sidebar {
+                    width: 100%;
                 }
-                
-                .user-manager-content {
-                    padding: 0 20px 20px;
-                }
-                
-                .page-header {
-                    flex-direction: column;
-                    gap: 15px;
-                    align-items: stretch;
-                }
-                
                 .filter-bar {
                     grid-template-columns: 1fr;
                 }
-                
-                .table-container {
-                    overflow-x: auto;
-                }
-                
-                table {
-                    min-width: 700px;
-                }
-                
-                .pagination-container {
-                    flex-direction: column;
-                    gap: 15px;
-                }
-
-                .table-header {
-                    flex-direction: column;
-                    gap: 10px;
-                    align-items: stretch;
-                    text-align: center;
-                }
             }
-
-            /* Loading Animation */
             .loading {
                 display: inline-block;
                 width: 20px;
                 height: 20px;
                 border: 3px solid #f3f3f3;
-                border-top: 3px solid #007bff;
+                border-top: 3px solid #3a8dde;
                 border-radius: 50%;
                 animation: spin 1s linear infinite;
             }
-
             @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
             }
         </style>
     </head>
     <body>
         <div class="container">
-            <!-- Main Content -->
+            <div class="sidebar">
+                <h2>Warehouse Manager</h2>
+                <a href="usermanager" class="nav-item">User Manager</a>
+                <a href="roleAssignment" class="nav-item">Role Assignment</a>
+                <a href="categoriesforward.jsp" class="nav-item">Material Information</a>
+                <a href="passwordrequest" class="nav-item">Password Request</a>
+                <a href="ApproveListForward.jsp" class="nav-item">Approve</a>
+                <a href="RequestForward.jsp" class="nav-item">Transaction</a>
+                <a href="#" class="nav-item">Statistic</a>
+            </div>
             <div class="main-content">
-                <!-- Header -->
                 <div class="header">
-                    <h1 class="header-title">👥 Quản lý người dùng</h1>
-                    <div class="header-actions">
-                        <a href="Admin.jsp" class="btn btn-secondary">🔙 Quay lại</a>
-                        <a href="AddUser.jsp" class="btn btn-success">➕ Thêm người dùng</a>
+                    <h1 class="header-title">Quản lý người dùng</h1>
+                    <div class="header-user">
+                        <span class="user-name">Admin</span>
+                        <a href="logout" class="logout-btn">Log out</a>
                     </div>
                 </div>
-
-                <!-- User Manager Content -->
-                <div class="user-manager-content">
-                    <!-- Filter Section -->
+                <div class="dashboard-content">
+                    <div class="page-header">
+                        <h2 class="page-title">Quản lý người dùng</h2>
+                        <div class="header-actions">
+                            <a href="Admin.jsp" class="btn">Quay lại</a>
+                            <a href="AddUser.jsp" class="btn"> + Thêm người dùng</a>
+                        </div>
+                    </div>
                     <div class="filter-section">
-                        <h3 class="filter-title">🔍 Tìm kiếm & Lọc dữ liệu</h3>
+                        <h3 class="filter-title">Tìm kiếm</h3>
                         <form action="userfilter" method="get">
                             <div class="filter-bar">
                                 <div class="filter-group">
@@ -514,7 +340,6 @@ response.setDateHeader("Expires", 0); // Proxies
                                         <option value="4">Giám đốc công ty</option>
                                     </select>
                                 </div>
-
                                 <div class="filter-group">
                                     <label class="filter-label">Trạng thái</label>
                                     <select name="status">
@@ -523,34 +348,28 @@ response.setDateHeader("Expires", 0); // Proxies
                                         <option value="inactive">Không hoạt động</option>
                                     </select>
                                 </div>
-
                                 <div class="filter-group">
                                     <label class="filter-label">Từ khóa</label>
                                     <input type="text" name="keyword" placeholder="Tìm theo tên đăng nhập, họ tên...">
                                 </div>
-
                                 <div class="filter-group">
-                                    <button type="submit" class="search-btn">
-                                        🔍 Tìm kiếm
-                                    </button>
+                                    <button type="submit" class="search-btn">Tìm kiếm</button>
                                 </div>
                             </div>
                             <input type="hidden" name="page" value="usermanager" />
                         </form>
                     </div>
-
-                    <!-- Table Section -->
                     <div class="table-container">
                         <div class="table-header">
-                            <h3 class="table-title">📋 Danh sách người dùng</h3>
+                            <h3 class="table-title">Danh sách người dùng</h3>
                             <div class="table-count">
                                 <c:set var="userCount" value="0" />
                                 <c:forEach var="user" items="${userList}">
-                                    <c:set var="userCount" value="${userCount + 1}" />
+                                    <c:set var="userCount" value="${userCount + 1}"/>
                                 </c:forEach>
                                 <c:choose>
                                     <c:when test="${userCount > 0}">
-                                        Hiển thị ${userCount} người dùng
+                                        Hiện có ${userCount} người dùng
                                     </c:when>
                                     <c:otherwise>
                                         Không tìm thấy người dùng
@@ -558,7 +377,6 @@ response.setDateHeader("Expires", 0); // Proxies
                                 </c:choose>
                             </div>
                         </div>
-
                         <c:choose>
                             <c:when test="${not empty userList}">
                                 <table>
@@ -582,13 +400,13 @@ response.setDateHeader("Expires", 0); // Proxies
                                                 <td>
                                                     <c:choose>
                                                         <c:when test="${user.roleName == 'Warehouse Staff'}">
-                                                            📦 Nhân viên kho
+                                                            Nhân viên kho
                                                         </c:when>
                                                         <c:when test="${user.roleName == 'Company Employee'}">
-                                                            👔 Nhân viên công ty
+                                                            Nhân viên công ty
                                                         </c:when>
                                                         <c:when test="${user.roleName == 'Company Director'}">
-                                                            👨‍💼 Giám đốc công ty
+                                                            Giám đốc công ty
                                                         </c:when>
                                                         <c:otherwise>
                                                             ${user.roleName}
@@ -598,10 +416,10 @@ response.setDateHeader("Expires", 0); // Proxies
                                                 <td>
                                                     <c:choose>
                                                         <c:when test="${user.activeFlag == 1}">
-                                                            <span class="status-badge status-active">✅ Hoạt động</span>
+                                                            <span class="status-badge status-active">Hoạt động</span>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <span class="status-badge status-inactive">❌ Không hoạt động</span>
+                                                            <span class="status-badge status-inactive">Không hoạt động</span>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
@@ -609,9 +427,7 @@ response.setDateHeader("Expires", 0); // Proxies
                                                     <fmt:formatDate value="${user.createDate}" pattern="dd/MM/yyyy" />
                                                 </td>
                                                 <td>
-                                                    <a href="edituser?id=${user.id}" class="action-btn">
-                                                        ✏️ Chỉnh sửa
-                                                    </a>
+                                                    <a href="edituser?id=${user.id}" class="action-btn">Chỉnh sửa</a>
                                                 </td>
                                             </tr>
                                         </c:forEach>
@@ -620,38 +436,31 @@ response.setDateHeader("Expires", 0); // Proxies
                             </c:when>
                             <c:otherwise>
                                 <div class="empty-state">
-                                    <div class="empty-state-icon">👥</div>
                                     <h3 class="empty-state-title">Không tìm thấy người dùng</h3>
                                     <p class="empty-state-text">Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc thêm người dùng mới.</p>
                                 </div>
                             </c:otherwise>
                         </c:choose>
                     </div>
-
-                    <!-- Pagination -->
                     <c:if test="${totalPages > 1}">
                         <div class="pagination-container">
-                            <div class="pagination-info">
-                                Trang ${currentPage} / ${totalPages}
-                            </div>
+                            <div class="pagination-info">Trang ${currentPage} / ${totalPages}</div>
                             <div class="pagination">
                                 <c:if test="${currentPage > 1}">
-                                    <a href="admin?page=${currentPage - 1}">← Trước</a>
+                                    <a href="usermanager?page=${currentPage - 1}">Trước</a>
                                 </c:if>
-                                
                                 <c:forEach begin="1" end="${totalPages}" var="i">
                                     <c:choose>
                                         <c:when test="${i == currentPage}">
                                             <button class="active">${i}</button>
                                         </c:when>
                                         <c:otherwise>
-                                            <a href="admin?page=${i}">${i}</a>
+                                            <a href="usermanager?page=${i}">${i}</a>
                                         </c:otherwise>
                                     </c:choose>
                                 </c:forEach>
-                                
                                 <c:if test="${currentPage < totalPages}">
-                                    <a href="admin?page=${currentPage + 1}">Sau →</a>
+                                    <a href="usermanager?page=${currentPage + 1}">Sau</a>
                                 </c:if>
                             </div>
                         </div>
@@ -659,84 +468,5 @@ response.setDateHeader("Expires", 0); // Proxies
                 </div>
             </div>
         </div>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Form validation
-                const searchForm = document.querySelector('form[action="userfilter"]');
-                if (searchForm) {
-                    searchForm.addEventListener('submit', function(e) {
-                        const keyword = this.querySelector('input[name="keyword"]').value.trim();
-                        const role = this.querySelector('select[name="role"]').value;
-                        const status = this.querySelector('select[name="status"]').value;
-                        
-                        if (!keyword && role === 'all' && !status) {
-                            if (!confirm('Chưa có tiêu chí tìm kiếm nào được chỉ định. Hiển thị tất cả người dùng?')) {
-                                e.preventDefault();
-                            }
-                        }
-                        
-                        // Add loading state
-                        const submitBtn = this.querySelector('.search-btn');
-                        const originalText = submitBtn.innerHTML;
-                        submitBtn.innerHTML = '<div class="loading"></div> Đang tìm kiếm...';
-                        submitBtn.disabled = true;
-                        
-                        // Reset after 3 seconds if still on page
-                        setTimeout(() => {
-                            if (submitBtn) {
-                                submitBtn.innerHTML = originalText;
-                                submitBtn.disabled = false;
-                            }
-                        }, 3000);
-                    });
-                }
-
-                // Enhanced table interactions
-                const tableRows = document.querySelectorAll('tbody tr');
-                tableRows.forEach(row => {
-                    row.addEventListener('click', function(e) {
-                        if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
-                            // Optional: Add row selection functionality
-                            this.style.backgroundColor = this.style.backgroundColor ? '' : '#e3f2fd';
-                        }
-                    });
-                });
-
-                // Auto-refresh functionality (optional)
-                let autoRefreshInterval;
-                const enableAutoRefresh = false; // Set to true to enable
-                
-                if (enableAutoRefresh) {
-                    autoRefreshInterval = setInterval(() => {
-                        // Only refresh if no form is being filled
-                        const activeElement = document.activeElement;
-                        if (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'SELECT') {
-                            location.reload();
-                        }
-                    }, 30000); // Refresh every 30 seconds
-                }
-
-                // Keyboard shortcuts
-                document.addEventListener('keydown', function(e) {
-                    // Ctrl + F to focus search
-                    if (e.ctrlKey && e.key === 'f') {
-                        e.preventDefault();
-                        const searchInput = document.querySelector('input[name="keyword"]');
-                        if (searchInput) {
-                            searchInput.focus();
-                        }
-                    }
-                    
-                    // Escape to clear search
-                    if (e.key === 'Escape') {
-                        const searchInput = document.querySelector('input[name="keyword"]');
-                        if (searchInput && searchInput === document.activeElement) {
-                            searchInput.value = '';
-                        }
-                    }
-                });
-            });
-        </script>
     </body>
 </html>

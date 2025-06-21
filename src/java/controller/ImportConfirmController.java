@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dao.ListRequestImportDAO;
@@ -11,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.sql.SQLException;
 import model.Request;
 import model.RequestItem;
 
@@ -21,7 +18,8 @@ public class ImportConfirmController extends HttpServlet {
             throws ServletException, IOException {
 
         String requestId = request.getParameter("id");
-        if (requestId == null || requestId.isEmpty()) {
+        if (requestId == null || requestId.trim().isEmpty()) {
+            System.err.println("Invalid requestId: null or empty");
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thiếu mã đơn nhập.");
             return;
         }
@@ -29,6 +27,12 @@ public class ImportConfirmController extends HttpServlet {
         ListRequestImportDAO dao = new ListRequestImportDAO();
         Request req = dao.getRequestById(requestId);
         List<RequestItem> itemList = dao.getRequestItemsByRequestId(requestId);
+
+        if (req == null) {
+            System.err.println("Request not found for requestId: " + requestId);
+            response.sendRedirect("import?error=request_not_found");
+            return;
+        }
 
         request.setAttribute("p", req);
         request.setAttribute("itemList", itemList);
@@ -43,36 +47,58 @@ public class ImportConfirmController extends HttpServlet {
         String requestId = request.getParameter("id");
         String action = request.getParameter("action");
         String importDate = request.getParameter("importDate");
-        String receiver = request.getParameter("receiver");
-        String warehouse = request.getParameter("warehouse");
+
+        // Validate parameters
+        if (requestId == null || requestId.trim().isEmpty()) {
+            System.err.println("Invalid requestId: null or empty");
+            response.sendRedirect("import?error=invalid_data");
+            return;
+        }
+        if (action == null || action.trim().isEmpty()) {
+            System.err.println("Invalid action: null or empty for requestId: " + requestId);
+            response.sendRedirect("import-confirm?id=" + requestId + "&error=invalid_action");
+            return;
+        }
 
         ListRequestImportDAO dao = new ListRequestImportDAO();
         List<RequestItem> itemList = dao.getRequestItemsByRequestId(requestId);
 
         try {
             if ("confirm".equalsIgnoreCase(action)) {
+                if (importDate == null || importDate.trim().isEmpty()) {
+                    System.err.println("Invalid importDate: null or empty for requestId: " + requestId);
+                    response.sendRedirect("import-confirm?id=" + requestId + "&error=invalid_data");
+                    return;
+                }
+
                 for (RequestItem item : itemList) {
                     String code = item.getProductCode();
                     String qtyParam = request.getParameter("importQty_" + code);
                     String note = request.getParameter("note_" + code);
 
-                    int qty = (qtyParam != null && !qtyParam.isEmpty()) ? Integer.parseInt(qtyParam) : 0;
+                    int qty = (qtyParam != null && !qtyParam.trim().isEmpty()) ? Integer.parseInt(qtyParam) : 0;
                     dao.updateImportItem(requestId, code, qty, note);
                 }
 
-                dao.updateRequestStatus(requestId, "completed", importDate, receiver, warehouse);
-                response.sendRedirect("import");
+                dao.updateRequestStatus(requestId, "completed", importDate);
+                response.sendRedirect("import?message=approve_success");
 
             } else if ("reject".equalsIgnoreCase(action)) {
-                dao.updateRequestStatus(requestId, "rejected", null, null, null);
-                response.sendRedirect("import");
+                dao.updateRequestStatus(requestId, "rejected", null);
+                response.sendRedirect("import?message=reject_success");
             } else {
+                System.err.println("Unknown action: " + action + " for requestId: " + requestId);
                 response.sendRedirect("import-confirm?id=" + requestId + "&error=invalid_action");
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
+            System.err.println("SQLException in doPost for requestId: " + requestId + ", Action: " + action + ", Error: " + e.getMessage());
             response.sendRedirect("import-confirm?id=" + requestId + "&error=processing_failed");
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            System.err.println("NumberFormatException in doPost for requestId: " + requestId + ", Error: " + e.getMessage());
+            response.sendRedirect("import-confirm?id=" + requestId + "&error=invalid_quantity");
         }
     }
 

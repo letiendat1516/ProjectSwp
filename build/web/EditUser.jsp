@@ -170,7 +170,7 @@
         </table>
         <button type="submit" class="btn-submit">Update User</button>
     </form>
-    <a href="admin" class="back-link">Back to User List</a>
+    <a href="usermanager" class="back-link">Back to User List</a>
 </div>
 </body>
 </html>

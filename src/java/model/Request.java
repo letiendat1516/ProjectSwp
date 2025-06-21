@@ -15,6 +15,7 @@ import java.util.Date;
 public class Request {
 
     private String id;
+    private String fullname;
     private int user_id;
     private String role;
     private Date day_request;
@@ -31,8 +32,9 @@ public class Request {
     public Request() {
     }
 
-    public Request(String id, int user_id, String role, Date day_request, String status, String reason, String supplier, String address, String phone, String email, String approve_by, String warehouse, ArrayList<RequestItem> items) {
+    public Request(String id, String fullname, int user_id, String role, Date day_request, String status, String reason, String supplier, String address, String phone, String email, String approve_by, String warehouse, ArrayList<RequestItem> items) {
         this.id = id;
+        this.fullname = fullname;
         this.user_id = user_id;
         this.role = role;
         this.day_request = day_request;
@@ -47,37 +49,20 @@ public class Request {
         this.items = items;
     }
 
-
-    public String getApprove_by() {
-        return approve_by;
-    }
-
-    public void setApprove_by(String approve_by) {
-        this.approve_by = approve_by;
-    }
-
-    public String getWarehouse() {
-        return warehouse;
-    }
-
-    public void setWarehouse(String warehouse) {
-        this.warehouse = warehouse;
-    }
-
-    public ArrayList<RequestItem> getItems() {
-        return items;
-    }
-
-    public void setItems(ArrayList<RequestItem> items) {
-        this.items = items;
-    }
-
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 
     public int getUser_id() {
@@ -151,5 +136,31 @@ public class Request {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public String getApprove_by() {
+        return approve_by;
+    }
+
+    public void setApprove_by(String approve_by) {
+        this.approve_by = approve_by;
+    }
+
+    public String getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(String warehouse) {
+        this.warehouse = warehouse;
+    }
+
+    public ArrayList<RequestItem> getItems() {
+        return items;
+    }
+
+    public void setItems(ArrayList<RequestItem> items) {
+        this.items = items;
+    }
+
+   
 
 }

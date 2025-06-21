@@ -267,7 +267,7 @@
               <c:if test="${childCount > 0}">
                   <div class="alert alert-info">
                       <span class="icon">ℹ️</span>
-                      Danh mục này có <span class="badge badge-info">${childCount}</span> danh mục con
+                      Danh mục này có <span class="badge badge-info">${childCount}</span> danh mục loại sản phẩm
                   </div>
               </c:if>
               
@@ -335,17 +335,13 @@
           
           <c:if test="${childCount > 0}">
               <div class="info-item">
-                  <span class="info-label">Số danh mục con:</span>
+                  <span class="info-label">Số danh mục loại sản phẩm:</span>
                   <span class="info-value">
                       <span class="badge badge-info">${childCount}</span> danh mục
                   </span>
               </div>
           </c:if>
           
-          <div style="margin-top: 15px; padding: 10px; background: #e9ecef; border-radius: 4px; font-size: 13px; color: #6c757d;">
-              <strong>💡 Lưu ý:</strong> Nếu bạn thay đổi trạng thái thành "Không hoạt động", 
-              tất cả danh mục con thuộc danh mục này sẽ bị ảnh hưởng.
-          </div>
       </div>
   </div>
   

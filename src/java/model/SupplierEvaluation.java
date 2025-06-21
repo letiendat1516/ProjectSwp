@@ -139,4 +139,9 @@ public class SupplierEvaluation {
         this.editCount = editCount;
     }
 
+    @Override
+    public String toString() {
+        return "SupplierEvaluation{" + "supplierEvaluationID=" + supplierEvaluationID + ", supplierID=" + supplierID + ", userID=" + userID + ", expectedDeliveryTime=" + expectedDeliveryTime + ", productQuality=" + productQuality + ", marketPriceComparison=" + marketPriceComparison + ", transparencyReputation=" + transparencyReputation + ", serviceQuality=" + serviceQuality + ", comment=" + comment + ", avgRate=" + avgRate + ", commentTime=" + commentTime + ", editCount=" + editCount + '}';
+    }
+
 }

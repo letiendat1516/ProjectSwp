@@ -61,15 +61,28 @@ public class TableSupplierEvaluation extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String id_raw = request.getParameter("id");
-        try {
-            int id = Integer.parseInt(id_raw);
-            SupplierDAO sd = new SupplierDAO();
-            Supplier s = sd.getSupplierByID(id);
-            request.setAttribute("supplier", s);
-            request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
-        } catch (NumberFormatException e) {
+        String seid_raw = request.getParameter("seid");
+        if (seid_raw != null) {
+            try {
+                int id = Integer.parseInt(id_raw);
+                int seid = Integer.parseInt(seid_raw);
+                SupplierDAO sd = new SupplierDAO();
+                Supplier s = sd.getSupplierByID(id);
+                request.setAttribute("seid", seid);
+                request.setAttribute("supplier", s);
+                request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+            } catch (NumberFormatException e) {
+            }
+        } else {
+            try {
+                int id = Integer.parseInt(id_raw);
+                SupplierDAO sd = new SupplierDAO();
+                Supplier s = sd.getSupplierByID(id);
+                request.setAttribute("supplier", s);
+                request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+            } catch (NumberFormatException e) {
+            }
         }
-
     }
 
     /**
@@ -86,6 +99,7 @@ public class TableSupplierEvaluation extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
+        String seid_raw = request.getParameter("seid");
         String sid_raw = request.getParameter("supplier");
         String dt_raw = request.getParameter("delivery_time");
         String mpc_raw = request.getParameter("market_price_comparison");
@@ -97,22 +111,40 @@ public class TableSupplierEvaluation extends HttpServlet {
         SupplierDAO sd = new SupplierDAO();
         Supplier s = sd.getSupplierByID(sid);
         request.setAttribute("supplier", s);
-        try {
+        if (seid_raw != null && seid_raw.length()>0) {
+            try {
+                int seid = Integer.parseInt(seid_raw);
+                int dt = Integer.parseInt(dt_raw);
+                int mpc = Integer.parseInt(mpc_raw);
+                int tr = Integer.parseInt(tr_raw);
+                int sq = Integer.parseInt(sq_raw);
+                SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
+                sed.UpdateSupplierEvaluation(dt, mpc, tr, sq, comment, seid);
+                request.setAttribute("mess", "Update Succesful");
+                request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+            } catch (NumberFormatException e) {
 
-            int dq = Integer.parseInt(dt_raw);
-            int mpc = Integer.parseInt(mpc_raw);
-            int tr = Integer.parseInt(tr_raw);
-            int sq = Integer.parseInt(sq_raw);
-            int uid = Integer.parseInt(uid_raw);
-            SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
-            sed.evaluation(sid, uid, dq, 0, mpc, tr, sq, comment);
+                request.setAttribute("mess", "error");
+                request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+            }
+        } else {
+            try {
 
-            request.setAttribute("mess", "successful supplier evaluation");
-            request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
-        } catch (NumberFormatException e) {
+                int dq = Integer.parseInt(dt_raw);
+                int mpc = Integer.parseInt(mpc_raw);
+                int tr = Integer.parseInt(tr_raw);
+                int sq = Integer.parseInt(sq_raw);
+                int uid = Integer.parseInt(uid_raw);
+                SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
+                sed.evaluation(sid, uid, dq, 0, mpc, tr, sq, comment);
 
-            request.setAttribute("mess", "error");
-            request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+                request.setAttribute("mess", "successful supplier evaluation");
+                request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+            } catch (NumberFormatException e) {
+
+                request.setAttribute("mess", "error");
+                request.getRequestDispatcher("SupplierEvaluation.jsp").forward(request, response);
+            }
         }
 
     }

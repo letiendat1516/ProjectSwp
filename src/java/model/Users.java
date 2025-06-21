@@ -119,6 +119,11 @@ public class Users {
         this.createDate = createDate;
     }
 
+    @Override
+    public String toString() {
+        return "Users{" + "id=" + id + ", username=" + username + ", dob=" + dob + ", password=" + password + ", email=" + email + ", fullname=" + fullname + ", phone=" + phone + ", roleName=" + roleName + ", activeFlag=" + activeFlag + ", createDate=" + createDate + '}';
+    }
+
 
     
 }

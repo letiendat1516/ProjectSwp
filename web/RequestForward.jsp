@@ -186,14 +186,14 @@
                 <!-- Request in -->
                 <div class="card">
                     <div class="card-header">
-                        <h3>Nhập kho</h3>
+                        <h3>Mua hàng</h3>
                     </div>
                     <div class="card-body">
                         <div class="icon-container">
                             <span class="material-icons">add_shopping_cart</span>
                         </div>
-                        <h4 class="card-title">Đơn yêu cầu nhập kho</h4>
-                        <p class="card-text">Yêu cầu nhập kho một số sản phẩm nhất định.</p>
+                        <h4 class="card-title">Đơn yêu cầu mua hàng</h4>
+                        <p class="card-text">Yêu cầu mua một số sản phẩm nhất định.</p>
                         <a href="loadingrequest" class="btn btn-primary">
                             Truy cập <span class="material-icons btn-icon">arrow_forward</span>
                         </a>
@@ -229,6 +229,21 @@
                         <h4 class="card-title">Danh sách yêu cầu nhập kho</h4>
                         <p class="card-text">Xem danh sách các yêu cầu nhập kho.</p>
                         <a href="import" class="btn btn-primary">
+                            Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Danh sách báo giá</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-container">
+                            <span class="material-icons">receipt_long</span>
+                        </div>
+                        <h4 class="card-title">Danh sách báo giá</h4>
+                        <p class="card-text">Xem và tạo đơn báo giá các sản phẩm được phép mua.</p>
+                        <a href="listpurchaseorder" class="btn btn-primary">
                             Truy cập <span class="material-icons btn-icon">arrow_forward</span>
                         </a>
                     </div>
