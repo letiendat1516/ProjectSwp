@@ -263,7 +263,7 @@
         <div class="container">
             <h1>ĐƠN BÁO GIÁ SẢN PHẨM</h1>
             <!-- Form gửi báo giá đến servlet submitpurchaseorder -->
-            <form id="myForm" action="submitpurchaseorder" method="post">
+            <form id="myForm" action="submitrequoteform" method="post">
                 <!-- Hidden field chứa ID của request gốc -->
                 <input type="hidden" name="originalRequestId" value="${requestId}">
 
@@ -560,7 +560,7 @@
             }
             }
 
-// Gắn event listener khi trang load
+            // Gắn event listener khi trang load
             document.addEventListener('DOMContentLoaded', function() {
             const supplierSelect = document.querySelector('select[name="supplier_name"]');
             if (supplierSelect) {

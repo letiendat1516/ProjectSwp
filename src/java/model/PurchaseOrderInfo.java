@@ -4,8 +4,9 @@
  */
 package model;
 
-import java.util.ArrayList;
+
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -23,12 +24,12 @@ public class PurchaseOrderInfo {
     private String phone;
     private String email;
     private String summary;
-    private ArrayList<PurchaseOrderItems> purchaseItems;
+    private List<PurchaseOrderItems> purchaseItems;
 
     public PurchaseOrderInfo() {
     }
 
-    public PurchaseOrderInfo(String id, String fullname, Date doB, Date dayPurchase, String status, String reason, String supplier, String address, String phone, String email, String summary, ArrayList<PurchaseOrderItems> purchaseItems) {
+    public PurchaseOrderInfo(String id, String fullname, Date doB, Date dayPurchase, String status, String reason, String supplier, String address, String phone, String email, String summary, List<PurchaseOrderItems> purchaseItems) {
         this.id = id;
         this.fullname = fullname;
         this.doB = doB;
@@ -131,12 +132,13 @@ public class PurchaseOrderInfo {
         this.summary = summary;
     }
 
-    public ArrayList<PurchaseOrderItems> getPurchaseItems() {
+    public List<PurchaseOrderItems> getPurchaseItems() {
         return purchaseItems;
     }
 
-    public void setPurchaseItems(ArrayList<PurchaseOrderItems> purchaseItems) {
+    public void setPurchaseItems(List<PurchaseOrderItems> purchaseItems) {
         this.purchaseItems = purchaseItems;
     }
-    
+
+   
 }
