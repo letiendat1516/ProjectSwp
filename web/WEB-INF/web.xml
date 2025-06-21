@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
-
+<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
     <!-- SERVLET DEFINITIONS -->
     <servlet>
         <servlet-name>CategoryServlet</servlet-name>
@@ -97,8 +94,19 @@
         <servlet-name>SubmitPurchaseOrderServlet</servlet-name>
         <servlet-class>controller.SubmitPurchaseOrderServlet</servlet-class>
     </servlet>
-
     <!-- SERVLET MAPPINGS -->
+    <servlet>
+        <servlet-name>ApprovePurchaseQuotedServlet</servlet-name>
+        <servlet-class>controller.ApprovePurchaseQuotedServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SubmitRequoteFormServlet</servlet-name>
+        <servlet-class>controller.SubmitRequoteFormServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RequoteFormServlet</servlet-name>
+        <servlet-class>controller.RequoteFormServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
         <url-pattern>/CategoryServlet</url-pattern>
@@ -191,7 +199,6 @@
         <servlet-name>SubmitPurchaseOrderServlet</servlet-name>
         <url-pattern>/submitpurchaseorder</url-pattern>
     </servlet-mapping>
-
     <!-- ERROR PAGES -->
     <error-page>
         <error-code>404</error-code>
@@ -201,8 +208,19 @@
         <error-code>500</error-code>
         <location>/error/error500.jsp</location>
     </error-page>
-
     <!-- SESSION CONFIG -->
+    <servlet-mapping>
+        <servlet-name>ApprovePurchaseQuotedServlet</servlet-name>
+        <url-pattern>/approvepurchasequoted</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SubmitRequoteFormServlet</servlet-name>
+        <url-pattern>/submitrequoteform</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RequoteFormServlet</servlet-name>
+        <url-pattern>/requoteform</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>15</session-timeout>
     </session-config>

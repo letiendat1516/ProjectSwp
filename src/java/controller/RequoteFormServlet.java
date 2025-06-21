@@ -28,7 +28,7 @@ import model.Users;
  *
  * @author Admin
  */
-public class PurchaseOrderFormServlet extends HttpServlet {
+public class RequoteFormServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -132,7 +132,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         session.setAttribute("DoB", DoB);
         
         // Forward to JSP
-        request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
+        request.getRequestDispatcher("RequoteForm.jsp").forward(request, response);
 
     } catch (Exception e) {
         e.printStackTrace();

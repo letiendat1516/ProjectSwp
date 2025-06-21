@@ -422,7 +422,7 @@
                                               </c:when>
                                               <c:when test="${req.status == 'pending re-quote'}">
                                                   <!-- Form báo giá lại -->
-                                                  <form action="purchaseorderform" method="post" class="quote-form">
+                                                  <form action="requoteform" method="post" class="quote-form">
                                                       <!-- Thông tin request -->
                                                       <input type="hidden" name="requestId" value="${req.id}">
                                                       <input type="hidden" name="fullname" value="${req.fullname}">
