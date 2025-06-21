@@ -211,7 +211,7 @@
                     </div>
                     <h4 class="card-title">Phê Duyệt Đơn Báo Giá</h4>
                     <p class="card-text">Kiểm tra và phê duyệt các báo giá sản phẩm được đề xuất từ yêu cầu mua hàng.</p>
-                    <a href="materialUnit.jsp" class="btn btn-primary">
+                    <a href="approvepurchasequoted" class="btn btn-primary">
                         Truy Cập <span class="material-icons btn-icon">arrow_forward</span>
                     </a>
                 </div>
