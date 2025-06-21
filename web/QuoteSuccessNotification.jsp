@@ -153,7 +153,7 @@
         <h1>Gửi Yêu Cầu Thành Công!</h1>
         <p>Yêu cầu của bạn đã được gửi. Chúng tôi sẽ xử lý trong thời gian sớm nhất.</p>
         <div class="button-group">
-            <a href="usermanager" class="btn btn-home">Quay Về Trang Chủ</a>
+            <a href="Admin.jsp" class="btn btn-home">Quay Về Trang Chủ</a>
             <a href="listpurchaseorder" class="btn btn-continue">Quay về danh sách báo giá</a>
         </div>
     </div>

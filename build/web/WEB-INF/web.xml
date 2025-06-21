@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+
+  <!-- ========== SERVLET DEFINITIONS ========== -->
   
   <!-- Category Servlet -->
   <servlet>
@@ -112,17 +116,27 @@
       <servlet-name>DeleteProductController</servlet-name>
       <servlet-class>controller.DeleteProductController</servlet-class>
   </servlet>
+  <servlet>
+      <servlet-name>ProductListController</servlet-name>
+      <servlet-class>controller.ProductListController</servlet-class>
+  </servlet>
 
-  <!-- Approve Purchase Request -->
+  <!-- Purchase Order Management -->
   <servlet>
       <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
       <servlet-class>controller.ApprovePurchaseRequestServlet</servlet-class>
   </servlet>
-
-  <!-- Product List -->
   <servlet>
-      <servlet-name>ProductListController</servlet-name>
-      <servlet-class>controller.ProductListController</servlet-class>
+      <servlet-name>ListPurchaseOrderServlet</servlet-name>
+      <servlet-class>controller.ListPurchaseOrderServlet</servlet-class>
+  </servlet>
+  <servlet>
+      <servlet-name>PurchaseOrderFormServlet</servlet-name>
+      <servlet-class>controller.PurchaseOrderFormServlet</servlet-class>
+  </servlet>
+  <servlet>
+      <servlet-name>SubmitPurchaseOrderServlet</servlet-name>
+      <servlet-class>controller.SubmitPurchaseOrderServlet</servlet-class>
   </servlet>
 
   <!-- ========== SERVLET MAPPINGS ========== -->
@@ -238,17 +252,27 @@
       <servlet-name>DeleteProductController</servlet-name>
       <url-pattern>/delete-product</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+      <servlet-name>ProductListController</servlet-name>
+      <url-pattern>/product-list</url-pattern>
+  </servlet-mapping>
 
-  <!-- Approve Purchase Request Mapping -->
+  <!-- Purchase Order Mappings -->
   <servlet-mapping>
       <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
       <url-pattern>/approvepurchaserequest</url-pattern>
   </servlet-mapping>
-
-  <!-- Product List Mapping -->
   <servlet-mapping>
-      <servlet-name>ProductListController</servlet-name>
-      <url-pattern>/product-list</url-pattern>
+      <servlet-name>ListPurchaseOrderServlet</servlet-name>
+      <url-pattern>/listpurchaseorder</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+      <servlet-name>PurchaseOrderFormServlet</servlet-name>
+      <url-pattern>/purchaseorderform</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+      <servlet-name>SubmitPurchaseOrderServlet</servlet-name>
+      <url-pattern>/submitpurchaseorder</url-pattern>
   </servlet-mapping>
 
   <!-- ========== FILTERS ========== -->

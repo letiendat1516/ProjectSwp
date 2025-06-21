@@ -170,7 +170,7 @@
         </table>
         <button type="submit" class="btn-submit">Update User</button>
     </form>
-    <a href="usermanager" class="back-link">Back to User List</a>
+    <a href="Admin.jsp" class="back-link">Back to User List</a>
 </div>
 </body>
 </html>
