@@ -2,19 +2,16 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-<<<<<<< HEAD
         <group>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ListRequestImportDAO.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/PurchaseOrderItems.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/web/ListRequestImport.jsp</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/PurchaseOrderInfo.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ImportConfirmController.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/SubmitPurchaseOrderServlet.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/DBContext/Context.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ListRequestImportController.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/RequoteFormServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/RequoteForm.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/SubmitPurchaseOrderServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/PurchaseOrderForm.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/PurchaseOrderFormServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ListPurchaseOrder.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/Admin.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/ListPurchaseOrderServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ApproveListForward.jsp</file>
         </group>
-=======
-        <group/>
->>>>>>> 68f00cfee708485bcaa9c0bdc6fd8a3dbef34ae1
     </open-files>
 </project-private>
