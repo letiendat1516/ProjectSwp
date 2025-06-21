@@ -263,6 +263,12 @@
           text-align: center;
           color: #6c757d;
       }
+      .table-mota{
+          width: 180px;
+      }
+      .quantity{
+          text-align: center
+      }
 
       /* Responsive */
       @media (max-width: 768px) {
@@ -342,7 +348,7 @@
                                       Tên ${sortField eq 'name' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
                                   </a>
                               </th>
-                              <th>Mô tả</th>
+                              <th class="table-mota">Mô tả</th>
                               <th>Trạng thái</th>
                               <th>Số danh mục loại sản phẩm</th>
                               <th>Thao tác</th>
@@ -360,7 +366,7 @@
                                           ${category.activeFlag ? 'Hoạt động' : 'Không hoạt động'}
                                       </span>
                                   </td>
-                                  <td><span class="badge badge-info">${category.childCount}</span></td>
+                                  <td class="quantity"><span class="badge badge-info">${category.childCount}</span></td>
                                   <td>
                                       <div class="action-buttons">
                                           <a href="${pageContext.request.contextPath}/category-parent/edit?id=${category.id}" 

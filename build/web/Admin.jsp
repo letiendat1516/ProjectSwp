@@ -134,10 +134,11 @@
         <div class="container">
             <div class="sidebar">
                 <h2>Warehouse Manager</h2>
-                <a href="admin" class="nav-item">User Manager</a>
+                <a href="usermanager" class="nav-item">User Manager</a>
                 <a href="roleAssignment" class="nav-item">Role Assignment</a>
                 <a href="categoriesforward.jsp" class="nav-item">Material Information</a>
                 <a href="passwordrequest" class="nav-item">Password Request</a>
+                <a href="ApproveListForward.jsp" class="nav-item">Approve</a>
                 <a href="RequestForward.jsp" class="nav-item">Transaction</a>
                 <a href="#" class="nav-item">Statistic</a>
             </div>

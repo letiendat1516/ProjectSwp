@@ -21,7 +21,7 @@ import model.Users;
  * @author phucn
  */
 
-public class AdminServlet extends HttpServlet {
+public class UserManager extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

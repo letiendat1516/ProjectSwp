@@ -2,19 +2,44 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-<<<<<<< HEAD
         <group>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ListRequestImportDAO.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/PurchaseOrderItems.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/web/ListRequestImport.jsp</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/PurchaseOrderInfo.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ImportConfirmController.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/SubmitPurchaseOrderServlet.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/DBContext/Context.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ListRequestImportController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/UserManager.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/AddNewSupplier.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/AddNewSupplier.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/WarehouseManagement.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/dao/UnitDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/EdituserServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/CategoryProductController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/category_product/list.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/PasswordRequestServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/model/Users.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/logout.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/LogoutServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/EditUser.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/CategoryParentController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/AddUser.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/password_request.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/update-product.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/DBContext/Context.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/UserManager.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/dao/UserDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/ListRequestImport.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/EditMaterialUnitServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/category_parent/create.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/categoriesforward.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/UserFilterServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/WEB-INF/web.xml</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/META-INF/context.xml</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/LoginServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/login.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/forgot.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/category_parent/list.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/RoleAssignment.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/category_product/create.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/AdduserServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/Admin.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/category_product/edit.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/category_parent/edit.jsp</file>
         </group>
-=======
-        <group/>
->>>>>>> 68f00cfee708485bcaa9c0bdc6fd8a3dbef34ae1
     </open-files>
 </project-private>

@@ -583,7 +583,7 @@
           </div>
 
           <div class="footer">
-              <a href="admin" class="btn-secondary">
+              <a href="usermanager" class="btn-secondary">
                   <span class="material-icons back-btn-icon">arrow_back</span> Quay Lại Trang Chủ
               </a>
           </div>
