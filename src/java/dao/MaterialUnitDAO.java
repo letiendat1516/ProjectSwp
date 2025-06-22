@@ -4,7 +4,8 @@
  */
 package dao;
 
-import DBContext.Context;
+// DAO for advanced operations on material units (search, paging, duplicate check)
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +13,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import DBContext.Context;
 import model.MaterialUnit;
 
 public class MaterialUnitDAO {

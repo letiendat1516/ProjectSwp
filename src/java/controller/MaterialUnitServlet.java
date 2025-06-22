@@ -50,7 +50,7 @@ public class MaterialUnitServlet extends HttpServlet {
         doGet(request, response);
     }
     
-    // Change all status references to type
+    // Controller for listing, searching, and paginating material units
     private void listMaterialUnits(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         int page = 1;
