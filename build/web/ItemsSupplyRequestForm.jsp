@@ -381,7 +381,7 @@
             <!-- Buttons submit và quay lại -->
             <div class="button-container">
                 <button type="submit" class="submit-btn">Gửi yêu cầu</button>
-                <a href="admin" class="back-btn">Quay lại</a>
+                <a href="Admin.jsp" class="back-btn">Quay lại</a>
             </div>
         </form>
     </div>

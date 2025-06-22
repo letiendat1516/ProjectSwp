@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chỉnh sửa danh mục</title>
+    <title>Chỉnh sửa danh mục loại sản phẩm</title>
     <style>
         * {
             margin: 0;
@@ -258,7 +258,7 @@
         <!-- Form chỉnh sửa -->
         <div class="card">
             <div class="card-header card-header-warning">
-                Chỉnh sửa danh mục
+                Chỉnh sửa danh mục loại sản phẩm
             </div>
             <div class="card-body">
                 <c:if test="${error != null}">
@@ -272,19 +272,19 @@
                     <input type="hidden" name="id" value="${category.id}">
                     
                     <div class="form-group">
-                        <label for="name" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+                        <label for="name" class="form-label">Tên danh mục loại sản phẩm <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="name" name="name" value="${category.name}" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="parentId" class="form-label">Danh mục cha</label>
+                        <label for="parentId" class="form-label">Danh mục </label>
                         <select class="form-select" id="parentId" name="parentId">
-                            <option value="0">-- Không có danh mục cha --</option>
+                            <option value="0">-- Không có danh mục  --</option>
                             <c:forEach items="${parentCategories}" var="parent">
                                 <option value="${parent.id}" ${category.parentId == parent.id ? 'selected' : ''}>${parent.name}</option>
                             </c:forEach>
                         </select>
-                        <div class="text-muted">Chọn danh mục cha từ danh sách có sẵn</div>
+                        <div class="text-muted">Chọn danh mục  từ danh sách có sẵn</div>
                     </div>
                     
                     <div class="form-group">
@@ -324,7 +324,7 @@
             </div>
             <div class="card-body">
                 <div class="info-item">
-                    <div class="info-label">ID danh mục:</div>
+                    <div class="info-label">ID danh mục loại sản phẩm:</div>
                     <div>#${category.id}</div>
                 </div>
                 
@@ -343,7 +343,7 @@
                 </div>
                 
                 <div class="info-item">
-                    <div class="info-label">Danh mục cha hiện tại:</div>
+                    <div class="info-label">Danh mục hiện tại:</div>
                     <div>
                         <c:choose>
                             <c:when test="${category.parentName != null}">
@@ -351,16 +351,12 @@
                                 <span class="text-muted">(ID: ${category.parentId})</span>
                             </c:when>
                             <c:otherwise>
-                                <span class="text-muted">Không có danh mục cha</span>
+                                <span class="text-muted">Không có danh mục</span>
                             </c:otherwise>
                         </c:choose>
                     </div>
                 </div>
                 
-                <div class="note">
-                    <strong>📝 Lưu ý:</strong> Danh mục cha được chọn từ bảng category_parent. 
-                    Nếu bạn không thấy danh mục cha mong muốn, vui lòng liên hệ quản trị viên để thêm mới.
-                </div>
             </div>
         </div>
     </div>

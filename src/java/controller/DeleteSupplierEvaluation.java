@@ -64,17 +64,29 @@ public class DeleteSupplierEvaluation extends HttpServlet {
             throws ServletException, IOException {
         String id_raw = request.getParameter("id");
         String sid_raw = request.getParameter("sid");
+        String indexPage = request.getParameter("index");
         try {
             int sid = Integer.parseInt(sid_raw);
             SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
             int id = Integer.parseInt(id_raw);
             sed.deleteSupplierEvaluation(id);
             List<SupplierEvaluation> list = sed.getSupplierEvaluationByID(sid);
-            request.setAttribute("listSED", list);
+
             SupplierDAO sd = new SupplierDAO();
             Supplier s = sd.getSupplierByID(sid);
             request.setAttribute("supplier", s);
 
+            //phan trang
+            int totalPage = (int) Math.ceil((double) list.size() / 5);
+            request.setAttribute("totalPage", totalPage);
+            int index = Integer.parseInt(indexPage);
+            if (index < totalPage) {
+                list = list.subList((index - 1) * 5, (index - 1) * 5 + 5);
+            } else {
+                list = list.subList((index - 1) * 5, list.size());
+            }
+            request.setAttribute("index", index);
+            request.setAttribute("listSED", list);
             request.getRequestDispatcher("ViewSupplierEvaluation.jsp").forward(request, response);
         } catch (Exception e) {
         }

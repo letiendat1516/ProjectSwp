@@ -139,6 +139,6 @@ public class PurchaseOrderInfo {
     public void setPurchaseItems(List<PurchaseOrderItems> purchaseItems) {
         this.purchaseItems = purchaseItems;
     }
-
    
 }
+

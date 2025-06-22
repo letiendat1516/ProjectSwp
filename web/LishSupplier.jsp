@@ -208,8 +208,194 @@
                 height: 35px;
                 width: 100px;
             }
+            /* CSS cải thiện cho các nút action trong bảng */
+            .action-container {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                align-items: stretch;
+                min-width: 140px;
+                padding: 8px 4px;
+            }
 
+            .action-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 8px 16px;
+                min-width: 100px;
+                height: 36px;
+                text-align: center;
+                text-decoration: none;
+                border-radius: 6px;
+                font-weight: 500;
+                font-size: 13px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 1px solid transparent;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                position: relative;
+                overflow: hidden;
+            }
 
+            .action-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+                transition: left 0.5s;
+            }
+
+            .action-btn:hover::before {
+                left: 100%;
+            }
+
+            /* Nút Edit - màu vàng cam gradient */
+            .btn-edit {
+                background: linear-gradient(135deg, #ffc107, #ff8f00);
+                color: #212529;
+                border-color: #ffc107;
+                box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+            }
+
+            .btn-edit:hover {
+                background: linear-gradient(135deg, #e0a800, #f57c00);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+            }
+
+            /* Nút Delete - màu đỏ gradient */
+            .btn-delete {
+                background: linear-gradient(135deg, #dc3545, #c82333);
+                color: white;
+                border-color: #dc3545;
+                box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+            }
+
+            .btn-delete:hover {
+                background: linear-gradient(135deg, #c82333, #bd2130);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+            }
+
+            /* Nút Active - màu xanh lá gradient */
+            .btn-active {
+                background: linear-gradient(135deg, #28a745, #20c997);
+                color: white;
+                border-color: #28a745;
+                box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+            }
+
+            .btn-active:hover {
+                background: linear-gradient(135deg, #218838, #1e7e34);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+            }
+
+            /* Nút Evaluation - màu xanh dương gradient */
+            .btn-evaluation {
+                background: linear-gradient(135deg, #17a2b8, #138496);
+                color: white;
+                border-color: #17a2b8;
+                box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+            }
+
+            .btn-evaluation:hover {
+                background: linear-gradient(135deg, #138496, #117a8b);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
+            }
+
+            /* Nút View evaluation - màu tím gradient */
+            .btn-view {
+                background: linear-gradient(135deg, #6f42c1, #5a32a3);
+                color: white;
+                border-color: #6f42c1;
+                box-shadow: 0 2px 8px rgba(111, 66, 193, 0.3);
+            }
+
+            .btn-view:hover {
+                background: linear-gradient(135deg, #5a32a3, #4e2a87);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(111, 66, 193, 0.4);
+            }
+
+            /* Responsive design cho mobile */
+            @media (max-width: 768px) {
+                .action-container {
+                    min-width: 120px;
+                }
+
+                .action-btn {
+                    min-width: 80px;
+                    padding: 6px 12px;
+                    font-size: 12px;
+                    height: 32px;
+                }
+            }
+
+            /* Cải thiện cho table cell chứa action buttons */
+            .LishBody td.action-cell {
+                padding: 12px 8px;
+                vertical-align: middle;
+                background-color: #f8f9fa !important;
+            }
+
+            .LishBody tr:nth-child(even) td.action-cell {
+                background-color: #e9f7ff !important;
+            }
+
+            .LishBody tr:hover td.action-cell {
+                background-color: #d4edff !important;
+            }
+
+            /* Animation cho loading state */
+            .action-btn:active {
+                transform: scale(0.95);
+                transition: transform 0.1s;
+            }
+
+            /* Tooltip effect (optional) */
+            .action-btn[title]:hover::after {
+                content: attr(title);
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                white-space: nowrap;
+                z-index: 1000;
+                margin-bottom: 5px;
+            }
+
+            /* Icon support (nếu muốn thêm icon) */
+            .action-btn i {
+                margin-right: 6px;
+                font-size: 14px;
+            }
+
+            /* Trạng thái disabled */
+            .action-btn:disabled,
+            .action-btn.disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none !important;
+                box-shadow: none !important;
+            }
+
+            .action-btn:disabled:hover,
+            .action-btn.disabled:hover {
+                transform: none;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
         </style>
 
     </head>
@@ -272,28 +458,42 @@
                             </c:choose>
                             <td>${listItem.createDate}</td>      
                             <td>
-                                <a href="UpdateSupplier.jsp?id=${listItem.supplierID}&name=${listItem.name}&phone=${listItem.phone}&email=${listItem.email}&address=${listItem.address}&note=${listItem.note}">Edit</a>
-                                <c:choose>
-                                    <c:when test="${listItem.activeFlag == 1}">
-                                        <a href="DeleteSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}&currentPage=${currentPage}" 
-                                           onclick="return confirm('Bạn có chắc chắn muốn xoá nhà cung cấp này không?')">Delete</a>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <a style="background-color: green;border: 1px solid #bd2130; color: yellow;"
-                                           href="ActiveSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}"
-                                           onclick="return confirm('Bạn có chắc chắn muốn active nhà cung cấp này không?')"
-                                           >Active</a>
-                                    </c:otherwise>
-                                </c:choose>
+                                <div class="action-container">
+                                    <a class="action-btn btn-edit" 
+                                       href="UpdateSupplier.jsp?id=${listItem.supplierID}&name=${listItem.name}&phone=${listItem.phone}&email=${listItem.email}&address=${listItem.address}&note=${listItem.note}">
+                                        Edit
+                                    </a>
+                                    <c:choose>
+                                        <c:when test="${listItem.activeFlag == 1}">
+                                            <a class="action-btn btn-delete" 
+                                               href="DeleteSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}&currentPage=${currentPage}" 
+                                               onclick="return confirm('Bạn có chắc chắn muốn xoá nhà cung cấp này không?')">
+                                                Delete
+                                            </a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a class="action-btn btn-active"
+                                               href="ActiveSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}"
+                                               onclick="return confirm('Bạn có chắc chắn muốn active nhà cung cấp này không?')">
+                                                Active
+                                            </a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
                             </td>
                             <td>
-                                <a style="background-color: aquamarine;border: 1px solid #bd2130; color: #0d6efd;"
-                                   href="TableSupplierEvaluation?id=${listItem.supplierID}" 
-                                   >Evaluation</a>
-                                <a style="background-color: #ccc;border: 1px solid #bd2130; color: #0d6efd;"
-                                   href="ViewSupplierEvaluation?supplierID=${listItem.supplierID}" 
-                                   >View evaluation</a>
+                                <div class="action-container">
+                                    <a class="action-btn btn-evaluation"
+                                       href="TableSupplierEvaluation?id=${listItem.supplierID}">
+                                        Evaluation
+                                    </a>
+                                    <a class="action-btn btn-view"
+                                       href="ViewSupplierEvaluation?supplierID=${listItem.supplierID}">
+                                        View evaluation
+                                    </a>
+                                </div>
                             </td>
+
                         </tr>
                     </c:forEach>
                 </table>
