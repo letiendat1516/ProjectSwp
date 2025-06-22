@@ -2,6 +2,7 @@ package controller;
 
 import dao.GetStatusOfPurchaseRequestInformationDAO;
 import dao.PurchaseOrderDAO;
+import dao.SupplierDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.Request;
+import model.Supplier;
 
 /**
  * Servlet xử lý Purchase Order - hiển thị các đơn đã được duyệt
@@ -20,7 +22,7 @@ public class ListPurchaseOrderServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         try {
             PurchaseOrderDAO dao = new PurchaseOrderDAO();
-
+           
             // Lấy tham số lọc từ form
             String startDateStr = request.getParameter("startDate");
             String endDateStr = request.getParameter("endDate");

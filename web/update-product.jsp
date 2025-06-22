@@ -3,23 +3,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ page import="model.Users" session="true" %>
 <!DOCTYPE html>
-<%
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-    response.setHeader("Pragma", "no-cache");
-    response.setDateHeader("Expires", 0);
-    
-    Users user = (Users) session.getAttribute("user");
-    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
-    
-    // Debug: Log what we have
-    Object productObj = request.getAttribute("product");
-    System.out.println("DEBUG - Product object in JSP: " + productObj);
-    System.out.println("DEBUG - Request parameters: " + request.getParameterMap());
-    System.out.println("DEBUG - Request attributes: " + request.getAttributeNames());
-%>
+
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -303,10 +287,6 @@
             <p>Chỉnh sửa thông tin sản phẩm trong hệ thống kho</p>
         </div>        <div class="nav-buttons">
             <a href="product-list" class="btn btn-primary">← Quay lại Danh Sách</a>
-            <a href="Admin.jsp" class="btn btn-secondary">🏠 Trang Admin</a>
-            <c:if test="${not empty product}">
-                <a href="product-detail?id=${product.id}" class="btn btn-secondary">👁️ Xem Chi Tiết</a>
-            </c:if>
         </div>
 
         <!-- Error/Success Messages -->
@@ -378,12 +358,6 @@
                     </span>
                 </div>
             </div>
-            <c:if test="${not empty product.imageUrl}">                <div style="margin-top: 15px;">
-                    <span class="info-label">Hình Ảnh Hiện Tại:</span><br>
-                    <img src="${product.imageUrl}" alt="Current Product" class="current-image" 
-                         onerror="this.style.display='none'">
-                </div>
-            </c:if>
         </div>
 
         <div class="form-container">
@@ -486,17 +460,6 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="imageUrl">URL Hình Ảnh</label>
-                        <input type="url" id="imageUrl" name="imageUrl" class="form-control" 
-                               value="${product.imageUrl}" placeholder="https://example.com/image.jpg">
-                        <div class="form-help">Link đến hình ảnh sản phẩm</div>
-                        <img id="imagePreview" class="image-preview" style="display: none;">
-                    </div>
-                </div>
-
-                <!-- Description and Notes -->
-                <div class="form-grid">
                     <div class="form-group full-width">
                         <label class="form-label" for="description">Mô Tả Sản Phẩm</label>
                         <textarea id="description" name="description" class="form-control" 
@@ -529,31 +492,6 @@
     </div>
 
     <script>
-        // Image preview functionality
-        document.getElementById('imageUrl').addEventListener('input', function() {
-            const url = this.value;
-            const preview = document.getElementById('imagePreview');
-            
-            if (url && isValidUrl(url)) {
-                preview.src = url;
-                preview.style.display = 'block';
-                preview.onerror = function() {
-                    this.style.display = 'none';
-                };
-            } else {
-                preview.style.display = 'none';
-            }
-        });
-
-        function isValidUrl(string) {
-            try {
-                new URL(string);
-                return true;
-            } catch (_) {
-                return false;
-            }
-        }
-
         // Form validation
         document.querySelector('form').addEventListener('submit', function(e) {
             const requiredFields = document.querySelectorAll('[required]');
@@ -579,7 +517,8 @@
             field.addEventListener('input', function() {
                 this.classList.remove('error');
             });
-        });        // Delete confirmation
+        });        
+        // Delete confirmation
         function confirmDelete() {
             <c:if test="${not empty product}">
                 var productName = '${product.name}';

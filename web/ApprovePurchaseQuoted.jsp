@@ -1,3 +1,4 @@
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -576,7 +577,7 @@
           <div class="total-pages">Tổng ${endPage} trang</div>
       </div>
       <div class="footer">
-          <a href="admin" class="btn-secondary">
+          <a href="Admin.jsp" class="btn-secondary">
               <span class="material-icons back-btn-icon">arrow_back</span> Quay Lại Trang Chủ
           </a>
       </div>
