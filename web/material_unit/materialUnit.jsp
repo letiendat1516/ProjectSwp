@@ -1,205 +1,281 @@
 <%@ page contentType="text/html; charset=UTF-8" isELIgnored="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<!-- Material Unit List Page: Displays, searches, filters, and manages material units -->
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Đơn vị vật tư</title>
-         <style>
+    <style>
+        body {
+            background: #f6f8fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
         .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
+            max-width: 950px;
+            background: #fff;
+            margin: 40px auto 0 auto;
+            padding: 32px 28px 28px 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
         }
-
         h1 {
-            color: #333;
-            margin-bottom: 20px;
+            color: #222;
+            margin-bottom: 28px;
+            font-size: 2.1rem;
+            letter-spacing: 1px;
+            text-align: center;
         }
-
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
-
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #444;
         }
-
         .form-group input[type="text"],
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 10px;
+            border: 1px solid #cfd8dc;
+            border-radius: 5px;
             box-sizing: border-box;
+            font-size: 1rem;
+            background: #f9fafb;
+            transition: border 0.2s;
         }
-
+        .form-group input[type="text"]:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border: 1.5px solid #4CAF50;
+            outline: none;
+            background: #fff;
+        }
         .form-buttons {
-            margin-top: 20px;
+            margin-top: 22px;
         }
-
         .btn-primary {
             display: inline-block;
-            background-color: #4CAF50;
-            color: white;
-            padding: 8px 16px;
+            background: linear-gradient(90deg, #4CAF50 80%, #388e3c 100%);
+            color: #fff;
+            padding: 9px 22px;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 5px;
             border: none;
             cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(76,175,80,0.08);
+            transition: background 0.2s, box-shadow 0.2s;
         }
-
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #388e3c 80%, #4CAF50 100%);
+            box-shadow: 0 4px 16px rgba(76,175,80,0.13);
+        }
         .btn-secondary {
             display: inline-block;
-            background-color: #f44336;
-            color: white;
-            padding: 8px 16px;
+            background: #f44336;
+            color: #fff;
+            padding: 9px 22px;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 5px;
             margin-left: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        .btn-secondary:hover {
+            background: #d32f2f;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 24px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-
         table, th, td {
-            border: 1px solid #ddd;
+            border: 1px solid #e0e0e0;
         }
-
         th, td {
-            padding: 12px;
+            padding: 14px 10px;
             text-align: left;
+            font-size: 1rem;
         }
-
         th {
-            background-color: #f2f2f2;
+            background: #f2f2f2;
+            font-weight: 700;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
         }
-
+        th:hover {
+            background: #e0f2f1;
+        }
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background: #f9f9f9;
         }
-
+        tr:hover {
+            background: #e3f2fd;
+        }
         .btn-edit {
             display: inline-block;
-            background-color: #2196F3;
-            color: white;
-            padding: 5px 10px;
+            background: #2196F3;
+            color: #fff;
+            padding: 6px 14px;
             text-decoration: none;
             border-radius: 4px;
-            margin-right: 5px;
+            margin-right: 6px;
+            border: none;
+            font-size: 0.97rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-
+        .btn-edit:hover {
+            background: #1565c0;
+        }
+        .btn-delete {
+            background: #ff4444;
+            border: none;
+        }
+        .btn-delete:hover {
+            background: #b71c1c;
+        }
         .status-button {
-            padding: 5px 10px;
+            padding: 6px 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             margin-right: 5px;
         }
-
         .active-button {
-            background-color: #4CAF50;
-            color: white;
+            background: #4CAF50;
+            color: #fff;
         }
-
         .inactive-button {
-            background-color: #f44336;
-            color: white;
+            background: #f44336;
+            color: #fff;
         }
-
         .disabled-button {
             opacity: 0.5;
             cursor: not-allowed;
         }
-
-        /* Styles cho thanh tìm kiếm */
         .search-container {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
-            flex-wrap: nowrap;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-
         #searchInput {
-            padding: 8px;
-            width: 300px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-right: 10px;
+            padding: 10px;
+            width: 260px;
+            border: 1px solid #cfd8dc;
+            border-radius: 5px;
+            font-size: 1rem;
+            background: #f9fafb;
+            transition: border 0.2s;
         }
-
-        #statusFilter {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            width: 150px;
+        #searchInput:focus {
+            border: 1.5px solid #4CAF50;
+            background: #fff;
         }
-
-        /* Add this new style for the form */
+        #typeFilter {
+            padding: 10px;
+            border: 1px solid #cfd8dc;
+            border-radius: 5px;
+            width: 180px;
+            font-size: 1rem;
+            background: #f9fafb;
+            transition: border 0.2s;
+        }
+        #typeFilter:focus {
+            border: 1.5px solid #4CAF50;
+            background: #fff;
+        }
         .search-form {
             display: flex;
             align-items: center;
+            gap: 10px;
         }
-
         .no-data {
             text-align: center;
-            padding: 20px;
+            padding: 24px;
             font-style: italic;
             color: #757575;
-        }
-
-        .view-options {
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .view-options .btn {
-            padding: 8px 16px;
-            margin: 0 5px;
-            text-decoration: none;
-            border: 1px solid #ddd;
-            color: #333;
-            border-radius: 4px;
-        }
-
-        .view-options .btn.active {
-            background-color: #4CAF50;
-            color: white;
-            border-color: #4CAF50;
-        }
-
-        .view-options .btn:hover:not(.active) {
-            background-color: #ddd;
+            background: #f9f9f9;
         }
         .pagination {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 28px;
         }
         .pagination a, .pagination span.page-number {
             display: inline-block;
-            padding: 8px 16px;
-            margin: 0 5px;
-            background-color: #007BFF;
-            color: white;
+            padding: 9px 18px;
+            margin: 0 6px;
+            background: #007BFF;
+            color: #fff;
             text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
         }
         .pagination a:hover {
-            background-color: #0056b3;
+            background: #0056b3;
         }
         .pagination span.page-number {
-            background-color: #6c757d;
+            background: #6c757d;
             cursor: default;
+        }
+        .error-message {
+            color: #d32f2f;
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            padding: 10px 16px;
+            border-radius: 5px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .success-message {
+            color: #388e3c;
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            padding: 10px 16px;
+            border-radius: 5px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        @media (max-width: 700px) {
+            .container {
+                padding: 10px 2vw;
+            }
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            table, th, td {
+                font-size: 0.95rem;
+            }
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                margin: 8px 0 0 0;
+            }
         }
     </style>
 </head>
@@ -215,7 +291,7 @@
         
         <!-- Hiển thị thông báo thành công nếu có -->
         <c:if test="${not empty successMessage}">
-            <div class="success-message" style="color: green; margin-bottom: 10px;">${successMessage}</div>
+            <div class="success-message">${successMessage}</div>
             <c:remove var="successMessage" scope="session"/>
         </c:if>
         
@@ -226,7 +302,7 @@
                 <input type="text" id="searchInput" name="searchTerm" placeholder="Tên, kí hiệu,..." value="${searchTerm}" />
                 <button type="submit" class="btn-primary">Tìm kiếm</button>
             </form>
-            <select id="typeFilter" onchange="filterByType(this.value)" style="padding: 8px; width: 300px; border: 1px solid #ddd; border-radius: 4px; margin-right: 10px;">
+            <select id="typeFilter" onchange="filterByType(this.value)">
                 <option value="all">Tất cả loại</option>
                 <option value="Khối lượng">Khối lượng</option>
                 <option value="Độ dài">Độ dài</option>
@@ -298,11 +374,11 @@
         <table id="materialUnitTable">
             <thead>
                 <tr>
-                    <th onclick="sortTable(0)" style="cursor: pointer;">ID ↕</th>
-                    <th onclick="sortTable(1)" style="cursor: pointer;">Tên ↕</th>
-                    <th onclick="sortTable(2)" style="cursor: pointer;">Kí hiệu ↕</th>
-                    <th onclick="sortTable(3)" style="cursor: pointer;">Mô tả ↕</th>
-                    <th onclick="sortTable(4)" style="cursor: pointer;">Loại đơn vị ↕</th>
+                    <th onclick="sortTable(0)">ID ↕</th>
+                    <th onclick="sortTable(1)">Tên ↕</th>
+                    <th onclick="sortTable(2)">Kí hiệu ↕</th>
+                    <th onclick="sortTable(3)">Mô tả ↕</th>
+                    <th onclick="sortTable(4)">Loại đơn vị ↕</th>
                     <th>Thao tác</th>
                 </tr>
             </thead>
@@ -323,7 +399,7 @@
                                 <td>${unit.type}</td>
                                 <td>
                                     <a href="editMaterialUnit?id=${unit.id}" class="btn-edit">Thay đổi</a> 
-                                    <button onclick="if(confirm('Bạn có muốn xóa đơn vị này không?')) window.location.href='deleteMaterialUnit?id=${unit.id}'" class="btn-edit btn-delete" style="background-color: #ff4444; border-color: #ff4444;">Xóa</button>
+                                    <button onclick="if(confirm('Bạn có muốn xóa đơn vị này không?')) window.location.href='deleteMaterialUnit?id=${unit.id}'" class="btn-edit btn-delete">Xóa</button>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -355,7 +431,7 @@
 </div>
 </c:if>
 <div style="text-align: center; margin-top: 30px;">
-    <a href="../Admin.jsp" class="btn-primary" style="background-color: #6c757d;">Quay lại trang Admin</a>
+    <a href="../categoriesforward.jsp" class="btn-primary" style="background: #6c757d;">Quay lại trang trước</a>
 </div>
     </div>
 </body>

@@ -85,7 +85,7 @@
       <servlet-class>controller.MaterialUnitServlet</servlet-class>
   </servlet>
   <servlet>
-<servlet-name>CreateMaterialUnitServlet</servlet-name>
+      <servlet-name>CreateMaterialUnitServlet</servlet-name>
       <servlet-class>controller.CreateMaterialUnitServlet</servlet-class>
   </servlet>
   <servlet>
@@ -172,7 +172,7 @@
   </servlet-mapping>
   <servlet-mapping>
       <servlet-name>UserFilterServlet</servlet-name>
-<url-pattern>/userfilter</url-pattern>
+      <url-pattern>/userfilter</url-pattern>
   </servlet-mapping>
 
   <!-- Request Management Mappings -->
@@ -259,7 +259,7 @@
 
   <!-- Purchase Order Mappings -->
   <servlet-mapping>
-<servlet-name>ApprovePurchaseRequestServlet</servlet-name>
+      <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
       <url-pattern>/approvepurchaserequest</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
@@ -274,6 +274,30 @@
       <servlet-name>SubmitPurchaseOrderServlet</servlet-name>
       <url-pattern>/submitpurchaseorder</url-pattern>
   </servlet-mapping>
+  <servlet>
+        <servlet-name>ApprovePurchaseQuotedServlet</servlet-name>
+        <servlet-class>controller.ApprovePurchaseQuotedServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ApprovePurchaseQuotedServlet</servlet-name>
+        <url-pattern>/approvepurchasequoted</url-pattern>
+    </servlet-mapping>
+      <servlet>
+        <servlet-name>RequoteFormServlet</servlet-name>
+        <servlet-class>controller.RequoteFormServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RequoteFormServlet</servlet-name>
+        <url-pattern>/requoteform</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>SubmitRequoteFormServlet</servlet-name>
+        <servlet-class>controller.SubmitRequoteFormServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SubmitRequoteFormServlet</servlet-name>
+        <url-pattern>/submitrequoteform</url-pattern>
+    </servlet-mapping>
 
   <!-- ========== FILTERS ========== -->
 

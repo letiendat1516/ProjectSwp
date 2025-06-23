@@ -1,19 +1,10 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<!-- Product List Page: Displays, searches, sorts, and manages products -->
 <%@ page import="model.Users" session="true" %>
 <!DOCTYPE html>
-<%
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-    response.setHeader("Pragma", "no-cache");
-    response.setDateHeader("Expires", 0);
-    
-    Users user = (Users) session.getAttribute("user");
-    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
-%>
+
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -385,7 +376,7 @@
         </div>
 
         <div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
-            <a href="Admin.jsp" class="back-btn">← Quay lại Trang Admin</a>
+            <a href="categoriesforward.jsp" class="back-btn">← Quay lại Trang trước</a>
             <a href="add-product" class="add-product-btn">➕ Thêm Sản Phẩm Mới</a>
         </div>        <!-- Success Message -->
         <c:if test="${not empty param.success}">

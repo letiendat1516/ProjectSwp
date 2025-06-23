@@ -231,7 +231,7 @@ public class CategoryProductController extends HttpServlet {
                     // ✅ SỬA: Kiểm tra parent_id hợp lệ thay vì kiểm tra tự tham chiếu
                     // (vì parent_id tham chiếu đến bảng category_parent, không phải category)
                     if (!categoryDAO.isValidParentId(parentId)) {
-                        request.setAttribute("error", "Danh mục cha không hợp lệ");
+                        request.setAttribute("error", "Danh mục  không hợp lệ");
                         showEditForm(request, response);
                         return;
                     }

@@ -1,5 +1,6 @@
 package controller;
 
+// Controller for adding a new product
 import dao.ProductInfoDAO;
 import model.ProductInfo;
 import model.CategoryProduct;
@@ -66,7 +67,6 @@ public class AddProductController extends HttpServlet {
             String supplierIdStr = request.getParameter("supplierId");
             String expirationDateStr = request.getParameter("expirationDate");
             String storageLocation = request.getParameter("storageLocation");
-            String imageUrl = request.getParameter("imageUrl");
             String additionalNotes = request.getParameter("additionalNotes");
             
             // Validate required fields
@@ -111,11 +111,7 @@ public class AddProductController extends HttpServlet {
             
             if (storageLocation != null && !storageLocation.isEmpty()) {
                 product.setStorageLocation(storageLocation.trim());
-            }
-            
-            if (imageUrl != null && !imageUrl.isEmpty()) {
-                product.setImageUrl(imageUrl.trim());
-            }
+            }           
             
             if (additionalNotes != null && !additionalNotes.isEmpty()) {
                 product.setAdditionalNotes(additionalNotes.trim());

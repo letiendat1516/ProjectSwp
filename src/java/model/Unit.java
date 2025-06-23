@@ -4,9 +4,13 @@
  */
 package model;
 
+// Model for material unit entity
 public class Unit {
+    // Unique identifier for the unit
     private int id;
+    // Name of the unit
     private String name;
+    // Symbol of the unit (e.g., kg, m)
     private String symbol;
     
     public Unit() {

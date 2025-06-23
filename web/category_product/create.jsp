@@ -249,7 +249,7 @@
       <!-- Form thêm mới -->
       <div class="card">
           <div class="card-header">
-              ➕ Thêm danh mục sản phẩm mới
+              ➕ Thêm danh mục loại sản phẩm mới
           </div>
           <div class="card-body">
               <!-- Thông báo lỗi -->
@@ -280,16 +280,16 @@
                   </div>
                   
                   <div class="form-group">
-                      <label for="parentId" class="form-label">Danh mục cha</label>
+                      <label for="parentId" class="form-label">Danh mục</label>
                       <select class="form-select" id="parentId" name="parentId">
-                          <option value="">-- Chọn danh mục cha (không bắt buộc) --</option>
+                          <option value="">-- Chọn danh mục (không bắt buộc) --</option>
                           <c:forEach var="parent" items="${parentCategories}">
                               <option value="${parent.id}" ${param.parentId eq parent.id ? 'selected' : ''}>
                                   ${parent.name}
                               </option>
                           </c:forEach>
                       </select>
-                      <div class="text-muted">Chọn danh mục cha để tạo cấu trúc phân cấp</div>
+                      <div class="text-muted">Chọn danh mục để tạo cấu trúc phân cấp</div>
                   </div>
                   
                   <div class="form-group">

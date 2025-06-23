@@ -4,9 +4,9 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
+  <meta rset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Danh sách danh mục cha</title>
+  <title>Danh sách danh mục </title>
   <style>
       * {
           margin: 0;
@@ -263,6 +263,12 @@
           text-align: center;
           color: #6c757d;
       }
+      .table-mota{
+          width: 180px;
+      }
+      .quantity{
+          text-align: center
+      }
 
       /* Responsive */
       @media (max-width: 768px) {
@@ -342,7 +348,7 @@
                                       Tên ${sortField eq 'name' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
                                   </a>
                               </th>
-                              <th>Mô tả</th>
+                              <th class="table-mota">Mô tả</th>
                               <th>Trạng thái</th>
                               <th>Số danh mục loại sản phẩm</th>
                               <th>Thao tác</th>
@@ -360,7 +366,7 @@
                                           ${category.activeFlag ? 'Hoạt động' : 'Không hoạt động'}
                                       </span>
                                   </td>
-                                  <td><span class="badge badge-info">${category.childCount}</span></td>
+                                  <td class="quantity"><span class="badge badge-info">${category.childCount}</span></td>
                                   <td>
                                       <div class="action-buttons">
                                           <a href="${pageContext.request.contextPath}/category-parent/edit?id=${category.id}" 
@@ -381,7 +387,7 @@
                   <div class="empty-state">
                       <h3>Không có danh mục nào</h3>
                       <p>Hãy thêm danh mục đầu tiên của bạn</p>
-                      <a href="${pageContext.request.contextPath}/category-parent/create" class="btn btn-primary">Thêm danh mục cha</a>
+                      <a href="${pageContext.request.contextPath}/category-parent/create" class="btn btn-primary">Thêm danh mục </a>
                   </div>
               </c:otherwise>
           </c:choose>
@@ -415,7 +421,7 @@
       <!-- Thống kê -->
       <div class="stats">
           Hiển thị ${(currentPage-1)*pageSize + 1} - ${currentPage*pageSize > totalCategoryParents ? totalCategoryParents : currentPage*pageSize} 
-          trong tổng số ${totalCategoryParents} danh mục cha
+          trong tổng số ${totalCategoryParents} danh mục 
       </div>
   </div>
 

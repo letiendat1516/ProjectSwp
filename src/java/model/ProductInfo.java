@@ -3,21 +3,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
+
+// Model for product information
+
 import java.math.BigDecimal;
-
-
-
 
 public class ProductInfo {
 
-    private int id;
-    private String name;
-    private String code;
-    private int cate_id;
-    private int unit_id;
-    private BigDecimal price;
-    private String status;
-    private String description;
+    private int id; // Product ID
+    private String name; // Product name
+    private String code; // Product code
+    private int cate_id; // Category ID
+    private int unit_id; // Unit ID
+    private BigDecimal price; // Product price
+    private String status; // Product status
+    private String description; // Product description
 
     public ProductInfo() {
     }
@@ -99,15 +99,14 @@ public class ProductInfo {
     }
     
     // Additional fields for enhanced product management
-    private int supplierId;
-    private java.sql.Date expirationDate;
-    private String storageLocation;
-    private String imageUrl;
-    private String additionalNotes;
-    private int createdBy;
-    private java.sql.Date createdDate;
-    private int updatedBy;
-    private java.sql.Date updatedDate;
+    private int supplierId; // Supplier ID
+    private java.sql.Date expirationDate; // Expiration date
+    private String storageLocation; // Storage location
+    private String additionalNotes; // Additional notes
+    private int createdBy; // Created by (user ID)
+    private java.sql.Date createdDate; // Creation date
+    private int updatedBy; // Updated by (user ID)
+    private java.sql.Date updatedDate; // Update date
 
     public int getSupplierId() {
         return supplierId;
@@ -131,14 +130,6 @@ public class ProductInfo {
 
     public void setStorageLocation(String storageLocation) {
         this.storageLocation = storageLocation;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
     }
 
     public String getAdditionalNotes() {
