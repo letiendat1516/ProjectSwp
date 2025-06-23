@@ -357,9 +357,7 @@
                         </select>
                     </div>
 
-
-                <!-- Description and Notes -->
-                <div class="form-grid">
+                    <!-- Description and Notes moved inside the form-grid with full-width -->
                     <div class="form-group full-width">
                         <label class="form-label" for="description">Mô Tả Sản Phẩm</label>
                         <textarea id="description" name="description" class="form-control" 
