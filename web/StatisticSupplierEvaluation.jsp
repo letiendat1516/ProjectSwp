@@ -260,6 +260,9 @@
         <c:set var="st" value="${requestScope.st}"/>
         <c:set var="mess" value="${requestScope.mess}"/>
         <c:set var="sta" value="${requestScope.sta}"/>
+        <c:set var="totalPage" value="${requestScope.totalPage}"/>
+        
+
         <h2 style="font-weight: bold;color: #c3e6cb" >Statistic Evaluation</h2>
         <form action="StatisticSupplierEvaluation">
             <select name="top">
@@ -301,6 +304,11 @@
                 </c:forEach>
             </table>
         </c:if>
+        <div>
+            <c:forEach var="i" begin="1" end="${totalPage}">
+                <a href="StatisticSupplierEvaluation?top=${fl}&sort=${st}&status=${sta}&index=${i}" >${i}</a>
+            </c:forEach>
+        </div>
         <a href="#">back</a>
     </body>
 </html>
