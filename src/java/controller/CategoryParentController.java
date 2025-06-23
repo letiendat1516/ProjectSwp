@@ -165,7 +165,6 @@ public class CategoryParentController extends HttpServlet {
     
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // ✅ ĐÃ SỬA: Đường dẫn vào folder category_parent
         request.getRequestDispatcher("/category_parent/create.jsp").forward(request, response);
     }
     
