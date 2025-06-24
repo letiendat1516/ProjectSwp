@@ -31,7 +31,7 @@ public class AddProductController extends HttpServlet {
         HttpSession session = request.getSession();
         Users user = (Users) session.getAttribute("user");
         
-        if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
+        if (user == null) {
             response.sendRedirect("login.jsp");
             return;
         }

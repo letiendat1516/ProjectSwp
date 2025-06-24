@@ -31,7 +31,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     // Check user authentication and authorization
     HttpSession session = request.getSession();
     Users user = (Users) session.getAttribute("user");
-    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
+    if (user == null) {
         response.sendRedirect("login.jsp");
         return;
     }
