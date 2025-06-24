@@ -85,6 +85,7 @@ public class ListRequestImportDAO {
                 + " ORDER BY po.day_purchase DESC";
 
         try {
+            System.out.println(sql);
             conn = Context.getJDBCConnection();
             ps = conn.prepareStatement(sql);
             if (searchValue != null && !searchValue.trim().isEmpty() && searchType != null) {
@@ -260,5 +261,10 @@ public class ListRequestImportDAO {
                 throw new SQLException("No rows updated for requestId: " + requestId);
             }
         }
+    }
+    
+    public static void main(String[] args) {
+        ListRequestImportDAO leid = new ListRequestImportDAO();
+        List<ApprovedRequestItem> l = leid.getApprovedRequestItems(null, null);
     }
 }

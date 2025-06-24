@@ -1045,7 +1045,7 @@
                                         </tr>
                                     </c:when>
                                     <c:otherwise>
-                                        <c:forEach var="item" items="${historyItems}" varStatus="status">
+                                        <c:forEach var="item" items="${historyItems}" varStatus="status">                                                                   
                                             <tr>
                                                 <td>${status.index + 1}</td>
                                                 <td>${item.requestId}</td>
@@ -1053,7 +1053,7 @@
                                                 <td>${item.productCode != null ? item.productCode : 'N/A'}</td>
                                                 <td>${item.supplier}</td>
                                                 <td>
-                                                    <a href="${pageContext.request.contextPath}/rate-order?id=${item.requestId}" class="btn btn-sm btn-info btn-icon">
+                                                    <a href="LishSupplier" class="btn btn-sm btn-info btn-icon">
                                                         <i class="fas fa-star"></i> Đánh giá
                                                     </a>
                                                 </td>
