@@ -7,6 +7,15 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
+<%@ page import="model.Users" %> 
+<%
+Users user = (Users) session.getAttribute("user");
+if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName())&&!"Nhân viên kho".equalsIgnoreCase(user.getRoleName()))) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -146,6 +155,7 @@
         <div class="form-container">
             <h1>Update Supplier</h1>
             <c:set var="mess" value="${requestScope.mess}"/>
+            <c:set var="invalid" value="${requestScope.invalid}"/>
             <c:if test="${not empty mess}">
                 <p style="color: red;font-size: larger">${mess}</p>
             </c:if>
@@ -155,6 +165,9 @@
                 <input type="text" id="name" name="name" value="<%= request.getParameter("name") %>" required>
 
                 <label for="phone">Số điện thoại:</label>
+                <c:if test="${not empty invalid}">
+                    <label style="color: red" >${invalid}</label>
+                </c:if>
                 <input type="number" id="phone" name="phone" value="<%= request.getParameter("phone") %>" required>
 
                 <label for="email">Email:</label>

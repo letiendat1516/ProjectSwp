@@ -7,6 +7,15 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
+<%@ page import="model.Users" %> 
+<%
+Users user = (Users) session.getAttribute("user");
+if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName())&&!"Nhân viên kho".equalsIgnoreCase(user.getRoleName()))) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+%>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
@@ -153,16 +162,21 @@
         <div class="form-container">
             <h1>Add New Supplier</h1>
             <c:set var="mess" value="${requestScope.mess}"/>
+            <c:set var="invalid" value="${requestScope.invalid}"/>
             <c:if test="${not empty mess}">
                 <p style="color: red;font-size: larger" >${mess}</p>
             </c:if>
-                <form action="AddNewSupplier" method="get">
+            <form action="AddNewSupplier" method="get">
                 <div class="input-group">
                     <label><i class="material-icons">business</i> Tên nhà cung cấp</label>
                     <input type="text" name="nameSupplier" required>
                 </div>
+
                 <div class="input-group">
                     <label><i class="material-icons">phone</i> Số điện thoại</label>
+                    <c:if test="${not empty invalid}">
+                        <label style="color: red" >${invalid}</label>
+                    </c:if>
                     <input type="number" name="phone" required>
                 </div>
                 <div class="input-group">

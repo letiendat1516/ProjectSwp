@@ -128,6 +128,7 @@
                     width: 100%;
                 }
             }
+
         </style>
     </head>
     <body>
@@ -140,7 +141,7 @@
                 <a href="passwordrequest" class="nav-item">Password Request</a>
                 <a href="ApproveListForward.jsp" class="nav-item">Approve</a>
                 <a href="RequestForward.jsp" class="nav-item">Transaction</a>
-                <a href="#" class="nav-item">Statistic</a>
+                <a href="StatisticSupplierEvaluation.jsp" class="nav-item">Statistic</a>
             </div>
             <div class="main-content">
                 <div class="header">

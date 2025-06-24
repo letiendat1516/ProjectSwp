@@ -7,6 +7,15 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
+<%@ page import="model.Users" %> 
+<%
+Users user = (Users) session.getAttribute("user");
+if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName()))) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -255,6 +264,7 @@
         </style>
     </head>
     <body>
+
         <c:set var="list" value="${requestScope.list}"/>
         <c:set var="fl" value="${requestScope.fl}"/>
         <c:set var="st" value="${requestScope.st}"/>
@@ -309,6 +319,10 @@
                 <a href="StatisticSupplierEvaluation?top=${fl}&sort=${st}&status=${sta}&index=${i}" >${i}</a>
             </c:forEach>
         </div>
+<<<<<<< HEAD
         <a href="#">back</a>
+=======
+        <a href="Admin.jsp">back</a>
+>>>>>>> 70e80aafa725db0b68d36774836b6761bf1f9d3a
     </body>
 </html>

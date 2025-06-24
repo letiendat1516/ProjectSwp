@@ -77,6 +77,7 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
 
+
             switch (user.getRoleName()) {
             case "Admin":
                 response.sendRedirect("Admin.jsp");

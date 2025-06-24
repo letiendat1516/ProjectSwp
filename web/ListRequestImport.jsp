@@ -1052,6 +1052,7 @@
                                                 <td>${item.productName != null ? item.productName : 'No items'}</td>
                                                 <td>${item.productCode != null ? item.productCode : 'N/A'}</td>
                                                 <td>${item.supplier}</td>
+                                                
                                                 <td>
                                                     <a href="LishSupplier" class="btn btn-sm btn-info btn-icon">
                                                         <i class="fas fa-star"></i> Đánh giá
