@@ -30,18 +30,17 @@ public class ListRequestImportController extends HttpServlet {
         // Lấy danh sách ApprovedRequestItem với tham số tìm kiếm
         List<ApprovedRequestItem> approvedItems = dao.getApprovedRequestItems(searchType, searchValue);
         List<ApprovedRequestItem> completedItems = dao.getCompletedRequestItems(searchType, searchValue);
-        
         SupplierDAO sd = new SupplierDAO();
         List<Supplier> listSupplier = new ArrayList<>();
-        for(int i=0;i<completedItems.size();i++){
+        for (int i = 0; i < completedItems.size(); i++) {
             Supplier s = sd.getSupplierByName(completedItems.get(i).getSupplier());
             listSupplier.add(s);
         }
-        for(int i=0;i<completedItems.size();i++){
-            int number = listSupplier.get(i).getSupplierID();
-            String str = String.valueOf(number);
-            completedItems.get(i).setSupplier(str);
-        }
+//        for (int i = 0; i < completedItems.size(); i++) {
+//            int number = listSupplier.get(i).getSupplierID();
+//            String str = String.valueOf(number);
+//            completedItems.get(i).setSupplier(str);
+//        }
         if (approvedItems == null || approvedItems.isEmpty()) {
             System.out.println("Không có yêu cầu nào đã được duyệt.");
         } else {
@@ -55,12 +54,12 @@ public class ListRequestImportController extends HttpServlet {
         }
 
         // Gửi danh sách và tham số tìm kiếm sang JSP
-        request.setAttribute("supplier", listSupplier);
         request.setAttribute("items", approvedItems);
         request.setAttribute("historyItems", completedItems);
         request.setAttribute("searchType", searchType);
         request.setAttribute("searchValue", searchValue);
         request.getRequestDispatcher("ListRequestImport.jsp").forward(request, response);
+        request.setAttribute("supplier", listSupplier);
     }
 
     @Override

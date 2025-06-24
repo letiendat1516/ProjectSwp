@@ -81,7 +81,7 @@ public class RequestInformationDAO {
         }
         return null;
     }
-
+                                                                        
     public boolean addItemsIntoDB(String request_id, String[] productNameArr,
             String[] productCodeArr, String[] unitArr, int[] quantityArr,
             String[] noteArr, String reasonDetail) {

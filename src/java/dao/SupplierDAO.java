@@ -23,14 +23,14 @@ public class SupplierDAO {
     private Connection conn = null;
     private PreparedStatement ps = null;
     private ResultSet rs = null;
-    
-    public Supplier getSupplierByID(int id){
-        String sql = "select * from swp.supplier where id=  "+id;
+
+    public Supplier getSupplierByID(int id) {
+        String sql = "select * from swp.supplier where id = " + id;
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
             rs = ps.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 Supplier s = new Supplier();
                 s.setSupplierID(rs.getInt("id"));
                 s.setActiveFlag(rs.getInt("active_flag"));
@@ -283,13 +283,13 @@ public class SupplierDAO {
         return 0;
     }
 
-    public Supplier getSupplierByName(String name){
-        String sql= "select * from swp.supplier where name = '  "+name+" ' ";
+    public Supplier getSupplierByName(String name) {
+        String sql = "select * from swp.supplier where name = \"" + name + "\"";
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
             rs = ps.executeQuery();
-            if(rs.next()) {
+            if (rs.next()) {
                 Supplier s = new Supplier();
                 s.setSupplierID(rs.getInt("id"));
                 s.setActiveFlag(rs.getInt("active_flag"));
@@ -305,12 +305,14 @@ public class SupplierDAO {
         }
         return null;
     }
-    
+
     public static void main(String[] args) {
         SupplierDAO sd = new SupplierDAO();
-        int a = 43;
-        String b = String.valueOf(a);
-        System.out.println(b);
-
+        Supplier s = sd.getSupplierByName("Công ty TNHH Bao Bì Bình Minh");
+        System.out.println(s.getSupplierID());
+        // limit (offset),(limit)
+//        List<Supplier> l = sd.getSuppliersByPageFilter(2, 10, "all", "");
+//        System.out.println(Math.ceil((double)l.size()/5));
     }
+
 }

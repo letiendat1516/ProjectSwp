@@ -262,8 +262,9 @@ public class ListRequestImportDAO {
             }
         }
     }
+    
     public static void main(String[] args) {
         ListRequestImportDAO leid = new ListRequestImportDAO();
-        List<ApprovedRequestItem> l = leid.getApprovedRequestItems("productName", "800");
+        List<ApprovedRequestItem> l = leid.getApprovedRequestItems(null, null);
     }
 }
