@@ -112,10 +112,10 @@ public class CategoryParentController extends HttpServlet {
                 sortDir = "asc";
             }
             
-            // Lấy danh sách danh mục cha
+            // Lấy danh sách danh mục 
             List<CategoryProductParent> categoryParents = categoryParentDAO.getAllCategoryParents(page, pageSize, searchKeyword, sortField, sortDir);
             
-            // Đếm tổng số danh mục cha
+            // Đếm tổng số danh mục 
             int totalCategoryParents = categoryParentDAO.countCategoryParents(searchKeyword);
             int totalPages = (int) Math.ceil((double) totalCategoryParents / pageSize);
             
@@ -156,7 +156,7 @@ public class CategoryParentController extends HttpServlet {
             
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Có lỗi xảy ra khi tải danh sách danh mục cha");
+            request.setAttribute("error", "Có lỗi xảy ra khi tải danh sách danh mục ");
             request.getRequestDispatcher("/error.jsp").forward(request, response);
         }
     }
@@ -202,7 +202,7 @@ public class CategoryParentController extends HttpServlet {
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/category-parent/list?message=create_success");
             } else {
-                request.setAttribute("error", "Không thể thêm danh mục cha. Tên danh mục có thể đã tồn tại.");
+                request.setAttribute("error", "Không thể thêm danh mục . Tên danh mục có thể đã tồn tại.");
                 request.setAttribute("name", name);
                 request.setAttribute("description", description);
                 request.setAttribute("activeFlag", activeFlagStr);
@@ -211,7 +211,7 @@ public class CategoryParentController extends HttpServlet {
             
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Có lỗi xảy ra khi thêm danh mục cha");
+            request.setAttribute("error", "Có lỗi xảy ra khi thêm danh mục ");
             showCreateForm(request, response);
         }
     }
@@ -284,7 +284,7 @@ public class CategoryParentController extends HttpServlet {
                 if (success) {
                     response.sendRedirect(request.getContextPath() + "/category-parent/list?message=update_success");
                 } else {
-                    request.setAttribute("error", "Không thể cập nhật danh mục cha. Tên danh mục có thể đã tồn tại.");
+                    request.setAttribute("error", "Không thể cập nhật danh mục . Tên danh mục có thể đã tồn tại.");
                     request.setAttribute("categoryParent", categoryParent);
                     showEditForm(request, response);
                 }
@@ -347,7 +347,7 @@ public class CategoryParentController extends HttpServlet {
         try {
             int id = Integer.parseInt(idStr);
             
-            // Xóa danh mục cha (hard delete)
+            // Xóa danh mục  (hard delete)
             boolean success = categoryParentDAO.deleteCategoryParent(id);
             
             if (success) {
@@ -373,7 +373,7 @@ public class CategoryParentController extends HttpServlet {
         try {
             int id = Integer.parseInt(idStr);
             
-            // Soft delete danh mục cha
+            // Soft delete danh mục 
             boolean success = categoryParentDAO.softDeleteCategoryParent(id);
             
             if (success) {
@@ -453,13 +453,13 @@ public class CategoryParentController extends HttpServlet {
     private String getMessageText(String messageKey) {
         switch (messageKey) {
             case "create_success":
-                return "Thêm danh mục cha thành công!";
+                return "Thêm danh mục thành công!";
             case "update_success":
-                return "Cập nhật danh mục cha thành công!";
+                return "Cập nhật danh mục thành công!";
             case "delete_success":
-                return "Xóa danh mục cha thành công!";
+                return "Xóa danh mục thành công!";
             case "soft_delete_success":
-                return "Vô hiệu hóa danh mục cha thành công!";
+                return "Vô hiệu hóa danh mục thành công!";
             default:
                 return "Thao tác thành công!";
         }
@@ -470,15 +470,15 @@ public class CategoryParentController extends HttpServlet {
             case "invalid_id":
                 return "ID không hợp lệ!";
             case "not_found":
-                return "Không tìm thấy danh mục cha!";
+                return "Không tìm thấy danh mục !";
             case "invalid_data":
                 return "Dữ liệu không hợp lệ!";
             case "delete_failed":
-                return "Không thể xóa danh mục cha. Có thể đang được sử dụng bởi danh mục con.";
+                return "Không thể xóa danh mục . Có thể đang được sử dụng bởi danh mục con.";
             case "soft_delete_failed":
-                return "Không thể vô hiệu hóa danh mục cha!";
+                return "Không thể vô hiệu hóa danh mục !";
             case "update_failed":
-                return "Không thể cập nhật danh mục cha!";
+                return "Không thể cập nhật danh mục !";
             default:
                 return "Có lỗi xảy ra!";
         }

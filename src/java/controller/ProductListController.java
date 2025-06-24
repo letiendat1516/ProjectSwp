@@ -1,5 +1,7 @@
 package controller;
 
+// Controller for listing, searching, and paginating products
+
 import dao.ProductInfoDAO;
 import model.ProductStock;
 import java.io.IOException;

@@ -6,7 +6,17 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
+<%@ page import="model.Users" %> 
+<%
+Users user = (Users) session.getAttribute("user");
+if (user == null) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -208,116 +218,207 @@
                 height: 35px;
                 width: 100px;
             }
+            /* CSS cải thiện cho các nút action trong bảng */
+            .action-container {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                align-items: stretch;
+                min-width: 140px;
+                padding: 8px 4px;
+            }
 
-            .LishBody .action-btn {
-                display: inline-block;
+            .action-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
                 padding: 8px 16px;
-                margin: 2px;
-                color: white;
+                min-width: 100px;
+                height: 36px;
+                text-align: center;
                 text-decoration: none;
                 border-radius: 6px;
                 font-weight: 500;
-                text-align: center;
-                min-width: 80px;
-                font-size: 12px;
-                transition: all 0.3s ease;
+                font-size: 13px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 border: 1px solid transparent;
-                box-sizing: border-box;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                position: relative;
+                overflow: hidden;
             }
 
-            /* Nút Edit */
-            .LishBody .edit-btn {
-                background: linear-gradient(135deg, #ffc107, #ffb300);
-                color: #333;
-                border-color: #e0a800;
+            .action-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+                transition: left 0.5s;
             }
 
-            .LishBody .edit-btn:hover {
-                background: linear-gradient(135deg, #ffb300, #ff8f00);
+            .action-btn:hover::before {
+                left: 100%;
+            }
+
+            /* Nút Edit - màu vàng cam gradient */
+            .btn-edit {
+                background: linear-gradient(135deg, #ffc107, #ff8f00);
+                color: #212529;
+                border-color: #ffc107;
+                box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+            }
+
+            .btn-edit:hover {
+                background: linear-gradient(135deg, #e0a800, #f57c00);
+                color: white;
                 transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+                box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
             }
 
-            /* Nút Delete */
-            .LishBody .delete-btn {
+            /* Nút Delete - màu đỏ gradient */
+            .btn-delete {
                 background: linear-gradient(135deg, #dc3545, #c82333);
                 color: white;
-                border-color: #bd2130;
+                border-color: #dc3545;
+                box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
             }
 
-            .LishBody .delete-btn:hover {
-                background: linear-gradient(135deg, #c82333, #a71e2a);
+            .btn-delete:hover {
+                background: linear-gradient(135deg, #c82333, #bd2130);
                 transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+                box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
             }
 
-            /* Nút Active */
-            .LishBody .active-btn {
+            /* Nút Active - màu xanh lá gradient */
+            .btn-active {
                 background: linear-gradient(135deg, #28a745, #20c997);
                 color: white;
-                border-color: #1e7e34;
+                border-color: #28a745;
+                box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
             }
 
-            .LishBody .active-btn:hover {
-                background: linear-gradient(135deg, #20c997, #17a2b8);
+            .btn-active:hover {
+                background: linear-gradient(135deg, #218838, #1e7e34);
                 transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+                box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
             }
 
-            /* Nút Evaluation */
-            .LishBody .evaluation-btn {
+            /* Nút Evaluation - màu xanh dương gradient */
+            .btn-evaluation {
                 background: linear-gradient(135deg, #17a2b8, #138496);
                 color: white;
-                border-color: #117a8b;
+                border-color: #17a2b8;
+                box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
             }
 
-            .LishBody .evaluation-btn:hover {
-                background: linear-gradient(135deg, #138496, #0f6674);
+            .btn-evaluation:hover {
+                background: linear-gradient(135deg, #138496, #117a8b);
                 transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+                box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
             }
 
-            /* Nút View Evaluation */
-            .LishBody .view-evaluation-btn {
+            /* Nút View evaluation - màu tím gradient */
+            .btn-view {
                 background: linear-gradient(135deg, #6f42c1, #5a32a3);
                 color: white;
-                border-color: #59359a;
+                border-color: #6f42c1;
+                box-shadow: 0 2px 8px rgba(111, 66, 193, 0.3);
             }
 
-            .LishBody .view-evaluation-btn:hover {
-                background: linear-gradient(135deg, #5a32a3, #4c2a85);
+            .btn-view:hover {
+                background: linear-gradient(135deg, #5a32a3, #4e2a87);
                 transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3);
+                box-shadow: 0 4px 12px rgba(111, 66, 193, 0.4);
             }
 
-            /* Container cho các nút để căn chỉnh đẹp hơn */
-            .LishBody .action-container {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 4px;
-                justify-content: center;
-                align-items: center;
-            }
-
-            /* Responsive cho mobile */
+            /* Responsive design cho mobile */
             @media (max-width: 768px) {
-                .LishBody .action-btn {
-                    min-width: 70px;
-                    padding: 6px 12px;
-                    font-size: 11px;
+                .action-container {
+                    min-width: 120px;
                 }
+
+                .action-btn {
+                    min-width: 80px;
+                    padding: 6px 12px;
+                    font-size: 12px;
+                    height: 32px;
+                }
+            }
+
+            /* Cải thiện cho table cell chứa action buttons */
+            .LishBody td.action-cell {
+                padding: 12px 8px;
+                vertical-align: middle;
+                background-color: #f8f9fa !important;
+            }
+
+            .LishBody tr:nth-child(even) td.action-cell {
+                background-color: #e9f7ff !important;
+            }
+
+            .LishBody tr:hover td.action-cell {
+                background-color: #d4edff !important;
+            }
+
+            /* Animation cho loading state */
+            .action-btn:active {
+                transform: scale(0.95);
+                transition: transform 0.1s;
+            }
+
+            /* Tooltip effect (optional) */
+            .action-btn[title]:hover::after {
+                content: attr(title);
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                white-space: nowrap;
+                z-index: 1000;
+                margin-bottom: 5px;
+            }
+
+            /* Icon support (nếu muốn thêm icon) */
+            .action-btn i {
+                margin-right: 6px;
+                font-size: 14px;
+            }
+
+            /* Trạng thái disabled */
+            .action-btn:disabled,
+            .action-btn.disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none !important;
+                box-shadow: none !important;
+            }
+
+            .action-btn:disabled:hover,
+            .action-btn.disabled:hover {
+                transform: none;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             }
         </style>
 
     </head>
     <body>
-
+        <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}"></c:if>
         <c:set var="currentPage" value="${requestScope.currentPage}"/>
         <c:set var="listSupplier" value="${listSupplier}" />
         <c:set var="option" value="${requestScope.filter}"/>
         <c:set var="status" value="${requestScope.status}"/>
         <c:set var="name" value="${requestScope.name}"/>
         <c:set var="line" value="${requestScope.line}"/>
+        <c:set var="user" value="${sessionScope.user}" />
+
         <div class="LishHead">
             <h1>List Supplier</h1>
             <form action="SearchListSupplier">
@@ -334,7 +435,9 @@
                 <input type="text"placeholder="Nhập Tên nhà cung cấp" value="${name}"  name="name">
                 <input type="submit" value="Search" name="name">
             </form>
-            <a href="AddNewSupplier.jsp">+ Add new supplier</a>
+            <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}">
+                <a href="AddNewSupplier.jsp">+ Add new supplier</a>
+            </c:if>
         </div>
         <div class="LishBody">
             <c:if test="${not empty listSupplier}">
@@ -348,8 +451,9 @@
                         <td>Note</td>
                         <td>Status</td>
                         <td>Date Create</td>
-                        <td colspan="3">Option</td>
-
+                        <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}">
+                            <td colspan="3">Option</td>
+                        </c:if>
                     </tr>
                     <c:forEach var="listItem" items="${listSupplier}">
                         <tr>
@@ -367,45 +471,47 @@
                                     <td style="font-weight: bold">Inactive</td>
                                 </c:otherwise>
                             </c:choose>
-                            <td>${listItem.createDate}</td>      
-                            <td>
-                                <div class="action-container">
-                                    <a class="action-btn edit-btn" 
-                                       href="UpdateSupplier.jsp?id=${listItem.supplierID}&name=${listItem.name}&phone=${listItem.phone}&email=${listItem.email}&address=${listItem.address}&note=${listItem.note}">
-                                        Edit
-                                    </a>
-                                    <c:choose>
-                                        <c:when test="${listItem.activeFlag == 1}">
-                                            <a class="action-btn delete-btn" 
-                                               href="DeleteSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}&currentPage=${currentPage}" 
-                                               onclick="return confirm('Bạn có chắc chắn muốn xoá nhà cung cấp này không?')">
-                                                Delete
-                                            </a>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <a class="action-btn active-btn"
-                                               href="ActiveSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}"
-                                               onclick="return confirm('Bạn có chắc chắn muốn active nhà cung cấp này không?')">
-                                                Active
-                                            </a>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
-                            </td>
-                            <td>
-
-                                <div class="action-container">
-                                    <a class="action-btn evaluation-btn"
-                                       href="TableSupplierEvaluation?id=${listItem.supplierID}">
-                                        Evaluation
-                                    </a>
-                                    <a class="action-btn view-evaluation-btn"
-                                       href="ViewSupplierEvaluation?supplierID=${listItem.supplierID}">
-                                        View Evaluation
-                                    </a>
-                                </div>
-                            </td>    
-
+                            <td>${listItem.createDate}</td> 
+                            <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}">
+                                <td>
+                                    <div class="action-container">
+                                        <a class="action-btn btn-edit" 
+                                           href="UpdateSupplier.jsp?id=${listItem.supplierID}&name=${listItem.name}&phone=${listItem.phone}&email=${listItem.email}&address=${listItem.address}&note=${listItem.note}">
+                                            Edit
+                                        </a>
+                                        <c:choose>
+                                            <c:when test="${listItem.activeFlag == 1}">
+                                                <a class="action-btn btn-delete" 
+                                                   href="DeleteSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}&currentPage=${currentPage}" 
+                                                   onclick="return confirm('Bạn có chắc chắn muốn xoá nhà cung cấp này không?')">
+                                                    Delete
+                                                </a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a class="action-btn btn-active"
+                                                   href="ActiveSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}"
+                                                   onclick="return confirm('Bạn có chắc chắn muốn active nhà cung cấp này không?')">
+                                                    Active
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </td>
+                            </c:if>
+                            <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}">
+                                <td>
+                                    <div class="action-container">
+                                        <a class="action-btn btn-evaluation"
+                                           href="TableSupplierEvaluation?id=${listItem.supplierID}">
+                                            Evaluation
+                                        </a>
+                                        <a class="action-btn btn-view"
+                                           href="ViewSupplierEvaluation?supplierID=${listItem.supplierID}">
+                                            View evaluation
+                                        </a>
+                                    </div>
+                                </td>
+                            </c:if>
                         </tr>
                     </c:forEach>
                 </table>

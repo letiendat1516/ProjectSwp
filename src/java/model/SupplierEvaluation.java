@@ -3,12 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
+
 import java.sql.Date;
+
 /**
  *
  * @author Fpt06
  */
 public class SupplierEvaluation {
+
     private int supplierEvaluationID;
     private Supplier supplierID;
     private Users userID;
@@ -135,6 +138,10 @@ public class SupplierEvaluation {
     public void setEditCount(int editCount) {
         this.editCount = editCount;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "SupplierEvaluation{" + "supplierEvaluationID=" + supplierEvaluationID + ", supplierID=" + supplierID + ", userID=" + userID + ", expectedDeliveryTime=" + expectedDeliveryTime + ", productQuality=" + productQuality + ", marketPriceComparison=" + marketPriceComparison + ", transparencyReputation=" + transparencyReputation + ", serviceQuality=" + serviceQuality + ", comment=" + comment + ", avgRate=" + avgRate + ", commentTime=" + commentTime + ", editCount=" + editCount + '}';
+    }
+
 }

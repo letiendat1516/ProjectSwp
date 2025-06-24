@@ -64,6 +64,8 @@ public class ViewSupplierEvaluation extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String id_raw = request.getParameter("supplierID");
+        String indexPage = request.getParameter("index");
+
         try {
             int id = Integer.parseInt(id_raw);
             SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
@@ -76,11 +78,34 @@ public class ViewSupplierEvaluation extends HttpServlet {
             String avg = String.valueOf(avg_rate);
             avg = avg.substring(0, 3);
             list.sort(Comparator.comparing(SupplierEvaluation::getAvgRate).reversed());
-            request.setAttribute("listSED", list);
+
             request.setAttribute("avg", avg);
             SupplierDAO sd = new SupplierDAO();
             Supplier s = sd.getSupplierByID(id);
             request.setAttribute("supplier", s);
+
+            //phan trang
+            int totalPage = (int) Math.ceil((double) list.size() / 5);
+            request.setAttribute("totalPage", totalPage);
+            if (indexPage != null) {
+                int index = Integer.parseInt(indexPage);
+                if (index < totalPage) {
+                    list = list.subList((index - 1) * 5, (index - 1) * 5 + 5);
+                } else {
+                    list = list.subList((index - 1) * 5, list.size());
+                }
+                request.setAttribute("index", index);
+                request.setAttribute("listSED", list);
+            } else {
+                if (list.size() < 5) {
+                    request.setAttribute("index", 1);
+                    request.setAttribute("listSED", list);
+                } else {
+                    list = list.subList(0, 5);
+                    request.setAttribute("index", 1);
+                    request.setAttribute("listSED", list);
+                }
+            }
 
             request.getRequestDispatcher("ViewSupplierEvaluation.jsp").forward(request, response);
         } catch (NumberFormatException e) {

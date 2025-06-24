@@ -7,6 +7,15 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
+<%@ page import="model.Users" %> 
+<%
+Users user = (Users) session.getAttribute("user");
+if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName())&&!"Nhân viên kho".equalsIgnoreCase(user.getRoleName()))) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+%>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">

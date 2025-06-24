@@ -7,6 +7,15 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
+<%@ page import="model.Users" %> 
+<%
+Users user = (Users) session.getAttribute("user");
+if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName()))) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -255,11 +264,15 @@
         </style>
     </head>
     <body>
+
         <c:set var="list" value="${requestScope.list}"/>
         <c:set var="fl" value="${requestScope.fl}"/>
         <c:set var="st" value="${requestScope.st}"/>
         <c:set var="mess" value="${requestScope.mess}"/>
         <c:set var="sta" value="${requestScope.sta}"/>
+        <c:set var="totalPage" value="${requestScope.totalPage}"/>
+        
+
         <h2 style="font-weight: bold;color: #c3e6cb" >Statistic Evaluation</h2>
         <form action="StatisticSupplierEvaluation">
             <select name="top">
@@ -279,7 +292,7 @@
             <input type="submit" value="Statistic" name="name">
         </form>
         <c:if test="${not empty list}">
-            <h2>${mess}</h2>
+            <h2 style="font-weight: bold;color: #c3e6cb" >${mess}</h2>
             <table border="1px solid">
                 <tr>
                     <td>ID</td>
@@ -301,6 +314,11 @@
                 </c:forEach>
             </table>
         </c:if>
-        <a href="#">back</a>
+        <div>
+            <c:forEach var="i" begin="1" end="${totalPage}">
+                <a href="StatisticSupplierEvaluation?top=${fl}&sort=${st}&status=${sta}&index=${i}" >${i}</a>
+            </c:forEach>
+        </div>
+        <a href="Admin.jsp">back</a>
     </body>
 </html>

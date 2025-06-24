@@ -1,16 +1,21 @@
 <%-- 
     Document   : SupplierEvaluation
-<<<<<<< HEAD
-    Created on : 9 thg 6, 2025, 20:56:44
-=======
     Created on : 11 thg 6, 2025, 01:38:28
->>>>>>> 7880e13fcf6ab2eda880dd7a4c83aed3ce459e86
     Author     : Fpt06
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
+<%@ page import="model.Users" %> 
+<%
+Users user = (Users) session.getAttribute("user");
+if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName())&&!"Nhân viên kho".equalsIgnoreCase(user.getRoleName()))) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -334,7 +339,6 @@
 
     </head>
     <body>
-
         <c:set var="supplier" value="${requestScope.supplier}"/>
         <c:set var="mess" value="${requestScope.mess}"/>
         <c:set var="user" value="${sessionScope.user}"/>
@@ -358,7 +362,7 @@
                         <tr>
                             <td><input type="hidden" name="supplier" value="${supplier.supplierID}"></td>
                             <td><input type="hidden" name="uid" value="${user.id}"></td>
-                            <c:if test="${not empty seid}"><td><input type="hidden" name="seid" value="${seid}"></td></c:if>
+                            <td><input type="hidden" name="seid" value="${seid}"></td>
                         </tr>
                         <tr>
                             <td>Delivery Time:</td>
@@ -447,5 +451,4 @@
     </body>
 
 </html>
-
 

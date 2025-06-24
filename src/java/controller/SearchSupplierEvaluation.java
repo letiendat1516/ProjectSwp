@@ -68,7 +68,7 @@ public class SearchSupplierEvaluation extends HttpServlet {
         String filter = request.getParameter("fl");
         String sid = request.getParameter("sid");
         String name = request.getParameter("name");
-
+        String indexPage = request.getParameter("index");
         try {
             int id = Integer.parseInt(sid);
             SupplierDAO sd = new SupplierDAO();
@@ -90,18 +90,47 @@ public class SearchSupplierEvaluation extends HttpServlet {
             request.setAttribute("avg", avg);
             //list
             List<SupplierEvaluation> list2 = list.stream().
-                            filter((c) -> c.getUserID().getFullname().toLowerCase().contains(name.toLowerCase())).
-                            collect(Collectors.toList());
-            if(filter.matches("star")){
+                    filter((c) -> c.getUserID().getFullname().toLowerCase().contains(name.toLowerCase())).
+                    collect(Collectors.toList());
+            if (filter.matches("star")) {
                 list2.sort(Comparator.comparing(SupplierEvaluation::getAvgRate).reversed());
+                
+                //phan trang
+                int totalPage = (int) Math.ceil((double) list2.size() / 5);
+                request.setAttribute("totalPage", totalPage);
+                int index = Integer.parseInt(indexPage);
+                if (index < totalPage) {
+                    list2 = list2.subList((index - 1) * 5, (index - 1) * 5 + 5);
+                } else {
+                    list2 = list2.subList((index - 1) * 5, list2.size());
+                }
+                request.setAttribute("index", index);
                 request.setAttribute("listSED", list2);
+                //
+                request.setAttribute("name", name);
+                request.setAttribute("isFilter", "search");
                 request.getRequestDispatcher("ViewSupplierEvaluation.jsp").forward(request, response);
-            }else{
+            } else {
                 list2.sort(Comparator.comparing(SupplierEvaluation::getCommentTime).reversed());
                 request.setAttribute("listSED", list2);
+                
+                //phan trang
+                int totalPage = (int) Math.ceil((double) list2.size() / 5);
+                request.setAttribute("totalPage", totalPage);
+                int index = Integer.parseInt(indexPage);
+                if (index < totalPage) {
+                    list2 = list2.subList((index - 1) * 5, (index - 1) * 5 + 5);
+                } else {
+                    list2 = list2.subList((index - 1) * 5, list2.size());
+                }
+                request.setAttribute("index", index);
+                request.setAttribute("listSED", list2);
+                //
+                request.setAttribute("name", name);
+                request.setAttribute("isFilter", "search");
                 request.getRequestDispatcher("ViewSupplierEvaluation.jsp").forward(request, response);
             }
-            
+
         } catch (NumberFormatException e) {
         }
     }

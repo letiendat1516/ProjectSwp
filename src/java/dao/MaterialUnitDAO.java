@@ -4,7 +4,8 @@
  */
 package dao;
 
-import DBContext.Context;
+// DAO for advanced operations on material units (search, paging, duplicate check)
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,10 +13,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import DBContext.Context;
 import model.MaterialUnit;
 
 public class MaterialUnitDAO {
-    
+    //Lấy tất cả các unit từ db
     public List<MaterialUnit> getAllMaterialUnits() {
         List<MaterialUnit> materialUnits = new ArrayList<>();
         
@@ -40,7 +43,7 @@ public class MaterialUnitDAO {
         
         return materialUnits;
     }
-    
+    //Tìm các unit từ db
     public List<MaterialUnit> searchMaterialUnits(String searchTerm) {
         List<MaterialUnit> units = new ArrayList<>();
         String sql = "SELECT * FROM unit WHERE name LIKE ? OR symbol LIKE ?";
@@ -69,7 +72,7 @@ public class MaterialUnitDAO {
         
         return units;
     }
-    
+    //Lấy các unit dựa vào id
     public MaterialUnit getMaterialUnitById(int id) {
         MaterialUnit unit = null;
         String sql = "SELECT * FROM unit WHERE id = ?";
@@ -94,7 +97,7 @@ public class MaterialUnitDAO {
         
         return unit;
     }
-    
+    //Thêm unit mới
     public boolean addMaterialUnit(MaterialUnit unit) {
         String sql = "INSERT INTO unit (name, symbol, description, type) VALUES (?, ?, ?, ?)";
         try (Connection conn = Context.getJDBCConnection();
@@ -112,7 +115,7 @@ public class MaterialUnitDAO {
             return false;
         }
     }
-  
+    //Update unit có từ trước
     public boolean updateMaterialUnit(MaterialUnit unit) {
         String sql = "UPDATE unit SET name = ?, symbol = ?, description = ?, type = ? WHERE id = ?";
         
@@ -132,7 +135,7 @@ public class MaterialUnitDAO {
             return false;
         }
     }
-    
+    //Xóa unit 
     public boolean deleteMaterialUnit(int id) {
         String sql = "DELETE FROM unit WHERE id = ?";
         
@@ -148,7 +151,7 @@ public class MaterialUnitDAO {
             return false;
         }
     }
-    
+    //Thay đổi trạng thái của unit
     public boolean updateMaterialUnitStatus(int id, String status) {
         boolean updated = false;
         
@@ -169,7 +172,7 @@ public class MaterialUnitDAO {
         
         return updated;
     }
-    
+    //Lấy unit dựa theo giới hạn phân trang
     public List<MaterialUnit> getMaterialUnitsWithPaging(int offset, int recordsPerPage) {
         List<MaterialUnit> units = new ArrayList<>();
         String query = "SELECT * FROM unit ORDER BY id LIMIT ?, ?";
@@ -194,7 +197,7 @@ public class MaterialUnitDAO {
         }
         return units;
     }
-
+    //Tìm unit dựa theo giới hạn phân trang 
     public List<MaterialUnit> searchMaterialUnitsWithPaging(String searchTerm, int offset, int recordsPerPage) {
         List<MaterialUnit> units = new ArrayList<>();
         String sql = "SELECT * FROM unit WHERE name LIKE ? OR symbol LIKE ? ORDER BY id LIMIT ?, ?";
@@ -297,7 +300,7 @@ public class MaterialUnitDAO {
         return count;
     }
 
-    // Check for duplicate name or symbol (excluding current id)
+    //Kiểm tra trùng tên hoặc kí hiệu (trừ id hiện tại)
     public boolean isDuplicateNameOrSymbol(String name, String symbol, Integer excludeId) {
         String sql = "SELECT COUNT(*) FROM unit WHERE (name = ? OR symbol = ?)" + (excludeId != null ? " AND id <> ?" : "");
         try (Connection conn = Context.getJDBCConnection();

@@ -12,6 +12,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.Supplier;
+import java.sql.Date;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import model.SupplierEvaluation;
 import model.Users;
 
@@ -25,46 +28,6 @@ public class SupplierEvaluationDAO {
     private PreparedStatement ps = null;
     private ResultSet rs = null;
 
-    public List<Supplier> staticMarketPrice(String sort) {
-        List<Supplier> list = new ArrayList<>();
-        String sql = "select swp.supplier_evaluation.supplier_id,avg(swp.supplier_evaluation.market_price_comparison) as avgrate \n"
-                + "from swp.supplier_evaluation group by supplier_id order by avg(swp.supplier_evaluation.market_price_comparison) " + sort;
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                SupplierDAO sd = new SupplierDAO();
-                Supplier s = sd.getSupplierByID(rs.getInt("supplier_id"));
-                list.add(s);
-            }
-
-        } catch (Exception e) {
-        }
-        return list;
-    }
-
-    public List<Supplier> staticExpectedDelivery(String sort) {
-        List<Supplier> list = new ArrayList<>();
-        String sql = "select swp.supplier_evaluation.supplier_id,avg(swp.supplier_evaluation.expected_delivery_time) as avgrate \n"
-                + "from swp.supplier_evaluation group by supplier_id order by avg(swp.supplier_evaluation.expected_delivery_time) " + sort;
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                SupplierDAO sd = new SupplierDAO();
-                Supplier s = sd.getSupplierByID(rs.getInt("supplier_id"));
-                list.add(s);
-            }
-
-        } catch (Exception e) {
-        }
-        return list;
-    }
-
     public List<Supplier> staticRated(String sort) {
         List<Supplier> list = new ArrayList<>();
         String sql = "select swp.supplier_evaluation.supplier_id,avg(swp.supplier_evaluation.avg_rate) as avgrate \n"
@@ -73,48 +36,49 @@ public class SupplierEvaluationDAO {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-
+            SupplierDAO sd = new SupplierDAO();
+            UserDAO ud = new UserDAO();
             while (rs.next()) {
-                SupplierDAO sd = new SupplierDAO();
                 Supplier s = sd.getSupplierByID(rs.getInt("supplier_id"));
                 list.add(s);
             }
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
         }
         return list;
     }
-
-    public List<SupplierEvaluation> sortDescendingByDate(int id) {
-        List<SupplierEvaluation> list = new ArrayList<>();
-        String sql = "SELECT * FROM swp.supplier_evaluation where supplier_id = " + id + " order by comment_time desc;";
+    
+    public List<Supplier> staticMarketPrice(String sort) {
+        List<Supplier> list = new ArrayList<>();
+        String sql = "select swp.supplier_evaluation.supplier_id,avg(swp.supplier_evaluation.market_price_comparison) as avgrate \n"
+                + "from swp.supplier_evaluation group by supplier_id order by avg(swp.supplier_evaluation.market_price_comparison) "+sort;
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
+            SupplierDAO sd = new SupplierDAO();
+            UserDAO ud = new UserDAO();
             while (rs.next()) {
-
-                UserDAO ud = new UserDAO();
-                SupplierDAO sd = new SupplierDAO();
-                Users u = ud.getUserById(rs.getInt("user_id"));
                 Supplier s = sd.getSupplierByID(rs.getInt("supplier_id"));
+                list.add(s);
+            }
+        } catch (SQLException e) {
+        }
+        return list;
+    }
 
-                SupplierEvaluation se = new SupplierEvaluation();
-
-                se.setAvgRate(rs.getFloat("avg_rate"));
-                se.setComment(rs.getString("comment"));
-                se.setCommentTime(rs.getDate("comment_time"));
-                se.setEditCount(rs.getInt("edit_count"));
-                se.setExpectedDeliveryTime(rs.getInt("expected_delivery_time"));
-                se.setMarketPriceComparison(rs.getInt("market_price_comparison"));
-                se.setProductQuality(rs.getInt("product_quality"));
-                se.setSupplierEvaluationID(rs.getInt("service_quality"));
-                se.setTransparencyReputation(rs.getInt("transparency_reputation"));
-                se.setSupplierEvaluationID(rs.getInt("id"));
-                se.setSupplierID(s);
-                se.setUserID(u);
-                list.add(se);
-
+    public List<Supplier> staticExpectedDelivery(String sort) {
+        List<Supplier> list = new ArrayList<>();
+        String sql = "select swp.supplier_evaluation.supplier_id,avg(swp.supplier_evaluation.expected_delivery_time) as avgrate \n"
+                + "from swp.supplier_evaluation group by supplier_id order by avg(swp.supplier_evaluation.expected_delivery_time) "+sort;
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            SupplierDAO sd = new SupplierDAO();
+            UserDAO ud = new UserDAO();
+            while (rs.next()) {
+                Supplier s = sd.getSupplierByID(rs.getInt("supplier_id"));
+                list.add(s);
             }
         } catch (SQLException e) {
         }
@@ -123,20 +87,15 @@ public class SupplierEvaluationDAO {
 
     public List<SupplierEvaluation> sortDescendingByStar(int id) {
         List<SupplierEvaluation> list = new ArrayList<>();
-        String sql = "SELECT * FROM swp.supplier_evaluation where supplier_id = " + id + " order by avg_rate desc;";
+        String sql = "SELECT * FROM swp.supplier_evaluation where supplier_id = " + id + " order by avg_rate desc";
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
+            SupplierDAO sd = new SupplierDAO();
+            UserDAO ud = new UserDAO();
             while (rs.next()) {
-
-                UserDAO ud = new UserDAO();
-                SupplierDAO sd = new SupplierDAO();
-                Users u = ud.getUserById(rs.getInt("user_id"));
-                Supplier s = sd.getSupplierByID(rs.getInt("supplier_id"));
-
                 SupplierEvaluation se = new SupplierEvaluation();
-
                 se.setAvgRate(rs.getFloat("avg_rate"));
                 se.setComment(rs.getString("comment"));
                 se.setCommentTime(rs.getDate("comment_time"));
@@ -144,64 +103,82 @@ public class SupplierEvaluationDAO {
                 se.setExpectedDeliveryTime(rs.getInt("expected_delivery_time"));
                 se.setMarketPriceComparison(rs.getInt("market_price_comparison"));
                 se.setProductQuality(rs.getInt("product_quality"));
-                se.setSupplierEvaluationID(rs.getInt("service_quality"));
-                se.setTransparencyReputation(rs.getInt("transparency_reputation"));
+                se.setServiceQuality(rs.getInt("service_quality"));
                 se.setSupplierEvaluationID(rs.getInt("id"));
-                se.setSupplierID(s);
-                se.setUserID(u);
-                list.add(se);
 
+                Supplier s = sd.getSupplierByID(rs.getInt("supplier_id"));
+                Users u = ud.getUserById(rs.getInt("user_id"));
+                se.setSupplierID(s);
+                se.setTransparencyReputation(rs.getInt("transparency_reputation"));
+                se.setUserID(u);
+
+                list.add(se);
             }
         } catch (SQLException e) {
         }
         return list;
     }
 
-    public void deleteSupplierEvaluation(int id) {
-        String sql = "delete from swp.supplier_evaluation where id = " + id;
+    public List<SupplierEvaluation> sortDescendingByDate(int id) {
+        List<SupplierEvaluation> list = new ArrayList<>();
+        String sql = "SELECT * FROM swp.supplier_evaluation where supplier_id = " + id + " order by comment_time desc";
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            SupplierDAO sd = new SupplierDAO();
+            UserDAO ud = new UserDAO();
+            while (rs.next()) {
+                SupplierEvaluation se = new SupplierEvaluation();
+                se.setAvgRate(rs.getFloat("avg_rate"));
+                se.setComment(rs.getString("comment"));
+                se.setCommentTime(rs.getDate("comment_time"));
+                se.setEditCount(rs.getInt("edit_count"));
+                se.setExpectedDeliveryTime(rs.getInt("expected_delivery_time"));
+                se.setMarketPriceComparison(rs.getInt("market_price_comparison"));
+                se.setProductQuality(rs.getInt("product_quality"));
+                se.setServiceQuality(rs.getInt("service_quality"));
+                se.setSupplierEvaluationID(rs.getInt("id"));
+
+                Supplier s = sd.getSupplierByID(rs.getInt("supplier_id"));
+                Users u = ud.getUserById(rs.getInt("user_id"));
+                se.setSupplierID(s);
+                se.setTransparencyReputation(rs.getInt("transparency_reputation"));
+                se.setUserID(u);
+
+                list.add(se);
+            }
+        } catch (SQLException e) {
+        }
+        return list;
+    }
+
+    public void UpdateSupplierEvaluation(int dt, int mpc, int tr, int sq, String comment, int seid) {
+        String sql = "UPDATE `swp`.`supplier_evaluation`\n"
+                + "SET\n"
+                + "`expected_delivery_time` = ?,\n"
+                + "`market_price_comparison` = ?,\n"
+                + "`transparency_reputation` = ?,\n"
+                + "`service_quality` = ?,\n"
+                + "`comment` = ?,\n"
+                + "`avg_rate` = ?,\n"
+                + "`edit_count` = ?\n"
+                + "WHERE `id` = ?";
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, dt);
+            ps.setInt(2, mpc);
+            ps.setInt(3, tr);
+            ps.setInt(4, sq);
+            ps.setString(5, comment);
+            float avg_rate = (dt + mpc + tr + sq) / 4.0f;
+            ps.setFloat(6, avg_rate);
+            ps.setInt(7, 1);
+            ps.setInt(8, seid);
             ps.executeUpdate();
         } catch (SQLException e) {
         }
-    }
-
-    public List<SupplierEvaluation> getSupplierEvaluationByID(int id) {
-
-        List<SupplierEvaluation> list = new ArrayList<>();
-        String sql = "SELECT * FROM swp.supplier_evaluation where supplier_id = " + id;
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-
-                UserDAO ud = new UserDAO();
-                SupplierDAO sd = new SupplierDAO();
-                Users u = ud.getUserById(rs.getInt("user_id"));
-                Supplier s = sd.getSupplierByID(rs.getInt("supplier_id"));
-
-                SupplierEvaluation se = new SupplierEvaluation();
-
-                se.setAvgRate(rs.getFloat("avg_rate"));
-                se.setComment(rs.getString("comment"));
-                se.setCommentTime(rs.getDate("comment_time"));
-                se.setEditCount(rs.getInt("edit_count"));
-                se.setExpectedDeliveryTime(rs.getInt("expected_delivery_time"));
-                se.setMarketPriceComparison(rs.getInt("market_price_comparison"));
-                se.setProductQuality(rs.getInt("product_quality"));
-                se.setSupplierEvaluationID(rs.getInt("service_quality"));
-                se.setTransparencyReputation(rs.getInt("transparency_reputation"));
-                se.setSupplierEvaluationID(rs.getInt("id"));
-                se.setSupplierID(s);
-                se.setUserID(u);
-                list.add(se);
-
-            }
-        } catch (SQLException e) {
-        }
-        return list;
     }
 
     public void evaluation(int sid, int uid, int dt, int pq, int mpc, int tr, int sq, String comment) {
@@ -230,36 +207,53 @@ public class SupplierEvaluationDAO {
             ps.setInt(6, tr);
             ps.setInt(7, sq);
             ps.setString(8, comment);
-            float avg_rate = (dt + mpc + tr + sq) / 4.0f;
+            float avg_rate = (dt + pq + mpc + tr + sq) / 4.0f;
             ps.setFloat(9, avg_rate);
             ps.executeUpdate();
         } catch (SQLException e) {
         }
     }
 
-    public void editComment(int id, int dt, int mpc, int tr, int sq, String comment) {
-        String sql = "UPDATE `swp`.`supplier_evaluation`\n"
-                + "SET\n"
-                + "`expected_delivery_time` = ?,\n"
-                + "`market_price_comparison` = ?,\n"
-                + "`transparency_reputation` = ?,\n"
-                + "`service_quality` = ?,\n"
-                + "`comment` = ?,\n"
-                + "`avg_rate` = ?,\n"
-                + "`edit_count` = ?\n"
-                + "WHERE `id` = ?;";
+    public List<SupplierEvaluation> getSupplierEvaluationByID(int id) {
+        List<SupplierEvaluation> list = new ArrayList<>();
+        String sql = "SELECT * FROM swp.supplier_evaluation where supplier_id = " + id;
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
-            ps.setInt(1, dt);
-            ps.setInt(2, mpc);
-            ps.setInt(3, tr);
-            ps.setInt(4, sq);
-            ps.setString(5, comment);
-            float avg_rate = (dt + mpc + tr + sq) / 4.0f;
-            ps.setFloat(6, avg_rate);
-            ps.setInt(7, 1);
-            ps.setInt(8, id);
+            ResultSet rs = ps.executeQuery();
+            SupplierDAO sd = new SupplierDAO();
+            UserDAO ud = new UserDAO();
+            while (rs.next()) {
+                SupplierEvaluation se = new SupplierEvaluation();
+                se.setAvgRate(rs.getFloat("avg_rate"));
+                se.setComment(rs.getString("comment"));
+                se.setCommentTime(rs.getDate("comment_time"));
+                se.setEditCount(rs.getInt("edit_count"));
+                se.setExpectedDeliveryTime(rs.getInt("expected_delivery_time"));
+                se.setMarketPriceComparison(rs.getInt("market_price_comparison"));
+                se.setProductQuality(rs.getInt("product_quality"));
+                se.setServiceQuality(rs.getInt("service_quality"));
+                se.setSupplierEvaluationID(rs.getInt("id"));
+
+                Supplier s = sd.getSupplierByID(rs.getInt("supplier_id"));
+                Users u = ud.getUserById(rs.getInt("user_id"));
+                se.setSupplierID(s);
+                se.setTransparencyReputation(rs.getInt("transparency_reputation"));
+                se.setUserID(u);
+
+                list.add(se);
+            }
+        } catch (SQLException e) {
+        }
+        return list;
+
+    }
+
+    public void deleteSupplierEvaluation(int id) {
+        String sql = "delete from swp.supplier_evaluation where id = " + id;
+        try {
+            conn = new Context().getJDBCConnection();
+            ps = conn.prepareStatement(sql);
             ps.executeUpdate();
         } catch (SQLException e) {
         }
@@ -267,14 +261,14 @@ public class SupplierEvaluationDAO {
 
     public static void main(String[] args) {
         SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
-        List<SupplierEvaluation> list = sed.getSupplierEvaluationByID(1);
+        List<Supplier> list = sed.staticRated("desc");
+//        List<SupplierEvaluation> list2 = list.stream().
+//                filter((c) -> c.getUserID().getFullname().toLowerCase().contains("ST".toLowerCase())).
+//                collect(Collectors.toList());
         for (int i = 0; i < list.size(); i++) {
-            System.out.println(list.get(i).getSupplierEvaluationID());
+            System.out.println(list.get(i).getSupplierID());
         }
-//        List<Supplier> listt = sed.staticMarketPrice("desc");
-//        for (int i = 0; i < listt.size(); i++) {
-//            System.out.println(listt.get(i).getSupplierID());
-//        }
-        sed.editComment(59, 1, 2, 3, 4, "ok");
+
     }
+
 }
