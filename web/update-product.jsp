@@ -447,19 +447,6 @@
                         <div class="form-help">Để trống nếu sản phẩm không có hạn sử dụng</div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="storageLocation">Vị Trí Lưu Trữ</label>
-                        <select id="storageLocation" name="storageLocation" class="form-control">
-                            <option value="">-- Chọn vị trí lưu trữ --</option>
-                            <c:forEach var="location" items="${storageLocations}">
-                                <option value="${location}" 
-                                        ${product.storageLocation == location ? 'selected' : ''}>
-                                    ${location}
-                                </option>
-                            </c:forEach>
-                        </select>
-                    </div>
-
                     <div class="form-group full-width">
                         <label class="form-label" for="description">Mô Tả Sản Phẩm</label>
                         <textarea id="description" name="description" class="form-control" 
