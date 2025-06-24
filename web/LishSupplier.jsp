@@ -6,7 +6,17 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
+<%@ page import="model.Users" %> 
+<%
+Users user = (Users) session.getAttribute("user");
+if (user == null) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -400,13 +410,15 @@
 
     </head>
     <body>
-
+        <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}"></c:if>
         <c:set var="currentPage" value="${requestScope.currentPage}"/>
         <c:set var="listSupplier" value="${listSupplier}" />
         <c:set var="option" value="${requestScope.filter}"/>
         <c:set var="status" value="${requestScope.status}"/>
         <c:set var="name" value="${requestScope.name}"/>
         <c:set var="line" value="${requestScope.line}"/>
+        <c:set var="user" value="${sessionScope.user}" />
+
         <div class="LishHead">
             <h1>List Supplier</h1>
             <form action="SearchListSupplier">
@@ -423,7 +435,9 @@
                 <input type="text"placeholder="Nhập Tên nhà cung cấp" value="${name}"  name="name">
                 <input type="submit" value="Search" name="name">
             </form>
-            <a href="AddNewSupplier.jsp">+ Add new supplier</a>
+            <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}">
+                <a href="AddNewSupplier.jsp">+ Add new supplier</a>
+            </c:if>
         </div>
         <div class="LishBody">
             <c:if test="${not empty listSupplier}">
@@ -437,8 +451,9 @@
                         <td>Note</td>
                         <td>Status</td>
                         <td>Date Create</td>
-                        <td colspan="3">Option</td>
-
+                        <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}">
+                            <td colspan="3">Option</td>
+                        </c:if>
                     </tr>
                     <c:forEach var="listItem" items="${listSupplier}">
                         <tr>
@@ -456,44 +471,47 @@
                                     <td style="font-weight: bold">Inactive</td>
                                 </c:otherwise>
                             </c:choose>
-                            <td>${listItem.createDate}</td>      
-                            <td>
-                                <div class="action-container">
-                                    <a class="action-btn btn-edit" 
-                                       href="UpdateSupplier.jsp?id=${listItem.supplierID}&name=${listItem.name}&phone=${listItem.phone}&email=${listItem.email}&address=${listItem.address}&note=${listItem.note}">
-                                        Edit
-                                    </a>
-                                    <c:choose>
-                                        <c:when test="${listItem.activeFlag == 1}">
-                                            <a class="action-btn btn-delete" 
-                                               href="DeleteSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}&currentPage=${currentPage}" 
-                                               onclick="return confirm('Bạn có chắc chắn muốn xoá nhà cung cấp này không?')">
-                                                Delete
-                                            </a>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <a class="action-btn btn-active"
-                                               href="ActiveSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}"
-                                               onclick="return confirm('Bạn có chắc chắn muốn active nhà cung cấp này không?')">
-                                                Active
-                                            </a>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="action-container">
-                                    <a class="action-btn btn-evaluation"
-                                       href="TableSupplierEvaluation?id=${listItem.supplierID}">
-                                        Evaluation
-                                    </a>
-                                    <a class="action-btn btn-view"
-                                       href="ViewSupplierEvaluation?supplierID=${listItem.supplierID}">
-                                        View evaluation
-                                    </a>
-                                </div>
-                            </td>
-
+                            <td>${listItem.createDate}</td> 
+                            <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}">
+                                <td>
+                                    <div class="action-container">
+                                        <a class="action-btn btn-edit" 
+                                           href="UpdateSupplier.jsp?id=${listItem.supplierID}&name=${listItem.name}&phone=${listItem.phone}&email=${listItem.email}&address=${listItem.address}&note=${listItem.note}">
+                                            Edit
+                                        </a>
+                                        <c:choose>
+                                            <c:when test="${listItem.activeFlag == 1}">
+                                                <a class="action-btn btn-delete" 
+                                                   href="DeleteSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}&currentPage=${currentPage}" 
+                                                   onclick="return confirm('Bạn có chắc chắn muốn xoá nhà cung cấp này không?')">
+                                                    Delete
+                                                </a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a class="action-btn btn-active"
+                                                   href="ActiveSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}"
+                                                   onclick="return confirm('Bạn có chắc chắn muốn active nhà cung cấp này không?')">
+                                                    Active
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </td>
+                            </c:if>
+                            <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}">
+                                <td>
+                                    <div class="action-container">
+                                        <a class="action-btn btn-evaluation"
+                                           href="TableSupplierEvaluation?id=${listItem.supplierID}">
+                                            Evaluation
+                                        </a>
+                                        <a class="action-btn btn-view"
+                                           href="ViewSupplierEvaluation?supplierID=${listItem.supplierID}">
+                                            View evaluation
+                                        </a>
+                                    </div>
+                                </td>
+                            </c:if>
                         </tr>
                     </c:forEach>
                 </table>

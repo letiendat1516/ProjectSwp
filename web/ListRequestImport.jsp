@@ -10,7 +10,6 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
-            /* CSS styles remain unchanged */
             * {
                 box-sizing: border-box;
                 margin: 0;
@@ -572,6 +571,23 @@
                 min-width: 200px;
             }
 
+            .select-group {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .select-group .form-control {
+                flex: 1;
+                border-top-left-radius: var(--border-radius);
+                border-bottom-left-radius: var(--border-radius);
+            }
+
+            .select-group .btn {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+
             .d-flex {
                 display: flex !important;
             }
@@ -793,6 +809,20 @@
                     width: 100%;
                 }
 
+                .select-group {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .select-group .form-control {
+                    border-radius: var(--border-radius);
+                    margin-bottom: 0.5rem;
+                }
+
+                .select-group .btn {
+                    border-radius: var(--border-radius);
+                }
+
                 .footer-content {
                     flex-direction: column;
                     gap: 1rem;
@@ -826,6 +856,7 @@
                                 <div class="alert-title">Thành công</div>
                                 <c:choose>
                                     <c:when test="${param.message eq 'approve_success'}">Phê duyệt nhập kho thành công!</c:when>
+                                    <c:when test="${param.message eq 'reject_success'}">Từ chối yêu cầu thành công!</c:when>
                                     <c:otherwise>Thao tác thành công!</c:otherwise>
                                 </c:choose>
                             </div>
@@ -848,6 +879,9 @@
                                     <c:when test="${param.error eq 'approve_failed'}">Không thể phê duyệt nhập kho!</c:when>
                                     <c:when test="${param.error eq 'invalid_data'}">Dữ liệu không hợp lệ!</c:when>
                                     <c:when test="${param.error eq 'permission_denied'}">Bạn không có quyền thực hiện hành động này!</c:when>
+                                    <c:when test="${param.error eq 'invalid_quantity'}">Số lượng nhập không hợp lệ!</c:when>
+                                    <c:when test="${param.error eq 'invalid_action'}">Hành động không hợp lệ!</c:when>
+                                    <c:when test="${param.error eq 'processing_failed'}">Xử lý yêu cầu thất bại!</c:when>
                                 </c:choose>
                             </div>
                             <div class="alert-close" onclick="this.parentElement.style.display = 'none'">
@@ -861,15 +895,18 @@
                         <div class="filter-title">Tìm kiếm</div>
                         <div class="filter-row">
                             <div class="filter-item">
-                                <form action="${pageContext.request.contextPath}/import" method="get">
+                                <form action="${pageContext.request.contextPath}/request/list" method="get">
                                     <input type="hidden" name="type" value="purchase">
-                                    <div class="input-group">
-                                        <input type="text" name="search" value="${param.search}" class="form-control" placeholder="Tìm kiếm theo tên sản phẩm...">
-                                        <div class="input-group-append">
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-search"></i> Tìm kiếm
-                                            </button>
-                                        </div>
+                                    <div class="select-group">
+                                        <select name="searchType" class="form-control" required>
+                                            <option value="requestId" ${param.searchType == 'requestId' ? 'selected' : ''}>Mã yêu cầu</option>
+                                            <option value="productName" ${param.searchType == 'productName' ? 'selected' : ''}>Tên sản phẩm</option>
+                                            <option value="productCode" ${param.searchType == 'productCode' ? 'selected' : ''}>Mã sản phẩm</option>
+                                        </select>
+                                        <input type="text" name="searchValue" value="${param.searchValue}" class="form-control" placeholder="Nhập giá trị tìm kiếm...">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search"></i> Tìm kiếm
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -917,15 +954,15 @@
                                                         <td>${status.index + 1}</td>
                                                         <td>${item.requestId}</td>
                                                         <td>${item.dayRequest}</td>
-                                                        <td>${item.supplier}</td>
-                                                        <td>${item.productName}</td>
-                                                        <td>${item.productCode}</td>
-                                                        <td>${item.unit}</td>
-                                                        <td><fmt:formatNumber value="${item.quantity}" pattern="#,##0.##" /></td>
-                                                        <td><fmt:formatNumber value="${item.price}" pattern="#,##0.## VNĐ" /></td>
-                                                        <td>${item.note}</td>
+                                                        <td>${item.supplier != null ? item.supplier : 'N/A'}</td>
+                                                        <td>${item.productName != null ? item.productName : 'No items'}</td>
+                                                        <td>${item.productCode != null ? item.productCode : 'N/A'}</td>
+                                                        <td>${item.unit != null ? item.unit : 'N/A'}</td>
+                                                        <td><fmt:formatNumber value="${item.quantity != null ? item.quantity : 0}" pattern="#,##0.##" /></td>
+                                                        <td><fmt:formatNumber value="${item.price != null ? item.price : 0}" pattern="#,##0.## VNĐ" /></td>
+                                                        <td>${item.note != null ? item.note : 'N/A'}</td>
                                                         <td>
-                                                            <a href="import-confirm?id=${item.requestId}" class="btn btn-sm btn-success">
+                                                            <a href="${pageContext.request.contextPath}/import-confirm?id=${item.requestId}" class="btn btn-sm btn-success">
                                                                 Xử lý nhập kho
                                                             </a>
                                                         </td>
@@ -944,19 +981,19 @@
                         <nav aria-label="Page navigation" class="d-flex justify-content-center">
                             <ul class="pagination">
                                 <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${currentPage - 1}&search=${param.search}" aria-label="Previous">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${currentPage - 1}&searchType=${param.searchType}&searchValue=${param.searchValue}" aria-label="Previous">
                                         <i class="fas fa-chevron-left"></i>
                                     </a>
                                 </li>
 
                                 <c:forEach begin="1" end="${totalPages}" var="i">
                                     <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${i}&search=${param.search}">${i}</a>
+                                        <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${i}&searchType=${param.searchType}&searchValue=${param.searchValue}">${i}</a>
                                     </li>
                                 </c:forEach>
 
                                 <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${currentPage + 1}&search=${param.search}" aria-label="Next">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${currentPage + 1}&searchType=${param.searchType}&searchValue=${param.searchValue}" aria-label="Next">
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
@@ -977,34 +1014,55 @@
                 </div>
             </div>
 
-            <!-- Thống kê yêu cầu nhập kho -->
+            <!-- Lịch sử nhập kho -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h2 class="mb-0">Thống kê yêu cầu nhập kho</h2>
+                    <h2 class="mb-0">Lịch sử nhập kho</h2>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex flex-wrap gap-3">
-                        <div style="flex: 1; min-width: 200px; background-color: #f0f9ff; border-radius: var(--border-radius); padding: 1.25rem; border-left: 4px solid #3b82f6;">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-primary fw-medium">Tổng yêu cầu</span>
-                                <i class="fas fa-clipboard-list text-primary"></i>
-                            </div>
-                            <div class="fs-3 fw-bold">${requestStats.totalRequests}</div>
-                        </div>
-                        <div style="flex: 1; min-width: 200px; background-color: #f0fdf4; border-radius: var(--border-radius); padding: 1.25rem; border-left: 4px solid #10b981;">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-success fw-medium">Đã nhập kho</span>
-                                <i class="fas fa-check-circle text-success"></i>
-                            </div>
-                            <div class="fs-3 fw-bold">${requestStats.approvedRequests}</div>
-                        </div>
-                        <div style="flex: 1; min-width: 200px; background-color: #fef3c7; border-radius: var(--border-radius); padding: 1.25rem; border-left: 4px solid #f59e0b;">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-warning fw-medium">Chờ nhập kho</span>
-                                <i class="fas fa-hourglass-half text-warning"></i>
-                            </div>
-                            <div class="fs-3 fw-bold">${requestStats.pendingRequests}</div>
-                        </div>
+                    <div class="table-container">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Mã đơn</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Mã sản phẩm</th>
+                                    <th>Nhà cung cấp</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:choose>
+                                    <c:when test="${empty historyItems}">
+                                        <tr>
+                                            <td colspan="6" class="text-center py-4">
+                                                <div style="color: gray;">
+                                                    <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i>
+                                                    <p>Không có dữ liệu để hiển thị.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:forEach var="item" items="${historyItems}" varStatus="status">                                                                   
+                                            <tr>
+                                                <td>${status.index + 1}</td>
+                                                <td>${item.requestId}</td>
+                                                <td>${item.productName != null ? item.productName : 'No items'}</td>
+                                                <td>${item.productCode != null ? item.productCode : 'N/A'}</td>
+                                                <td>${item.supplier}</td>
+                                                <td>
+                                                    <a href="LishSupplier" class="btn btn-sm btn-info btn-icon">
+                                                        <i class="fas fa-star"></i> Đánh giá
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </c:otherwise>
+                                </c:choose>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -1020,7 +1078,7 @@
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-                    <form id="approveForm" action="list" method="post">
+                    <form id="approveForm" action="${pageContext.request.contextPath}/request/list" method="post">
                         <div class="modal-body">
                             <div class="d-flex align-items-center gap-3 mb-3">
                                 <div style="width: 3rem; height: 3rem; background-color: #d1fae5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">

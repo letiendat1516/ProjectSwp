@@ -159,7 +159,7 @@
     <body>
         <div class="admin-navbar">
             <div class="left">
-                <a href="admin" class="back-btn">← Quay lại trang chính</a>
+                <a href="Admin.jsp" class="back-btn">← Quay lại trang chính</a>
             </div>
             <div class="center">
                 <span class="page-title">Yêu cầu reset mật khẩu</span>

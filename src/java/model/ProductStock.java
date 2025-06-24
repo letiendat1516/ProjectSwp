@@ -1,25 +1,27 @@
 package model;
 
+// Model for product stock information
+
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class ProductStock {
-    private int id;
-    private String name;
-    private String code;
-    private int cateId;
-    private int unitId;
-    private BigDecimal price;
-    private String status;
-    private String description;
-    private BigDecimal stockQuantity;
-    private String stockStatus;
-    private String categoryName;
-    private String unitName;
-    private String unitSymbol;
-    private Date expirationDate;
-    private boolean isLowStock;
-    private boolean isNearExpiration;
+    private int id; // Unique identifier for the product
+    private String name; // Name of the product
+    private String code; // Code of the product
+    private int cateId; // Category ID the product belongs to
+    private int unitId; // Unit ID for the product
+    private BigDecimal price; // Price of the product
+    private String status; // Status of the product (e.g., available, discontinued)
+    private String description; // Description of the product
+    private BigDecimal stockQuantity; // Quantity of the product in stock
+    private String stockStatus; // Status of the stock (e.g., in stock, out of stock)
+    private String categoryName; // Name of the category the product belongs to
+    private String unitName; // Name of the unit of measurement
+    private String unitSymbol; // Symbol of the unit of measurement
+    private Date expirationDate; // Expiration date of the product
+    private boolean isLowStock; // Flag indicating if the stock is low
+    private boolean isNearExpiration; // Flag indicating if the product is near expiration
 
     public ProductStock() {
     }    public ProductStock(int id, String name, String code, BigDecimal stockQuantity) {

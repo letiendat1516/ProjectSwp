@@ -4,6 +4,7 @@
  */
 package controller;
 
+import dao.SupplierDAO;
 import dao.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.Supplier;
 
 import model.Users;
 
@@ -66,26 +68,33 @@ public class PurchaseOrderFormServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Redirect về danh sách nếu truy cập trực tiếp
+        response.sendRedirect("listpurchaseorder");
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        request.setCharacterEncoding("UTF-8");
+@Override
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    response.setContentType("text/html;charset=UTF-8");
+    request.setCharacterEncoding("UTF-8");
 
-        // Nhận thông tin cơ bản từ form trước đó
+    HttpSession session = request.getSession(false);
+    if (session == null || session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    try {
+        // ✅ 1. LOAD SUPPLIER LIST
+        SupplierDAO supplierDao = new SupplierDAO();
+        List<Supplier> supplier_list = supplierDao.getLishSupplier();
+        request.setAttribute("supplier_list", supplier_list);
+
+        // Các xử lý khác...
         String requestId = request.getParameter("requestId");
         String reason = request.getParameter("reason");
-        // Nhận thông tin items
+
+        // Xử lý items...
         List<Map<String, String>> items = new ArrayList<>();
         int i = 0;
         while (request.getParameter("items[" + i + "].productName") != null) {
@@ -99,49 +108,40 @@ public class PurchaseOrderFormServlet extends HttpServlet {
             i++;
         }
 
-        HttpSession session = request.getSession(false);
-        Users currentUser = (Users) session.getAttribute("user");
-
-        UserDAO dao = new UserDAO();
-        String fullname = dao.getFullName(currentUser.getId());
-        Date DoB = dao.getDoB(currentUser.getId());
-        if (currentUser != null) {
-            Date dob = DoB;
-
-            if (dob != null) {
-                java.util.Calendar cal = java.util.Calendar.getInstance();
-                cal.setTime(dob);
-                int yearOfBirth = cal.get(java.util.Calendar.YEAR);
-                int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-                int age = currentYear - yearOfBirth;
-
-                request.setAttribute("age", age);
-            } else {
-                System.out.println("DOB is null for user: " + currentUser.getId());
-            }
-        } else {
-            System.out.println("currentUser is null in session");
-        }
-
-        // Set các attribute để hiển thị trong form
+        // Set attributes
         request.setAttribute("requestId", requestId);
         request.setAttribute("reason", reason);
         request.setAttribute("items", items);
+
+        // User info
+        Users currentUser = (Users) session.getAttribute("user");
+        UserDAO dao = new UserDAO();
+        String fullname = dao.getFullName(currentUser.getId());
+        Date DoB = dao.getDoB(currentUser.getId());
+
+        if (currentUser != null && DoB != null) {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.setTime(DoB);
+            int yearOfBirth = cal.get(java.util.Calendar.YEAR);
+            int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+            int age = currentYear - yearOfBirth;
+            request.setAttribute("age", age);
+        }
+
         session.setAttribute("currentUser", fullname);
         session.setAttribute("DoB", DoB);
-
-        // Forward đến JSP
+        
+        // Forward to JSP
         request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
-    }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
+    } catch (Exception e) {
+        e.printStackTrace();
+        request.setAttribute("errorMessage", "Lỗi: " + e.getMessage());
+        request.getRequestDispatcher("error.jsp").forward(request, response);
+    }
+}
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "Servlet hiển thị form tạo báo giá";
+    }
 }
