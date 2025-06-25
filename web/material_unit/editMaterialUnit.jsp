@@ -144,7 +144,6 @@
     <div class="layout-container">
         <jsp:include page="/include/sidebar.jsp" />
         <div class="main-content">
-            <div class="container">
                 <h1>Thay đổi dữ liệu của đơn vị</h1>
                 <c:if test="${not empty errorMessage}">
                     <div class="error-message">${errorMessage}</div>
@@ -185,7 +184,6 @@
                 </c:if>
             </div>
         </div>
-    </div>
     
     <script>
         // Character counter functionality

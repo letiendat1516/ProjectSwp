@@ -28,6 +28,7 @@
             body {
                 background-color: #f5f5f5;
                 padding: 20px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
 
             .container {
@@ -55,7 +56,6 @@
                 font-size: 2rem;
                 margin-bottom: 10px;
                 
-                margin-left: 16cm;
             }
 
             .lead {
@@ -192,7 +192,7 @@
             }
             .layout-container {
                 display: flex;
-                min-height: 100vh;
+                min-height: 150vh;
             }
 
             .main-content {
