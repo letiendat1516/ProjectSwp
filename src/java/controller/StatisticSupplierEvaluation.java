@@ -66,6 +66,12 @@ public class StatisticSupplierEvaluation extends HttpServlet {
         String status = request.getParameter("status");
         SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
         request.setAttribute("sta", status);
+        String index_raw = request.getParameter("index");
+        
+        int index = 1;
+        if(index_raw!=null){
+            index = Integer.parseInt(index_raw);
+        }
         if (top.equalsIgnoreCase("avg")) {
             List<Supplier> list = sed.staticRated(sort);
             if (status.equalsIgnoreCase("active")) {
@@ -73,7 +79,16 @@ public class StatisticSupplierEvaluation extends HttpServlet {
             } else if (status.equalsIgnoreCase("inactive")) {
                 list = list.stream().filter((c) -> c.getActiveFlag() == 0).collect(Collectors.toList());
             }
-
+            //phan trang
+            int totalPage = (int) Math.ceil((double)list.size()/5);
+            if(index<totalPage){
+                list = list.subList((index-1)*5, index*5);
+            }
+            if(index == totalPage){
+                list = list.subList((index-1)*5, list.size());
+            }
+            request.setAttribute("totalPage", totalPage);
+            //
             request.setAttribute("list", list);
             request.setAttribute("fl", top);
             request.setAttribute("st", sort);
@@ -86,6 +101,11 @@ public class StatisticSupplierEvaluation extends HttpServlet {
             } else if (status.equalsIgnoreCase("inactive")) {
                 list = list.stream().filter((c) -> c.getActiveFlag() == 0).collect(Collectors.toList());
             }
+            //phan trang
+            int totalPage = (int) Math.ceil((double)list.size()/5);
+            
+            request.setAttribute("totalPage", totalPage);
+            //
             request.setAttribute("list", list);
             request.setAttribute("mess", "Top-rated expected delivery");
             request.setAttribute("fl", top);
@@ -98,6 +118,11 @@ public class StatisticSupplierEvaluation extends HttpServlet {
             } else if (status.equalsIgnoreCase("inactive")) {
                 list = list.stream().filter((c) -> c.getActiveFlag() == 0).collect(Collectors.toList());
             }
+            //phan trang
+            int totalPage = (int) Math.ceil((double)list.size()/5);
+            
+            request.setAttribute("totalPage", totalPage);
+            //
             request.setAttribute("mess", "Top-rated market price comparison");
             request.setAttribute("list", list);
             request.setAttribute("fl", top);

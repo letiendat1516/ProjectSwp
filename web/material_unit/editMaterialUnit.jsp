@@ -105,6 +105,18 @@
             margin-bottom: 18px;
             text-align: center;
         }
+        .char-counter {
+            display: block;
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+        .char-counter.warning {
+            color: #ff9800;
+        }
+        .char-counter.danger {
+            color: #f44336;
+        }
         @media (max-width: 600px) {
             .container {
                 padding: 10px 2vw;
@@ -118,59 +130,102 @@
             }
         }
         .layout-container {
-                display: flex;
-                min-height: 100vh;
-            }
-
-            .main-content {
-                flex: 1;
-                padding: 20px;
-                background: #f5f5f5;
-            }
+            display: flex;
+            min-height: 100vh;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: #f5f5f5;
+        }
     </style>
 </head>
 <body>
     <div class="layout-container">
-            <jsp:include page="/include/sidebar.jsp" />
-            <div class="main-content">
-        <h1>Thay đổi dữ liệu của đơn vị</h1>
-        <c:if test="${not empty errorMessage}">
-            <div class="error-message">${errorMessage}</div>
-        </c:if>
-        <c:if test="${empty unit}">
-            <div class="error-message">Không tìm thấy đơn vị. <a href="materialUnit">Quay về danh sách.</a></div>
-        </c:if>
-        <c:if test="${not empty unit}">
-            <form action="editMaterialUnit" method="post">
-                <input type="hidden" name="id" value="${unit.id}">
-                <div class="form-group">
-                    <label for="name">Tên:</label>
-                    <input type="text" id="name" name="name" value="${unit.name}" required>
-                </div>
-                <div class="form-group">
-                    <label for="symbol">Kí hiệu:</label>
-                    <input type="text" id="symbol" name="symbol" value="${unit.symbol}" required>
-                </div>
-                <div class="form-group">
-                    <label for="description">Mô tả:</label>
-                    <textarea id="description" name="description" rows="4">${unit.description}</textarea>
-                </div>
-                <div class="form-group">
-                    <label for="type">Loại đơn vị</label>
-                    <select id="type" name="type" required>
-                        <option value="Khối lượng" ${unit.type == 'Khối lượng' ? 'selected' : ''}>Khối lượng</option>
-                        <option value="Độ dài" ${unit.type == 'Độ dài' ? 'selected' : ''}>Độ dài</option>
-                        <option value="Số lượng" ${unit.type == 'Số lượng' ? 'selected' : ''}>Số lượng</option>
-                    </select>
-                </div>
-                <div class="form-buttons">
-                    <button type="submit" class="btn-primary">Cập nhật</button>
-                    <a href="materialUnit" class="btn-secondary">Hủy bỏ</a>
-                </div>
-            </form>
-        </c:if>
-    </div>
+        <jsp:include page="/include/sidebar.jsp" />
+        <div class="main-content">
+            <div class="container">
+                <h1>Thay đổi dữ liệu của đơn vị</h1>
+                <c:if test="${not empty errorMessage}">
+                    <div class="error-message">${errorMessage}</div>
+                </c:if>
+                <c:if test="${empty unit}">
+                    <div class="error-message">Không tìm thấy đơn vị. <a href="materialUnit">Quay về danh sách.</a></div>
+                </c:if>
+                <c:if test="${not empty unit}">
+                    <form action="editMaterialUnit" method="post">
+                        <input type="hidden" name="id" value="${unit.id}">
+                        <div class="form-group">
+                            <label for="name">Tên:</label>
+                            <input type="text" id="name" name="name" maxlength="50" value="${unit.name}" placeholder="Tối đa 50 ký tự" required>
+                            <small class="char-counter" id="nameCounter">0/50 ký tự</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="symbol">Kí hiệu:</label>
+                            <input type="text" id="symbol" name="symbol" maxlength="10" value="${unit.symbol}" placeholder="Tối đa 10 ký tự" required>
+                            <small class="char-counter" id="symbolCounter">0/10 ký tự</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Mô tả:</label>
+                            <textarea id="description" name="description" rows="4">${unit.description}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="type">Loại đơn vị</label>
+                            <select id="type" name="type" required>
+                                <option value="Khối lượng" ${unit.type == 'Khối lượng' ? 'selected' : ''}>Khối lượng</option>
+                                <option value="Độ dài" ${unit.type == 'Độ dài' ? 'selected' : ''}>Độ dài</option>
+                                <option value="Số lượng" ${unit.type == 'Số lượng' ? 'selected' : ''}>Số lượng</option>
+                            </select>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" class="btn-primary">Cập nhật</button>
+                            <a href="materialUnit" class="btn-secondary">Hủy bỏ</a>
+                        </div>
+                    </form>
+                </c:if>
             </div>
+        </div>
+    </div>
+    
+    <script>
+        // Character counter functionality
+        function updateCharCounter(inputId, counterId, maxLength) {
+            const input = document.getElementById(inputId);
+            const counter = document.getElementById(counterId);
+            const currentLength = input.value.length;
+            
+            counter.textContent = currentLength + '/' + maxLength + ' ký tự';
+            
+            // Update counter color based on usage
+            counter.classList.remove('warning', 'danger');
+            if (currentLength > maxLength * 0.8) {
+                counter.classList.add('warning');
+            }
+            if (currentLength >= maxLength) {
+                counter.classList.add('danger');
+            }
+        }
+        
+        // Initialize counters and add event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const nameInput = document.getElementById('name');
+            const symbolInput = document.getElementById('symbol');
+            
+            if (nameInput && symbolInput) {
+                // Initial count update
+                updateCharCounter('name', 'nameCounter', 50);
+                updateCharCounter('symbol', 'symbolCounter', 10);
+                
+                // Add input event listeners
+                nameInput.addEventListener('input', function() {
+                    updateCharCounter('name', 'nameCounter', 50);
+                });
+                
+                symbolInput.addEventListener('input', function() {
+                    updateCharCounter('symbol', 'symbolCounter', 10);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
-

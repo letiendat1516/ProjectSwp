@@ -983,43 +983,39 @@ exists or setup the property manually. For example like this:
     <target depends="init,compile,compile-jsps,-pre-dist,-do-dist-with-manifest,-do-dist-without-manifest" name="do-dist"/>
     <target depends="init" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <copyfiles files="${libs.CopyLibs.classpath}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-<<<<<<< HEAD
         <copyfiles files="${file.reference.gson-2.10.1.jar-1}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-=======
-        <copyfiles files="${file.reference.gson-2.10.1.jar-3}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
->>>>>>> c26aca99fc990e0893c3bb57a73e1ca1c0018e76
-        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-2.0.0.jar-4}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0.jar-3}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
 <<<<<<< HEAD
-        <copyfiles files="${file.reference.mysql-connector-j-8.3.0.jar-3}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-<<<<<<< HEAD
-        <copyfiles files="${file.reference.sqljdbc42.jar-2}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.jakarta.servlet-api-6.0.0.jar-1}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-2.0.0.jar-2}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0.jar-2}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.jaxb-api-2.1.jar-2}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.mysql-connector-j-8.3.0.jar-2}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.sqljdbc42.jar-1}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
 =======
-=======
-        <copyfiles files="${file.reference.mysql-connector-j-8.3.0.jar-4}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
->>>>>>> 1265fcc0991843d37c856ef690584da00fb3d6f6
->>>>>>> c26aca99fc990e0893c3bb57a73e1ca1c0018e76
+        <copyfiles files="${file.reference.jakarta.servlet-api-6.0.0.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-2.0.0.jar-5}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0.jar-5}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.mysql-connector-j-9.3.0.jar-1}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+>>>>>>> 54055cbe176c8667d5b0b20d2e860c6e2c93e5ae
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update"/>
     </target>
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
         <copyfiles files="${libs.CopyLibs.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
-<<<<<<< HEAD
         <copyfiles files="${file.reference.gson-2.10.1.jar-1}" todir="${build.web.dir}/WEB-INF/lib"/>
-=======
-        <copyfiles files="${file.reference.gson-2.10.1.jar-3}" todir="${build.web.dir}/WEB-INF/lib"/>
->>>>>>> c26aca99fc990e0893c3bb57a73e1ca1c0018e76
-        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-2.0.0.jar-4}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0.jar-3}" todir="${build.web.dir}/WEB-INF/lib"/>
 <<<<<<< HEAD
-        <copyfiles files="${file.reference.mysql-connector-j-8.3.0.jar-3}" todir="${build.web.dir}/WEB-INF/lib"/>
-<<<<<<< HEAD
-        <copyfiles files="${file.reference.sqljdbc42.jar-2}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.jakarta.servlet-api-6.0.0.jar-1}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-2.0.0.jar-2}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0.jar-2}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.jaxb-api-2.1.jar-2}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.mysql-connector-j-8.3.0.jar-2}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.sqljdbc42.jar-1}" todir="${build.web.dir}/WEB-INF/lib"/>
 =======
-=======
-        <copyfiles files="${file.reference.mysql-connector-j-8.3.0.jar-4}" todir="${build.web.dir}/WEB-INF/lib"/>
->>>>>>> 1265fcc0991843d37c856ef690584da00fb3d6f6
->>>>>>> c26aca99fc990e0893c3bb57a73e1ca1c0018e76
+        <copyfiles files="${file.reference.jakarta.servlet-api-6.0.0.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-2.0.0.jar-5}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0.jar-5}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.mysql-connector-j-9.3.0.jar-1}" todir="${build.web.dir}/WEB-INF/lib"/>
+>>>>>>> 54055cbe176c8667d5b0b20d2e860c6e2c93e5ae
     </target>
     <target depends="init" if="dist.ear.dir" name="-clean-webinf-lib">
         <delete dir="${build.web.dir}/WEB-INF/lib"/>

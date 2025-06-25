@@ -15,12 +15,14 @@
 %>
 
 
+
 <%
 Users user = (Users) session.getAttribute("user");
 if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
     response.sendRedirect("login.jsp");
     return;
 }
+
 %>
 
 <html>

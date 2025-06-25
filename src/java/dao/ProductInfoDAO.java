@@ -16,7 +16,7 @@ import model.Unit;
 
 public class ProductInfoDAO {
     
-    // Constants for column names
+    // Tham số cho các cột 
     private static final String COL_ID = "id";
     private static final String COL_NAME = "name";
     private static final String COL_CODE = "code";
@@ -30,6 +30,7 @@ public class ProductInfoDAO {
      * Get all active products with basic information
      * @return List of ProductInfo objects
      */
+    //Lấy tất cả product 
     public List<ProductInfo> getAllProducts() {
         List<ProductInfo> list = new ArrayList<>();
         String sql = "SELECT id, name, code, cate_id, unit_id, price, status, description FROM product_info";
@@ -62,6 +63,7 @@ public class ProductInfoDAO {
      * @param productId The ID of the product
      * @return Product name as String
      */
+    //Lấy product dựa trên id
     public String getProductNameById(int productId) {
         String sql = "SELECT name FROM product_info WHERE id = ?";
         try (Connection con = Context.getJDBCConnection(); PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -88,6 +90,7 @@ public class ProductInfoDAO {
      * @param sortOrder Sort order (ASC/DESC)
      * @return List of ProductStock objects
      */
+    //Lấy product dựa trên số lượng trong kho
     public List<ProductStock> getProductsWithStock(int page, int pageSize, String search, String sortBy, String sortOrder) {
         List<ProductStock> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
@@ -170,6 +173,7 @@ public class ProductInfoDAO {
      * @param search Search term
      * @return Total count of products as int
      */
+    //Lấy tổng số lượng product
     public int getTotalProductCount(String search) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT COUNT(*) FROM product_info p ");
@@ -206,6 +210,7 @@ public class ProductInfoDAO {
      * @param createdBy User ID of the creator
      * @return true if addition was successful, false otherwise
      */
+    //Thêm product mới
     public boolean addProduct(ProductInfo product, int createdBy) {
         String sql = "INSERT INTO product_info (name, code, cate_id, unit_id, price, status, description, " +
                     "supplier_id, expiration_date, storage_location, additional_notes, created_by) " +
@@ -247,6 +252,7 @@ public class ProductInfoDAO {
      * @param code Product code to check
      * @return true if code exists, false otherwise
      */
+    //Kiểm tra product code có tồn tại hay không
     public boolean isProductCodeExists(String code) {
         String sql = "SELECT COUNT(*) FROM product_info WHERE code = ?";
         try (Connection con = Context.getJDBCConnection(); 
@@ -268,6 +274,7 @@ public class ProductInfoDAO {
      * Get all active categories for dropdown
      * @return List of CategoryProduct objects
      */
+    //Lấy dữ liệu từ categories 
     public List<CategoryProduct> getAllActiveCategories() {
         List<CategoryProduct> categories = new ArrayList<>();
         String sql = "SELECT id, name FROM category WHERE active_flag = 1 ORDER BY name";
@@ -290,6 +297,7 @@ public class ProductInfoDAO {
      * Get all active units for dropdown
      * @return List of Unit objects
      */
+    //Lấy dữ liệu từ Unit 
     public List<Unit> getAllActiveUnits() {
         List<Unit> units = new ArrayList<>();
         String sql = "SELECT id, name, symbol FROM unit ORDER BY name";
@@ -314,6 +322,7 @@ public class ProductInfoDAO {
        * Get all active suppliers for dropdown
        * @return List of Supplier objects
        */
+    //Lấy dữ liệu từ Suppliers
     public List<Supplier> getAllActiveSuppliers() {
         List<Supplier> suppliers = new ArrayList<>();
         String sql = "SELECT id, name FROM supplier WHERE active_flag = 1 ORDER BY name";
@@ -338,6 +347,7 @@ public class ProductInfoDAO {
      * Get all storage locations for dropdown
      * @return List of storage location names
      */
+    //Lấy dữ liệu từ Storage Location
     public List<String> getAllStorageLocations() {
         List<String> locations = new ArrayList<>();
         String sql = "SELECT name FROM storage_location WHERE active_flag = 1 ORDER BY name";
@@ -358,6 +368,7 @@ public class ProductInfoDAO {
     /**
      * Get a single product by ID for editing
      */
+    //Lấy dữ liệu từ product dựa trên id 
 public ProductInfo getProductById(int productId) {
     String sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.price, p.status, p.description, " +
                  "p.supplier_id, p.expiration_date, p.storage_location, p.additional_notes, " +
@@ -417,6 +428,7 @@ public ProductInfo getProductById(int productId) {
     /**
      * Update product information
      */
+    //Update dữ liệu của product
     public boolean updateProduct(ProductInfo product) {
         String sql = "UPDATE product_info SET " +
                      "name = ?, code = ?, cate_id = ?, unit_id = ?, price = ?, " +
@@ -461,6 +473,7 @@ public ProductInfo getProductById(int productId) {
     /**
      * Update product stock quantity
      */
+    //Update số lượng tồn kho của product 
     public boolean updateProductStock(int productId, double newQuantity) {
         String sql = "UPDATE product_in_stock SET qty = ? WHERE product_id = ?";
         
@@ -482,6 +495,7 @@ public ProductInfo getProductById(int productId) {
     /**
      * Check if product code exists for other products (for duplicate validation during update)
      */
+    //Kiểm tra trùng lặp product dựa trên code 
     public boolean isProductCodeExistsForOtherProduct(String code, int excludeProductId) {
         String sql = "SELECT COUNT(*) FROM product_info WHERE code = ? AND id != ?";
         
@@ -506,7 +520,9 @@ public ProductInfo getProductById(int productId) {
      * Delete a product by ID
      * @param productId The ID of the product to delete
      * @return true if deletion was successful, false otherwise
-     */    public boolean deleteProduct(int productId) {
+     */   
+    //Xóa product 
+    public boolean deleteProduct(int productId) {
         String sql = "DELETE FROM product_info WHERE id = ?";
         
         System.out.println("ProductInfoDAO: Attempting to delete product with ID: " + productId);
@@ -531,7 +547,9 @@ public ProductInfo getProductById(int productId) {
      * Check if a product can be safely deleted (no dependencies)
      * @param productId The ID of the product to check
      * @return true if product can be deleted, false if it has dependencies
-     */    public boolean canDeleteProduct(int productId) {
+     */    
+    //Kiểm tra xem có xóa product được không
+    public boolean canDeleteProduct(int productId) {
         // Check if product is referenced in other tables
         String[] dependencyTables = {
             "product_in_stock",

@@ -1,6 +1,14 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
+<%@ page import="model.Users" %> 
+<%
+Users user = (Users) session.getAttribute("user");
+if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName()))) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+%>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -178,6 +186,32 @@
             transform: translateY(-1px);
         }
 
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            padding: 8px 12px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .pagination a.active {
+            background: #764ba2;
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
             form {
                 flex-direction: column;
@@ -233,6 +267,8 @@
                 <c:set var="st" value="${requestScope.st}"/>
                 <c:set var="mess" value="${requestScope.mess}"/>
                 <c:set var="sta" value="${requestScope.sta}"/>
+                <c:set var="totalPage" value="${requestScope.totalPage}"/>
+                <c:set var="currentIndex" value="${param.index}"/>
 
                 <h2 class="title">Statistic Evaluation</h2>
 
@@ -276,6 +312,15 @@
                             </tr>
                         </c:forEach>
                     </table>
+                </c:if>
+
+                <c:if test="${totalPage > 1}">
+                    <div class="pagination">
+                        <c:forEach var="i" begin="1" end="${totalPage}">
+                            <a href="StatisticSupplierEvaluation?top=${fl}&sort=${st}&status=${sta}&index=${i}" 
+                               class="${i == currentIndex ? 'active' : ''}">${i}</a>
+                        </c:forEach>
+                    </div>
                 </c:if>
 
                 <a href="Admin.jsp" class="btn-back">Back</a>

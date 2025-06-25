@@ -3,7 +3,6 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ page import="model.Users" session="true" %>
 <!DOCTYPE html>
-
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
@@ -42,7 +41,7 @@
                 font-size: 2.5rem;
                 margin-bottom: 10px;
                 font-weight: 300;
-                color: black;
+                color: white;
             }
 
             .header p {
@@ -162,6 +161,7 @@
             .form-control.error {
                 border-color: #dc3545;
             }
+            
             .form-control:disabled {
                 background-color: #f8f9fa;
                 color: #6c757d;
@@ -263,6 +263,17 @@
                 border: 2px solid #dee2e6;
             }
 
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
+
             @media (max-width: 768px) {
                 .form-grid {
                     grid-template-columns: 1fr;
@@ -280,16 +291,6 @@
                     grid-template-columns: 1fr;
                 }
             }
-            .layout-container {
-                display: flex;
-                min-height: 100vh;
-            }
-
-            .main-content {
-                flex: 1;
-                padding: 20px;
-                background: #f5f5f5;
-            }
         </style>
     </head>
     <body>
@@ -299,7 +300,9 @@
                 <div class="header">
                     <h1>📝 Cập Nhật Sản Phẩm</h1>
                     <p>Chỉnh sửa thông tin sản phẩm trong hệ thống kho</p>
-                </div>        <div class="nav-buttons">
+                </div>
+                
+                <div class="nav-buttons">
                     <a href="product-list" class="btn btn-primary">← Quay lại Danh Sách</a>
                 </div>
 
@@ -314,7 +317,9 @@
                     <div class="success-message">
                         <strong>✅ Thành công:</strong> ${success}
                     </div>
-                </c:if>        <!-- Check if product exists -->
+                </c:if>
+                
+                <!-- Check if product exists -->
                 <c:choose>
                     <c:when test="${empty product}">
                         <div class="error-message">
@@ -328,7 +333,6 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-
                         <!-- Current Product Information -->
                         <div class="product-info-card">
                             <h3 style="margin-bottom: 15px; color: #495057;">📦 Thông Tin Hiện Tại</h3>
@@ -340,7 +344,8 @@
                                 <div class="info-item">
                                     <span class="info-label">Tên Sản Phẩm</span>
                                     <span class="info-value">${product.name}</span>
-                                </div>                <div class="info-item">
+                                </div>
+                                <div class="info-item">
                                     <span class="info-label">Danh Mục</span>
                                     <span class="info-value">
                                         <c:forEach var="category" items="${categories}">
@@ -349,17 +354,18 @@
                                             </c:if>
                                         </c:forEach>
                                         <c:if test="${empty categories}">ID: ${product.cate_id}</c:if>
-                                        </span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-label">Trạng Thái</span>
-                                        <span class="info-value">
+                                    </span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Trạng Thái</span>
+                                    <span class="info-value">
                                         <c:choose>
                                             <c:when test="${product.status == 'active'}">🟢 Hoạt động</c:when>
                                             <c:otherwise>🔴 Ngưng hoạt động</c:otherwise>
                                         </c:choose>
                                     </span>
-                                </div>                <div class="info-item">
+                                </div>
+                                <div class="info-item">
                                     <span class="info-label">Ngày Tạo</span>
                                     <span class="info-value">
                                         <fmt:formatDate value="${product.createdDate}" pattern="dd/MM/yyyy HH:mm"/>
@@ -390,12 +396,16 @@
                                         <input type="text" id="name" name="name" class="form-control" 
                                                value="${product.name}" maxlength="100" required>
                                         <div class="form-help">Tối đa 100 ký tự</div>
-                                    </div>                    <div class="form-group">
+                                    </div>
+                                    
+                                    <div class="form-group">
                                         <label class="form-label" for="code">Mã Sản Phẩm</label>
                                         <input type="text" id="code" name="code" class="form-control" 
                                                value="${product.code}" maxlength="50" readonly>
                                         <div class="form-help">Mã sản phẩm không thể thay đổi</div>
-                                    </div><div class="form-group">
+                                    </div>
+                                    
+                                    <div class="form-group">
                                         <label class="form-label required" for="categoryId">Danh Mục</label>
                                         <select id="categoryId" name="categoryId" class="form-control" required>
                                             <option value="">-- Chọn danh mục --</option>
@@ -503,66 +513,65 @@
                                 </div>
                             </form>
                         </div>
-                    </div>
-                </div>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </div>
 
+        <script>
+            // Form validation
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const requiredFields = document.querySelectorAll('[required]');
+                let isValid = true;
 
-                <script>
-                    // Form validation
-                    document.querySelector('form').addEventListener('submit', function (e) {
-                        const requiredFields = document.querySelectorAll('[required]');
-                        let isValid = true;
-
-                        requiredFields.forEach(field => {
-                            if (!field.value.trim()) {
-                                field.classList.add('error');
-                                isValid = false;
-                            } else {
-                                field.classList.remove('error');
-                            }
-                        });
-
-                        if (!isValid) {
-                            e.preventDefault();
-                            alert('Vui lòng điền đầy đủ các trường bắt buộc.');
-                        }
-                    });
-
-                    // Remove error styling on input
-                    document.querySelectorAll('.form-control').forEach(field => {
-                        field.addEventListener('input', function () {
-                            this.classList.remove('error');
-                        });
-                    });
-                    // Delete confirmation
-                    function confirmDelete() {
-                    <c:if test="${not empty product}">
-                        var productName = '${product.name}';
-                        var productCode = '${product.code}';
-
-                        var confirmMessage = 'XÁC NHẬN XÓA SẢN PHẨM\n\n' +
-                                'Sản phẩm: ' + productName + '\n' +
-                                'Mã sản phẩm: ' + productCode + '\n\n' +
-                                'Bạn có chắc chắn muốn xóa sản phẩm này?\n' +
-                                'Hành động này không thể hoàn tác!\n\n' +
-                                'Lưu ý: Sản phẩm chỉ có thể xóa nếu không có trong kho hoặc yêu cầu nhập/xuất nào.';
-
-                        if (confirm(confirmMessage)) {
-                            window.location.href = 'delete-product?id=${product.id}';
-                        }
-                    </c:if>
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.classList.add('error');
+                        isValid = false;
+                    } else {
+                        field.classList.remove('error');
                     }
+                });
 
-                    // Initialize image preview on page load
-                    window.addEventListener('load', function () {
-                        const imageUrlField = document.getElementById('imageUrl');
-                        if (imageUrlField && imageUrlField.value) {
-                            imageUrlField.dispatchEvent(new Event('input'));
-                        }
-                    });
-                </script>
-            </c:otherwise>
-        </c:choose>
-    </div>
-</body>
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Vui lòng điền đầy đủ các trường bắt buộc.');
+                }
+            });
+
+            // Remove error styling on input
+            document.querySelectorAll('.form-control').forEach(field => {
+                field.addEventListener('input', function() {
+                    this.classList.remove('error');
+                });
+            });
+
+            // Delete confirmation
+            function confirmDelete() {
+                <c:if test="${not empty product}">
+                    var productName = '${product.name}';
+                    var productCode = '${product.code}';
+                    
+                    var confirmMessage = 'XÁC NHẬN XÓA SẢN PHẨM\n\n' +
+                        'Sản phẩm: ' + productName + '\n' +
+                        'Mã sản phẩm: ' + productCode + '\n\n' +
+                        'Bạn có chắc chắn muốn xóa sản phẩm này?\n' +
+                        'Hành động này không thể hoàn tác!\n\n' +
+                        'Lưu ý: Sản phẩm chỉ có thể xóa nếu không có trong kho hoặc yêu cầu nhập/xuất nào.';
+                    
+                    if (confirm(confirmMessage)) {
+                        window.location.href = 'delete-product?id=${product.id}';
+                    }
+                </c:if>
+            }
+
+            // Initialize image preview on page load
+            window.addEventListener('load', function() {
+                const imageUrlField = document.getElementById('imageUrl');
+                if (imageUrlField && imageUrlField.value) {
+                    imageUrlField.dispatchEvent(new Event('input'));
+                }
+            });
+        </script>
+    </body>
 </html>
