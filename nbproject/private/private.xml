@@ -6,7 +6,6 @@
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/UserManager.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/AddNewSupplier.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/AddNewSupplier.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/ExportRequestSuccessNotification.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/WarehouseManagement.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/dao/UnitDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/EdituserServlet.java</file>
@@ -16,38 +15,38 @@
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/logout.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/LishSupplier.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/LogoutServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/dao/SupplierDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/EditUser.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/CategoryParentController.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/AddUser.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/DBContext/Context.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/dao/UserDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/ListRequestImport.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/dao/CategoryProductDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/EditMaterialUnitServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/LishSupplier.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/category_parent/create.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/SupplierEvaluation.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/categoriesforward.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/dao/SupplierEvaluationDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/material_unit/materialUnit.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/UserFilterServlet.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/EditProfile.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/material_unit/editMaterialUnit.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/CreateNewSupplier.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/WEB-INF/web.xml</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/UpdateSupplier.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/META-INF/context.xml</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/LoginServlet.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/login.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/RequestSuccessNotification.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/forgot.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/ItemsSupplyRequestForm.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/category_parent/list.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/RoleAssignment.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/RequestForward.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/dao/CategoryParentDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/category_product/create.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/AdduserServlet.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/Admin.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/material_unit/createMaterialUnit.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/category_product/edit.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/Profile.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/category_parent/edit.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/ExportRequest.jsp</file>
         </group>

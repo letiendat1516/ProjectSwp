@@ -1,5 +1,7 @@
 package controller;
 
+// Controller for deleting a product
+
 import dao.ProductInfoDAO;
 import model.ProductInfo;
 import model.Users;

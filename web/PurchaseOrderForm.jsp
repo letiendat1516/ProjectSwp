@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Đơn Báo Giá</title>
         <style>
- 
+
             * {
                 margin: 0;
                 padding: 0;
@@ -17,9 +17,6 @@
 
             body {
                 background-color: #f0f2f5;
-                display: flex;
-                justify-content: center;
-                align-items: center;
                 min-height: 100vh;
                 padding: 20px;
             }
@@ -257,10 +254,22 @@
                 background-color: transparent !important;
 
             }
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
         </style>
     </head>
     <body>
-        <div class="container">
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
             <h1>ĐƠN BÁO GIÁ SẢN PHẨM</h1>
             <!-- Form gửi báo giá đến servlet submitpurchaseorder -->
             <form id="myForm" action="submitpurchaseorder" method="post">
@@ -270,22 +279,22 @@
                 <h3>Thông tin người tạo báo giá</h3>
                 <div class="information-user">
                     <div class="form-group">
-                        <label>Người tạo đơn</label>
+                        <label>Người tạo đơn <span style="color: red">*</span></label>
                         <!-- Hiển thị tên user từ session -->
                         <input type="text" value="${sessionScope.currentUser}" readonly> 
                     </div>
                     <div class="form-group">
-                        <label>Tuổi</label>
+                        <label>Tuổi <span style="color: red">*</span></label>
                         <!-- Hiển thị tuổi được tính từ server -->
                         <input type="text" value="${age}" readonly>
                     </div>
                     <div class="form-group">
-                        <label>Ngày tháng năm sinh</label>
+                        <label>Ngày tháng năm sinh <span style="color: red">*</span></label>
                         <!-- Hiển thị ngày sinh từ session -->
                         <input type="text" value="${sessionScope.DoB}" readonly>
                     </div>
                     <div class="form-group">
-                        <label>Ngày tạo báo giá</label>
+                        <label>Ngày tạo báo giá <span style="color: red">*</span></label>
                         <!-- Input date bắt buộc nhập -->
                         <input type="date" name="quote_date" required>
                     </div>
@@ -295,41 +304,49 @@
                 <div class="information-items">
                     <div class="row">
                         <div class="form-group">
-                            <label>ID Báo giá</label>
+                            <label>ID Báo giá <span style="color: red">*</span></label>
                             <!-- ID báo giá tự động từ requestId -->
                             <textarea rows="1" name="quote_id" style="width: 100%; resize: none;overflow: hidden;background-color: #f8f9fa; cursor: not-allowed;" readonly>${requestId}</textarea>
                         </div>
                         <div class="form-group">
-                            <label>Mục đích mua hàng</label>
+                            <label>Mục đích mua hàng <span style="color: red">*</span></label>
                             <!-- Lý do mua hàng từ request gốc -->
                             <textarea rows="1" name="quote_note" style="width: 100%; resize: none;overflow: hidden;background-color: #f8f9fa; cursor: not-allowed;" readonly>${reason}</textarea>
                         </div>
                         <div class="form-group">
-                            <label>Nhà cung cấp</label>
-                            <!-- Cho phép nhập thông tin nhà cung cấp -->
-                            <textarea rows="1" name="supplier" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)"></textarea>
+                            <label>Nhà cung cấp <span style="color: red">*</span></label>
+                            <select name="supplier_name" style="width: 100%;" onchange="handleSupplierChange(this)">
+                                <option value="" disabled selected>-- Chọn nhà cung cấp --</option>
+                                <c:forEach var="sn" items="${supplier_list}">
+                                    <option value="${sn.name}">
+                                        ${sn.name}
+                                    </option>
+                                </c:forEach>
+                            </select>
                         </div>
+
                     </div>
                     <div class="row">
                         <div class="form-group">
-                            <label>Địa chỉ</label>
-                            <textarea rows="1" name="address" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)"></textarea>
+                            <label>Địa chỉ <span style="color: red">*</span></label>
+                            <textarea rows="1" name="supplier_address" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" readonly></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Điện thoại</label>
-                            <!-- Validation pattern cho số điện thoại VN -->
-                            <input rows="1" name="phone" id="phone" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" pattern="0[0-9]{9}" title="Số điện thoại phải bắt đầu bằng 0 và có đúng 10 chữ số">
+                            <label>Điện thoại <span style="color: red">*</span></label>
+                            <textarea rows="1" name="supplier_phone" id="phone" 
+                                      style="width: 100%; resize: none; overflow: hidden;" 
+                                      oninput="autoResize(this)"readonly></textarea>
 
                         </div>
                         <div class="form-group">
-                            <label>Email</label>
-                            <textarea rows="1" name="email" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)"></textarea>
+                            <label>Email <span style="color: red">*</span></label>
+                            <textarea rows="1" name="supplier_email" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" readonly></textarea>
                         </div>
                     </div>
                 </div>
 
                 <div class="items-table">
-                    <label>Chi tiết mặt hàng và báo giá</label>
+                    <label>Chi tiết mặt hàng và báo giá <span style="color: red">*</span></label>
                     <table>
                         <thead>
                             <tr>
@@ -386,7 +403,7 @@
                                                           onblur="formatPrice(this)"
                                                           onkeypress="return isNumberKey(event)"></textarea>
                                             </td>
-                                            
+
                                             <td>
                                                 <!-- Thành tiền tự động tính, readonly -->
                                                 <textarea name="totalPrice" rows="1" readonly 
@@ -408,146 +425,169 @@
                     </table>
 
                     <div class="form-group">
-                        <label>Tổng kết báo giá</label>
+                        <label>Tổng kết báo giá <span style="color: red">*</span></label>
                         <!-- Textarea tổng kết bắt buộc -->
                         <textarea rows="3" name="quote_summary" style="width: 100%; border: 1px solid #ddd; resize: none;" oninput="autoResize(this)" required placeholder="Nhập tổng kết về báo giá này..."></textarea>
                     </div>
                 </div>
-
                 <div class="button-container">
                     <button type="submit" class="submit-btn">Gửi báo giá</button>
                     <a href="listpurchaseorder" class="back-btn">Quay lại</a>
                 </div>
             </form>
         </div>
-
+                        </div>
+                        
         <script>
-            // Hàm tự động resize textarea theo nội dung
             function autoResize(textarea) {
-                textarea.style.height = 'auto';
-                textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
             }
 
-            // Hàm tính tổng tiền tự động khi nhập giá
             function calculateTotal(input) {
-                const row = input.closest('tr');
-
-                const quantityElement = row.querySelector('input[name="quantity"], textarea[name="quantity"]');
-                const priceElement = row.querySelector('input[name="pricePerUnit"], textarea[name="pricePerUnit"]');
-                const totalPriceElement = row.querySelector('input[name="totalPrice"], textarea[name="totalPrice"]');
-
-                if (quantityElement && priceElement && totalPriceElement) {
-                    // Lấy giá trị và chuyển dấu phẩy thành dấu chấm để tính toán
-                    const quantity = parseFloat(quantityElement.value.replace(',', '.')) || 0;
-                    const pricePerUnit = parseFloat(priceElement.value.replace(',', '.')) || 0;
-                    const totalPrice = quantity * pricePerUnit;
-
-                    // Format số theo định dạng Việt Nam
-                    totalPriceElement.value = totalPrice.toLocaleString('vi-VN', {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 2
-                    });
-                }
+            const row = input.closest('tr');
+            const quantityElement = row.querySelector('input[name="quantity"], textarea[name="quantity"]');
+            const priceElement = row.querySelector('input[name="pricePerUnit"], textarea[name="pricePerUnit"]');
+            const totalPriceElement = row.querySelector('input[name="totalPrice"], textarea[name="totalPrice"]');
+            if (quantityElement && priceElement && totalPriceElement) {
+            const quantity = parseFloat(quantityElement.value.replace(',', '.')) || 0;
+            const pricePerUnit = parseFloat(priceElement.value.replace(',', '.')) || 0;
+            const totalPrice = quantity * pricePerUnit;
+            totalPriceElement.value = totalPrice.toLocaleString('vi-VN', {
+            minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+            });
+            }
             }
 
-            // Hàm kiểm tra phím - CHỈ CHO PHÉP SỐ, DẤU CHẤM VÀ DẤU PHẨY
             function isNumberKey(evt) {
-                var charCode = (evt.which) ? evt.which : evt.keyCode;
-                var inputValue = evt.target.value;
-
-                // Cho phép: backspace, delete, tab, escape, enter, arrow keys
-                if ([8, 9, 27, 13, 37, 38, 39, 40, 46].indexOf(charCode) !== -1) {
-                    return true;
-                }
-
-                // Cho phép dấu chấm (.) - chỉ một dấu chấm
-                if (charCode == 46) {
-                    if (inputValue.indexOf('.') !== -1) {
-                        return false; // Đã có dấu chấm rồi
-                    }
-                    return true;
-                }
-
-                // Cho phép dấu phẩy (,) - chỉ một dấu phẩy
-                if (charCode == 44) {
-                    if (inputValue.indexOf(',') !== -1 || inputValue.indexOf('.') !== -1) {
-                        return false; // Đã có dấu phân cách rồi
-                    }
-                    return true;
-                }
-
-                // Chỉ cho phép số (0-9)
-                if (charCode < 48 || charCode > 57) {
-                    return false;
-                }
-
-                return true;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            var inputValue = evt.target.value;
+            if ([8, 9, 27, 13, 37, 38, 39, 40, 46].indexOf(charCode) !== - 1) {
+            return true;
             }
 
-            // Hàm validate giá - chuẩn hóa format số
+            if (charCode == 46) {
+            if (inputValue.indexOf('.') !== - 1) {
+            return false;
+            }
+            return true;
+            }
+
+            if (charCode == 44) {
+            if (inputValue.indexOf(',') !== - 1 || inputValue.indexOf('.') !== - 1) {
+            return false;
+            }
+            return true;
+            }
+
+            if (charCode < 48 || charCode > 57) {
+            return false;
+            }
+
+            return true;
+            }
+
             function validatePrice(textarea) {
-                let value = textarea.value;
-
-                // Chuẩn hóa dấu phẩy thành dấu chấm
-                if (value.includes(',')) {
-                    value = value.replace(',', '.');
-                    textarea.value = value;
-                }
-
-                // Kiểm tra định dạng số hợp lệ
-                const parts = value.split('.');
-                if (parts.length > 2) {
-                    // Nếu có nhiều hơn 1 dấu chấm, chỉ giữ lại 2 phần đầu
-                    textarea.value = parts[0] + '.' + parts[1];
-                } else if (parts.length === 2 && parts[1].length > 2) {
-                    // Giới hạn tối đa 2 chữ số thập phân
-                    textarea.value = parts[0] + '.' + parts[1].substring(0, 2);
-                }
+            let value = textarea.value;
+            if (value.includes(',')) {
+            value = value.replace(',', '.');
+            textarea.value = value;
             }
 
-            // Format số khi blur - HIỂN THỊ THEO ĐỊNH DẠNG VIỆT NAM
+            const parts = value.split('.');
+            if (parts.length > 2) {
+            textarea.value = parts[0] + '.' + parts[1];
+            } else if (parts.length === 2 && parts[1].length > 2) {
+            textarea.value = parts[0] + '.' + parts[1].substring(0, 2);
+            }
+            }
+
+            // Format giá theo định dạng Việt Nam khi blur
             function formatPrice(textarea) {
-                let value = textarea.value.trim();
-
-                if (value === '')
+            let value = textarea.value.trim();
+            if (value === '')
                     return;
-
-                // Chuyển dấu phẩy thành dấu chấm để parse
-                value = value.replace(',', '.');
-                const numValue = parseFloat(value);
-
-                if (!isNaN(numValue) && numValue >= 0) {
-                    // Hiển thị theo định dạng Việt Nam (dấu phẩy cho thập phân)
-                    textarea.value = numValue.toLocaleString('vi-VN', {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 2
-                    });
-                }
+            // Chuyển dấu phẩy thành dấu chấm để parse
+            value = value.replace(',', '.');
+            const numValue = parseFloat(value);
+            // Kiểm tra giới hạn số an toàn
+            if (!isNaN(numValue) && numValue >= 0 && numValue <= Number.MAX_SAFE_INTEGER) {
+            textarea.value = numValue.toLocaleString('vi-VN', {
+            minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+            });
+            } else if (numValue > Number.MAX_SAFE_INTEGER) {
+            // Hiển thị cảnh báo và xóa giá trị
+            alert('Giá trị quá lớn! Vui lòng nhập số nhỏ hơn.');
+            textarea.value = '';
+            }
             }
 
-            // Xử lý khi focus - chuyển về dạng số thuần để dễ chỉnh sửa
             function handlePriceFocus(textarea) {
-                let value = textarea.value;
-                if (value) {
-                    // Chuyển về dạng số thuần (dấu chấm cho thập phân)
-                    value = value.replace(/\./g, '').replace(',', '.');
-
-                    // Nếu có dấu phẩy ở cuối (do format), chuyển thành dấu chấm
-                    const numValue = parseFloat(value);
-                    if (!isNaN(numValue)) {
-                        textarea.value = numValue.toString();
-                    }
-                }
+            let value = textarea.value;
+            if (value) {
+            value = value.replace(/\./g, '').replace(',', '.');
+            const numValue = parseFloat(value);
+            if (!isNaN(numValue)) {
+            textarea.value = numValue.toString();
+            }
+            }
             }
 
-            // Hàm kết hợp validate và calculate
             function validateAndCalculate(textarea) {
-                validatePrice(textarea);
-                calculateTotal(textarea);
-                autoResize(textarea);
+            validatePrice(textarea);
+            calculateTotal(textarea);
+            autoResize(textarea);
             }
-        </script>
+            // Dữ liệu supplier từ server (sẽ được render từ JSTL)
+            const supplierData = {
+            <c:forEach var="supplier" items="${supplier_list}" varStatus="status">
+            "${supplier.name}": {
+            address: "${supplier.address}",
+                    phone: "${supplier.phone}",
+                    email: "${supplier.email}"
+            }<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+            };
+// Hàm xử lý khi thay đổi supplier
+            function handleSupplierChange(selectElement) {
+            const selectedSupplier = selectElement.value;
+            // Lấy các element cần điền thông tin
+            const addressField = document.querySelector('textarea[name="supplier_address"]');
+            const phoneField = document.querySelector('textarea[name="supplier_phone"]');
+            const emailField = document.querySelector('textarea[name="supplier_email"]');
+            if (selectedSupplier && supplierData[selectedSupplier]) {
+            // Điền thông tin tự động
+            const supplier = supplierData[selectedSupplier];
+            addressField.value = supplier.address || '';
+            phoneField.value = supplier.phone || '';
+            emailField.value = supplier.email || '';
+            // Auto resize các textarea
+            autoResize(addressField);
+            autoResize(phoneField);
+            autoResize(emailField);
+            } else {
+            // Xóa thông tin nếu không chọn supplier
+            addressField.value = '';
+            phoneField.value = '';
+            emailField.value = '';
+            autoResize(addressField);
+            autoResize(phoneField);
+            autoResize(emailField);
+            }
+            }
 
+// Gắn event listener khi trang load
+            document.addEventListener('DOMContentLoaded', function() {
+            const supplierSelect = document.querySelector('select[name="supplier_name"]');
+            if (supplierSelect) {
+            supplierSelect.addEventListener('change', function() {
+            handleSupplierChange(this);
+            });
+            }
+            });
+        </script>
 
     </body>
 </html>

@@ -5,6 +5,7 @@
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@page import="model.Users"%>
 <!DOCTYPE html>
 <%
@@ -98,24 +99,31 @@ if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
                 font-size: 1.04rem;
             }
             .back-link:hover {
-                text-decoration: underline;
+text-decoration: underline;
+            }
+            .success-message {
+                color: green;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            .error-message {
+                color: red;
+                margin-bottom: 15px;
+                text-align: center;
             }
         </style>
     </head>
     <body>
         <div class="form-container">
             <h2>Add New User</h2>
-            <%
-                String message = (String) session.getAttribute("message");
-                if (message != null) {
-            %>
-            <div style="color: green; margin-bottom: 15px;">
-                <%= message %>
-            </div>
-            <%
-                    session.removeAttribute("message");
-                }
-            %>
+            <c:if test="${not empty error}">
+                <div class="error-message">${error}</div>
+            </c:if>
+            <c:if test="${not empty sessionScope.message}">
+                <div class="success-message">${sessionScope.message}</div>
+                <c:remove var="message" scope="session"/>
+            </c:if>
+
             <form action="adduser" method="post">
                 <table>
                     <tr>
@@ -132,26 +140,32 @@ if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
                     </tr>
                     <tr>
                         <td class="label"><label for="email">Email:</label></td>
-                        <td class="input"><input type="email" id="email" name="email" required></td>
+                        <td class="input"><input type="email" id="email" name="email" required
+                                                 pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                                 title="Email phải đúng định dạng: example@domain.com">
+                        </td>
                     </tr>
                     <tr>
                         <td class="label"><label for="phone">Phone:</label></td>
-                        <td class="input"><input type="text" id="phone" name="phone" maxlength="20" required></td>
+                        <td class="input"><input type="text" id="phone" name="phone"
+                                                 required pattern="^[0-9]{10}$"
+                                                 title="Số điện thoại chỉ được chứa chữ số">
+                        </td>
                     </tr>
                     <tr>
                         <td class="label"><label for="dob">Date of Birth:</label></td>
-                        <td class="input"><input type="date" id="dob" name="dob" required></td>
+                        <td class="input"><input type="date" id="dob" name="dob" required title="errror"></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="role">Role:</label></td>
                         <td class="input">
                             <div class="row-flex">
                                 <div>
-                                    <select id="role" name="role" required>
+<select id="role" name="role" required>
                                         <option value="">-- Select Role --</option>
                                         <option value="2">Warehouse Staff</option>
-                                        <option value="3">Company Director</option>
-                                        <option value="4">Company Employee</option>
+                                        <option value="3">Company Employee</option>
+                                        <option value="4">Company Director</option>
                                     </select>
                                 </div>
                                 <div>
@@ -166,10 +180,7 @@ if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
                 </table>
                 <button type="submit" class="btn-submit">Add User</button>
             </form>
-            <a href="admin" class="back-link">Back to User List</a>
+            <a href="usermanager" class="back-link">Back to User List</a>
         </div>
     </body>
 </html>
-
-
-

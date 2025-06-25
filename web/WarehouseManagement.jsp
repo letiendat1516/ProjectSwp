@@ -109,10 +109,22 @@
             .btn-secondary:hover {
                 background-color: #64748b;
             }
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
         </style>
     </head>
     <body>
-        <div class="container">
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
             <h2>Xử lý Nhập Kho</h2>
             <form action="import-confirm" method="post">
                 <div class="section">
@@ -190,5 +202,7 @@
                 </div>
             </form>
         </div>
+                    </div>
+                    
     </body>
 </html>

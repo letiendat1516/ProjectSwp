@@ -1,19 +1,10 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<!-- Product List Page: Displays, searches, sorts, and manages products -->
 <%@ page import="model.Users" session="true" %>
 <!DOCTYPE html>
-<%
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-    response.setHeader("Pragma", "no-cache");
-    response.setDateHeader("Expires", 0);
-    
-    Users user = (Users) session.getAttribute("user");
-    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
-%>
+
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -52,6 +43,7 @@
             font-size: 2.5rem;
             margin-bottom: 10px;
             font-weight: 300;
+            color: black;
         }
 
         .header p {
@@ -376,16 +368,30 @@
                 min-width: 800px;
             }
         }
+        .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
     </style>
 </head>
 <body>
-    <div class="container">        <div class="header">
+
+     <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
+        <div class="header">
             <h1>📦 Danh Sách Sản Phẩm</h1>
             <p>Quản lý và theo dõi tồn kho sản phẩm</p>
         </div>
 
         <div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
-            <a href="Admin.jsp" class="back-btn">← Quay lại Trang Admin</a>
+            <a href="categoriesforward.jsp" class="back-btn">← Quay lại Trang trước</a>
             <a href="add-product" class="add-product-btn">➕ Thêm Sản Phẩm Mới</a>
         </div>        <!-- Success Message -->
         <c:if test="${not empty param.success}">
@@ -615,6 +621,8 @@
             </div>
         </c:if>
     </div>
+                </div>
+                
 
     <script>
         function sortTable(column) {

@@ -44,7 +44,7 @@ public class GetStatusOfPurchaseRequestInformationDAO {
             if (statusFilter != null && !statusFilter.isEmpty()) {
                 if ("approved".equals(statusFilter)) {
                     // Lọc tất cả status được coi là "Đã duyệt"
-                    sqlIds.append("AND r.status IN ('approved', 'quoted', 'pending re-quote', 'completed') ");
+                    sqlIds.append("AND r.status IN ('approved', 'quoted', 'pending re-quote') ");
                 } else {
                     // Các status khác vẫn lọc bình thường
                     sqlIds.append("AND r.status = ? ");

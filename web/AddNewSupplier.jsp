@@ -22,9 +22,7 @@
             body {
                 margin: 0;
                 background: linear-gradient(135deg, #e0f7fa, #e1bee7);
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                
                 min-height: 100vh;
                 animation: fadeIn 1.2s ease-in-out;
             }
@@ -146,11 +144,22 @@
                 vertical-align: middle;
                 margin-right: 6px;
             }
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
         </style>
     </head>
     <body>
-
-        <div class="form-container">
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
             <h1>Add New Supplier</h1>
             <c:set var="mess" value="${requestScope.mess}"/>
             <c:if test="${not empty mess}">
@@ -181,6 +190,6 @@
             </form>
             <a href="LishSupplier" class="back-btn"><i class="material-icons">arrow_back</i> Back</a>
         </div>
-
+            </div>
     </body>
 </html>

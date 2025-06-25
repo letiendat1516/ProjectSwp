@@ -1,6 +1,17 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<%-- Tính toán reverseSortDir --%>
+<c:set var="reverseSortDir" value="${sortDir eq 'asc' ? 'desc' : 'asc'}" />
+
+<%-- Tính toán phân trang hiển thị --%>
+<c:set var="startPage" value="${currentPage - 2 > 0 ? currentPage - 2 : 1}" />
+<c:set var="endPage" value="${startPage + 4 < totalPages ? startPage + 4 : totalPages}" />
+<c:if test="${endPage - startPage < 4 && totalPages > 5}">
+    <c:set var="startPage" value="${endPage - 4 > 0 ? endPage - 4 : 1}" />
+</c:if>
+
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -167,11 +178,24 @@
                 text-align: left;
                 font-weight: bold;
                 border-bottom: 2px solid #dee2e6;
+                position: relative;
             }
 
             .table th a {
                 color: #333;
                 text-decoration: none;
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+
+            .table th a:hover {
+                color: #007bff;
+            }
+
+            .sort-icon {
+                font-size: 12px;
+                margin-left: 5px;
             }
 
             .table td {
@@ -254,6 +278,15 @@
                 color: #6c757d;
             }
 
+            /* Info Panel */
+            .info-panel {
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 5px;
+                margin-bottom: 20px;
+                border-left: 4px solid #007bff;
+            }
+
             /* Responsive */
             @media (max-width: 768px) {
                 .container {
@@ -276,162 +309,237 @@
                 .action-buttons {
                     flex-direction: column;
                 }
+
+                .search-form {
+                    flex-direction: column;
+                }
+
+                .form-input {
+                    width: 100%;
+                }
             }
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
+
         </style>
     </head>
     <body>
-        <div class="container">
-            <div class="page-header">
-                <h1 class="page-title">Quản lý danh mục loại sản phẩm</h1>
-            </div>
 
-            <!-- Navigation Buttons -->
-            <div class="nav-buttons">
-                <a href="/ProjectWarehouse/categoriesforward.jsp" class="btn btn-info">← Quay lại trang trước</a>
-                <a href="${pageContext.request.contextPath}/category-parent/list" class="btn btn-success">Quản lý danh mục</a>
-            </div>
 
-            <!-- Thông báo -->
-            <c:if test="${not empty param.message}">
-                <div class="alert alert-success">
-                    <c:choose>
-                        <c:when test="${param.message eq 'create_success'}">Thêm danh mục thành công!</c:when>
-                        <c:when test="${param.message eq 'update_success'}">Cập nhật danh mục thành công!</c:when>
-                        <c:when test="${param.message eq 'delete_success'}">Xóa danh mục thành công!</c:when>
-                        <c:otherwise>${param.message}</c:otherwise>
-                    </c:choose>
-                    <button type="button" class="alert-close" onclick="this.parentElement.style.display = 'none'">&times;</button>
-                </div>
-            </c:if>
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
+                    <div class="page-header">
+                        <h1 class="page-title">Quản lý danh mục loại sản phẩm</h1>
+                    </div>
 
-            <c:if test="${not empty param.error}">
-                <div class="alert alert-danger">
-                    <c:choose>
-                        <c:when test="${param.error eq 'invalid_id'}">ID không hợp lệ!</c:when>
-                        <c:when test="${param.error eq 'category_not_found'}">Không tìm thấy danh mục!</c:when>
-                        <c:when test="${param.error eq 'invalid_data'}">Dữ liệu không hợp lệ!</c:when>
-                        <c:when test="${param.error eq 'delete_failed'}">Không thể xóa danh mục!</c:when>
-                        <c:otherwise>${param.error}</c:otherwise>
-                    </c:choose>
-                    <button type="button" class="alert-close" onclick="this.parentElement.style.display = 'none'">&times;</button>
-                </div>
-            </c:if>
+                    <!-- Navigation Buttons -->
+                    <div class="nav-buttons">
+                        <a href="/ProjectWarehouse/categoriesforward.jsp" class="btn btn-info">← Quay lại trang trước</a>
+                        <a href="${pageContext.request.contextPath}/category-parent/list" class="btn btn-success">Quản lý danh mục</a>
+                    </div>
 
-            <!-- Thanh công cụ -->
-            <div class="toolbar">
-                <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">Thêm danh mục loại sản phẩm</a>
-                <form method="get" class="search-form">
-                    <input type="text" name="search" class="form-input" 
-                           placeholder="Tìm kiếm danh mục..." value="${searchKeyword}">
-                    <button type="submit" class="btn btn-secondary">Tìm kiếm</button>
-                </form>
-            </div>
-
-            <!-- Bảng danh sách -->
-            <div class="table-container">
-                <c:choose>
-                    <c:when test="${not empty categories}">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <a href="?sortField=id&sortDir=${sortField eq 'id' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
-                                            ID ${sortField eq 'id' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
-                                        </a>
-                                    </th>
-                                    <th>
-                                        <a href="?sortField=name&sortDir=${sortField eq 'name' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
-                                            Tên ${sortField eq 'name' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
-                                        </a>
-                                    </th>
-                                    <th>
-                                        <a href="?sortField=parent_name&sortDir=${sortField eq 'parent_name' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
-                                            Danh mục ${sortField eq 'parent_name' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
-                                        </a>
-                                    </th>
-                                    <th>Trạng thái</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach var="category" items="${categories}">
-                                    <tr>
-                                        <td>#${category.id}</td>
-                                        <td>${category.name}</td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${not empty category.parentName}">
-                                                    <span class="badge badge-info">${category.parentName}</span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="text-muted">Không có</span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <span class="badge ${category.activeFlag ? 'badge-success' : 'badge-secondary'}">
-                                                ${category.activeFlag ? 'Hoạt động' : 'Tạm dừng'}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <a href="${pageContext.request.contextPath}/category/edit?id=${category.id}" 
-                                                   class="btn btn-warning btn-sm">Sửa</a>
-                                                <a href="${pageContext.request.contextPath}/category/delete?id=${category.id}" 
-                                                   class="btn btn-danger btn-sm" 
-                                                   onclick="return confirmDelete('${category.name}')">
-                                                    Xóa
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
-                    </c:when>
-                    <c:otherwise>
-                        <div class="empty-state">
-                            <h3>Không có danh mục nào</h3>
-                            <p>Hãy thêm danh mục đầu tiên của bạn</p>
-                            <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">Thêm danh mục loại sản phẩm</a>
+                    <!-- Thông báo -->
+                    <c:if test="${not empty param.message}">
+                        <div class="alert alert-success">
+                            <c:choose>
+                                <c:when test="${param.message eq 'create_success'}">Thêm danh mục thành công!</c:when>
+                                <c:when test="${param.message eq 'update_success'}">Cập nhật danh mục thành công!</c:when>
+                                <c:when test="${param.message eq 'delete_success'}">Xóa danh mục thành công!</c:when>
+                                <c:otherwise>${param.message}</c:otherwise>
+                            </c:choose>
+                            <button type="button" class="alert-close" onclick="this.parentElement.style.display = 'none'">&times;</button>
                         </div>
-                    </c:otherwise>
-                </c:choose>
+                    </c:if>
+
+                    <c:if test="${not empty param.error}">
+                        <div class="alert alert-danger">
+                            <c:choose>
+                                <c:when test="${param.error eq 'invalid_id'}">ID không hợp lệ!</c:when>
+                                <c:when test="${param.error eq 'category_not_found'}">Không tìm thấy danh mục!</c:when>
+                                <c:when test="${param.error eq 'invalid_data'}">Dữ liệu không hợp lệ!</c:when>
+                                <c:when test="${param.error eq 'delete_failed'}">Không thể xóa danh mục!</c:when>
+                                <c:otherwise>${param.error}</c:otherwise>
+                            </c:choose>
+                            <button type="button" class="alert-close" onclick="this.parentElement.style.display = 'none'">&times;</button>
+                        </div>
+                    </c:if>
+
+
+                    <!-- Thanh công cụ -->
+                    <div class="toolbar">
+                        <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">+ Thêm danh mục loại sản phẩm</a>
+                        <form method="get" class="search-form">
+                            <!-- Giữ lại sort parameters khi search -->
+                            <c:if test="${not empty sortField}">
+                                <input type="hidden" name="sortField" value="${sortField}">
+                            </c:if>
+                            <c:if test="${not empty sortDir}">
+                                <input type="hidden" name="sortDir" value="${sortDir}">
+                            </c:if>
+
+                            <input type="text" name="search" class="form-input" 
+                                   placeholder="Tìm kiếm danh mục..." value="${searchKeyword}">
+                            <button type="submit" class="btn btn-secondary">Tìm kiếm</button>
+
+                            <!-- Nút clear search -->
+                            <c:if test="${not empty searchKeyword}">
+                                <a href="?sortField=${sortField}&sortDir=${sortDir}" class="btn btn-info">✕ Xóa tìm kiếm</a>
+                            </c:if>
+                        </form>
+                    </div>
+
+                    <!-- Bảng danh sách -->
+                    <div class="table-container">
+                        <c:choose>
+                            <c:when test="${not empty categories}">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <a href="?sortField=id&sortDir=${sortField eq 'id' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                                    ID 
+                                                    <c:if test="${sortField eq 'id'}">
+                                                        <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
+                                                    </c:if>
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a href="?sortField=name&sortDir=${sortField eq 'name' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                                    Tên 
+                                                    <c:if test="${sortField eq 'name'}">
+                                                        <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
+                                                    </c:if>
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a href="?sortField=parent_name&sortDir=${sortField eq 'parent_name' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                                    Danh mục 
+                                                    <c:if test="${sortField eq 'parent_name'}">
+                                                        <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
+                                                    </c:if>
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a href="?sortField=active_flag&sortDir=${sortField eq 'active_flag' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                                    Trạng thái 
+                                                    <c:if test="${sortField eq 'active_flag'}">
+                                                        <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
+                                                    </c:if>
+                                                </a>
+                                            </th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach var="category" items="${categories}">
+                                            <tr>
+                                                <td>#${category.id}</td>
+                                                <td>${category.name}</td>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${not empty category.parentName}">
+                                                            <span class="badge badge-info">${category.parentName}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted">Không có</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>
+                                                    <span class="badge ${category.activeFlag ? 'badge-success' : 'badge-secondary'}">
+                                                        ${category.activeFlag ? 'Hoạt động' : 'Không hoạt động'}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        <a href="${pageContext.request.contextPath}/category/edit?id=${category.id}" 
+                                                           class="btn btn-warning btn-sm" title="Chỉnh sửa">
+                                                            ️Sửa
+                                                        </a>
+                                                        <a href="${pageContext.request.contextPath}/category/delete?id=${category.id}" 
+                                                           class="btn btn-danger btn-sm" 
+                                                           onclick="return confirmDelete('${category.name}')" title="Xóa">
+                                                            Xóa
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="empty-state">
+                                    <h3>Không có danh mục nào</h3>
+                                    <c:choose>
+                                        <c:when test="${not empty searchKeyword}">
+                                            <p>Không tìm thấy danh mục nào với từ khóa "<strong>${searchKeyword}</strong>"</p>
+                                            <a href="${pageContext.request.contextPath}/category/list" class="btn btn-info">← Xem tất cả danh mục</a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <p>Hãy thêm danh mục đầu tiên của bạn</p>
+                                            <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">+ Thêm danh mục loại sản phẩm</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+
+                    <!-- Phân trang -->
+                    <c:if test="${totalPages > 1}">
+                        <div class="pagination-container">
+                            <ul class="pagination">
+                                <!-- First page -->
+                                <c:if test="${currentPage > 1}">
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=${currentPage-1}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">Trước</a>
+                                    </li>
+                                </c:if>
+
+                                <!-- Page numbers -->
+                                <c:forEach begin="${startPage}" end="${endPage}" var="i">
+                                    <li class="page-item ${i eq currentPage ? 'active' : ''}">
+                                        <a class="page-link" href="?page=${i}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">${i}</a>
+                                    </li>
+                                </c:forEach>
+
+                                <!-- Next page -->
+                                <c:if test="${currentPage < totalPages}">
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=${currentPage+1}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">Sau</a>
+                                    </li>
+                                </c:if>
+                            </ul>
+
+                        </div>
+                    </c:if>
+                </div>
             </div>
 
-            <!-- Phân trang -->
-            <c:if test="${totalPages > 1}">
-                <div class="pagination-container">
-                    <ul class="pagination">
-                        <c:if test="${currentPage > 1}">
-                            <li class="page-item">
-                                <a class="page-link" href="?page=${currentPage-1}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">Trước</a>
-                            </li>
-                        </c:if>
-
-                        <c:forEach begin="${startPage}" end="${endPage}" var="i">
-                            <li class="page-item ${i eq currentPage ? 'active' : ''}">
-                                <a class="page-link" href="?page=${i}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">${i}</a>
-                            </li>
-                        </c:forEach>
-
-                        <c:if test="${currentPage < totalPages}">
-                            <li class="page-item">
-                                <a class="page-link" href="?page=${currentPage+1}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">Sau</a>
-                            </li>
-                        </c:if>
-                    </ul>
-                </div>
-            </c:if>
-        </div>
         <script>
             function confirmDelete(categoryName) {
-                return confirm(
-                        
-                        'Bạn có chắc chắn muốn xóa danh mục' + categoryName 
-                        
-                        );
+                return confirm('Bạn có chắc chắn muốn xóa danh mục "' + categoryName + '"?\n\nHành động này không thể hoàn tác!');
             }
+
+            // Auto hide alerts after 5 seconds
+            document.addEventListener('DOMContentLoaded', function () {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function (alert) {
+                    setTimeout(function () {
+                        alert.style.display = 'none';
+                    }, 5000);
+                });
+            });
         </script>
     </body>
 </html>

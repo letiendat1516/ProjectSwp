@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 public class Context {
 
     public static Connection getJDBCConnection() {
-        String url = "jdbc:mysql://localhost:3306/warehouse_offical";
+        String url = "jdbc:mysql://localhost:3306/warehouse_offical?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC";
         String user = "root";
         String password = "letiendat";
         try {

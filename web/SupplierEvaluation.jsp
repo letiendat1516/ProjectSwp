@@ -326,10 +326,23 @@
             .star-rating label:hover ~ label .star-num {
                 color: #FFD700;
             }
+             .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
         </style>
 
     </head>
     <body>
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
         <c:set var="supplier" value="${requestScope.supplier}"/>
         <c:set var="mess" value="${requestScope.mess}"/>
         <c:set var="user" value="${sessionScope.user}"/>
@@ -438,6 +451,7 @@
                 </form>
             </div>
         </div>
+                        </div>
         <a href="LishSupplier" class="back-btn">Back</a>
     </body>
 
