@@ -319,10 +319,6 @@ if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName()))) {
                 <a href="StatisticSupplierEvaluation?top=${fl}&sort=${st}&status=${sta}&index=${i}" >${i}</a>
             </c:forEach>
         </div>
-<<<<<<< HEAD
-        <a href="#">back</a>
-=======
         <a href="Admin.jsp">back</a>
->>>>>>> 70e80aafa725db0b68d36774836b6761bf1f9d3a
     </body>
 </html>
