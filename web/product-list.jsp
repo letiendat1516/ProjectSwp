@@ -440,6 +440,7 @@
         <div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
             <a href="categoriesforward.jsp" class="back-btn">← Quay lại Trang trước</a>
             <a href="add-product" class="add-product-btn">➕ Thêm Sản Phẩm Mới</a>
+            <a href="deleted-products" class="add-product-btn" style="background: #ffc107; color: #333;">🗑️ Sản Phẩm Đã Xóa</a>
         </div>        <!-- Success Message -->
         <c:if test="${not empty param.success}">
             <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #c3e6cb;">
@@ -577,6 +578,9 @@
                                             <c:when test="${product.status == 'inactive' || product.status == 'Ngưng hoạt động'}">
                                                 <span class="badge badge-warning">Ngưng hoạt động</span>
                                             </c:when>
+                                            <c:when test="${product.status == 'deleted'}">
+                                                <span class="badge badge-danger">Đã xóa</span>
+                                            </c:when>
                                             <c:otherwise>
                                                 <span class="badge badge-warning">${product.status}</span>
                                             </c:otherwise>
@@ -590,9 +594,18 @@
                                         </c:if>
                                     </td>
                                     <td>
-                                        <a href="update-product?id=${product.id}" class="btn-edit" title="Chỉnh sửa sản phẩm">
-                                            ✏️ Sửa
-                                        </a>
+                                        <c:choose>
+                                            <c:when test="${product.status == 'deleted'}">
+                                                <a href="recover-product?id=${product.id}" class="btn-edit" style="background: #ffc107; color: #333;" title="Khôi phục sản phẩm">
+                                                    ♻️ Khôi phục
+                                                </a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="update-product?id=${product.id}" class="btn-edit" title="Chỉnh sửa sản phẩm">
+                                                    ✏️ Sửa
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </td>
                                 </tr>
                             </c:forEach>

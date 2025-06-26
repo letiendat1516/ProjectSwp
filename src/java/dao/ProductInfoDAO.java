@@ -34,7 +34,7 @@ public class ProductInfoDAO {
   //Lấy tất cả product 
   public List<ProductInfo> getAllProducts() {
       List<ProductInfo> list = new ArrayList<>();
-      String sql = "SELECT id, name, code, cate_id, unit_id, price, status, description FROM product_info";
+      String sql = "SELECT id, name, code, cate_id, unit_id, price, status, description FROM product_info WHERE status != 'deleted'";
 
       try (
               Connection con = Context.getJDBCConnection(); 
@@ -102,7 +102,7 @@ public class ProductInfoDAO {
       sql.append("LEFT JOIN product_in_stock s ON p.id = s.product_id ");
       sql.append("LEFT JOIN category c ON p.cate_id = c.id ");
       sql.append("LEFT JOIN unit u ON p.unit_id = u.id ");
-      sql.append("WHERE p.active_flag = 1 ");
+      sql.append("WHERE p.active_flag = 1 AND p.status != 'deleted' ");
       
       if (search != null && !search.trim().isEmpty()) {
           sql.append("AND (p.name LIKE ? OR p.code LIKE ? OR c.name LIKE ?) ");
@@ -180,7 +180,7 @@ public class ProductInfoDAO {
       StringBuilder sql = new StringBuilder();
       sql.append("SELECT COUNT(*) FROM product_info p ");
       sql.append("LEFT JOIN category c ON p.cate_id = c.id ");
-      sql.append("WHERE p.active_flag = 1 ");
+      sql.append("WHERE p.active_flag = 1 AND p.status != 'deleted' ");
       
       if (search != null && !search.trim().isEmpty()) {
           sql.append("AND (p.name LIKE ? OR p.code LIKE ? OR c.name LIKE ?) ");
@@ -377,8 +377,11 @@ public class ProductInfoDAO {
   public ProductInfo getProductById(int productId) {
       String sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.price, p.status, p.description, " +
                    "p.supplier_id, p.expiration_date, p.additional_notes, " +
-                   "p.created_by, p.created_date, p.updated_by, p.updated_date " +
-                   "FROM product_info p WHERE p.id = ? AND p.active_flag = 1";
+                   "p.created_by, p.created_date, p.updated_by, p.updated_date, " +
+                   "COALESCE(s.qty, 0) as stock_qty " +
+                   "FROM product_info p " +
+                   "LEFT JOIN product_in_stock s ON p.id = s.product_id " +
+                   "WHERE p.id = ? AND p.active_flag = 1";
       
       System.out.println("DEBUG: getProductById called with ID: " + productId);
       
@@ -547,15 +550,15 @@ public class ProductInfoDAO {
   }
   
   /**
-   * Delete a product by ID
+   * Soft delete a product by ID
    * @param productId The ID of the product to delete
-   * @return true if deletion was successful, false otherwise
+   * @return true if soft deletion was successful, false otherwise
    */   
-  //Xóa product 
+  //Soft delete product 
   public boolean deleteProduct(int productId) {
-      String sql = "DELETE FROM product_info WHERE id = ?";
+      String sql = "UPDATE product_info SET status = 'deleted' WHERE id = ?";
       
-      System.out.println("ProductInfoDAO: Attempting to delete product with ID: " + productId);
+      System.out.println("ProductInfoDAO: Attempting to soft delete product with ID: " + productId);
       
       try (Connection con = Context.getJDBCConnection();
            PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -563,11 +566,11 @@ public class ProductInfoDAO {
           stmt.setInt(1, productId);
           int rowsAffected = stmt.executeUpdate();
           
-          System.out.println("ProductInfoDAO: Delete operation affected " + rowsAffected + " rows");
+          System.out.println("ProductInfoDAO: Soft delete operation affected " + rowsAffected + " rows");
           return rowsAffected > 0;
           
       } catch (SQLException e) {
-          System.out.println("ProductInfoDAO: Error deleting product - " + e.getMessage());
+          System.out.println("ProductInfoDAO: Error soft deleting product - " + e.getMessage());
           e.printStackTrace();
           return false;
       }
@@ -607,5 +610,49 @@ public class ProductInfoDAO {
       }
       System.out.println("ProductInfoDAO: No dependencies found for product " + productId);
       return true; // No dependencies found
+  }
+
+  /**
+   * Recover a soft-deleted product by setting status to 'active'
+   */
+  public boolean recoverProduct(int productId) {
+      String sql = "UPDATE product_info SET status = 'active' WHERE id = ?";
+      try (Connection con = Context.getJDBCConnection();
+           PreparedStatement stmt = con.prepareStatement(sql)) {
+          stmt.setInt(1, productId);
+          int rowsAffected = stmt.executeUpdate();
+          return rowsAffected > 0;
+      } catch (SQLException e) {
+          e.printStackTrace();
+          return false;
+      }
+  }
+
+  /**
+   * Get all soft-deleted products (status = 'deleted')
+   */
+  public List<ProductInfo> getDeletedProducts() {
+      List<ProductInfo> list = new ArrayList<>();
+      String sql = "SELECT id, name, code, cate_id, unit_id, price, status, description FROM product_info WHERE status = 'deleted'";
+      try (
+              Connection con = Context.getJDBCConnection();
+              PreparedStatement stmt = con.prepareStatement(sql);
+              ResultSet rs = stmt.executeQuery();) {
+          while (rs.next()) {
+              ProductInfo p = new ProductInfo();
+              p.setId(rs.getInt(COL_ID));
+              p.setName(rs.getString(COL_NAME));
+              p.setCode(rs.getString(COL_CODE));
+              p.setCate_id(rs.getInt(COL_CATE_ID));
+              p.setUnit_id(rs.getInt(COL_UNIT_ID));
+              p.setPrice(rs.getBigDecimal(COL_PRICE));
+              p.setStatus(rs.getString(COL_STATUS));
+              p.setDescription(rs.getString(COL_DESCRIPTION));
+              list.add(p);
+          }
+      } catch (SQLException e) {
+          e.printStackTrace();
+      }
+      return list;
   }
 }

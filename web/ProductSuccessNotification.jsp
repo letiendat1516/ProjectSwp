@@ -188,11 +188,8 @@
         <% } %>
         
         <div class="button-group">
-            <a href="add-product" class="btn btn-primary">
-                ➕ Thêm sản phẩm khác
-            </a>
             <a href="product-list" class="btn btn-success">
-                📋 Xem danh sách sản phẩm
+                📋 Quay lại danh sách sản phẩ m
             </a>
         </div>
     </div>
