@@ -649,6 +649,7 @@ if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName())&&!"Nhân viê
                 <c:if test="${empty fl or fl == null}">
                     <c:set var="fl" value="star"/>
                 </c:if>
+                <c:set var="page" value="${requestScope.page}"/>
                 <div class="supplier-container">
                     <c:if test="${empty listVSE}">
                         <h2>Supplier Information</h2>
@@ -773,9 +774,16 @@ if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName())&&!"Nhân viê
                         </div>
                     </div>
                 </c:if>
-                <div class="action-buttons">
-                    <a class="btn-back" href="LishSupplier">Back</a>
-                </div>
+                <c:if test="${empty page}">
+                    <div class="action-buttons">
+                        <a class="btn-back" href="LishSupplier">Back</a>
+                    </div>
+                </c:if>
+                <c:if test="${not empty page}">
+                    <div class="action-buttons">
+                        <a class="btn-back" href="StatisticSupplierEvaluation.jsp">Back</a>
+                    </div>
+                </c:if>
             </div>
         </div>
     </body>

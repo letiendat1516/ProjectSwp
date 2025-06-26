@@ -184,21 +184,24 @@
         </style>
     </head>
     <body>
-        <div class="layout-container">
-            <jsp:include page="/include/sidebar.jsp"/>
-            <div class="main-content">
-                <div class="admin-navbar">
-                    <div class="left">
-                        <a href="Admin.jsp" class="back-btn">← Quay lại trang chính</a>
-                    </div>
-                    <div class="center">
-                        <span class="page-title">Yêu cầu reset mật khẩu</span>
-                    </div>
-                    <div class="right">
-                        <span class="admin-name">Admin</span>
-                        <a href="logout" class="logout-btn">Đăng xuất</a>
-                    </div>
-                </div>
+        <div class="admin-navbar">
+            <div class="left">
+                <a href="Admin.jsp" class="back-btn">← Quay lại trang chính</a>
+            </div>
+            <div class="center">
+                <span class="page-title">Yêu cầu reset mật khẩu</span>
+            </div>
+            <div class="right">
+                <span class="admin-name">Admin</span>
+                <a href="logout" class="logout-btn">Đăng xuất</a>
+            </div>
+        </div>
+        <div class="container">
+            <div class="msg<%= (msg != null && msg.contains("lỗi")) ? " err" : "" %>">
+                <%= (msg != null) ? msg : "" %>
+            </div>
+            <table>
+                Số lượng: <%= (requests != null ? requests.size() : "null") %>
 
                 <div class="container">
                     <div style="font-weight: bold; margin-bottom: 10px;">Số lượng: <%= (requests != null ? requests.size() : 0) %></div>

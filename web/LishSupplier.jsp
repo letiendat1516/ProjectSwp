@@ -416,6 +416,52 @@ if (user == null) {
                 padding: 20px;
                 background: #f5f5f5;
             }
+            /* Container chứa các nút option chia làm 2 hàng 2 cột */
+            .action-container {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                justify-items: center;
+                align-items: center;
+                padding: 8px 0;
+            }
+
+            /* Nút nhỏ gọn & đồng đều */
+            .action-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+                width: 100px;
+                height: 34px;
+                border-radius: 5px;
+                font-weight: 600;
+                text-align: center;
+                white-space: nowrap;
+                transition: all 0.2s ease;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+                border: none;
+            }
+
+            /* Các màu nút giữ nguyên */
+            .btn-edit {
+                background: linear-gradient(135deg, #ffc107, #ff8f00);
+                color: black;
+            }
+            .btn-delete {
+                background: linear-gradient(135deg, #dc3545, #c82333);
+                color: white;
+            }
+            .btn-active {
+                background: linear-gradient(135deg, #28a745, #20c997);
+                color: white;
+            }
+            .btn-evaluation {
+                background: linear-gradient(135deg, #17a2b8, #138496);
+                color: yellow;
+            }
+            .btn-view {
+                background: linear-gradient(135deg, #6f42c1, #5a32a3);
+                color: white;
+            }
         </style>
 
     </head>
@@ -455,19 +501,20 @@ if (user == null) {
                 <div class="LishBody">
                     <c:if test="${not empty listSupplier}">
                         <table border="1px solid">
-                            <tr>
-                                <td>ID</td>
-                                <td>Name</td>
-                                <td>Phone</td>
-                                <td>Email</td>
-                                <td>Address</td>
-                                <td>Note</td>
-                                <td>Status</td>
-                                <td>Date Create</td>
+
+                            <thead>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Address</th>
+                            <th>Note</th>
+                            <th>Status</th>
+                            <th>Date Create</th>
                                 <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}">
-                                    <td colspan="3">Option</td>
+                                <th style="text-align: center;">Option</th> 
                                 </c:if>
-                            </tr>
+                            </thead>
                             <c:forEach var="listItem" items="${listSupplier}">
                                 <tr>
                                     <td>${listItem.supplierID}</td>
@@ -486,18 +533,27 @@ if (user == null) {
                                     </c:choose>
                                     <td>${listItem.createDate}</td> 
                                     <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}">
-                                        <td>
+                                        <td  class="option-cell" colspan="4" >
                                             <div class="action-container">
-                                                <a class="action-btn btn-edit" 
-                                                   href="UpdateSupplier.jsp?id=${listItem.supplierID}&name=${listItem.name}&phone=${listItem.phone}&email=${listItem.email}&address=${listItem.address}&note=${listItem.note}">
-                                                    Edit
-                                                </a>
+
                                                 <c:choose>
                                                     <c:when test="${listItem.activeFlag == 1}">
+                                                        <a class="action-btn btn-edit" 
+                                                           href="UpdateSupplier.jsp?id=${listItem.supplierID}&name=${listItem.name}&phone=${listItem.phone}&email=${listItem.email}&address=${listItem.address}&note=${listItem.note}">
+                                                            Edit
+                                                        </a>
                                                         <a class="action-btn btn-delete" 
                                                            href="DeleteSupplier?id=${listItem.supplierID}&filter=${option}&status=${status}&name=${name}&line=${line}&currentPage=${currentPage}" 
                                                            onclick="return confirm('Bạn có chắc chắn muốn xoá nhà cung cấp này không?')">
                                                             Delete
+                                                        </a>
+                                                        <a class="action-btn btn-evaluation"
+                                                           href="TableSupplierEvaluation?id=${listItem.supplierID}">
+                                                            Evaluation
+                                                        </a>
+                                                        <a class="action-btn btn-view"
+                                                           href="ViewSupplierEvaluation?supplierID=${listItem.supplierID}">
+                                                            View evaluation
                                                         </a>
                                                     </c:when>
                                                     <c:otherwise>
@@ -511,20 +567,7 @@ if (user == null) {
                                             </div>
                                         </td>
                                     </c:if>
-                                    <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}">
-                                        <td>
-                                            <div class="action-container">
-                                                <a class="action-btn btn-evaluation"
-                                                   href="TableSupplierEvaluation?id=${listItem.supplierID}">
-                                                    Evaluation
-                                                </a>
-                                                <a class="action-btn btn-view"
-                                                   href="ViewSupplierEvaluation?supplierID=${listItem.supplierID}">
-                                                    View evaluation
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </c:if>
+
                                 </tr>
                             </c:forEach>
                         </table>

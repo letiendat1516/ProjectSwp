@@ -1,6 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="model.Users" session="true" %> 
 <!DOCTYPE html>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
 <%@page import="model.Users"%>
 <%
     Users user = (Users) session.getAttribute("user");
@@ -55,7 +60,7 @@
                 color: #3f51b5;
                 font-size: 2rem;
                 margin-bottom: 10px;
-                
+
             }
 
             .lead {
@@ -200,6 +205,22 @@
                 padding: 20px;
                 background: #f5f5f5;
             }
+            .header-user {
+                display: flex;
+                align-items: center;
+            }
+            .logout-btn {
+                background: red;
+                color: #fff;
+                border: #007BFF;
+                padding: 8px 16px;
+                border-radius: 4px;
+                cursor: pointer;
+                text-decoration: none;
+            }
+            .logout-btn:hover {
+                background: orange;
+            }
         </style>
 
     </head>
@@ -207,17 +228,12 @@
         <div class="layout-container">
             <jsp:include page="/include/sidebar.jsp" />
             <div class="main-content">
-                <div class="profile-info">
-                    <label class="label">Employee Name:</label>
-                    <span class="value"><%= user.getFullname() %></span>
-                </div>
-                <div class="profile-info">
-                    <span class="value">
-                        <a href="Profile.jsp">Personal Information</a>
-                    </span>
-                </div>
                 <div class="header">
                     <h1 class="page-title">Quản lý Thông tin Vật liệu</h1>
+                    <div class="header-user">
+                        <label class="label"><%= user.getFullname()%></label>
+                        <a href="logout" class="logout-btn">Đăng xuất</a>
+                    </div>
                 </div>
 
                 <div class="card-container">
@@ -288,12 +304,6 @@
                             </a>
                         </div>
                     </div>
-                </div>
-
-                <div class="footer">
-                    <a href="Admin.jsp" class="btn btn-secondary">
-                        Quay lại Trang chủ
-                    </a>
                 </div>
             </div>
         </div>

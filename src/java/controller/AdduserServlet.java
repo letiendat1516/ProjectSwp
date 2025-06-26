@@ -105,12 +105,13 @@ public class AdduserServlet extends HttpServlet {
         java.time.LocalDate today = java.time.LocalDate.now();
         int age = java.time.Period.between(birthDate, today).getYears();
 
-        if (age < 18 || age > 60) {
-            request.setAttribute("error", "Tuổi người dùng phải từ 18 đến 60!");
-            request.getRequestDispatcher("AddUser.jsp").forward(request, response);
-            return;
+            if (age < 18 || age > 60) {
+                request.setAttribute("error", "Tuổi người dùng phải từ 18 đến 60!");
+                request.getRequestDispatcher("AddUser.jsp").forward(request, response);
+                return;
+            }
         }
-    }
+
         user.setActiveFlag(activeFlag);
 
         try {
@@ -126,11 +127,6 @@ public class AdduserServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
         return "Short description";

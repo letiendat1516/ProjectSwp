@@ -332,8 +332,15 @@
                             <option value="inactive" ${formData.status[0] == 'inactive' ? 'selected' : ''}>Ngưng hoạt động</option>
                         </select>
                     </div>
-                </div>
 
+                    <div class="form-group">
+                        <label class="form-label" for="stockQuantity">Số Lượng Tồn Kho</label>
+                        <input type="number" id="stockQuantity" name="stockQuantity" class="form-control" 
+                               value="${formData.stockQuantity[0]}" min="0" step="0.01" placeholder="0">
+                        <div class="form-help">Số lượng hiện có trong kho (tùy chọn)</div>
+                    </div>
+                </div>
+                
                 <!-- Additional Information -->
                 <div class="section-title">📦 Thông Tin Bổ Sung</div>
                 <div class="form-grid">

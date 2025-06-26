@@ -2,6 +2,19 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
+<%@page import="model.Users"%>
+<%
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
 <html lang="vi">
     <head>
         <meta rset="UTF-8">
@@ -29,19 +42,6 @@
                 padding: 30px;
                 border-radius: 8px;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            }
-
-            .page-header {
-                text-align: center;
-                margin-bottom: 30px;
-                padding-bottom: 20px;
-                border-bottom: 2px solid #eee;
-            }
-
-            .page-title {
-                font-size: 2rem;
-                color: #333;
-                margin-bottom: 10px;
             }
 
             /* Navigation Buttons */
@@ -303,14 +303,49 @@
                 padding: 20px;
                 background: #f5f5f5;
             }
+            
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .header-user {
+                display: flex;
+                align-items: center;
+            }
+            .label {
+                color: #888;
+                width: 120px;
+            }
+            .logout-btn {
+                background: red;
+                color: #fff;
+                border: #007BFF;
+                padding: 8px 16px;
+                border-radius: 4px;
+                cursor: pointer;
+                text-decoration: none;
+            }
+            .logout-btn:hover {
+                background: orange;
+            }
+            .page-title {
+                color: #3f51b5;
+                font-size: 2rem;
+                margin-bottom: 10px;
+
+            }
         </style>
     </head>
     <body>
         <div class="layout-container">
             <jsp:include page="/include/sidebar.jsp" />
-            <div class="main-content">
-                <div class="page-header">
+            <div class="main-content">                             
+                <div class="header">
                     <h1 class="page-title">Quản lý danh mục</h1>
+                    <div class="header-user">
+                        <label class="label"><%= user.getFullname()%></label>
+                        <a href="logout" class="logout-btn">Đăng xuất</a>
+                    </div>
                 </div>
 
                 <!-- Navigation Buttons -->

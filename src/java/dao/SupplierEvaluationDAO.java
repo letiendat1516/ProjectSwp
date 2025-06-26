@@ -30,9 +30,10 @@ public class SupplierEvaluationDAO {
 
     public List<Supplier> staticRated(String sort) {
         List<Supplier> list = new ArrayList<>();
-        String sql = "select warehouse_offical.supplier_evaluation.supplier_id,avg(warehouse_offical.supplier_evaluation.avg_rate) as avgrate \n"
-                + "from warehouse_offical.supplier_evaluation group by supplier_id order by avg(warehouse_offical.supplier_evaluation.avg_rate) " + sort;
+        String sql = "select supplier_evaluation.supplier_id,avg(supplier_evaluation.avg_rate) as avgrate \n"
+                + "from supplier_evaluation group by supplier_id order by avg(supplier_evaluation.avg_rate) " + sort;
         try {
+            System.out.println(sql);
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -46,11 +47,11 @@ public class SupplierEvaluationDAO {
         }
         return list;
     }
-    
+
     public List<Supplier> staticMarketPrice(String sort) {
         List<Supplier> list = new ArrayList<>();
-        String sql = "select warehouse_offical.supplier_evaluation.supplier_id,avg(warehouse_offical.supplier_evaluation.market_price_comparison) as avgrate \n"
-                + "from warehouse_offical.supplier_evaluation group by supplier_id order by avg(warehouse_offical.supplier_evaluation.market_price_comparison) "+sort;
+        String sql = "select supplier_evaluation.supplier_id,avg(supplier_evaluation.market_price_comparison) as avgrate \n"
+                + "from supplier_evaluation group by supplier_id order by avg(supplier_evaluation.market_price_comparison) " + sort;
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
@@ -68,9 +69,10 @@ public class SupplierEvaluationDAO {
 
     public List<Supplier> staticExpectedDelivery(String sort) {
         List<Supplier> list = new ArrayList<>();
-        String sql = "select warehouse_offical.supplier_evaluation.supplier_id,avg(warehouse_offical.supplier_evaluation.expected_delivery_time) as avgrate \n"
-                + "from warehouse_offical.supplier_evaluation group by supplier_id order by avg(warehouse_offical.supplier_evaluation.expected_delivery_time) "+sort;
+        String sql = "select supplier_evaluation.supplier_id,avg(supplier_evaluation.expected_delivery_time) as avgrate \n"
+                + "from supplier_evaluation group by supplier_id order by avg(supplier_evaluation.expected_delivery_time) " + sort;
         try {
+            System.out.println(sql);
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -87,7 +89,7 @@ public class SupplierEvaluationDAO {
 
     public List<SupplierEvaluation> sortDescendingByStar(int id) {
         List<SupplierEvaluation> list = new ArrayList<>();
-        String sql = "SELECT * FROM warehouse_offical.supplier_evaluation where supplier_id = " + id + " order by avg_rate desc";
+        String sql = "SELECT * FROM supplier_evaluation where supplier_id = " + id + " order by avg_rate desc";
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
@@ -121,7 +123,7 @@ public class SupplierEvaluationDAO {
 
     public List<SupplierEvaluation> sortDescendingByDate(int id) {
         List<SupplierEvaluation> list = new ArrayList<>();
-        String sql = "SELECT * FROM warehouse_offical.supplier_evaluation where supplier_id = " + id + " order by comment_time desc";
+        String sql = "SELECT * FROM supplier_evaluation where supplier_id = " + id + " order by comment_time desc";
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
@@ -154,7 +156,7 @@ public class SupplierEvaluationDAO {
     }
 
     public void UpdateSupplierEvaluation(int dt, int mpc, int tr, int sq, String comment, int seid) {
-        String sql = "UPDATE `warehouse_offical`.`supplier_evaluation`\n"
+        String sql = "UPDATE `supplier_evaluation`\n"
                 + "SET\n"
                 + "`expected_delivery_time` = ?,\n"
                 + "`market_price_comparison` = ?,\n"
@@ -182,7 +184,7 @@ public class SupplierEvaluationDAO {
     }
 
     public void evaluation(int sid, int uid, int dt, int pq, int mpc, int tr, int sq, String comment) {
-        String sql = "INSERT INTO `warehouse_offical`.`supplier_evaluation`\n"
+        String sql = "INSERT INTO `supplier_evaluation`\n"
                 + "(\n"
                 + "`supplier_id`,\n"
                 + "`user_id`,\n"
@@ -216,7 +218,7 @@ public class SupplierEvaluationDAO {
 
     public List<SupplierEvaluation> getSupplierEvaluationByID(int id) {
         List<SupplierEvaluation> list = new ArrayList<>();
-        String sql = "SELECT * FROM warehouse_offical.supplier_evaluation where supplier_id = " + id;
+        String sql = "SELECT * FROM supplier_evaluation where supplier_id = " + id;
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
@@ -250,7 +252,7 @@ public class SupplierEvaluationDAO {
     }
 
     public void deleteSupplierEvaluation(int id) {
-        String sql = "delete from warehouse_offical.supplier_evaluation where id = " + id;
+        String sql = "delete from supplier_evaluation where id = " + id;
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
@@ -262,13 +264,18 @@ public class SupplierEvaluationDAO {
     public static void main(String[] args) {
         SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
         List<Supplier> list = sed.staticRated("desc");
-//        List<SupplierEvaluation> list2 = list.stream().
-//                filter((c) -> c.getUserID().getFullname().toLowerCase().contains("ST".toLowerCase())).
-//                collect(Collectors.toList());
+        System.out.println(list.size());
+        List<Float> listStar = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
-            System.out.println(list.get(i).getSupplierID());
+            List<SupplierEvaluation> lse = sed.getSupplierEvaluationByID(list.get(i).getSupplierID());
+            float star = 0;
+            for (int j = 0; j < lse.size(); j++) {
+                star = star + lse.get(j).getAvgRate();
+            }
+            star = star / lse.size() * 1.0f;
+            listStar.add(star);
         }
-
+        System.out.println(listStar.size());
     }
 
 }

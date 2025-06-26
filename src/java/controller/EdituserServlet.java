@@ -81,7 +81,7 @@ public class EdituserServlet extends HttpServlet {
             String username = request.getParameter("username");
             String fullname = request.getParameter("fullname");
             String email = request.getParameter("email");
-String phone = request.getParameter("phone");
+            String phone = request.getParameter("phone");
             String dobStr = request.getParameter("dob");
             int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
             int roleId = Integer.parseInt(request.getParameter("role"));
