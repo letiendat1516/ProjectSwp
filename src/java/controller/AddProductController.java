@@ -68,6 +68,7 @@ public class AddProductController extends HttpServlet {
             String expirationDateStr = request.getParameter("expirationDate");
             String storageLocation = request.getParameter("storageLocation");
             String additionalNotes = request.getParameter("additionalNotes");
+            String stockQuantityStr = request.getParameter("stockQuantity");
             
             // Validate required fields
             String validationError = validateInput(name, code, categoryIdStr, unitIdStr, priceStr, status);
@@ -115,7 +116,22 @@ public class AddProductController extends HttpServlet {
             
             if (additionalNotes != null && !additionalNotes.isEmpty()) {
                 product.setAdditionalNotes(additionalNotes.trim());
-            }              // Add product to database
+            }              
+            
+            // Set stock quantity if provided
+            if (stockQuantityStr != null && !stockQuantityStr.trim().isEmpty()) {
+                try {
+                    BigDecimal stockQuantity = new BigDecimal(stockQuantityStr);
+                    if (stockQuantity.compareTo(BigDecimal.ZERO) >= 0) {
+                        product.setStockQuantity(stockQuantity);
+                    }
+                } catch (NumberFormatException e) {
+                    // Log error but don't fail - stock is optional
+                    System.err.println("Invalid stock quantity format: " + stockQuantityStr);
+                }
+            }
+            
+            // Add product to database
             boolean success = productDAO.addProduct(product, user.getId());
               if (success) {                // Set success message and forward to a success page
                 request.setAttribute("successMessage", "Sản phẩm đã được thêm thành công!");
