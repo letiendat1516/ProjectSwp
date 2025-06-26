@@ -111,12 +111,12 @@ public class ListRequestImportDAO {
         StringBuilder sql = new StringBuilder();
 
         sql.append("SELECT po.id AS request_id, po.day_purchase AS day_request, po.status, po.supplier, ")
-                .append("po.address, po.phone, po.email, poi.product_name, poi.product_code, ")
+                .append("po.address, po.phone, po.email, po.reason, poi.product_name, poi.product_code, ")
                 .append("poi.product_name AS product_full_name, poi.price_per_unit AS price, poi.unit, ")
                 .append("poi.quantity, poi.note ")
                 .append("FROM purchase_order_info po ")
                 .append("LEFT JOIN purchase_order_items poi ON po.id = poi.purchase_id ")
-                .append("WHERE po.status = 'completed' ");
+                .append("WHERE po.status IN ('completed', 'rejected') "); // Thêm 'rejected' vào đây
 
         // Thêm điều kiện tìm kiếm
         if (searchValue != null && !searchValue.trim().isEmpty() && searchType != null) {
@@ -163,11 +163,11 @@ public class ListRequestImportDAO {
                 item.setUnit(rs.getString("unit"));
                 item.setQuantity(rs.getDouble("quantity"));
                 item.setNote(rs.getString("note"));
-                item.setReasonDetail(null);
+                item.setReasonDetail(rs.getString("reason")); // Thêm lý do từ chối
                 list.add(item);
             }
 
-            System.out.println("Fetched completed items count: " + list.size());
+            System.out.println("Fetched completed/rejected items count: " + list.size());
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -316,21 +316,20 @@ public class ListRequestImportDAO {
     }
 
     public void updateRequestStatusWithReason(String requestId, String status, String rejectReason) throws SQLException {
-        String sql = "UPDATE request SET status = ?, reject_reason = ?, rejected_at = NOW(), updated_at = NOW() WHERE id = ?";
+        String sql = "UPDATE purchase_order_info SET status = ?, reason = ? WHERE id = ?";
 
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(sql);
+        try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, status);
             ps.setString(2, rejectReason);
             ps.setString(3, requestId);
 
-            int result = ps.executeUpdate();
-            if (result == 0) {
-                throw new SQLException("Failed to update request status. No rows affected.");
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("No rows updated for requestId: " + requestId);
             }
-        } finally {
-            closeResources();
+
+            System.out.println("Successfully updated request " + requestId + " to " + status + " with reason: " + rejectReason);
         }
     }
 

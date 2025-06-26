@@ -194,9 +194,6 @@
             <a href="product-list" class="btn btn-success">
                 📋 Xem danh sách sản phẩm
             </a>
-            <a href="Admin.jsp" class="btn btn-secondary">
-                🏠 Về trang chủ
-            </a>
         </div>
     </div>
 </body>

@@ -4,7 +4,19 @@
 <!-- Product List Page: Displays, searches, sorts, and manages products -->
 <%@ page import="model.Users" session="true" %>
 <!DOCTYPE html>
-
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
+<%@page import="model.Users"%>
+<%
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -43,6 +55,7 @@
             font-size: 2.5rem;
             margin-bottom: 10px;
             font-weight: 300;
+            color: black;
         }
 
         .header p {
@@ -367,13 +380,62 @@
                 min-width: 800px;
             }
         }
+        .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
+            
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .header-user {
+                display: flex;
+                align-items: center;
+            }
+            .label {
+                color: #888;
+                width: 120px;
+            }
+            .logout-btn {
+                background: red;
+                color: #fff;
+                border: #007BFF;
+                padding: 8px 16px;
+                border-radius: 4px;
+                cursor: pointer;
+                text-decoration: none;
+            }
+            .logout-btn:hover {
+                background: orange;
+            }
+            .page-title {
+                color: #3f51b5;
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
     </style>
 </head>
 <body>
-    <div class="container">        <div class="header">
-            <h1>📦 Danh Sách Sản Phẩm</h1>
-            <p>Quản lý và theo dõi tồn kho sản phẩm</p>
-        </div>
+
+     <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
+        
+                <div class="header">
+                    <h1 class="page-title">📦 Danh Sách Sản Phẩm</h1>
+                    <p>Quản lý và theo dõi tồn kho sản phẩm</p>
+                    <div class="header-user">
+                        <label class="label"><%= user.getFullname()%></label>
+                        <a href="logout" class="logout-btn">Đăng xuất</a>
+                    </div>
+                </div>
 
         <div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
             <a href="categoriesforward.jsp" class="back-btn">← Quay lại Trang trước</a>
@@ -606,6 +668,8 @@
             </div>
         </c:if>
     </div>
+                </div>
+                
 
     <script>
         function sortTable(column) {

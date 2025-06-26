@@ -3,15 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ListRequestImportDAO.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/web/ExportRequest.jsp</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ExportRequestDAO.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/PurchaseOrderItems.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ExportRequestController.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/ProductInfo.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/web/ListRequestImport.jsp</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ImportConfirmController.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ListRequestImportController.java</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/web/EditUser.jsp</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/controller/AdduserServlet.java</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/DBContext/Context.java</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/web/AddUser.jsp</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/web/Admin.jsp</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/controller/EdituserServlet.java</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/web/password_request.jsp</file>
         </group>
     </open-files>
 </project-private>

@@ -697,10 +697,22 @@
                     grid-template-columns: 1fr;
                 }
             }
+                        .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
         </style>
     </head>
     <body>
-        <div class="container">
+         <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
             <!-- Breadcrumbs -->
             <div class="breadcrumbs mb-4">
                 <a href="${pageContext.request.contextPath}/Admin.jsp">Trang chủ</a>
@@ -1006,6 +1018,7 @@
                                         <c:forEach var="item" items="${historyItems}" varStatus="status">                                                                   
                                             <tr>
                                                 <td>${status.index + 1}</td>
+
                                                 <td class="searchable">${item.requestId}</td>
                                                 <td>${item.dayRequest}</td>
                                                 <td class="searchable">${item.productName != null ? item.productName : 'No items'}</td>
@@ -1043,6 +1056,12 @@
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
+
+                                                <td>${item.requestId}</td>
+                                                <td>${item.productName != null ? item.productName : 'No items'}</td>
+                                                <td>${item.productCode != null ? item.productCode : 'N/A'}</td>
+                                                <td>${item.supplier}</td>
+
                                                 <td>
                                                     <a href="LishSupplier" class="btn btn-sm btn-info btn-icon">
                                                         <i class="fas fa-star"></i> Đánh giá
@@ -1104,8 +1123,9 @@
                         </div>
                     </form>
                 </div>
+                            </div>
+                            </div>
             </div>
-        </div>
 
         <!-- Modal chi tiết yêu cầu -->
         <div id="detailModal" class="modal">

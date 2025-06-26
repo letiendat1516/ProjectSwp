@@ -7,6 +7,15 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
+<%@ page import="model.Users" %> 
+<%
+Users user = (Users) session.getAttribute("user");
+if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName())&&!"Nhân viên kho".equalsIgnoreCase(user.getRoleName()))) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -326,10 +335,23 @@
             .star-rating label:hover ~ label .star-num {
                 color: #FFD700;
             }
+             .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
         </style>
 
     </head>
     <body>
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
         <c:set var="supplier" value="${requestScope.supplier}"/>
         <c:set var="mess" value="${requestScope.mess}"/>
         <c:set var="user" value="${sessionScope.user}"/>
@@ -438,6 +460,7 @@
                 </form>
             </div>
         </div>
+                        </div>
         <a href="LishSupplier" class="back-btn">Back</a>
     </body>
 

@@ -1,5 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
+<%@page import="model.Users"%>
+<%
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName()) && !"Nhân viên công ty".equals(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
@@ -30,7 +43,9 @@
                 text-align: center;
                 margin-bottom: 30px;
             }
-
+            .h1 {
+                color: #f4f4f9;
+            }
             .page-title {
                 color: #3f51b5;
                 font-size: 2rem;
@@ -173,14 +188,59 @@
                     gap: 10px;
                 }
             }
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
+            
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .header-user {
+                display: flex;
+                align-items: center;
+            }
+            .label {
+                color: #888;
+                width: 120px;
+            }
+            .logout-btn {
+                background: red;
+                color: #fff;
+                border: #007BFF;
+                padding: 8px 16px;
+                border-radius: 4px;
+                cursor: pointer;
+                text-decoration: none;
+            }
+            .logout-btn:hover {
+                background: orange;
+            }
+            .page-title {
+                color: #3f51b5;
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
         </style>
     </head>
     <body>
-        <div class="container">
-            <div class="header">
-                <h1 class="page-title">Quản lý Xuất Nhập kho</h1>
-                <p class="lead">Chọn danh mục</p>
-            </div>
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">           
+                <div class="header">
+                    <h1 class="page-title">Quản lý Xuất Nhập kho</h1>
+                    <div class="header-user">
+                        <label class="label"><%= user.getFullname()%></label>
+                        <a href="logout" class="logout-btn">Đăng xuất</a>
+                    </div>
+                </div>
 
             <div class="card-container">
                 <!-- Request in -->
@@ -251,10 +311,11 @@
             </div>
 
             <div class="footer">
-                <a href="Admin.jsp" class="btn btn-secondary">
+                <a href="categoriesforward.jsp" class="btn btn-secondary">
                     Quay lại Trang chủ
                 </a>
             </div>
         </div>
+            </div>
     </body>
 </html>

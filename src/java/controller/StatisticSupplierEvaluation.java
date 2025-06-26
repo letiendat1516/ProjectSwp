@@ -12,9 +12,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import model.Supplier;
+import model.SupplierEvaluation;
 
 /**
  *
@@ -66,6 +68,12 @@ public class StatisticSupplierEvaluation extends HttpServlet {
         String status = request.getParameter("status");
         SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
         request.setAttribute("sta", status);
+        String index_raw = request.getParameter("index");
+
+        int index = 1;
+        if (index_raw != null) {
+            index = Integer.parseInt(index_raw);
+        }
         if (top.equalsIgnoreCase("avg")) {
             List<Supplier> list = sed.staticRated(sort);
             if (status.equalsIgnoreCase("active")) {
@@ -73,19 +81,69 @@ public class StatisticSupplierEvaluation extends HttpServlet {
             } else if (status.equalsIgnoreCase("inactive")) {
                 list = list.stream().filter((c) -> c.getActiveFlag() == 0).collect(Collectors.toList());
             }
-
+            //phan trang
+            int totalPage = (int) Math.ceil((double) list.size() / 5);
+            if (index < totalPage) {
+                list = list.subList((index - 1) * 5, index * 5);
+            }
+            if (index == totalPage) {
+                list = list.subList((index - 1) * 5, list.size());
+            }
+            request.setAttribute("totalPage", totalPage);
+            //
+            List<Float> listStar = new ArrayList<>();
+            List<Integer> listComment = new ArrayList<>();
+            for (int i = 0; i < list.size(); i++) {
+                List<SupplierEvaluation> lse = sed.getSupplierEvaluationByID(list.get(i).getSupplierID());
+                float star = 0;
+                for (int j = 0; j < lse.size(); j++) {
+                    star = star + lse.get(j).getAvgRate();
+                }
+                listComment.add(lse.size());
+                star = star / lse.size();
+                star = Math.round(star * 10) / 10.0f;
+                listStar.add(star);
+            }
+            request.setAttribute("listComment", listComment);
+            request.setAttribute("listStar", listStar);
             request.setAttribute("list", list);
             request.setAttribute("fl", top);
             request.setAttribute("st", sort);
             request.setAttribute("mess", "Top-rated Supplier");
             request.getRequestDispatcher("StatisticSupplierEvaluation.jsp").forward(request, response);
         } else if (top.equalsIgnoreCase("expexted")) {
+
             List<Supplier> list = sed.staticExpectedDelivery(sort);
             if (status.equalsIgnoreCase("active")) {
                 list = list.stream().filter((c) -> c.getActiveFlag() == 1).collect(Collectors.toList());
             } else if (status.equalsIgnoreCase("inactive")) {
                 list = list.stream().filter((c) -> c.getActiveFlag() == 0).collect(Collectors.toList());
             }
+            //phan trang
+            int totalPage = (int) Math.ceil((double) list.size() / 5);
+            if (index < totalPage) {
+                list = list.subList((index - 1) * 5, index * 5);
+            }
+            if (index == totalPage) {
+                list = list.subList((index - 1) * 5, list.size());
+            }
+            request.setAttribute("totalPage", totalPage);
+            //
+            List<Float> listStar = new ArrayList<>();
+            List<Integer> listComment = new ArrayList<>();
+            for (int i = 0; i < list.size(); i++) {
+                List<SupplierEvaluation> lse = sed.getSupplierEvaluationByID(list.get(i).getSupplierID());
+                float star = 0;
+                for (int j = 0; j < lse.size(); j++) {
+                    star = star + lse.get(j).getExpectedDeliveryTime();
+                }
+                listComment.add(lse.size());
+                star = star / lse.size();
+                star = Math.round(star * 10) / 10.0f;
+                listStar.add(star);
+            }
+            request.setAttribute("listComment", listComment);
+            request.setAttribute("listStar", listStar);
             request.setAttribute("list", list);
             request.setAttribute("mess", "Top-rated expected delivery");
             request.setAttribute("fl", top);
@@ -98,6 +156,31 @@ public class StatisticSupplierEvaluation extends HttpServlet {
             } else if (status.equalsIgnoreCase("inactive")) {
                 list = list.stream().filter((c) -> c.getActiveFlag() == 0).collect(Collectors.toList());
             }
+            //phan trang
+            int totalPage = (int) Math.ceil((double) list.size() / 5);
+            if (index < totalPage) {
+                list = list.subList((index - 1) * 5, index * 5);
+            }
+            if (index == totalPage) {
+                list = list.subList((index - 1) * 5, list.size());
+            }
+            request.setAttribute("totalPage", totalPage);
+            //
+            List<Float> listStar = new ArrayList<>();
+            List<Integer> listComment = new ArrayList<>();
+            for (int i = 0; i < list.size(); i++) {
+                List<SupplierEvaluation> lse = sed.getSupplierEvaluationByID(list.get(i).getSupplierID());
+                float star = 0;
+                for (int j = 0; j < lse.size(); j++) {
+                    star = star + lse.get(j).getMarketPriceComparison();
+                }
+                listComment.add(lse.size());
+                star = star / lse.size();
+                star = Math.round(star * 10) / 10.0f;
+                listStar.add(star);
+            }
+            request.setAttribute("listStar", listStar);
+            request.setAttribute("listComment", listComment);
             request.setAttribute("mess", "Top-rated market price comparison");
             request.setAttribute("list", list);
             request.setAttribute("fl", top);

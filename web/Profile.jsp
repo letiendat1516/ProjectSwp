@@ -47,9 +47,22 @@
         .edit-link:hover { background: #217dbb; }
         .logout-link:hover { background: #c0392b; }
         .btn-row { text-align: center; margin-top: 14px; }
+        .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
     </style>
 </head>
 <body>
+    <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
     <div class="profile-container">
         <h2>My Profile</h2>
         <table>
@@ -78,6 +91,8 @@
             <a href="editprofile" class="edit-link">Edit Profile</a>
             <a href="logout" class="logout-link">Log Out</a>
         </div>
+    </div>
+            </div>
     </div>
 </body>
 </html>

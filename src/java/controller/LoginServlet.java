@@ -9,7 +9,6 @@ import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +19,6 @@ import model.Users;
  *
  * @author phucn
  */
-@WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
 
     /**
@@ -77,6 +75,7 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
 
+
             switch (user.getRoleName()) {
             case "Admin":
                 response.sendRedirect("Admin.jsp");
@@ -85,8 +84,12 @@ public class LoginServlet extends HttpServlet {
                 response.sendRedirect("categoriesforward.jsp");
                 break;
             case "Nhân viên công ty":
-                response.sendRedirect("categoriesforward.jsp");
+                response.sendRedirect("RequestForward.jsp");
                 break;
+            case "Giám đốc":
+                response.sendRedirect("ApproveListForward.jsp");
+                break;
+            
             default:
                 response.sendRedirect("homepage.jsp");
         }

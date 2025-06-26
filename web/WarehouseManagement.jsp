@@ -1,4 +1,3 @@
-
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
@@ -44,11 +43,21 @@
             }
 
             body {
-                background: white;
+                background: #f5f5f5;
                 font-family: 'Inter', sans-serif;
                 min-height: 100vh;
-                padding: 2rem 1rem;
                 color: var(--gray-800);
+            }
+
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
             }
 
             .container {
@@ -476,8 +485,8 @@
             }
 
             @media (max-width: 768px) {
-                body {
-                    padding: 1rem 0.5rem;
+                .main-content {
+                    padding: 1rem;
                 }
 
                 .header {
@@ -553,203 +562,208 @@
             <div class="spinner"></div>
         </div>
 
-        <div class="container">
-            <div class="header">
-                <h1><i class="fas fa-warehouse"></i> Xử lý Nhập Kho</h1>
-                <p>Xác nhận hoặc từ chối yêu cầu nhập kho vào hệ thống</p>
-            </div>
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
+                <div class="container">
+                    <div class="header">
+                        <h1><i class="fas fa-warehouse"></i> Xử lý Nhập Kho</h1>
+                        <p>Xác nhận hoặc từ chối yêu cầu nhập kho vào hệ thống</p>
+                    </div>
 
-            <div class="content">
-                <div class="breadcrumb">
-                    <a href="${pageContext.request.contextPath}/Admin.jsp"><i class="fas fa-home"></i> Trang chủ</a>
-                    <i class="fas fa-chevron-right"></i>
-                    <a href="import">Danh sách yêu cầu</a>
-                    <i class="fas fa-chevron-right"></i>
-                    <span>Xử lý nhập kho</span>
+                    <div class="content">
+                        <div class="breadcrumb">
+                            <a href="${pageContext.request.contextPath}/Admin.jsp"><i class="fas fa-home"></i> Trang chủ</a>
+                            <i class="fas fa-chevron-right"></i>
+                            <a href="import">Danh sách yêu cầu</a>
+                            <i class="fas fa-chevron-right"></i>
+                            <span>Xử lý nhập kho</span>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Lưu ý:</strong> Vui lòng kiểm tra kỹ thông tin trước khi xác nhận nhập kho. 
+                                Sau khi xác nhận, dữ liệu sẽ được cập nhật vào hệ thống kho.
+                            </div>
+                        </div>
+
+                        <form action="import-confirm" method="post" id="importForm">
+                            <!-- Thông tin đơn nhập kho -->
+                            <div class="section">
+                                <div class="section-header">
+                                    <div class="icon"><i class="fas fa-file-alt"></i></div>
+                                    <h3>Thông tin đơn nhập kho</h3>
+                                    <span class="status-badge status-approved">
+                                        <i class="fas fa-check-circle"></i> Đã duyệt
+                                    </span>
+                                </div>
+                                <div class="section-body">
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label class="info-label">Mã đơn nhập</label>
+                                            <input type="text" name="id" value="${p.id}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Ngày tạo đơn</label>
+                                            <input type="text" name="dayRequest" value="${p.day_request}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Người tạo đơn</label>
+                                            <input type="text" name="userId" value="${p.user_id}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Trạng thái</label>
+                                            <input type="text" name="status" value="${p.status}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                        </div>
+                                        <div class="info-item" style="grid-column: 1 / -1;">
+                                            <label class="info-label">Lý do nhập kho</label>
+                                            <input type="text" name="reason" value="${p.reason}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin nhà cung cấp -->
+                            <div class="section">
+                                <div class="section-header">
+                                    <div class="icon"><i class="fas fa-building"></i></div>
+                                    <h3>Thông tin nhà cung cấp</h3>
+                                </div>
+                                <div class="section-body">
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label class="info-label">Tên nhà cung cấp</label>
+                                            <input type="text" name="supplier" value="${p.supplier}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Điện thoại</label>
+                                            <input type="text" name="phone" value="${p.phone}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Email</label>
+                                            <input type="text" name="email" value="${p.email}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Địa chỉ</label>
+                                            <input type="text" name="address" value="${p.address}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Danh sách vật tư -->
+                            <div class="section">
+                                <div class="section-header">
+                                    <div class="icon"><i class="fas fa-boxes"></i></div>
+                                    <h3>Danh sách vật tư nhập kho</h3>
+                                </div>
+                                <div class="section-body">
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <div>
+                                            <strong>Chú ý:</strong> Nhập số lượng thực tế nhận được. Có thể nhập ít hơn số lượng yêu cầu nếu cần thiết.
+                                        </div>
+                                    </div>
+
+                                    <div class="table-container">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th><i class="fas fa-barcode"></i> Mã VT</th>
+                                                    <th><i class="fas fa-tag"></i> Tên VT</th>
+                                                    <th><i class="fas fa-ruler"></i> Đơn vị</th>
+                                                    <th><i class="fas fa-list-ol"></i> SL Yêu cầu</th>
+                                                    <th><i class="fas fa-check-circle"></i> Đã nhập</th>
+                                                    <th><i class="fas fa-plus-circle"></i> Nhập lần này</th>
+                                                    <th><i class="fas fa-sticky-note"></i> Ghi chú</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <c:forEach var="item" items="${itemList}" varStatus="status">
+                                                    <tr>
+                                                        <td>
+                                                            <input type="text" name="code_${item.productCode}" value="${item.productCode}" readonly class="form-input">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="name_${item.productCode}" value="${item.productName}" readonly class="form-input">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="unit_${item.productCode}" value="${item.unit}" readonly class="form-input">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" value="${item.quantity}" readonly class="form-input quantity-input">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" value="0" readonly class="form-input quantity-input">
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" name="importQty_${item.productCode}" min="0" max="${item.quantity}" 
+                                                                   class="form-input editable quantity-input" required 
+                                                                   placeholder="Nhập SL">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="note_${item.productCode}" 
+                                                                   class="form-input editable" placeholder="Ghi chú...">
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin nhập kho -->
+                            <div class="section">
+                                <div class="section-header">
+                                    <div class="icon"><i class="fas fa-warehouse"></i></div>
+                                    <h3>Thông tin nhập kho</h3>
+                                </div>
+                                <div class="section-body">
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label class="info-label">Kho nhập hàng *</label>
+                                            <select name="warehouse" required class="form-input editable">
+                                                <option value="">-- Chọn kho --</option>
+                                                <option value="kho1">Kho chính</option>
+                                                <option value="kho2">Kho chi nhánh</option>
+                                                <option value="kho3">Kho phụ liệu</option>
+                                            </select>
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Ngày nhập kho thực tế *</label>
+                                            <input type="date" name="importDate" required class="form-input editable" 
+                                                   value="${currentDate}" min="${currentDate}">
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Người nhập kho *</label>
+                                            <input type="text" name="receiver" required class="form-input editable" 
+                                                   placeholder="Nhập tên người nhận hàng">
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Ghi chú bổ sung</label>
+                                            <input type="text" name="additionalNote" class="form-input editable" 
+                                                   placeholder="Ghi chú thêm (nếu có)">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-footer">
+                                <button type="button" onclick="confirmImport()" class="btn btn-primary">
+                                    <i class="fas fa-check-circle"></i> Xác nhận nhập kho
+                                </button>
+                                <button type="button" onclick="rejectImport()" class="btn btn-danger">
+                                    <i class="fas fa-times-circle"></i> Từ chối nhập kho
+                                </button>
+                                <a href="import" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                                </a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    <div>
-                        <strong>Lưu ý:</strong> Vui lòng kiểm tra kỹ thông tin trước khi xác nhận nhập kho. 
-                        Sau khi xác nhận, dữ liệu sẽ được cập nhật vào hệ thống kho.
-                    </div>
-                </div>
-
-                <form action="import-confirm" method="post" id="importForm">
-                    <!-- Thông tin đơn nhập kho -->
-                    <div class="section">
-                        <div class="section-header">
-                            <div class="icon"><i class="fas fa-file-alt"></i></div>
-                            <h3>Thông tin đơn nhập kho</h3>
-                            <span class="status-badge status-approved">
-                                <i class="fas fa-check-circle"></i> Đã duyệt
-                            </span>
-                        </div>
-                        <div class="section-body">
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label class="info-label">Mã đơn nhập</label>
-                                    <input type="text" name="id" value="${p.id}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
-                                </div>
-                                <div class="info-item">
-                                    <label class="info-label">Ngày tạo đơn</label>
-                                    <input type="text" name="dayRequest" value="${p.day_request}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
-                                </div>
-                                <div class="info-item">
-                                    <label class="info-label">Người tạo đơn</label>
-                                    <input type="text" name="userId" value="${p.user_id}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
-                                </div>
-                                <div class="info-item">
-                                    <label class="info-label">Trạng thái</label>
-                                    <input type="text" name="status" value="${p.status}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
-                                </div>
-                                <div class="info-item" style="grid-column: 1 / -1;">
-                                    <label class="info-label">Lý do nhập kho</label>
-                                    <input type="text" name="reason" value="${p.reason}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Thông tin nhà cung cấp -->
-                    <div class="section">
-                        <div class="section-header">
-                            <div class="icon"><i class="fas fa-building"></i></div>
-                            <h3>Thông tin nhà cung cấp</h3>
-                        </div>
-                        <div class="section-body">
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label class="info-label">Tên nhà cung cấp</label>
-                                    <input type="text" name="supplier" value="${p.supplier}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
-                                </div>
-                                <div class="info-item">
-                                    <label class="info-label">Điện thoại</label>
-                                    <input type="text" name="phone" value="${p.phone}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
-                                </div>
-                                <div class="info-item">
-                                    <label class="info-label">Email</label>
-                                    <input type="text" name="email" value="${p.email}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
-                                </div>
-                                <div class="info-item">
-                                    <label class="info-label">Địa chỉ</label>
-                                    <input type="text" name="address" value="${p.address}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Danh sách vật tư -->
-                    <div class="section">
-                        <div class="section-header">
-                            <div class="icon"><i class="fas fa-boxes"></i></div>
-                            <h3>Danh sách vật tư nhập kho</h3>
-                        </div>
-                        <div class="section-body">
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <div>
-                                    <strong>Chú ý:</strong> Nhập số lượng thực tế nhận được. Có thể nhập ít hơn số lượng yêu cầu nếu cần thiết.
-                                </div>
-                            </div>
-
-                            <div class="table-container">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th><i class="fas fa-barcode"></i> Mã VT</th>
-                                            <th><i class="fas fa-tag"></i> Tên VT</th>
-                                            <th><i class="fas fa-ruler"></i> Đơn vị</th>
-                                            <th><i class="fas fa-list-ol"></i> SL Yêu cầu</th>
-                                            <th><i class="fas fa-check-circle"></i> Đã nhập</th>
-                                            <th><i class="fas fa-plus-circle"></i> Nhập lần này</th>
-                                            <th><i class="fas fa-sticky-note"></i> Ghi chú</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:forEach var="item" items="${itemList}" varStatus="status">
-                                            <tr>
-                                                <td>
-                                                    <input type="text" name="code_${item.productCode}" value="${item.productCode}" readonly class="form-input">
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="name_${item.productCode}" value="${item.productName}" readonly class="form-input">
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="unit_${item.productCode}" value="${item.unit}" readonly class="form-input">
-                                                </td>
-                                                <td>
-                                                    <input type="text" value="${item.quantity}" readonly class="form-input quantity-input">
-                                                </td>
-                                                <td>
-                                                    <input type="text" value="0" readonly class="form-input quantity-input">
-                                                </td>
-                                                <td>
-                                                    <input type="number" name="importQty_${item.productCode}" min="0" max="${item.quantity}" 
-                                                           class="form-input editable quantity-input" required 
-                                                           placeholder="Nhập SL">
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="note_${item.productCode}" 
-                                                           class="form-input editable" placeholder="Ghi chú...">
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Thông tin nhập kho -->
-                    <div class="section">
-                        <div class="section-header">
-                            <div class="icon"><i class="fas fa-warehouse"></i></div>
-                            <h3>Thông tin nhập kho</h3>
-                        </div>
-                        <div class="section-body">
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label class="info-label">Kho nhập hàng *</label>
-                                    <select name="warehouse" required class="form-input editable">
-                                        <option value="">-- Chọn kho --</option>
-                                        <option value="kho1">Kho chính</option>
-                                        <option value="kho2">Kho chi nhánh</option>
-                                        <option value="kho3">Kho phụ liệu</option>
-                                    </select>
-                                </div>
-                                <div class="info-item">
-                                    <label class="info-label">Ngày nhập kho thực tế *</label>
-                                    <input type="date" name="importDate" required class="form-input editable" 
-                                           value="${currentDate}" min="${currentDate}">
-                                </div>
-                                <div class="info-item">
-                                    <label class="info-label">Người nhập kho *</label>
-                                    <input type="text" name="receiver" required class="form-input editable" 
-                                           placeholder="Nhập tên người nhận hàng">
-                                </div>
-                                <div class="info-item">
-                                    <label class="info-label">Ghi chú bổ sung</label>
-                                    <input type="text" name="additionalNote" class="form-input editable" 
-                                           placeholder="Ghi chú thêm (nếu có)">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-footer">
-                        <button type="button" onclick="confirmImport()" class="btn btn-primary">
-                            <i class="fas fa-check-circle"></i> Xác nhận nhập kho
-                        </button>
-                        <button type="button" onclick="rejectImport()" class="btn btn-danger">
-                            <i class="fas fa-times-circle"></i> Từ chối nhập kho
-                        </button>
-                        <a href="import" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Quay lại danh sách
-                        </a>
-                    </div>
-                </form>
             </div>
         </div>
 
@@ -844,6 +858,9 @@
 
                 // Submit form
                 form.submit();
+
+                // Close modal
+                closeModal();
             }
 
             function validateForm() {
@@ -952,7 +969,7 @@
                 const quantityInputs = document.querySelectorAll('input[name^="importQty_"]');
                 quantityInputs.forEach(input => {
                     input.addEventListener('change', function () {
-                        const value = pdarseInt(this.value) || 0;
+                        const value = parseInt(this.value) || 0;
                         const max = parseInt(this.getAttribute('max')) || 0;
 
                         if (value > max) {
@@ -981,12 +998,13 @@
                     }
                 });
 
-                showNotification('Trang xử lý nhập kho đã được tải thành công!', 'success');
+                // REMOVED: Auto notification when page loads
+                // showNotification('Trang xử lý nhập kho đã được tải thành công!', 'success');
             });
 
             // Add CSS animations
             const style = document.createElement('style');
-            style.textContent = `đáy đa
+            style.textContent = `
                 @keyframes slideInRight {
                     from {
                         transform: translateX(100%);

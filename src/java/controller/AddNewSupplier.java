@@ -66,9 +66,21 @@ public class AddNewSupplier extends HttpServlet {
         String email = request.getParameter("email");
         String address = request.getParameter("address");
         String note = request.getParameter("note");
-        SupplierDAO sd = new SupplierDAO();
-        sd.AddNewSupplier(name, phone, email, address, note);
-        request.setAttribute("mess", "Addsuccessfully !!!");
+        boolean check = true;
+        if(!phone.matches("^0\\d{9,11}$")){
+            check = false;
+            request.setAttribute("invalidPhone", "phone number contains 10 to 12 digits and start with 0");
+        }
+        if(!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")){
+            check = false;
+            request.setAttribute("invalidEmail", "Invalid Email");
+        }
+        if (check) {
+            SupplierDAO sd = new SupplierDAO();
+            sd.AddNewSupplier(name, phone, email, address, note);
+            request.setAttribute("mess", "Addsuccessful !!!");
+        }
+
         request.getRequestDispatcher("AddNewSupplier.jsp").forward(request, response);
     }
 

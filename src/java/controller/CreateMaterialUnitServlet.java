@@ -33,13 +33,61 @@ public class CreateMaterialUnitServlet extends HttpServlet {
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        try {
-            // Lấy dữ liệu từ form
+            throws ServletException, IOException {        try {            // Lấy dữ liệu từ form
             String name = request.getParameter("name");
             String symbol = request.getParameter("symbol");
             String description = request.getParameter("description");
             String type = request.getParameter("type");
+
+            // Kiểm tra dữ liệu không được để trống
+            if (name == null || name.trim().isEmpty()) {
+                request.setAttribute("errorMessage", "Tên đơn vị không được để trống.");
+                MaterialUnit unit = new MaterialUnit();
+                unit.setName(name);
+                unit.setSymbol(symbol);
+                unit.setDescription(description);
+                unit.setType(type);
+                request.setAttribute("unit", unit);
+                request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
+                return;
+            }
+            
+            if (symbol == null || symbol.trim().isEmpty()) {
+                request.setAttribute("errorMessage", "Ký hiệu đơn vị không được để trống.");
+                MaterialUnit unit = new MaterialUnit();
+                unit.setName(name);
+                unit.setSymbol(symbol);
+                unit.setDescription(description);
+                unit.setType(type);
+                request.setAttribute("unit", unit);
+                request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
+                return;
+            }
+
+            // Kiểm tra độ dài của tên và ký hiệu
+            if (name.length() > 50) {
+                request.setAttribute("errorMessage", "Tên đơn vị không được vượt quá 50 ký tự.");
+                MaterialUnit unit = new MaterialUnit();
+                unit.setName(name);
+                unit.setSymbol(symbol);
+                unit.setDescription(description);
+                unit.setType(type);
+                request.setAttribute("unit", unit);
+                request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
+                return;
+            }
+            
+            if (symbol.length() > 10) {
+                request.setAttribute("errorMessage", "Ký hiệu đơn vị không được vượt quá 10 ký tự.");
+                MaterialUnit unit = new MaterialUnit();
+                unit.setName(name);
+                unit.setSymbol(symbol);
+                unit.setDescription(description);
+                unit.setType(type);
+                request.setAttribute("unit", unit);
+                request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
+                return;
+            }
 
             // Kiểm tra trùng tên hoặc ký hiệu
             if (materialUnitDAO.isDuplicateNameOrSymbol(name, symbol, null)) {
@@ -60,17 +108,23 @@ public class CreateMaterialUnitServlet extends HttpServlet {
             unit.setName(name);
             unit.setSymbol(symbol);
             unit.setDescription(description);
-            unit.setType(type);
+            unit.setType(type);            // Lưu vào database
+            boolean success = materialUnitDAO.addMaterialUnit(unit);
 
-            // Lưu vào database
-            materialUnitDAO.addMaterialUnit(unit);
-
-            // Thông báo thành công
-            request.getSession().setAttribute("successMessage", "Thêm đơn vị thành công!");
-            response.sendRedirect("materialUnit");
-        } catch (Exception e) {
+            if (success) {
+                // Thông báo thành công
+                request.getSession().setAttribute("successMessage", "Thêm đơn vị thành công!");
+                response.sendRedirect("materialUnit");
+            } else {
+                // Thông báo lỗi khi không thể lưu
+                request.setAttribute("errorMessage", "Không thể thêm đơn vị. Vui lòng thử lại.");
+                request.setAttribute("unit", unit);
+                request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
+            }        } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("/material_unit/materialUnit");
+            // Thông báo lỗi thay vì redirect im lặng
+            request.setAttribute("errorMessage", "Có lỗi xảy ra khi thêm đơn vị. Vui lòng thử lại.");
+            request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
         }
     }
 }

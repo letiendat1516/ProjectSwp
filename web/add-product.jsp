@@ -232,10 +232,22 @@
                 padding: 10px;
             }
         }
+        .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
         <div class="header">
             <h1>➕ Thêm Sản Phẩm Mới</h1>
             <p>Nhập thông tin chi tiết để thêm sản phẩm vào hệ thống kho</p>
@@ -320,8 +332,15 @@
                             <option value="inactive" ${formData.status[0] == 'inactive' ? 'selected' : ''}>Ngưng hoạt động</option>
                         </select>
                     </div>
-                </div>
 
+                    <div class="form-group">
+                        <label class="form-label" for="stockQuantity">Số Lượng Tồn Kho</label>
+                        <input type="number" id="stockQuantity" name="stockQuantity" class="form-control" 
+                               value="${formData.stockQuantity[0]}" min="0" step="0.01" placeholder="0">
+                        <div class="form-help">Số lượng hiện có trong kho (tùy chọn)</div>
+                    </div>
+                </div>
+                
                 <!-- Additional Information -->
                 <div class="section-title">📦 Thông Tin Bổ Sung</div>
                 <div class="form-grid">
@@ -344,22 +363,7 @@
                         <div class="form-help">Để trống nếu sản phẩm không có hạn sử dụng</div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="storageLocation">Vị Trí Lưu Trữ</label>
-                        <select id="storageLocation" name="storageLocation" class="form-control">
-                            <option value="">-- Chọn vị trí lưu trữ --</option>
-                            <c:forEach var="location" items="${storageLocations}">
-                                <option value="${location}" 
-                                        ${formData.storageLocation[0] == location ? 'selected' : ''}>
-                                    ${location}
-                                </option>
-                            </c:forEach>
-                        </select>
-                    </div>
-
-
-                <!-- Description and Notes -->
-                <div class="form-grid">
+                    <!-- Description and Notes moved inside the form-grid with full-width -->
                     <div class="form-group full-width">
                         <label class="form-label" for="description">Mô Tả Sản Phẩm</label>
                         <textarea id="description" name="description" class="form-control" 
@@ -385,6 +389,7 @@
                 </div>
             </form>
         </div>
+    </div>
     </div>
 
     <script>

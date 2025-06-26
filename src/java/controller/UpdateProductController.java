@@ -28,31 +28,42 @@ public class UpdateProductController extends HttpServlet {
 protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
     
+    System.out.println("DEBUG: UpdateProductController doGet method called");
+    
     // Check user authentication and authorization
     HttpSession session = request.getSession();
     Users user = (Users) session.getAttribute("user");
-    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
+    if (user == null) {
+        System.out.println("DEBUG: User not authenticated, redirecting to login");
         response.sendRedirect("login.jsp");
         return;
     }
     
     String productIdStr = request.getParameter("id");
+    System.out.println("DEBUG: Product ID parameter: " + productIdStr);
+    
     if (productIdStr == null || productIdStr.trim().isEmpty()) {
+        System.out.println("DEBUG: Product ID is null or empty");
         response.sendRedirect("product-list?error=Không tìm thấy sản phẩm!");
         return;
     }
     
     try {
         int productId = Integer.parseInt(productIdStr);
+        System.out.println("DEBUG: Parsed product ID: " + productId);
         
         // Get product details
         ProductInfo product = productDAO.getProductById(productId);
+        System.out.println("DEBUG: Product from DAO: " + (product != null ? product.getName() : "null"));
+        
         if (product == null) {
+            System.out.println("DEBUG: Product is null, redirecting with error");
             response.sendRedirect("product-list?error=Sản phẩm không tồn tại!");
             return;
         }
         
         // Load dropdown data FIRST
+        System.out.println("DEBUG: Loading dropdown data");
         loadDropdownData(request);
         
         // Set product data for form - Make sure this is set
@@ -60,14 +71,17 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         request.setAttribute("mode", "edit");
         
         // Debug log
-        System.out.println("Product loaded: " + product.getName() + " (ID: " + product.getId() + ")");
+        System.out.println("DEBUG: Product set in request: " + product.getName() + " (ID: " + product.getId() + ")");
+        System.out.println("DEBUG: Request attributes set, forwarding to JSP");
         
         // Forward to update product page
         request.getRequestDispatcher("update-product.jsp").forward(request, response);
         
     } catch (NumberFormatException e) {
+        System.out.println("DEBUG: NumberFormatException for product ID: " + e.getMessage());
         response.sendRedirect("product-list?error=ID sản phẩm không hợp lệ!");
     } catch (Exception e) {
+        System.out.println("DEBUG: Exception in doGet: " + e.getMessage());
         e.printStackTrace();
         response.sendRedirect("product-list?error=Có lỗi xảy ra khi tải thông tin sản phẩm!");
     }
@@ -165,7 +179,6 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         String status = request.getParameter("status");
         String description = request.getParameter("description");
         String expirationDateStr = request.getParameter("expirationDate");
-        String storageLocation = request.getParameter("storageLocation");
         String additionalNotes = request.getParameter("additionalNotes");
           // Basic validation
         if (name == null || name.trim().isEmpty()) {
@@ -187,7 +200,6 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         product.setCode(code.trim());
         product.setStatus(status != null ? status : "active");
         product.setDescription(description != null ? description.trim() : "");
-        product.setStorageLocation(storageLocation != null ? storageLocation.trim() : "");
         product.setAdditionalNotes(additionalNotes != null ? additionalNotes.trim() : "");
         product.setUpdatedBy(userId);
         
@@ -231,12 +243,10 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
             List<CategoryProduct> categories = productDAO.getAllActiveCategories();
             List<Unit> units = productDAO.getAllActiveUnits();
             List<Supplier> suppliers = productDAO.getAllActiveSuppliers();
-            List<String> storageLocations = productDAO.getAllStorageLocations();
             
             request.setAttribute("categories", categories != null ? categories : List.of());
             request.setAttribute("units", units != null ? units : List.of());
             request.setAttribute("suppliers", suppliers != null ? suppliers : List.of());
-            request.setAttribute("storageLocations", storageLocations != null ? storageLocations : List.of());
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -245,7 +255,6 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
             request.setAttribute("categories", List.of());
             request.setAttribute("units", List.of());
             request.setAttribute("suppliers", List.of());
-            request.setAttribute("storageLocations", List.of());
         }
     }
 }

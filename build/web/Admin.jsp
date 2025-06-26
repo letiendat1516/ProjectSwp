@@ -42,10 +42,15 @@
                 min-height: 100vh;
             }
             .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
                 width: 250px;
+                height: 100vh;
                 background: #e6f0fa;
                 padding: 20px 0;
                 border-right: 1px solid #d6e0ef;
+                z-index: 100;
             }
             .sidebar h2 {
                 font-size: 1.4rem;
@@ -65,17 +70,18 @@
                 color: #1567c1;
             }
             .main-content {
-                flex: 1;
+                margin-left: 250px;
                 padding: 20px;
+                flex: 1;
             }
             .header {
                 background: #fff;
                 padding: 15px;
-        border-bottom: 1px solid #d6e0ef;
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+                border-bottom: 1px solid #d6e0ef;
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
             }
             .header-title {
                 font-size: 1.8rem;
@@ -128,26 +134,27 @@
                     width: 100%;
                 }
             }
+
         </style>
     </head>
     <body>
         <div class="container">
             <div class="sidebar">
                 <h2>Warehouse Manager</h2>
-                <a href="usermanager" class="nav-item">User Manager</a>
-                <a href="roleAssignment" class="nav-item">Role Assignment</a>
-                <a href="categoriesforward.jsp" class="nav-item">Material Information</a>
-                <a href="passwordrequest" class="nav-item">Password Request</a>
-                <a href="ApproveListForward.jsp" class="nav-item">Approve</a>
-                <a href="RequestForward.jsp" class="nav-item">Transaction</a>
-                <a href="#" class="nav-item">Statistic</a>
+                <a href="usermanager" class="nav-item">Quản lý người dùng</a>
+                <a href="roleAssignment" class="nav-item">Phân quyền người dùng</a>
+                <a href="categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
+                <a href="passwordrequest" class="nav-item">Reset mật khẩu</a>
+                <a href="ApproveListForward.jsp" class="nav-item">Đơn từ</a>
+                <a href="RequestForward.jsp" class="nav-item">Giao dịch</a>
+                <a href="StatisticSupplierEvaluation.jsp" class="nav-item">Thống kê</a>
             </div>
             <div class="main-content">
                 <div class="header">
                     <h1 class="header-title">Admin Dashboard</h1>
                     <div class="header-user">
-                        <span class="user-name">Admin</span>
-                        <a href="logout" class="logout-btn">Log out</a>
+                        <span class="user-name"><%= user.getFullname()%></span>
+                        <a href="logout" class="logout-btn">Đăng xuất</a>
                     </div>
                 </div>
                 <div class="dashboard-content">

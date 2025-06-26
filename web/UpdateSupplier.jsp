@@ -1,9 +1,3 @@
-<%-- 
-    Document   : UpdateSupplier
-    Created on : 29 thg 5, 2025, 02:42:16
-    Author     : Fpt06
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -24,9 +18,6 @@
                 background: linear-gradient(270deg, #f39c12, #e74c3c, #8e44ad, #3498db);
                 background-size: 800% 800%;
                 animation: gradientBG 15s ease infinite;
-                display: flex;
-                justify-content: center;
-                align-items: center;
             }
 
             @keyframes gradientBG {
@@ -41,13 +32,27 @@
                 }
             }
 
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 40px 20px;
+                background: rgba(255, 255, 255, 0.92);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
             .form-container {
-                background: rgba(255, 255, 255, 0.95);
+                background: white;
                 padding: 40px 50px;
                 border-radius: 16px;
                 box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
                 width: 100%;
-                max-width: 480px;
+                max-width: 500px;
                 animation: slideIn 0.6s ease-out;
             }
 
@@ -84,8 +89,8 @@
                 margin-bottom: 20px;
                 border: 1.5px solid #ccc;
                 border-radius: 8px;
-                transition: all 0.3s ease-in-out;
                 font-size: 15px;
+                transition: all 0.3s ease-in-out;
             }
 
             input[type="text"]:focus,
@@ -113,7 +118,8 @@
                 transform: translateY(-2px);
                 background: linear-gradient(to right, #2980b9, #3498db);
             }
-            a {
+
+            .back-link {
                 display: inline-block;
                 text-align: center;
                 margin-top: 20px;
@@ -126,11 +132,18 @@
                 transition: all 0.3s ease;
             }
 
-            a:hover {
+            .back-link:hover {
                 background-color: #3498db;
                 color: white;
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+            }
+
+            .error-message {
+                color: red;
+                font-size: larger;
+                text-align: center;
+                margin-bottom: 20px;
             }
         </style>
     </head>
@@ -143,33 +156,47 @@
             String address = request.getParameter("address");
             String note = request.getParameter("note");
         %>
-        <div class="form-container">
-            <h1>Update Supplier</h1>
-            <c:set var="mess" value="${requestScope.mess}"/>
-            <c:if test="${not empty mess}">
-                <p style="color: red;font-size: larger">${mess}</p>
-            </c:if>
-            <form action="UpdateSupplier" method="get">
-                <input style="display: none" type="text" value="<%=id%>" name="id"><br>
-                <label for="name">Tên nhà cung cấp:</label>
-                <input type="text" id="name" name="name" value="<%= request.getParameter("name") %>" required>
 
-                <label for="phone">Số điện thoại:</label>
-                <input type="number" id="phone" name="phone" value="<%= request.getParameter("phone") %>" required>
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
+                <div class="form-container">
+                    <h1>Update Supplier</h1>
+                    <c:set var="mess" value="${requestScope.mess}" />
+                    <c:set var="invalidPhone" value="${requestScope.invalidPhone}"/>
+                    <c:set var="invalidEmail" value="${requestScope.invalidEmail}"/>
+                    <c:if test="${not empty mess}">
+                        <div class="error-message" style="color: green">${mess}</div>
+                    </c:if>
+                    <form action="UpdateSupplier" method="get">
+                        <input type="hidden" name="id" value="<%=id%>">
+                        <label for="name">Tên nhà cung cấp:</label>
+                        <input type="text" id="name" name="name" value="<%= name %>" required>
 
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" value="<%= request.getParameter("email") %>" required>
+                        <label for="phone">Số điện thoại:</label>
+                        <c:if test="${not empty invalidPhone}">
+                            <label style="color: red" >${invalidPhone}</label>
+                        </c:if>
+                        <input type="number" id="phone" name="phone" value="<%= phone %>" required>
 
-                <label for="address">Địa chỉ:</label>
-                <input type="text" id="address" name="address" value="<%= request.getParameter("address") %>" required>
+                        <label for="email">Email:</label>
+                        <c:if test="${not empty invalidEmail}">
+                            <label style="color: red" >${invalidEmail}</label>
+                        </c:if>
+                        <input type="email" id="email" name="email" value="<%= email %>" required>
 
-                <label for="note">Ghi chú:</label>
-                <input type="text" id="note" name="note" value="<%= request.getParameter("note") %>">
+                        <label for="address">Địa chỉ:</label>
+                        <input type="text" id="address" name="address" value="<%= address %>" required>
 
-                <input type="submit" value="Cập nhật">
-            </form>
-            <div style="text-align: center;">
-                <a href="LishSupplier">← Back</a>
+                        <label for="note">Ghi chú:</label>
+                        <input type="text" id="note" name="note" value="<%= note %>">
+
+                        <input type="submit" value="Cập nhật">
+                    </form>
+                    <div style="text-align: center;">
+                        <a href="LishSupplier" class="back-link">← Back</a>
+                    </div>
+                </div>
             </div>
         </div>
     </body>

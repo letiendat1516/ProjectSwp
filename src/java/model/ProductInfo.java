@@ -101,7 +101,6 @@ public class ProductInfo {
     // Additional fields for enhanced product management
     private int supplierId; // Supplier ID
     private java.sql.Date expirationDate; // Expiration date
-    private String storageLocation; // Storage location
     private String additionalNotes; // Additional notes
     private int createdBy; // Created by (user ID)
     private java.sql.Date createdDate; // Creation date
@@ -124,13 +123,8 @@ public class ProductInfo {
         this.expirationDate = expirationDate;
     }
 
-    public String getStorageLocation() {
-        return storageLocation;
-    }
 
-    public void setStorageLocation(String storageLocation) {
-        this.storageLocation = storageLocation;
-    }
+
 
     public String getAdditionalNotes() {
         return additionalNotes;
@@ -170,5 +164,9 @@ public class ProductInfo {
 
     public void setUpdatedDate(java.sql.Date updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public void setStockQuantity(BigDecimal stockQty) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

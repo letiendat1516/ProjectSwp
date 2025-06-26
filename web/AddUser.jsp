@@ -5,6 +5,7 @@
 --%>
 
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@page import="model.Users"%>
 <!DOCTYPE html>
 <%
@@ -14,17 +15,19 @@
 %>
 
 
+
 <%
 Users user = (Users) session.getAttribute("user");
 if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
     response.sendRedirect("login.jsp");
     return;
 }
+
 %>
 
 <html>
     <head>
-        <title>Add New User</title>
+        <title>Thêm người dùng mới</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -100,22 +103,39 @@ if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
             .back-link:hover {
                 text-decoration: underline;
             }
+            .success-message {
+                color: green;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            .error-message {
+                color: red;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            .success-message {
+                color: green;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            .error-message {
+                color: red;
+                margin-bottom: 15px;
+                text-align: center;
+            }
         </style>
     </head>
     <body>
         <div class="form-container">
-            <h2>Add New User</h2>
-            <%
-                String message = (String) session.getAttribute("message");
-                if (message != null) {
-            %>
-            <div style="color: green; margin-bottom: 15px;">
-                <%= message %>
-            </div>
-            <%
-                    session.removeAttribute("message");
-                }
-            %>
+            <h2>Thêm người dùng</h2>
+            <c:if test="${not empty error}">
+                <div class="error-message">${error}</div>
+            </c:if>
+            <c:if test="${not empty sessionScope.message}">
+                <div class="success-message">${sessionScope.message}</div>
+                <c:remove var="message" scope="session"/>
+            </c:if>
+
             <form action="adduser" method="post">
                 <table>
                     <tr>
@@ -123,53 +143,56 @@ if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
                         <td class="input"><input type="text" id="username" name="username" required></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="password">Password:</label></td>
+                        <td class="label"><label for="password">Mật khẩu:</label></td>
                         <td class="input"><input type="password" id="password" name="password" required></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="fullname">Full Name:</label></td>
+                        <td class="label"><label for="fullname">Họ và Tên:</label></td>
                         <td class="input"><input type="text" id="fullname" name="fullname" required></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="email">Email:</label></td>
-                        <td class="input"><input type="email" id="email" name="email" required></td>
+                        <td class="input"><input type="email" id="email" name="email" required
+                                                 pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                                 title="Email phải đúng định dạng: example@domain.com">
+                        </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="phone">Phone:</label></td>
-                        <td class="input"><input type="text" id="phone" name="phone" maxlength="20" required></td>
+                        <td class="label"><label for="phone">SĐT:</label></td>
+                        <td class="input"><input type="text" id="phone" name="phone"
+                                                 required pattern="^[0-9]{10}$"
+                                                 title="Số điện thoại chỉ được chứa chữ số">
+                        </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="dob">Date of Birth:</label></td>
-                        <td class="input"><input type="date" id="dob" name="dob" required></td>
+                        <td class="label"><label for="dob">Sinh nhật:</label></td>
+                        <td class="input"><input type="date" id="dob" name="dob" required title="errror"></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="role">Role:</label></td>
+                        <td class="label"><label for="role">Vai trò:</label></td>
                         <td class="input">
                             <div class="row-flex">
                                 <div>
                                     <select id="role" name="role" required>
                                         <option value="">-- Select Role --</option>
-                                        <option value="2">Warehouse Staff</option>
-                                        <option value="3">Company Director</option>
-                                        <option value="4">Company Employee</option>
+                                        <option value="2">Nhân viên kho</option>
+                                        <option value="3">Nhân viên công ty</option>
+                                        <option value="4">Giám đốc</option>
                                     </select>
                                 </div>
                                 <div>
                                     <select id="activeFlag" name="activeFlag" required>
-                                        <option value="1" selected>Active</option>
-                                        <option value="0">Inactive</option>
+                                        <option value="1" selected>Hoạt động</option>
+                                        <option value="0">Không hoạt động</option>
                                     </select>
                                 </div>
                             </div>
                         </td>
                     </tr>
                 </table>
-                <button type="submit" class="btn-submit">Add User</button>
+                <button type="submit" class="btn-submit">Thêm</button>
             </form>
-            <a href="admin" class="back-link">Back to User List</a>
+            <a href="usermanager" class="back-link">Quay lại danh sách người dùng</a>
         </div>
     </body>
 </html>
-
-
-

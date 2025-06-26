@@ -18,9 +18,6 @@
         /* Layout chính */
         body {
             background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
             padding: 20px;
         }
@@ -236,10 +233,22 @@
             margin-top: 20px;
             flex-wrap: wrap;
         }
+        .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
         <h1>ĐƠN YÊU CẦU MUA HÀNG</h1>
         
         <!-- Form chính gửi yêu cầu mua hàng -->
@@ -249,19 +258,19 @@
             <!-- Phần thông tin người dùng (readonly) -->
             <div class="information-user">
                 <div class="form-group">
-                    <label>Người dùng</label>
+                    <label>Người dùng <span style="color: red">*</span></label>
                     <input type="text" value="${sessionScope.currentUser}" readonly> 
                 </div>
                 <div class="form-group">
-                    <label>Tuổi</label>
+                    <label>Tuổi <span style="color: red">*</span></label>
                     <input type="text" value="${age}" readonly>
                 </div>
                 <div class="form-group">
-                    <label>Ngày tháng năm sinh</label>
+                    <label>Ngày tháng năm sinh <span style="color: red">*</span></label>
                     <input type="text" value="${sessionScope.DoB}" readonly>
                 </div>
                 <div class="form-group">
-                    <label>Vai trò</label>
+                    <label>Vai trò <span style="color: red">*</span></label>
                     <select name="role" required>
                         <option value="" disabled selected>-- Chọn vai trò --</option>
                         <option value="Nhân viên">Nhân viên</option>
@@ -270,7 +279,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Ngày yêu cầu</label>
+                    <label>Ngày yêu cầu <span style="color: red">*</span></label>
                     <input type="date" name="day_request" required>
                 </div>
             </div>
@@ -281,11 +290,11 @@
             <div class="information-items">
                 <div class="row">
                     <div class="form-group">
-                        <label>ID</label>
+                        <label>ID <span style="color: red">*</span></label>
                         <textarea rows="1" name="request_id" style="resize: none; overflow: hidden; background-color: #f8f9fa; cursor: not-allowed;" oninput="autoResize(this)" readonly>${requestScope.nextID}</textarea>
                     </div>
                     <div class="form-group">
-                        <label>Mục đích</label>
+                        <label>Mục đích <span style="color: red">*</span></label>
                         <textarea rows="1" name="reason" style="resize: none; overflow: hidden;" oninput="autoResize(this)" required></textarea>
                     </div>
                     <div class="form-group">
@@ -303,15 +312,18 @@
                         <input name="phone" pattern="0[0-9]{9}" title="Số điện thoại phải bắt đầu bằng 0 và có đúng 10 chữ số">
                     </div>
                     <div class="form-group">
-                        <label>Email</label>
-                        <textarea rows="1" name="email" style="resize: none; overflow: hidden;" oninput="autoResize(this)"></textarea>
-                    </div>
+                            <label>Email</label>
+                            <input type="email" 
+                                   name="email" 
+                                   pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                   title="Email phải đúng định dạng">
+                        </div>
                 </div>
             </div>
             
             <!-- Bảng danh sách sản phẩm -->
             <div class="items-table">
-                <label>Vui lòng nhập chi tiết mặt hàng</label>
+                <label>Vui lòng nhập chi tiết mặt hàng <span style="color: red">*</span></label>
                 <button type="button" class="add-row-btn" onclick="addRow()">Thêm hàng</button>
                 <table>
                     <thead>
@@ -373,7 +385,7 @@
                 
                 <!-- Lý do chi tiết -->
                 <div class="form-group">
-                    <label>Lý do chi tiết</label>
+                    <label>Lý do chi tiết <span style="color: red">*</span></label>
                     <textarea rows="3" name="reason_detail" style="border: 1px solid #ddd; resize: none;" oninput="autoResize(this)" required></textarea>
                 </div>
             </div>
@@ -384,6 +396,7 @@
                 <a href="Admin.jsp" class="back-btn">Quay lại</a>
             </div>
         </form>
+    </div>
     </div>
     
     <script>
@@ -449,23 +462,25 @@
         }
 
         // Format số lượng theo định dạng Việt Nam khi blur
-        function formatQuantity(textarea) {
-            let value = textarea.value.trim();
-
-            if (value === '') return;
-
-            // Chuyển dấu phẩy thành dấu chấm để parse
-            value = value.replace(',', '.');
-            const numValue = parseFloat(value);
-
-            if (!isNaN(numValue) && numValue >= 0) {
-                // Hiển thị theo định dạng Việt Nam (dấu phẩy cho thập phân)
-                textarea.value = numValue.toLocaleString('vi-VN', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2
-                });
+            function formatQuantity(textarea) {
+                let value = textarea.value.trim();
+                if (value === '')
+                    return;
+                // Chuyển dấu phẩy thành dấu chấm để parse
+                value = value.replace(',', '.');
+                const numValue = parseFloat(value);
+                // Kiểm tra giới hạn số an toàn
+                if (!isNaN(numValue) && numValue >= 0 && numValue <= Number.MAX_SAFE_INTEGER) {
+                    textarea.value = numValue.toLocaleString('vi-VN', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2
+                    });
+                } else if (numValue > Number.MAX_SAFE_INTEGER) {
+                    // Hiển thị cảnh báo và giữ nguyên giá trị
+                    alert('Số lượng quá lớn! Vui lòng nhập số nhỏ hơn.');
+                    textarea.value ='';
+                }
             }
-        }
 
         // Thêm hàng mới vào bảng sản phẩm
         function addRow() {
