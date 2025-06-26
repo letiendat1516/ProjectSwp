@@ -446,6 +446,14 @@
                                             <option value="inactive" ${product.status == 'inactive' ? 'selected' : ''}>Ngưng hoạt động</option>
                                         </select>
                                     </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="stockQuantity">Số Lượng Tồn Kho</label>
+                                        <input type="number" id="stockQuantity" name="stockQuantity" class="form-control" 
+                                               value="${product.stockQuantity != null ? product.stockQuantity : ''}" 
+                                               min="0" step="0.01" placeholder="0">
+                                        <div class="form-help">Cập nhật số lượng hiện có trong kho</div>
+                                    </div>
                                 </div>
 
                                 <!-- Additional Information -->
