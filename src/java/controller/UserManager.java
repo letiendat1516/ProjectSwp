@@ -21,7 +21,7 @@ import model.Users;
  * @author phucn
  */
 
-public class AdminServlet extends HttpServlet {
+public class UserManager extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -31,10 +31,10 @@ public class AdminServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AdminServlet</title>");
+            out.println("<title>Servlet UserManager</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet AdminServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet UserManager at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }

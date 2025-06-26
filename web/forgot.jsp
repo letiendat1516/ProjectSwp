@@ -96,9 +96,8 @@
                 <label for="note">Lý do đổi mật khẩu</label>
                 <textarea id="note" name="note" placeholder="Nhập lý do đổi mật khẩu..."></textarea>
                 <button type="submit">Gửi yêu cầu</button>
-                <div class="back">
-                    <a href="login.jsp">Quay lại trang đăng nhập</a> 
-                    
+                <div class="back" style="text-align: center;">
+                    <a href="login.jsp">Quay lại</a>
                 </div>
             </form>
             <div class="msg<%= (msg != null && msg.contains("không")) ? " err" : "" %>">

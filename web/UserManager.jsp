@@ -303,7 +303,7 @@ response.setDateHeader("Expires", 0); // Proxies
         <div class="container">
             <div class="sidebar">
                 <h2>Warehouse Manager</h2>
-                <a href="admin" class="nav-item">User Manager</a>
+                <a href="usermanager" class="nav-item">User Manager</a>
                 <a href="roleAssignment" class="nav-item">Role Assignment</a>
                 <a href="categoriesforward.jsp" class="nav-item">Material Information</a>
                 <a href="passwordrequest" class="nav-item">Password Request</a>
@@ -446,7 +446,7 @@ response.setDateHeader("Expires", 0); // Proxies
                             <div class="pagination-info">Trang ${currentPage} / ${totalPages}</div>
                             <div class="pagination">
                                 <c:if test="${currentPage > 1}">
-                                    <a href="admin?page=${currentPage - 1}">Trước</a>
+                                    <a href="usermanager?page=${currentPage - 1}">Trước</a>
                                 </c:if>
                                 <c:forEach begin="1" end="${totalPages}" var="i">
                                     <c:choose>
@@ -454,12 +454,12 @@ response.setDateHeader("Expires", 0); // Proxies
                                             <button class="active">${i}</button>
                                         </c:when>
                                         <c:otherwise>
-                                            <a href="admin?page=${i}">${i}</a>
+                                            <a href="usermanager?page=${i}">${i}</a>
                                         </c:otherwise>
                                     </c:choose>
                                 </c:forEach>
                                 <c:if test="${currentPage < totalPages}">
-                                    <a href="admin?page=${currentPage + 1}">Sau</a>
+                                    <a href="usermanager?page=${currentPage + 1}">Sau</a>
                                 </c:if>
                             </div>
                         </div>

@@ -22,8 +22,8 @@
         <servlet-class>controller.AdduserServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>AdminServlet</servlet-name>
-        <servlet-class>controller.AdminServlet</servlet-class>
+        <servlet-name>UserManager</servlet-name>
+        <servlet-class>controller.UserManager</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>EdituserServlet</servlet-name>
@@ -134,8 +134,8 @@
         <url-pattern>/adduser</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>AdminServlet</servlet-name>
-        <url-pattern>/admin</url-pattern>
+        <servlet-name>UserManager</servlet-name>
+        <url-pattern>/usermanager</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>EdituserServlet</servlet-name>
