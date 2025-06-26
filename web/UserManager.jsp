@@ -321,7 +321,6 @@ response.setDateHeader("Expires", 0); // Proxies
                 </div>
                 <div class="dashboard-content">
                     <div class="page-header">
-                        <h2 class="page-title">Quản lý người dùng</h2>
                         <div class="header-actions">
                             <a href="Admin.jsp" class="btn">Quay lại</a>
                             <a href="AddUser.jsp" class="btn"> + Thêm người dùng</a>

@@ -28,6 +28,7 @@
             body {
                 background-color: #f5f5f5;
                 padding: 20px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
 
             .container {
@@ -54,6 +55,7 @@
                 color: #3f51b5;
                 font-size: 2rem;
                 margin-bottom: 10px;
+                
             }
 
             .lead {
@@ -188,99 +190,111 @@
                     width: 100%;
                 }
             }
+            .layout-container {
+                display: flex;
+                min-height: 150vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
         </style>
 
     </head>
     <body>
-        <div class="container">
-            <div class="profile-info">
-                <label class="label">Employee Name:</label>
-                <span class="value"><%= user.getFullname() %></span>
-            </div>
-            <div class="profile-info">
-                <span class="value">
-                    <a href="Profile.jsp">Personal Information</a>
-                </span>
-            </div>
-            <div class="header">
-                <h1 class="page-title">Quản lý Thông tin Vật liệu</h1>
-                <p class="lead">Chọn danh mục bạn muốn quản lý</p>
-            </div>
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
+                <div class="profile-info">
+                    <label class="label">Employee Name:</label>
+                    <span class="value"><%= user.getFullname() %></span>
+                </div>
+                <div class="profile-info">
+                    <span class="value">
+                        <a href="Profile.jsp">Personal Information</a>
+                    </span>
+                </div>
+                <div class="header">
+                    <h1 class="page-title">Quản lý Thông tin Vật liệu</h1>
+                </div>
 
-            <div class="card-container">
-                <!-- Categories Product -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Danh mục Sản phẩm</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="icon-container">
-                            <span class="material-icons">category</span>
+                <div class="card-container">
+                    <!-- Categories Product -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Danh mục Sản phẩm</h3>
                         </div>
-                        <h4 class="card-title">Quản lý Danh mục Sản phẩm</h4>
-                        <p class="card-text">Thêm, sửa, xóa và xem các danh mục sản phẩm trong hệ thống.</p>
-                        <a href="category/list" class="btn btn-primary">
-                            Truy cập <span class="material-icons btn-icon">arrow_forward</span>
-                        </a>
+                        <div class="card-body">
+                            <div class="icon-container">
+                                <span class="material-icons">category</span>
+                            </div>
+                            <h4 class="card-title">Quản lý Danh mục Sản phẩm</h4>
+                            <p class="card-text">Thêm, sửa, xóa và xem các danh mục sản phẩm trong hệ thống.</p>
+                            <a href="category/list" class="btn btn-primary">
+                                Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Categories Unit -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Danh mục Đơn vị</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-container">
+                                <span class="material-icons">straighten</span>
+                            </div>
+                            <h4 class="card-title">Quản lý Đơn vị Tính</h4>
+                            <p class="card-text">Quản lý các đơn vị đo lường và tính toán cho vật liệu và sản phẩm.</p>
+                            <a href="material_unit/materialUnit" class="btn btn-primary">
+                                Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Categories Supplier -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Danh mục Nhà cung cấp</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-container">
+                                <span class="material-icons">business</span>
+                            </div>
+                            <h4 class="card-title">Quản lý Nhà cung cấp</h4>
+                            <p class="card-text">Thêm, sửa, xóa và xem thông tin về các nhà cung cấp vật liệu.</p>
+                            <a href="LishSupplier" class="btn btn-primary">
+                                Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>   
+
+                    <!-- Categories Product -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Danh mục Sản phẩm</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-container">
+                                <span class="material-icons">inventory</span>
+                            </div>
+                            <h4 class="card-title">Quản lý Sản phẩm</h4>
+                            <p class="card-text">Thêm, sửa, xóa và xem thông tin về các sản phẩm.</p>
+                            <a href="product-list" class="btn btn-primary">
+                                Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Categories Unit -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Danh mục Đơn vị</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="icon-container">
-                            <span class="material-icons">straighten</span>
-                        </div>
-                        <h4 class="card-title">Quản lý Đơn vị Tính</h4>
-                        <p class="card-text">Quản lý các đơn vị đo lường và tính toán cho vật liệu và sản phẩm.</p>
-                        <a href="material_unit/materialUnit.jsp" class="btn btn-primary">
-                            Truy cập <span class="material-icons btn-icon">arrow_forward</span>
-                        </a>
-                    </div>
+                <div class="footer">
+                    <a href="Admin.jsp" class="btn btn-secondary">
+                        Quay lại Trang chủ
+                    </a>
                 </div>
-
-                <!-- Categories Supplier -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Danh mục Nhà cung cấp</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="icon-container">
-                            <span class="material-icons">business</span>
-                        </div>
-                        <h4 class="card-title">Quản lý Nhà cung cấp</h4>
-                        <p class="card-text">Thêm, sửa, xóa và xem thông tin về các nhà cung cấp vật liệu.</p>
-                        <a href="LishSupplier" class="btn btn-primary">
-                            Truy cập <span class="material-icons btn-icon">arrow_forward</span>
-                        </a>
-                    </div>
-                </div>   
-                
-                <!-- Categories Product -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Danh mục Sản phẩm</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="icon-container">
-                            <span class="material-icons">inventory</span>
-                        </div>
-                        <h4 class="card-title">Quản lý Sản phẩm</h4>
-                        <p class="card-text">Thêm, sửa, xóa và xem thông tin về các sản phẩm.</p>
-                        <a href="product-list.jsp" class="btn btn-primary">
-                            Truy cập <span class="material-icons btn-icon">arrow_forward</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="footer">
-                <a href="Admin.jsp" class="btn btn-secondary">
-                    Quay lại Trang chủ
-                </a>
             </div>
         </div>
     </body>

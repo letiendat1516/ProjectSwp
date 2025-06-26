@@ -277,10 +277,22 @@
                 margin: 8px 0 0 0;
             }
         }
+        .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
     </style>
 </head>
 <body>
-    <div class="container">
+            <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
         <h1>Quản lí đơn vị vật tư</h1>
       
         
@@ -434,5 +446,6 @@
     <a href="../categoriesforward.jsp" class="btn-primary" style="background: #6c757d;">Quay lại trang trước</a>
 </div>
     </div>
+                </div>
 </body>
 </html>

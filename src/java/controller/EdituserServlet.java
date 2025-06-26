@@ -69,69 +69,82 @@ public class EdituserServlet extends HttpServlet {
             request.getRequestDispatcher("EditUser.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
-            response.sendRedirect("admin");
+            response.sendRedirect("usermanager");
         }
     }
 
-
-@Override
-protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    try {
-        int id = Integer.parseInt(request.getParameter("id"));
-        String username = request.getParameter("username");
-        String fullname = request.getParameter("fullname");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        String dobStr = request.getParameter("dob");
-        int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
-        int roleId = Integer.parseInt(request.getParameter("role"));
-
-        Users user = new Users();
-        user.setId(id);
-        user.setUsername(username);
-        user.setFullname(fullname);
-        user.setEmail(email);
-        user.setPhone(phone);
-
-        // Xử lý ngày sinh
-        java.sql.Date dob = null;
-        try {
-            if (dobStr != null && !dobStr.trim().isEmpty()) {
-                dob = java.sql.Date.valueOf(dobStr);
-            }
-        } catch (IllegalArgumentException e) {
-            request.setAttribute("error", "Date of Birth is invalid!");
-            
-            UserDAO userDAO = new UserDAO();
-            user = userDAO.getUserById(id);
-            request.setAttribute("editUser", user);
-            request.getRequestDispatcher("EditUser.jsp").forward(request, response);
-            return;
-        }
-        user.setDob(dob);
-
-        user.setActiveFlag(activeFlag);
-
-        UserDAO userDAO = new UserDAO();
-        userDAO.updateUser(user, roleId);
-
-        HttpSession session = request.getSession();
-        session.setAttribute("message", "User updated successfully!");
-        response.sendRedirect("admin");
-    } catch (Exception e) {
-        request.setAttribute("error", "Error updating user: " + e.getMessage());
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
-            UserDAO userDAO = new UserDAO();
-            Users user = userDAO.getUserById(id);
-            request.setAttribute("editUser", user);
-        } catch (Exception ex) {
-        }
-        request.getRequestDispatcher("EditUser.jsp").forward(request, response);
-    }
-}
+            String username = request.getParameter("username");
+            String fullname = request.getParameter("fullname");
+            String email = request.getParameter("email");
+String phone = request.getParameter("phone");
+            String dobStr = request.getParameter("dob");
+            int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
+            int roleId = Integer.parseInt(request.getParameter("role"));
 
+            Users user = new Users();
+            user.setId(id);
+            user.setUsername(username);
+            user.setFullname(fullname);
+            user.setEmail(email);
+            user.setPhone(phone);
+
+            // Xử lý ngày sinh
+            java.sql.Date dob = null;
+            try {
+                if (dobStr != null && !dobStr.trim().isEmpty()) {
+                    dob = java.sql.Date.valueOf(dobStr);
+                }
+            } catch (IllegalArgumentException e) {
+                request.setAttribute("error", "Date of Birth is invalid!");
+
+                UserDAO userDAO = new UserDAO();
+                user = userDAO.getUserById(id);
+                request.setAttribute("editUser", user);
+                request.getRequestDispatcher("EditUser.jsp").forward(request, response);
+                return;
+            }
+            user.setDob(dob);
+
+            if (dob != null) {
+                // Tính tuổi
+                java.time.LocalDate birth = dob.toLocalDate();
+                java.time.LocalDate now = java.time.LocalDate.now();
+                int age = java.time.Period.between(birth, now).getYears();
+
+                if (age < 18 || age > 60) {
+                    request.setAttribute("error", "Tuổi người dùng phải từ 18 đến 60!");
+                    UserDAO userDAO = new UserDAO();
+                    Users userOld = userDAO.getUserById(id);
+                    request.setAttribute("editUser", userOld);
+                    request.getRequestDispatcher("EditUser.jsp").forward(request, response);
+                    return;
+                }
+            }
+            user.setActiveFlag(activeFlag);
+
+            UserDAO userDAO = new UserDAO();
+            userDAO.updateUser(user, roleId);
+
+            HttpSession session = request.getSession();
+            session.setAttribute("message", "User updated successfully!");
+            response.sendRedirect("usermanager");
+        } catch (Exception e) {
+            request.setAttribute("error", "Error updating user: " + e.getMessage());
+            try {
+                int id = Integer.parseInt(request.getParameter("id"));
+                UserDAO userDAO = new UserDAO();
+                Users user = userDAO.getUserById(id);
+                request.setAttribute("editUser", user);
+            } catch (Exception ex) {
+            }
+            request.getRequestDispatcher("EditUser.jsp").forward(request, response);
+        }
+    }
 
     @Override
     public String getServletInfo() {

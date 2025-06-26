@@ -22,8 +22,6 @@
       }
       body {
           background-color: #f0f2f5;
-          display: flex;
-          justify-content: center;
           align-items: flex-start;
           min-height: 100vh;
           padding: 20px;
@@ -333,10 +331,22 @@
               transform: translateY(0);
           }
       }
+      .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
       <h1>PHÊ DUYỆT ĐƠN BÁO GIÁ</h1>
       <form action="approvepurchasequoted" method="post" class="filter-section" id="filterForm">
           <div class="filter-item">
@@ -582,6 +592,7 @@
           </a>
       </div>
   </div>
+      </div>
   <script>
       function toggleDetails(button) {
           const row = button.closest('tr').nextElementSibling;

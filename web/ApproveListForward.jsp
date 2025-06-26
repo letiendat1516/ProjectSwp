@@ -173,10 +173,22 @@
                 gap: 10px;
             }
         }
+        .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
         <div class="header">
             <h1 class="page-title">Yêu Cầu Cần Phê Duyệt</h1>
             <p class="lead">Chọn danh mục cần phê duyệt để xem chi tiết và xử lý các yêu cầu.</p>
@@ -223,6 +235,7 @@
                 <span class="material-icons back-btn-icon">arrow_back</span> Quay Lại Trang Chủ
             </a>
         </div>
+                </div>
     </div>
 </body>
 </html>

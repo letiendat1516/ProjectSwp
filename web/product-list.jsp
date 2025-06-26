@@ -43,6 +43,7 @@
             font-size: 2.5rem;
             margin-bottom: 10px;
             font-weight: 300;
+            color: black;
         }
 
         .header p {
@@ -367,10 +368,24 @@
                 min-width: 800px;
             }
         }
+        .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
     </style>
 </head>
 <body>
-    <div class="container">        <div class="header">
+
+     <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
+        <div class="header">
             <h1>📦 Danh Sách Sản Phẩm</h1>
             <p>Quản lý và theo dõi tồn kho sản phẩm</p>
         </div>
@@ -606,6 +621,8 @@
             </div>
         </c:if>
     </div>
+                </div>
+                
 
     <script>
         function sortTable(column) {

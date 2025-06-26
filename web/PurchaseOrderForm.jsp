@@ -17,9 +17,6 @@
 
             body {
                 background-color: #f0f2f5;
-                display: flex;
-                justify-content: center;
-                align-items: center;
                 min-height: 100vh;
                 padding: 20px;
             }
@@ -257,10 +254,22 @@
                 background-color: transparent !important;
 
             }
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
         </style>
     </head>
     <body>
-        <div class="container">
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
             <h1>ĐƠN BÁO GIÁ SẢN PHẨM</h1>
             <!-- Form gửi báo giá đến servlet submitpurchaseorder -->
             <form id="myForm" action="submitpurchaseorder" method="post">
@@ -270,22 +279,22 @@
                 <h3>Thông tin người tạo báo giá</h3>
                 <div class="information-user">
                     <div class="form-group">
-                        <label>Người tạo đơn</label>
+                        <label>Người tạo đơn <span style="color: red">*</span></label>
                         <!-- Hiển thị tên user từ session -->
                         <input type="text" value="${sessionScope.currentUser}" readonly> 
                     </div>
                     <div class="form-group">
-                        <label>Tuổi</label>
+                        <label>Tuổi <span style="color: red">*</span></label>
                         <!-- Hiển thị tuổi được tính từ server -->
                         <input type="text" value="${age}" readonly>
                     </div>
                     <div class="form-group">
-                        <label>Ngày tháng năm sinh</label>
+                        <label>Ngày tháng năm sinh <span style="color: red">*</span></label>
                         <!-- Hiển thị ngày sinh từ session -->
                         <input type="text" value="${sessionScope.DoB}" readonly>
                     </div>
                     <div class="form-group">
-                        <label>Ngày tạo báo giá</label>
+                        <label>Ngày tạo báo giá <span style="color: red">*</span></label>
                         <!-- Input date bắt buộc nhập -->
                         <input type="date" name="quote_date" required>
                     </div>
@@ -295,17 +304,17 @@
                 <div class="information-items">
                     <div class="row">
                         <div class="form-group">
-                            <label>ID Báo giá</label>
+                            <label>ID Báo giá <span style="color: red">*</span></label>
                             <!-- ID báo giá tự động từ requestId -->
                             <textarea rows="1" name="quote_id" style="width: 100%; resize: none;overflow: hidden;background-color: #f8f9fa; cursor: not-allowed;" readonly>${requestId}</textarea>
                         </div>
                         <div class="form-group">
-                            <label>Mục đích mua hàng</label>
+                            <label>Mục đích mua hàng <span style="color: red">*</span></label>
                             <!-- Lý do mua hàng từ request gốc -->
                             <textarea rows="1" name="quote_note" style="width: 100%; resize: none;overflow: hidden;background-color: #f8f9fa; cursor: not-allowed;" readonly>${reason}</textarea>
                         </div>
                         <div class="form-group">
-                            <label>Nhà cung cấp</label>
+                            <label>Nhà cung cấp <span style="color: red">*</span></label>
                             <select name="supplier_name" style="width: 100%;" onchange="handleSupplierChange(this)">
                                 <option value="" disabled selected>-- Chọn nhà cung cấp --</option>
                                 <c:forEach var="sn" items="${supplier_list}">
@@ -319,25 +328,25 @@
                     </div>
                     <div class="row">
                         <div class="form-group">
-                            <label>Địa chỉ</label>
+                            <label>Địa chỉ <span style="color: red">*</span></label>
                             <textarea rows="1" name="supplier_address" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" readonly></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Điện thoại</label>
+                            <label>Điện thoại <span style="color: red">*</span></label>
                             <textarea rows="1" name="supplier_phone" id="phone" 
                                       style="width: 100%; resize: none; overflow: hidden;" 
                                       oninput="autoResize(this)"readonly></textarea>
 
                         </div>
                         <div class="form-group">
-                            <label>Email</label>
+                            <label>Email <span style="color: red">*</span></label>
                             <textarea rows="1" name="supplier_email" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" readonly></textarea>
                         </div>
                     </div>
                 </div>
 
                 <div class="items-table">
-                    <label>Chi tiết mặt hàng và báo giá</label>
+                    <label>Chi tiết mặt hàng và báo giá <span style="color: red">*</span></label>
                     <table>
                         <thead>
                             <tr>
@@ -416,7 +425,7 @@
                     </table>
 
                     <div class="form-group">
-                        <label>Tổng kết báo giá</label>
+                        <label>Tổng kết báo giá <span style="color: red">*</span></label>
                         <!-- Textarea tổng kết bắt buộc -->
                         <textarea rows="3" name="quote_summary" style="width: 100%; border: 1px solid #ddd; resize: none;" oninput="autoResize(this)" required placeholder="Nhập tổng kết về báo giá này..."></textarea>
                     </div>
@@ -427,6 +436,8 @@
                 </div>
             </form>
         </div>
+                        </div>
+                        
         <script>
             function autoResize(textarea) {
             textarea.style.height = 'auto';
@@ -492,17 +503,24 @@
             }
             }
 
+            // Format giá theo định dạng Việt Nam khi blur
             function formatPrice(textarea) {
             let value = textarea.value.trim();
             if (value === '')
                     return;
+            // Chuyển dấu phẩy thành dấu chấm để parse
             value = value.replace(',', '.');
             const numValue = parseFloat(value);
-            if (!isNaN(numValue) && numValue >= 0) {
+            // Kiểm tra giới hạn số an toàn
+            if (!isNaN(numValue) && numValue >= 0 && numValue <= Number.MAX_SAFE_INTEGER) {
             textarea.value = numValue.toLocaleString('vi-VN', {
             minimumFractionDigits: 0,
                     maximumFractionDigits: 2
             });
+            } else if (numValue > Number.MAX_SAFE_INTEGER) {
+            // Hiển thị cảnh báo và xóa giá trị
+            alert('Giá trị quá lớn! Vui lòng nhập số nhỏ hơn.');
+            textarea.value = '';
             }
             }
 

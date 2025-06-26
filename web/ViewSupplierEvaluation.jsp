@@ -619,151 +619,172 @@ if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName())&&!"Nhân viê
                     transform: translateY(0);
                 }
             }
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
 
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
         </style>
     </head>
     <body>
-
-        <c:set var="listVSE" value="${requestScope.listSED}"/>
-        <c:set var="supplier" value="${requestScope.supplier}"/>
-        <c:set var="user" value="${sessionScope.user}"/>
-        <c:set var="avg" value="${requestScope.avg}"/>
-        <c:set var="fl" value="${requestScope.fl}"/>
-        <c:set var="totalPage" value="${requestScope.totalPage}"/>
-        <c:set var="index" value="${requestScope.index}"/>
-        <c:set var="nameSearch" value="${requestScope.name}"/>
-        <!-- isFilter -->
-        <c:set var="isFilter" value="${requestScope.isFilter}"/>
-        <!-- isFilter -->
-        <c:if test="${empty fl or fl == null}">
-            <c:set var="fl" value="star"/>
-        </c:if>
-        <div class="supplier-container">
-            <c:if test="${empty listVSE}">
-                <h2>Supplier Information</h2>
-            </c:if>
-            <c:if test="${not empty listVSE}">
-                <h2 style="color: orange">Supplier Information ${avg}★</h2>
-            </c:if>
-            <table class="supplier-info">
-                <tr><td>Name:</td><td>${supplier.name}</td></tr>
-                <tr><td>Phone:</td><td>${supplier.phone}</td></tr>
-                <tr><td>Email:</td><td>${supplier.email}</td></tr>
-                <tr><td>Address:</td><td>${supplier.address}</td></tr>
-                <tr><td>Note:</td><td>${supplier.note}</td></tr>
-            </table>    
-        </div>
-        <div class="filter-search-container">
-            <h3>Filter & Search</h3>
-            <div class="forms-wrapper">
-                <form action="FilterSupplierEvaluation" class="filter-form">
-                    <span class="form-label">Filter:</span>
-                    <select name="filter">
-                        <option ${fl==null || fl=="start"?'selected':''} value="star">Sort descending by star</option>
-                        <option ${fl=="date"?'selected':''} value="date">Sort descending by date</option>
-                    </select>
-                    <input style="display:none" type="text" value="${supplier.supplierID}" name="sid">
-                    <input style="display:none" type="text" value="${index}" name="index">
-                    <input type="submit" value="Apply Filter" name="x">
-                </form>
-
-                <form action="SearchSupplierEvaluation" class="search-form">
-                    <span class="form-label">Search:</span>
-                    <input style="display:none" type="text" value="${supplier.supplierID}" name="sid">
-                    <input style="display:none" type="text" value="${fl}" name="fl">
-                    <input style="display:none" type="text" value="${index}" name="index">
-                    <input type="text" placeholder="Enter user name to search..." name="name">
-                    <input type="submit" value="Search" name="y">
-                </form>
-            </div>
-        </div>
-        <div class="comments-container">
-            <div>
-                <h2>Comments</h2>
-            </div>
-
-            <c:forEach var="i" items="${listVSE}">
-                <c:set var="ratingValue" value="${i.avgRate}"/>
-                <c:set var="ratingClass" value="rating-3"/>
-
-                <c:if test="${ratingValue >= 5}">
-                    <c:set var="ratingClass" value="rating-5"/>
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
+                <c:set var="listVSE" value="${requestScope.listSED}"/>
+                <c:set var="supplier" value="${requestScope.supplier}"/>
+                <c:set var="user" value="${sessionScope.user}"/>
+                <c:set var="avg" value="${requestScope.avg}"/>
+                <c:set var="fl" value="${requestScope.fl}"/>
+                <c:set var="totalPage" value="${requestScope.totalPage}"/>
+                <c:set var="index" value="${requestScope.index}"/>
+                <c:set var="nameSearch" value="${requestScope.name}"/>
+                <!-- isFilter -->
+                <c:set var="isFilter" value="${requestScope.isFilter}"/>
+                <!-- isFilter -->
+                <c:if test="${empty fl or fl == null}">
+                    <c:set var="fl" value="star"/>
                 </c:if>
-                <c:if test="${ratingValue >= 4 && ratingValue < 5}">
-                    <c:set var="ratingClass" value="rating-4"/>
-                </c:if>
-                <c:if test="${ratingValue >= 3 && ratingValue < 4}">
-                    <c:set var="ratingClass" value="rating-3"/>
-                </c:if>
-                <c:if test="${ratingValue >= 2 && ratingValue < 3}">
-                    <c:set var="ratingClass" value="rating-2"/>
-                </c:if>
-                <c:if test="${ratingValue < 2}">
-                    <c:set var="ratingClass" value="rating-1"/>
-                </c:if>
+                <c:set var="page" value="${requestScope.page}"/>
+                <div class="supplier-container">
+                    <c:if test="${empty listVSE}">
+                        <h2>Supplier Information</h2>
+                    </c:if>
+                    <c:if test="${not empty listVSE}">
+                        <h2 style="color: orange">Supplier Information ${avg}★</h2>
+                    </c:if>
+                    <table class="supplier-info">
+                        <tr><td>Name:</td><td>${supplier.name}</td></tr>
+                        <tr><td>Phone:</td><td>${supplier.phone}</td></tr>
+                        <tr><td>Email:</td><td>${supplier.email}</td></tr>
+                        <tr><td>Address:</td><td>${supplier.address}</td></tr>
+                        <tr><td>Note:</td><td>${supplier.note}</td></tr>
+                    </table>    
+                </div>
+                <div class="filter-search-container">
+                    <h3>Filter & Search</h3>
+                    <div class="forms-wrapper">
+                        <form action="FilterSupplierEvaluation" class="filter-form">
+                            <span class="form-label">Filter:</span>
+                            <select name="filter">
+                                <option ${fl==null || fl=="start"?'selected':''} value="star">Sort descending by star</option>
+                                <option ${fl=="date"?'selected':''} value="date">Sort descending by date</option>
+                            </select>
+                            <input style="display:none" type="text" value="${supplier.supplierID}" name="sid">
+                            <input style="display:none" type="text" value="${index}" name="index">
+                            <input type="submit" value="Apply Filter" name="x">
+                        </form>
 
-                <!-- Format date: convert yyyy-MM-dd to dd/MM/yyyy -->
-                <fmt:parseDate value="${i.commentTime}" pattern="yyyy-MM-dd" var="parsedDate" />
-                <fmt:formatDate value="${parsedDate}" pattern="dd/MM/yyyy" var="formattedDate" />
-
-                <div class="comment-item ${ratingClass}">
-                    <div class="comment-header">
-                        <div class="user-info">
-                            <span class="username">${i.userID.fullname}:</span>
-                            <span class="rating">${i.avgRate}★</span>
-                        </div>
-                        <div class="comment-actions">
-                            <span class="date">${formattedDate}</span>
-                            <c:if test="${i.userID.id == user.id}">
-                                <a href="TableSupplierEvaluation?seid=${i.supplierEvaluationID}&id=${supplier.supplierID}" 
-                                   class="edit-button">Edit</a>
-
-                            </c:if>
-                            <c:if test="${i.userID.id == user.id}">
-                                <a href="DeleteSupplierEvaluation?id=${i.supplierEvaluationID}&sid=${supplier.supplierID}&index=${index}" class="delete-button"
-                                   onclick="return confirm('Bạn có chắc chắn muốn xoá đánh giá nhà cung cấp này không?')">
-                                    Delete</a>
-                                </c:if>
-                        </div>
-                    </div>
-                    <div class="comment-content">
-                        ${i.comment}
+                        <form action="SearchSupplierEvaluation" class="search-form">
+                            <span class="form-label">Search:</span>
+                            <input style="display:none" type="text" value="${supplier.supplierID}" name="sid">
+                            <input style="display:none" type="text" value="${fl}" name="fl">
+                            <input style="display:none" type="text" value="${index}" name="index">
+                            <input type="text" placeholder="Enter user name to search..." name="name">
+                            <input type="submit" value="Search" name="y">
+                        </form>
                     </div>
                 </div>
-            </c:forEach>
-        </div>
-        <c:if test="${empty isFilter}">
-            <div class="pagination-container">
-                <div class="pagination">
-                    <c:forEach var="i" begin="1" end="${totalPage}">
-                        <a href="ViewSupplierEvaluation?supplierID=${supplier.supplierID}&index=${i}" 
-                           class="${i == index ? 'active' : ''}">${i}</a>
+                <div class="comments-container">
+                    <div>
+                        <h2>Comments</h2>
+                    </div>
+
+                    <c:forEach var="i" items="${listVSE}">
+                        <c:set var="ratingValue" value="${i.avgRate}"/>
+                        <c:set var="ratingClass" value="rating-3"/>
+
+                        <c:if test="${ratingValue >= 5}">
+                            <c:set var="ratingClass" value="rating-5"/>
+                        </c:if>
+                        <c:if test="${ratingValue >= 4 && ratingValue < 5}">
+                            <c:set var="ratingClass" value="rating-4"/>
+                        </c:if>
+                        <c:if test="${ratingValue >= 3 && ratingValue < 4}">
+                            <c:set var="ratingClass" value="rating-3"/>
+                        </c:if>
+                        <c:if test="${ratingValue >= 2 && ratingValue < 3}">
+                            <c:set var="ratingClass" value="rating-2"/>
+                        </c:if>
+                        <c:if test="${ratingValue < 2}">
+                            <c:set var="ratingClass" value="rating-1"/>
+                        </c:if>
+
+                        <!-- Format date: convert yyyy-MM-dd to dd/MM/yyyy -->
+                        <fmt:parseDate value="${i.commentTime}" pattern="yyyy-MM-dd" var="parsedDate" />
+                        <fmt:formatDate value="${parsedDate}" pattern="dd/MM/yyyy" var="formattedDate" />
+
+                        <div class="comment-item ${ratingClass}">
+                            <div class="comment-header">
+                                <div class="user-info">
+                                    <span class="username">${i.userID.fullname}:</span>
+                                    <span class="rating">${i.avgRate}★</span>
+                                </div>
+                                <div class="comment-actions">
+                                    <span class="date">${formattedDate}</span>
+                                    <c:if test="${i.userID.id == user.id}">
+                                        <a href="TableSupplierEvaluation?seid=${i.supplierEvaluationID}&id=${supplier.supplierID}" 
+                                           class="edit-button">Edit</a>
+
+                                    </c:if>
+                                    <c:if test="${i.userID.id == user.id}">
+                                        <a href="DeleteSupplierEvaluation?id=${i.supplierEvaluationID}&sid=${supplier.supplierID}&index=${index}" class="delete-button"
+                                           onclick="return confirm('Bạn có chắc chắn muốn xoá đánh giá nhà cung cấp này không?')">
+                                            Delete</a>
+                                        </c:if>
+                                </div>
+                            </div>
+                            <div class="comment-content">
+                                ${i.comment}
+                            </div>
+                        </div>
                     </c:forEach>
                 </div>
+                <c:if test="${empty isFilter}">
+                    <div class="pagination-container">
+                        <div class="pagination">
+                            <c:forEach var="i" begin="1" end="${totalPage}">
+                                <a href="ViewSupplierEvaluation?supplierID=${supplier.supplierID}&index=${i}" 
+                                   class="${i == index ? 'active' : ''}">${i}</a>
+                            </c:forEach>
+                        </div>
+                    </div>
+                </c:if>
+                <c:if test="${isFilter eq 'filter'}">
+                    <div class="pagination-container">
+                        <div class="pagination">
+                            <c:forEach var="i" begin="1" end="${totalPage}">
+                                <a href="FilterSupplierEvaluation?index=${i}&filter=${fl}&sid=${supplier.supplierID}" 
+                                   class="${i == index ? 'active' : ''}">${i}</a>
+                            </c:forEach>
+                        </div>
+                    </div>
+                </c:if>
+                <c:if test="${isFilter eq 'search'}">
+                    <div class="pagination-container">
+                        <div class="pagination">
+                            <c:forEach var="i" begin="1" end="${totalPage}">
+                                <a href="SearchSupplierEvaluation?index=${i}&fl=${fl}&sid=${supplier.supplierID}&name=${nameSearch}" 
+                                   class="${i == index ? 'active' : ''}">${i}</a>
+                            </c:forEach>
+                        </div>
+                    </div>
+                </c:if>
+                <c:if test="${empty page}">
+                    <div class="action-buttons">
+                        <a class="btn-back" href="LishSupplier">Back</a>
+                    </div>
+                </c:if>
+                <c:if test="${not empty page}">
+                    <div class="action-buttons">
+                        <a class="btn-back" href="StatisticSupplierEvaluation.jsp">Back</a>
+                    </div>
+                </c:if>
             </div>
-        </c:if>
-        <c:if test="${isFilter eq 'filter'}">
-            <div class="pagination-container">
-                <div class="pagination">
-                    <c:forEach var="i" begin="1" end="${totalPage}">
-                        <a href="FilterSupplierEvaluation?index=${i}&filter=${fl}&sid=${supplier.supplierID}" 
-                           class="${i == index ? 'active' : ''}">${i}</a>
-                    </c:forEach>
-                </div>
-            </div>
-        </c:if>
-        <c:if test="${isFilter eq 'search'}">
-            <div class="pagination-container">
-                <div class="pagination">
-                    <c:forEach var="i" begin="1" end="${totalPage}">
-                        <a href="SearchSupplierEvaluation?index=${i}&fl=${fl}&sid=${supplier.supplierID}&name=${nameSearch}" 
-                           class="${i == index ? 'active' : ''}">${i}</a>
-                    </c:forEach>
-                </div>
-            </div>
-        </c:if>
-        <div class="action-buttons">
-            <a class="btn-back" href="LishSupplier">Back</a>
         </div>
     </body>
 </html>

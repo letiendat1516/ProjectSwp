@@ -30,7 +30,9 @@
                 text-align: center;
                 margin-bottom: 30px;
             }
-
+            .h1 {
+                color: #f4f4f9;
+            }
             .page-title {
                 color: #3f51b5;
                 font-size: 2rem;
@@ -173,13 +175,24 @@
                     gap: 10px;
                 }
             }
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
         </style>
     </head>
     <body>
-        <div class="container">
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
             <div class="header">
                 <h1 class="page-title">Quản lý Xuất Nhập kho</h1>
-                <p class="lead">Chọn danh mục</p>
             </div>
 
             <div class="card-container">
@@ -256,5 +269,6 @@
                 </a>
             </div>
         </div>
+            </div>
     </body>
 </html>

@@ -65,7 +65,10 @@ public class ViewSupplierEvaluation extends HttpServlet {
             throws ServletException, IOException {
         String id_raw = request.getParameter("supplierID");
         String indexPage = request.getParameter("index");
-
+        String page = request.getParameter("page");
+        if(page!=null && page.length()!=0){
+            request.setAttribute("page", "Statistic");
+        }
         try {
             int id = Integer.parseInt(id_raw);
             SupplierEvaluationDAO sed = new SupplierEvaluationDAO();

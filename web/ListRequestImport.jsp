@@ -829,10 +829,22 @@
                     text-align: center;
                 }
             }
+                        .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
         </style>
     </head>
     <body>
-        <div class="container">
+         <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
             <!-- Breadcrumbs -->
             <div class="breadcrumbs mb-4">
                 <a href="${pageContext.request.contextPath}/Admin.jsp">Trang chủ</a>
@@ -1114,8 +1126,9 @@
                         </div>
                     </form>
                 </div>
+                            </div>
+                            </div>
             </div>
-        </div>
 
         <script>
             // Xử lý đóng alert sau 5 giây
