@@ -2,442 +2,489 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
+<%@page import="model.Users"%>
+<%
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Danh sách danh mục cha</title>
-  <style>
-      * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-      }
+    <head>
+        <meta rset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Danh sách danh mục </title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-      body {
-          font-family: Arial, sans-serif;
-          background: #f5f5f5;
-          color: #333;
-          line-height: 1.6;
-          padding: 20px;
-      }
+            body {
+                font-family: Arial, sans-serif;
+                background: #f5f5f5;
+                color: #333;
+                line-height: 1.6;
+                padding: 20px;
+            }
 
-      .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          background: white;
-          padding: 30px;
-          border-radius: 8px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
 
-      .page-header {
-          text-align: center;
-          margin-bottom: 30px;
-          padding-bottom: 20px;
-          border-bottom: 2px solid #eee;
-      }
+            /* Navigation Buttons */
+            .nav-buttons {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 25px;
+            }
 
-      .page-title {
-          font-size: 2rem;
-          color: #333;
-          margin-bottom: 10px;
-      }
+            /* Alert Styles */
+            .alert {
+                padding: 15px;
+                border-radius: 5px;
+                margin-bottom: 20px;
+            }
 
-      /* Navigation Buttons */
-      .nav-buttons {
-          display: flex;
-          gap: 15px;
-          margin-bottom: 25px;
-      }
+            .alert-success {
+                background: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
 
-      /* Alert Styles */
-      .alert {
-          padding: 15px;
-          border-radius: 5px;
-          margin-bottom: 20px;
-      }
+            .alert-danger {
+                background: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f1aeb5;
+            }
 
-      .alert-success {
-          background: #d4edda;
-          color: #155724;
-          border: 1px solid #c3e6cb;
-      }
+            .alert-close {
+                float: right;
+                background: none;
+                border: none;
+                font-size: 20px;
+                cursor: pointer;
+            }
 
-      .alert-danger {
-          background: #f8d7da;
-          color: #721c24;
-          border: 1px solid #f1aeb5;
-      }
+            /* Toolbar */
+            .toolbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 25px;
+                gap: 15px;
+            }
 
-      .alert-close {
-          float: right;
-          background: none;
-          border: none;
-          font-size: 20px;
-          cursor: pointer;
-      }
+            .search-form {
+                display: flex;
+                gap: 10px;
+            }
 
-      /* Toolbar */
-      .toolbar {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 25px;
-          gap: 15px;
-      }
+            .form-input {
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+                width: 250px;
+            }
 
-      .search-form {
-          display: flex;
-          gap: 10px;
-      }
+            .btn {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                font-size: 14px;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+            }
 
-      .form-input {
-          padding: 10px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          font-size: 14px;
-          width: 250px;
-      }
+            .btn-primary {
+                background: #007bff;
+                color: white;
+            }
 
-      .btn {
-          padding: 10px 20px;
-          border: none;
-          border-radius: 4px;
-          font-size: 14px;
-          cursor: pointer;
-          text-decoration: none;
-          display: inline-block;
-      }
+            .btn-secondary {
+                background: #6c757d;
+                color: white;
+            }
 
-      .btn-primary {
-          background: #007bff;
-          color: white;
-      }
+            .btn-warning {
+                background: #ffc107;
+                color: #212529;
+            }
 
-      .btn-secondary {
-          background: #6c757d;
-          color: white;
-      }
+            .btn-danger {
+                background: #dc3545;
+                color: white;
+            }
 
-      .btn-warning {
-          background: #ffc107;
-          color: #212529;
-      }
+            .btn-info {
+                background: #17a2b8;
+                color: white;
+            }
 
-      .btn-danger {
-          background: #dc3545;
-          color: white;
-      }
+            .btn-success {
+                background: #28a745;
+                color: white;
+            }
 
-      .btn-info {
-          background: #17a2b8;
-          color: white;
-      }
+            .btn:hover {
+                opacity: 0.9;
+            }
 
-      .btn-success {
-          background: #28a745;
-          color: white;
-      }
+            .btn-sm {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
 
-      .btn:hover {
-          opacity: 0.9;
-      }
+            /* Table Styles */
+            .table-container {
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                overflow: hidden;
+            }
 
-      .btn-sm {
-          padding: 8px 15px;
-          font-size: 13px;
-      }
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+            }
 
-      /* Table Styles */
-      .table-container {
-          border: 1px solid #ddd;
-          border-radius: 5px;
-          overflow: hidden;
-      }
+            .table th {
+                background: #f8f9fa;
+                padding: 15px;
+                text-align: left;
+                font-weight: bold;
+                border-bottom: 2px solid #dee2e6;
+            }
 
-      .table {
-          width: 100%;
-          border-collapse: collapse;
-      }
+            .table th a {
+                color: #333;
+                text-decoration: none;
+            }
 
-      .table th {
-          background: #f8f9fa;
-          padding: 15px;
-          text-align: left;
-          font-weight: bold;
-          border-bottom: 2px solid #dee2e6;
-      }
+            .table td {
+                padding: 12px 15px;
+                border-bottom: 1px solid #dee2e6;
+            }
 
-      .table th a {
-          color: #333;
-          text-decoration: none;
-      }
+            .table tbody tr:hover {
+                background: #f5f5f5;
+            }
 
-      .table td {
-          padding: 12px 15px;
-          border-bottom: 1px solid #dee2e6;
-      }
+            /* Badge Styles */
+            .badge {
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 12px;
+                font-weight: bold;
+            }
 
-      .table tbody tr:hover {
-          background: #f5f5f5;
-      }
+            .badge-success {
+                background: #28a745;
+                color: white;
+            }
 
-      /* Badge Styles */
-      .badge {
-          padding: 5px 10px;
-          border-radius: 15px;
-          font-size: 12px;
-          font-weight: bold;
-      }
+            .badge-secondary {
+                background: #6c757d;
+                color: white;
+            }
 
-      .badge-success {
-          background: #28a745;
-          color: white;
-      }
+            .badge-info {
+                background: #17a2b8;
+                color: white;
+            }
 
-      .badge-secondary {
-          background: #6c757d;
-          color: white;
-      }
+            .text-muted {
+                color: #6c757d;
+            }
 
-      .badge-info {
-          background: #17a2b8;
-          color: white;
-      }
+            /* Action Buttons */
+            .action-buttons {
+                display: flex;
+                gap: 8px;
+            }
 
-      .text-muted {
-          color: #6c757d;
-      }
+            /* Pagination */
+            .pagination-container {
+                text-align: center;
+                margin-top: 25px;
+            }
 
-      /* Action Buttons */
-      .action-buttons {
-          display: flex;
-          gap: 8px;
-      }
+            .pagination {
+                display: inline-flex;
+                list-style: none;
+                gap: 5px;
+            }
 
-      /* Pagination */
-      .pagination-container {
-          text-align: center;
-          margin-top: 25px;
-      }
+            .page-link {
+                display: block;
+                padding: 8px 12px;
+                color: #007bff;
+                text-decoration: none;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+            }
 
-      .pagination {
-          display: inline-flex;
-          list-style: none;
-          gap: 5px;
-      }
+            .page-link:hover {
+                background: #e9ecef;
+            }
 
-      .page-link {
-          display: block;
-          padding: 8px 12px;
-          color: #007bff;
-          text-decoration: none;
-          border: 1px solid #dee2e6;
-          border-radius: 4px;
-      }
+            .page-item.active .page-link {
+                background: #007bff;
+                color: white;
+                border-color: #007bff;
+            }
 
-      .page-link:hover {
-          background: #e9ecef;
-      }
+            /* Empty State */
+            .empty-state {
+                text-align: center;
+                padding: 50px;
+                color: #6c757d;
+            }
 
-      .page-item.active .page-link {
-          background: #007bff;
-          color: white;
-          border-color: #007bff;
-      }
+            /* Stats */
+            .stats {
+                margin-top: 20px;
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 5px;
+                text-align: center;
+                color: #6c757d;
+            }
+            .table-mota{
+                width: 180px;
+            }
+            .quantity{
+                text-align: center
+            }
 
-      /* Empty State */
-      .empty-state {
-          text-align: center;
-          padding: 50px;
-          color: #6c757d;
-      }
+            /* Responsive */
+            @media (max-width: 768px) {
+                .container {
+                    padding: 15px;
+                }
 
-      /* Stats */
-      .stats {
-          margin-top: 20px;
-          padding: 15px;
-          background: #f8f9fa;
-          border-radius: 5px;
-          text-align: center;
-          color: #6c757d;
-      }
+                .toolbar {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
 
-      /* Responsive */
-      @media (max-width: 768px) {
-          .container {
-              padding: 15px;
-          }
-          
-          .toolbar {
-              flex-direction: column;
-              align-items: stretch;
-          }
-          
-          .nav-buttons {
-              flex-direction: column;
-          }
-          
-          .table-container {
-              overflow-x: auto;
-          }
-          
-          .action-buttons {
-              flex-direction: column;
-          }
-      }
-  </style>
-</head>
-<body>
-  <div class="container">
-      <div class="page-header">
-          <h1 class="page-title">Quản lý danh mục</h1>
-      </div>
+                .nav-buttons {
+                    flex-direction: column;
+                }
 
-      <!-- Navigation Buttons -->
-      <div class="nav-buttons">
-          <a href="${pageContext.request.contextPath}/category/list" class="btn btn-info">← Quay lại</a>
-      </div>
+                .table-container {
+                    overflow-x: auto;
+                }
 
-      <!-- Thông báo -->
-      <c:if test="${not empty message}">
-          <div class="alert alert-success">
-              ${message}
-              <button type="button" class="alert-close" onclick="this.parentElement.style.display='none'">&times;</button>
-          </div>
-      </c:if>
+                .action-buttons {
+                    flex-direction: column;
+                }
+            }
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
 
-      <c:if test="${not empty error}">
-          <div class="alert alert-danger">
-              ${error}
-              <button type="button" class="alert-close" onclick="this.parentElement.style.display='none'">&times;</button>
-          </div>
-      </c:if>
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
+            
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .header-user {
+                display: flex;
+                align-items: center;
+            }
+            .label {
+                color: #888;
+                width: 120px;
+            }
+            .logout-btn {
+                background: red;
+                color: #fff;
+                border: #007BFF;
+                padding: 8px 16px;
+                border-radius: 4px;
+                cursor: pointer;
+                text-decoration: none;
+            }
+            .logout-btn:hover {
+                background: orange;
+            }
+            .page-title {
+                color: #3f51b5;
+                font-size: 2rem;
+                margin-bottom: 10px;
 
-      <!-- Thanh công cụ -->
-      <div class="toolbar">
-          <a href="${pageContext.request.contextPath}/category-parent/create" class="btn btn-primary">Thêm danh mục</a>
-          <form method="get" class="search-form">
-              <input type="text" name="search" class="form-input" 
-                     placeholder="Tìm kiếm..." value="${searchKeyword}">
-              <button type="submit" class="btn btn-secondary">Tìm kiếm</button>
-          </form>
-      </div>
+            }
+        </style>
+    </head>
+    <body>
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">                             
+                <div class="header">
+                    <h1 class="page-title">Quản lý danh mục</h1>
+                    <div class="header-user">
+                        <label class="label"><%= user.getFullname()%></label>
+                        <a href="logout" class="logout-btn">Đăng xuất</a>
+                    </div>
+                </div>
 
-      <!-- Bảng danh sách -->
-      <div class="table-container">
-          <c:choose>
-              <c:when test="${not empty categoryParents}">
-                  <table class="table">
-                      <thead>
-                          <tr>
-                              <th>
-                                  <a href="?sortField=id&sortDir=${sortField eq 'id' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
-                                      ID ${sortField eq 'id' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
-                                  </a>
-                              </th>
-                              <th>
-                                  <a href="?sortField=name&sortDir=${sortField eq 'name' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
-                                      Tên ${sortField eq 'name' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
-                                  </a>
-                              </th>
-                              <th>Mô tả</th>
-                              <th>Trạng thái</th>
-                              <th>Số danh mục loại sản phẩm</th>
-                              <th>Thao tác</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          <c:forEach var="category" items="${categoryParents}">
-                              <tr>
-                                  <td>#${category.id}</td>
-                                  <td>${category.name}</td>
-                                  <td>${category.description}</td>
-                                  <td>
-                                      <span class="badge ${category.activeFlag ? 'badge-success' : 'badge-secondary'}" 
-                                            id="status-${category.id}">
-                                          ${category.activeFlag ? 'Hoạt động' : 'Không hoạt động'}
-                                      </span>
-                                  </td>
-                                  <td><span class="badge badge-info">${category.childCount}</span></td>
-                                  <td>
-                                      <div class="action-buttons">
-                                          <a href="${pageContext.request.contextPath}/category-parent/edit?id=${category.id}" 
-                                             class="btn btn-warning btn-sm">Sửa</a>
-                                          <button onclick="toggleStatus(${category.id})" 
-                                                  class="btn btn-secondary btn-sm">Đổi trạng thái</button>
-                                          <a href="${pageContext.request.contextPath}/category-parent/delete?id=${category.id}" 
-                                             class="btn btn-danger btn-sm" 
-                                             onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
-                                      </div>
-                                  </td>
-                              </tr>
-                          </c:forEach>
-                      </tbody>
-                  </table>
-              </c:when>
-              <c:otherwise>
-                  <div class="empty-state">
-                      <h3>Không có danh mục nào</h3>
-                      <p>Hãy thêm danh mục đầu tiên của bạn</p>
-                      <a href="${pageContext.request.contextPath}/category-parent/create" class="btn btn-primary">Thêm danh mục cha</a>
-                  </div>
-              </c:otherwise>
-          </c:choose>
-      </div>
+                <!-- Navigation Buttons -->
+                <div class="nav-buttons">
+                    <a href="${pageContext.request.contextPath}/category/list" class="btn btn-info">← Quay lại trang trước</a>
+                </div>
 
-      <!-- Phân trang -->
-      <c:if test="${totalPages > 1}">
-          <div class="pagination-container">
-              <ul class="pagination">
-                  <c:if test="${currentPage > 1}">
-                      <li class="page-item">
-                          <a class="page-link" href="?page=${currentPage-1}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">Trước</a>
-                      </li>
-                  </c:if>
+                <!-- Thông báo -->
+                <c:if test="${not empty successMessage}">
+                    <div class="alert alert-success">
+                        ${successMessage}
+                        <button type="button" class="alert-close" onclick="this.parentElement.style.display = 'none'">&times;</button>
+                    </div>
+                </c:if>
 
-                  <c:forEach begin="${startPage}" end="${endPage}" var="i">
-                      <li class="page-item ${i eq currentPage ? 'active' : ''}">
-                          <a class="page-link" href="?page=${i}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">${i}</a>
-                      </li>
-                  </c:forEach>
+                <c:if test="${not empty errorMessage}">
+                    <div class="alert alert-danger">
+                        ${errorMessage}
+                        <button type="button" class="alert-close" onclick="this.parentElement.style.display = 'none'">&times;</button>
+                    </div>
+                </c:if>
 
-                  <c:if test="${currentPage < totalPages}">
-                      <li class="page-item">
-                          <a class="page-link" href="?page=${currentPage+1}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">Sau</a>
-                      </li>
-                  </c:if>
-              </ul>
-          </div>
-      </c:if>
 
-      <!-- Thống kê -->
-      <div class="stats">
-          Hiển thị ${(currentPage-1)*pageSize + 1} - ${currentPage*pageSize > totalCategoryParents ? totalCategoryParents : currentPage*pageSize} 
-          trong tổng số ${totalCategoryParents} danh mục cha
-      </div>
-  </div>
+                <!-- Thanh công cụ -->
+                <div class="toolbar">
+                    <a href="${pageContext.request.contextPath}/category-parent/create" class="btn btn-primary">+ Thêm danh mục</a>
+                    <form method="get" class="search-form">
+                        <input type="text" name="search" class="form-input" 
+                               placeholder="Tìm kiếm..." value="${searchKeyword}">
+                        <button type="submit" class="btn btn-secondary">Tìm kiếm</button>
+                    </form>
+                </div>
 
-  <script>
-  function toggleStatus(id) {
-    fetch('${pageContext.request.contextPath}/category-parent/toggle-status?id=' + id, {
-        method: 'GET'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const statusElement = document.getElementById('status-' + id);
-            statusElement.textContent = data.newStatus;
-            statusElement.className = 'badge ' + (data.statusClass === 'badge-success' ? 'badge-success' : 'badge-secondary');
-        } else {
-            alert('Lỗi: ' + data.message);
-        }
-    })
-    .catch(error => {
-        alert('Có lỗi xảy ra khi cập nhật trạng thái');
-    });
-  }
-  </script>
-</body>
+                <!-- Bảng danh sách -->
+                <div class="table-container">
+                    <c:choose>
+                        <c:when test="${not empty categoryParents}">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <a href="?sortField=id&sortDir=${sortField eq 'id' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                                ID ${sortField eq 'id' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="?sortField=name&sortDir=${sortField eq 'name' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                                Tên ${sortField eq 'name' ? (sortDir eq 'asc' ? '↑' : '↓') : ''}
+                                            </a>
+                                        </th>
+                                        <th class="table-mota">Mô tả</th>
+                                        <th>Trạng thái</th>
+                                        <th>Số danh mục loại sản phẩm</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="category" items="${categoryParents}">
+                                        <tr>
+                                            <td>#${category.id}</td>
+                                            <td>${category.name}</td>
+                                            <td>${category.description}</td>
+                                            <td>
+                                                <span class="badge ${category.activeFlag ? 'badge-success' : 'badge-secondary'}" 
+                                                      id="status-${category.id}">
+                                                    ${category.activeFlag ? 'Hoạt động' : 'Không hoạt động'}
+                                                </span>
+                                            </td>
+                                            <td class="quantity"><span class="badge badge-info">${category.childCount}</span></td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a href="${pageContext.request.contextPath}/category-parent/edit?id=${category.id}" 
+                                                       class="btn btn-warning btn-sm">Sửa</a>
+                                                    <a href="${pageContext.request.contextPath}/category-parent/delete?id=${category.id}" 
+                                                       class="btn btn-danger btn-sm" 
+                                                       onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="empty-state">
+                                <h3>Không có danh mục nào</h3>
+                                <p>Hãy thêm danh mục đầu tiên của bạn</p>
+                                <a href="${pageContext.request.contextPath}/category-parent/create" class="btn btn-primary">Thêm danh mục </a>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+
+                <!-- Phân trang -->
+                <c:if test="${totalPages > 1}">
+                    <div class="pagination-container">
+                        <ul class="pagination">
+                            <c:if test="${currentPage > 1}">
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=${currentPage-1}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">Trước</a>
+                                </li>
+                            </c:if>
+
+                            <c:forEach begin="${startPage}" end="${endPage}" var="i">
+                                <li class="page-item ${i eq currentPage ? 'active' : ''}">
+                                    <a class="page-link" href="?page=${i}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">${i}</a>
+                                </li>
+                            </c:forEach>
+
+                            <c:if test="${currentPage < totalPages}">
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=${currentPage+1}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">Sau</a>
+                                </li>
+                            </c:if>
+                        </ul>
+                    </div>
+                </c:if>
+            </div>
+        </div>
+
+        <script>
+            function toggleStatus(id) {
+                fetch('${pageContext.request.contextPath}/category-parent/toggle-status?id=' + id, {
+                    method: 'GET'
+                })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const statusElement = document.getElementById('status-' + id);
+                                statusElement.textContent = data.newStatus;
+                                statusElement.className = 'badge ' + (data.statusClass === 'badge-success' ? 'badge-success' : 'badge-secondary');
+                            } else {
+                                alert('Lỗi: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            alert('Có lỗi xảy ra khi cập nhật trạng thái');
+                        });
+            }
+        </script>
+    </body>
 </html>

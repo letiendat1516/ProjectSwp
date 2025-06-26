@@ -104,9 +104,22 @@
                 margin-bottom: 13px;
                 text-align: center;
             }
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
         </style>
     </head>
     <body>
+        <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
         <div class="edit-container">
             <h2>Edit Profile</h2>
             <c:if test="${not empty error}">
@@ -140,6 +153,7 @@
             </form>
             <a href="profile" class="back-link">Back to Profile</a>
             <a href="<%= homePage %>" class="back-link">Back</a>
+        </div>
         </div>
     </body>
 </html>

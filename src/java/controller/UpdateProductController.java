@@ -1,5 +1,7 @@
 package controller;
 
+// Controller for updating product information
+
 import dao.ProductInfoDAO;
 import model.CategoryProduct;
 import model.ProductInfo;
@@ -29,7 +31,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     // Check user authentication and authorization
     HttpSession session = request.getSession();
     Users user = (Users) session.getAttribute("user");
-    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
+    if (user == null) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -164,7 +166,6 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         String description = request.getParameter("description");
         String expirationDateStr = request.getParameter("expirationDate");
         String storageLocation = request.getParameter("storageLocation");
-        String imageUrl = request.getParameter("imageUrl");
         String additionalNotes = request.getParameter("additionalNotes");
           // Basic validation
         if (name == null || name.trim().isEmpty()) {
@@ -187,7 +188,6 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         product.setStatus(status != null ? status : "active");
         product.setDescription(description != null ? description.trim() : "");
         product.setStorageLocation(storageLocation != null ? storageLocation.trim() : "");
-        product.setImageUrl(imageUrl != null ? imageUrl.trim() : "");
         product.setAdditionalNotes(additionalNotes != null ? additionalNotes.trim() : "");
         product.setUpdatedBy(userId);
         

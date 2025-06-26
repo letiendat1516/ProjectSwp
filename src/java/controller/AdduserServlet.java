@@ -100,11 +100,10 @@ public class AdduserServlet extends HttpServlet {
             return;
         }
         user.setDob(dob); // Đặt giá trị ngày sinh
-
         if (dob != null) {
-            java.time.LocalDate birthDate = dob.toLocalDate();
-            java.time.LocalDate today = java.time.LocalDate.now();
-            int age = java.time.Period.between(birthDate, today).getYears();
+        java.time.LocalDate birthDate = dob.toLocalDate();
+        java.time.LocalDate today = java.time.LocalDate.now();
+        int age = java.time.Period.between(birthDate, today).getYears();
 
             if (age < 18 || age > 60) {
                 request.setAttribute("error", "Tuổi người dùng phải từ 18 đến 60!");
@@ -112,6 +111,7 @@ public class AdduserServlet extends HttpServlet {
                 return;
             }
         }
+
         user.setActiveFlag(activeFlag);
 
         try {

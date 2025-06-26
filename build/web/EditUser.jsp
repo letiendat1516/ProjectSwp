@@ -26,7 +26,7 @@ if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
 
 <html>
     <head>
-        <title>Edit User</title>
+        <title>Sửa đổi thông tin người dùng</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -116,7 +116,7 @@ if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
     </head>
     <body>
         <div class="form-container">
-            <h2>Edit User</h2>
+            <h2>Sửa đổi thông tin người dùng</h2>
 
             <c:if test="${not empty error}">
                 <div class="error-message">${error}</div>
@@ -135,11 +135,11 @@ if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
                         <td class="input"><input type="text" id="username" name="username" value="${editUser.username}" required></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="password">Password:</label></td>
+                        <td class="label"><label for="password">Mật khẩu:</label></td>
                         <td class="input"><input type="text" id="password" name="password" value="${editUser.password}" required></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="fullname">Full Name:</label></td>
+                        <td class="label"><label for="fullname">Họ và Tên:</label></td>
                         <td class="input"><input type="text" id="fullname" name="fullname" value="${editUser.fullname}" required></td>
                     </tr>
                     <tr>
@@ -150,43 +150,41 @@ if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
                         </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="phone">Phone:</label></td>
+                        <td class="label"><label for="phone">SĐT:</label></td>
                         <td class="input"><input type="text" id="phone" name="phone" value="${editUser.phone}" 
                                                  required pattern="^[0-9]{10}$"
                                                  title="Số điện thoại chỉ được chứa chữ số">
                         </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="dob">Date of Birth:</label></td>
+                        <td class="label"><label for="dob">Sinh nhật:</label></td>
                         <td class="input"><input type="date" id="dob" name="dob" value="${editUser.dob}" required></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="role">Role:</label></td>
+                        <td class="label"><label for="role">Vai trò:</label></td>
                         <td class="input">
                             <div class="row-flex">
                                 <div>
                                     <select id="role" name="role" required>
                                         <option value="">-- Select Role --</option>
-                                        <option value="2" ${editUser.roleName == 'Warehouse Staff' ? 'selected' : ''}>Warehouse Staff</option>
-                                        <option value="3" ${editUser.roleName == 'Company Employee' ? 'selected' : ''}>Company Employee</option>
-                                        <option value="4" ${editUser.roleName == 'Company Director' ? 'selected' : ''}>Company Director</option>
+                                        <option value="2" ${editUser.roleName == 'Warehouse Staff' ? 'selected' : ''}>Nhân viên kho</option>
+                                        <option value="3" ${editUser.roleName == 'Company Employee' ? 'selected' : ''}>Nhân viên công ty</option>
+                                        <option value="4" ${editUser.roleName == 'Company Director' ? 'selected' : ''}>Giám đốc</option>
                                     </select>
                                 </div>
                                 <div>
                                     <select id="activeFlag" name="activeFlag" required>
-                                        <option value="1" ${editUser.activeFlag == 1 ? 'selected' : ''}>Active</option>
-                                        <option value="0" ${editUser.activeFlag == 0 ? 'selected' : ''}>Inactive</option>
+                                        <option value="1" ${editUser.activeFlag == 1 ? 'selected' : ''}>Hoạt động</option>
+                                        <option value="0" ${editUser.activeFlag == 0 ? 'selected' : ''}>Không hoạt động</option>
                                     </select>
                                 </div>
                             </div>
                         </td>
                     </tr>
                 </table>
-                <button type="submit" class="btn-submit">Update User</button>
+                <button type="submit" class="btn-submit">Cập nhật thông tin</button>
             </form>
-            <a href="usermanager" class="back-link">Back to User List</a>
+            <a href="usermanager" class="back-link">Quay lại danh sách người dùng</a>
         </div>
     </body>
 </html>
-
-

@@ -489,4 +489,10 @@ public class UserDAO extends Context {
 
         return dob;
     }
+    
+    public static void main(String[] args) {
+        UserDAO ud = new UserDAO();
+        Users u = ud.login("admin", "123");
+        System.out.println(u.getId());
+    }
 }

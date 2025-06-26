@@ -8,84 +8,122 @@ import DBContext.Context;
 import java.sql.*;
 import java.util.Date;
 
-/**
- *
- * @author Admin
- */
 public class RequestInformationDAO {
 
-   public String addRequestInformationIntoDB(int user_id, String role, Date day_request,
-        String status, String reason, String supplier, String address, String phone, String email) {
-    String generatedId = null;
+    public String addRequestInformationIntoDB(int user_id, String role, Date day_request,
+            String status, String reason, String supplier, String address, String phone, String email) {
 
-    String insertSql = "INSERT INTO request (user_id, role, day_request, status, reason, supplier, address, phone, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    String selectSql = "SELECT id FROM request WHERE user_id = ? AND role = ? AND day_request = ? AND status = ? AND reason = ? AND supplier = ? AND address = ? AND phone = ? AND email = ? ORDER BY id DESC LIMIT 1";
+        String insertSql = "INSERT INTO request (id, user_id, role, day_request, status, reason, supplier, address, phone, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    try (
-        Connection con = Context.getJDBCConnection();
-        PreparedStatement insertStmt = con.prepareStatement(insertSql);
-        PreparedStatement selectStmt = con.prepareStatement(selectSql)
-    ) {
-        // B1: Insert
-        insertStmt.setInt(1, user_id);
-        insertStmt.setString(2, role);
-        insertStmt.setDate(3, new java.sql.Date(day_request.getTime()));
-        insertStmt.setString(4, status);
-        insertStmt.setString(5, reason);
-        insertStmt.setString(6, supplier);
-        insertStmt.setString(7, address);
-        insertStmt.setString(8, phone);
-        insertStmt.setString(9, email);
-        insertStmt.executeUpdate();
+        try (Connection con = Context.getJDBCConnection(); PreparedStatement insertStmt = con.prepareStatement(insertSql)) {
 
-        // B2: Truy lại ID vừa chèn
-        selectStmt.setInt(1, user_id);
-        selectStmt.setString(2, role);
-        selectStmt.setDate(3, new java.sql.Date(day_request.getTime()));
-        selectStmt.setString(4, status);
-        selectStmt.setString(5, reason);
-        selectStmt.setString(6, supplier);
-        selectStmt.setString(7, address);
-        selectStmt.setString(8, phone);
-        selectStmt.setString(9, email);
+            // Tạo ID trước
+            String nextId = getNextRequestId();
+            System.out.println("Generated ID: " + nextId);
 
-        ResultSet rs = selectStmt.executeQuery();
-        if (rs.next()) {
-            generatedId = rs.getString("id");
+            insertStmt.setString(1, nextId);
+            insertStmt.setInt(2, user_id);
+            insertStmt.setString(3, role);
+            insertStmt.setDate(4, new java.sql.Date(day_request.getTime()));
+            insertStmt.setString(5, status);
+            insertStmt.setString(6, reason);
+            insertStmt.setString(7, supplier);
+            insertStmt.setString(8, address);
+            insertStmt.setString(9, phone);
+            insertStmt.setString(10, email);
+
+            int result = insertStmt.executeUpdate();
+            System.out.println("Request insert result: " + result);
+
+            if (result > 0) {
+                return nextId;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ SQL Error in addRequestInformationIntoDB: " + e.getMessage());
+            e.printStackTrace();
         }
 
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return null;
     }
 
-    return generatedId;
-}
-
-
+    /**
+     * Tự động tạo ID tiếp theo cho request theo format: NK{số}-{số thứ tự}
+     */
     public String getNextRequestId() {
+        // Query lấy ID cuối cùng có format NK{số}-{3 chữ số}
         String sql = "SELECT id FROM request WHERE id LIKE 'NK%-___' ORDER BY id DESC LIMIT 1";
-        try (Connection con = Context.getJDBCConnection();
-             PreparedStatement stmt = con.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+
+        try (Connection con = Context.getJDBCConnection(); PreparedStatement stmt = con.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             if (!rs.next()) {
+                // Nếu chưa có record nào, bắt đầu từ NK1-000
                 return "NK1-000";
             } else {
+                // Parse ID cuối cùng để tạo ID tiếp theo
                 String lastId = rs.getString("id");
-                String prefix = lastId.split("-")[0]; // NK1
-                int num = Integer.parseInt(lastId.split("-")[1]); // 003
+                String prefix = lastId.split("-")[0]; // Ví dụ: "NK1"
+                int num = Integer.parseInt(lastId.split("-")[1]); // Ví dụ: 003
 
                 if (num < 999) {
+                    // Nếu chưa đến 999, tăng số thứ tự
                     num++;
-                    return prefix + "-" + String.format("%03d", num);
-} else {
-                    int prefixNum = Integer.parseInt(prefix.substring(2)) + 1;
-                    return "NK" + prefixNum + "-000";
+                    return prefix + "-" + String.format("%03d", num); // NK1-004
+                } else {
+                    // Nếu đã đến 999, chuyển sang prefix tiếp theo
+                    int prefixNum = Integer.parseInt(prefix.substring(2)) + 1; // NK1 -> 1 -> 2
+                    return "NK" + prefixNum + "-000"; // NK2-000
                 }
             }
 
         } catch (Exception e) {
+            e.printStackTrace(); // Nên có error handling
         }
         return null;
     }
+                                                                        
+    public boolean addItemsIntoDB(String request_id, String[] productNameArr,
+            String[] productCodeArr, String[] unitArr, int[] quantityArr,
+            String[] noteArr, String reasonDetail) {
+
+        String sql = "INSERT INTO request_items (request_id, product_name, product_code, unit, quantity, note, reason_detail) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection con = Context.getJDBCConnection(); PreparedStatement stmt = con.prepareStatement(sql)) {
+
+            System.out.println("=== SAVING REQUEST ITEMS ===");
+            System.out.println("Request ID: " + request_id);
+            System.out.println("Number of items: " + productNameArr.length);
+
+            for (int i = 0; i < productNameArr.length; i++) {
+                // Kiểm tra dữ liệu trước khi insert
+                if (productNameArr[i] == null || productNameArr[i].trim().isEmpty()) {
+                    System.out.println("Skipping empty product at index " + i);
+                    continue;
+                }
+
+                stmt.setString(1, request_id);
+                stmt.setString(2, productNameArr[i]);
+                stmt.setString(3, productCodeArr[i]);
+                stmt.setString(4, unitArr[i]);
+                stmt.setInt(5, quantityArr[i]); // ✅ Dùng setDouble thay vì setInt
+                stmt.setString(6, noteArr[i]);
+                stmt.setString(7, reasonDetail);
+
+                System.out.println("Inserting item " + (i + 1) + ": " + productNameArr[i]
+                        + " - Code: " + productCodeArr[i] + " - Qty: " + quantityArr[i]);
+
+                int result = stmt.executeUpdate();
+                System.out.println("Insert result: " + result);
+            }
+
+            System.out.println("✅ All items saved successfully!");
+            return true;
+
+        } catch (SQLException e) {
+            System.err.println("❌ SQL Error: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

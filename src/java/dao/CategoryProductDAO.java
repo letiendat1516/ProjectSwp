@@ -1,236 +1,234 @@
-package dao;
+    package dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import model.CategoryProduct;
-import model.CategoryProductParent;
-import DBContext.Context;
+    import java.sql.Connection;
+    import java.sql.PreparedStatement;
+    import java.sql.ResultSet;
+    import java.sql.SQLException;
+    import java.util.ArrayList;
+    import java.util.List;
+    import model.CategoryProduct;
+    import model.CategoryProductParent;
+    import DBContext.Context;
 
-public class CategoryProductDAO {
+    public class CategoryProductDAO {
+    private CategoryParentDAO parentDAO;
 
-    private Connection conn = null;
-    private PreparedStatement ps = null;
-    private ResultSet rs = null;
-    private CategoryParentDAO categoryParentDAO = new CategoryParentDAO();
+    public CategoryProductDAO() {
+        this.parentDAO = new CategoryParentDAO();
+    }
 
-    // Lấy danh sách danh mục có phân trang, tìm kiếm và sắp xếp (với thông tin parent)
-    public List<CategoryProduct> getAllCategoriesWithParent(int page, int pageSize, String searchKeyword, String sortField, String sortDir) {
-        List<CategoryProduct> list = new ArrayList<>();
-        StringBuilder query = new StringBuilder(
-                "SELECT c.*, cp.name as parent_name "
-                + "FROM category c "
-                + "LEFT JOIN category_parent cp ON c.parent_id = cp.id "
-                + "WHERE 1=1"
+    // Get categories with parent info (paginated, searchable, sortable)
+    public List<CategoryProduct> getAllCategoriesWithParent(int page, int pageSize, 
+            String searchKeyword, String sortField, String sortDir) {
+
+        List<CategoryProduct> categories = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT c.id, c.name, c.parent_id, c.active_flag, cp.name as parent_name " +
+            "FROM category c LEFT JOIN category_parent cp ON c.parent_id = cp.id WHERE 1=1"
         );
 
+        List<Object> params = new ArrayList<>();
+
+        // Add search condition - simple lowercase comparison
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            query.append(" AND c.name LIKE ?");
+            sql.append(" AND LOWER(c.name) LIKE LOWER(?)");
+            params.add("%" + searchKeyword.trim() + "%");
         }
 
-        // Thêm phần sắp xếp
-        if (sortField != null && !sortField.trim().isEmpty()) {
-            String validSortField = "c.id";
-            if ("name".equalsIgnoreCase(sortField)) {
-                validSortField = "c.name";
-            } else if ("parent_name".equalsIgnoreCase(sortField)) {
-                validSortField = "cp.name";
-            }
+        // Add sorting
+        sql.append(" ORDER BY ").append(getSortField(sortField)).append(" ")
+           .append(getSortDirection(sortDir));
 
-            String validSortDir = "desc".equalsIgnoreCase(sortDir) ? "desc" : "asc";
-            query.append(" ORDER BY ").append(validSortField).append(" ").append(validSortDir);
-        } else {
-            query.append(" ORDER BY c.id ASC");
-        }
+        // Add pagination
+        sql.append(" LIMIT ?, ?");
+        params.add((page - 1) * pageSize);
+        params.add(pageSize);
 
-        query.append(" LIMIT ?, ?");
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query.toString());
+            setParameters(ps, params);
 
-            int paramIndex = 1;
-            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                ps.setString(paramIndex++, "%" + searchKeyword + "%");
-            }
-
-            ps.setInt(paramIndex++, (page - 1) * pageSize);
-            ps.setInt(paramIndex, pageSize);
-
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                CategoryProduct category = new CategoryProduct();
-                category.setId(rs.getInt("id"));
-                category.setName(rs.getString("name"));
-                category.setParentId(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setActiveFlag(rs.getBoolean("active_flag"));
-                // ✅ ĐÃ SỬA: Set parentName từ JOIN
-                category.setParentName(rs.getString("parent_name"));
-                list.add(category);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    categories.add(mapResultSetToCategory(rs, true));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            closeResources();
         }
-        return list;
+
+        return categories;
     }
 
-    // Lấy danh sách danh mục có phân trang, tìm kiếm và sắp xếp (không có parent info)
-    public List<CategoryProduct> getAllCategories(int page, int pageSize, String searchKeyword, String sortField, String sortDir) {
-        List<CategoryProduct> list = new ArrayList<>();
-        StringBuilder query = new StringBuilder("SELECT * FROM category WHERE 1=1");
+    // Get categories without parent info (for backward compatibility)
+    public List<CategoryProduct> getAllCategories(int page, int pageSize, 
+            String searchKeyword, String sortField, String sortDir) {
 
+        List<CategoryProduct> categories = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM category WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        // Add search condition - simple lowercase comparison
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            query.append(" AND name LIKE ?");
+            sql.append(" AND LOWER(name) LIKE LOWER(?)");
+            params.add("%" + searchKeyword.trim() + "%");
         }
 
-        // Thêm phần sắp xếp
-        if (sortField != null && !sortField.trim().isEmpty()) {
-            String validSortField = "id";
-            if ("name".equalsIgnoreCase(sortField)) {
-                validSortField = "name";
-            }
+        sql.append(" ORDER BY ").append(getSortFieldSimple(sortField)).append(" ")
+           .append(getSortDirection(sortDir))
+           .append(" LIMIT ?, ?");
 
-            String validSortDir = "desc".equalsIgnoreCase(sortDir) ? "desc" : "asc";
-            query.append(" ORDER BY ").append(validSortField).append(" ").append(validSortDir);
-        } else {
-            query.append(" ORDER BY id ASC");
-        }
+        params.add((page - 1) * pageSize);
+        params.add(pageSize);
 
-        query.append(" LIMIT ?, ?");
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query.toString());
+            setParameters(ps, params);
 
-            int paramIndex = 1;
-            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                ps.setString(paramIndex++, "%" + searchKeyword + "%");
-            }
-
-            ps.setInt(paramIndex++, (page - 1) * pageSize);
-            ps.setInt(paramIndex, pageSize);
-
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                CategoryProduct category = new CategoryProduct();
-                category.setId(rs.getInt("id"));
-                category.setName(rs.getString("name"));
-                category.setParentId(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setActiveFlag(rs.getBoolean("active_flag"));
-                list.add(category);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    categories.add(mapResultSetToCategory(rs, false));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            closeResources();
         }
-        return list;
+
+        return categories;
     }
 
-    // Phương thức overload để tương thích ngược
+    // Overloaded method for backward compatibility
     public List<CategoryProduct> getAllCategories(int page, int pageSize, String searchKeyword) {
         return getAllCategories(page, pageSize, searchKeyword, "id", "asc");
     }
 
-    // Đếm tổng số danh mục (dùng cho phân trang)
+    // Count categories for pagination
     public int countCategories(String searchKeyword) {
-        int count = 0;
-        String query = "SELECT COUNT(*) FROM category WHERE 1=1";
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM category WHERE 1=1");
+        List<Object> params = new ArrayList<>();
 
+        // Add search condition - simple lowercase comparison
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            query += " AND name LIKE ?";
+            sql.append(" AND LOWER(name) LIKE LOWER(?)");
+            params.add("%" + searchKeyword.trim() + "%");
         }
 
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query);
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                ps.setString(1, "%" + searchKeyword + "%");
-            }
+            setParameters(ps, params);
 
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                count = rs.getInt(1);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            closeResources();
         }
-        return count;
+
+        return 0;
     }
 
-    // Lấy danh mục theo ID
+    // Get category by ID
     public CategoryProduct getCategoryById(int id) {
-        String query = "SELECT * FROM category WHERE id = ?";
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query);
+        String sql = "SELECT * FROM category WHERE id = ?";
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, id);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                CategoryProduct category = new CategoryProduct();
-                category.setId(rs.getInt("id"));
-                category.setName(rs.getString("name"));
-                category.setParentId(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setActiveFlag(rs.getBoolean("active_flag"));
-                return category;
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToCategory(rs, false);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            closeResources();
         }
+
         return null;
     }
 
-    // ✅ THÊM METHOD MỚI: Lấy danh mục theo ID với thông tin parent
+    // Get category with parent info by ID
     public CategoryProduct getCategoryWithParentById(int id) {
-        String query = "SELECT c.*, cp.name as parent_name " +
-                       "FROM category c " +
-                       "LEFT JOIN category_parent cp ON c.parent_id = cp.id " +
-                       "WHERE c.id = ?";
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query);
+        String sql = "SELECT c.id, c.name, c.parent_id, c.active_flag, cp.name as parent_name " +
+                    "FROM category c LEFT JOIN category_parent cp ON c.parent_id = cp.id " +
+                    "WHERE c.id = ?";
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, id);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                CategoryProduct category = new CategoryProduct();
-                category.setId(rs.getInt("id"));
-                category.setName(rs.getString("name"));
-                category.setParentId(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setActiveFlag(rs.getBoolean("active_flag"));
-                category.setParentName(rs.getString("parent_name"));
-                return category;
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToCategory(rs, true);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            closeResources();
         }
+
         return null;
     }
 
-    // Thêm danh mục mới (với validation parent_id)
-    public boolean addCategory(CategoryProduct category) {
-        // Validate parent_id trước khi thêm
-        if (!isValidParentId(category.getParentId())) {
-            System.out.println("Invalid parent_id: " + category.getParentId());
+    // Check if category name exists (for duplicate prevention)
+    public boolean isCategoryNameExists(String name, Integer excludeId) {
+        if (name == null || name.trim().isEmpty()) {
             return false;
         }
 
-        String query = "INSERT INTO category (name, parent_id, active_flag) VALUES (?, ?, ?)";
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query);
-            ps.setString(1, category.getName());
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM category WHERE LOWER(name) = LOWER(?)");
+
+        if (excludeId != null) {
+            sql.append(" AND id != ?");
+        }
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            ps.setString(1, name.trim());
+            if (excludeId != null) {
+                ps.setInt(2, excludeId);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // Overloaded method for backward compatibility
+    public boolean isCategoryNameExists(String name) {
+        return isCategoryNameExists(name, null);
+    }
+
+    // Add category
+    public boolean addCategory(CategoryProduct category) {
+        if (category == null || category.getName() == null || category.getName().trim().isEmpty()) {
+            return false;
+        }
+
+        // Check for duplicate name
+        if (isCategoryNameExists(category.getName())) {
+            System.out.println("Category name already exists: " + category.getName());
+            return false;
+        }
+
+        String sql = "INSERT INTO category (name, parent_id, active_flag) VALUES (?, ?, ?)";
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, category.getName().trim());
             if (category.getParentId() != null) {
                 ps.setInt(2, category.getParentId());
             } else {
@@ -238,29 +236,32 @@ public class CategoryProductDAO {
             }
             ps.setBoolean(3, category.isActiveFlag());
 
-            int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
+            return ps.executeUpdate() > 0;
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
-        } finally {
-            closeResources();
         }
     }
 
-    // Cập nhật danh mục (với validation parent_id)
+    // Update category
     public boolean updateCategory(CategoryProduct category) {
-        // Validate parent_id trước khi update
-        if (!isValidParentId(category.getParentId())) {
-            System.out.println("Invalid parent_id: " + category.getParentId());
+        if (category == null || category.getName() == null || category.getName().trim().isEmpty()) {
             return false;
         }
 
-        String query = "UPDATE category SET name = ?, parent_id = ?, active_flag = ? WHERE id = ?";
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query);
-            ps.setString(1, category.getName());
+        // Check for duplicate name (excluding current category)
+        if (isCategoryNameExists(category.getName(), category.getId())) {
+            System.out.println("Category name already exists: " + category.getName());
+            return false;
+        }
+
+        String sql = "UPDATE category SET name = ?, parent_id = ?, active_flag = ? WHERE id = ?";
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, category.getName().trim());
             if (category.getParentId() != null) {
                 ps.setInt(2, category.getParentId());
             } else {
@@ -269,172 +270,124 @@ public class CategoryProductDAO {
             ps.setBoolean(3, category.isActiveFlag());
             ps.setInt(4, category.getId());
 
-            int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
+            return ps.executeUpdate() > 0;
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
-        } finally {
-            closeResources();
         }
     }
 
-    // Xóa danh mục
+    // Delete category
     public boolean deleteCategory(int id) {
-        // Kiểm tra xem danh mục có được sử dụng làm parent_id không
-        if (isCategoryUsedAsParent(id)) {
-            System.out.println("Cannot delete category: it's being used as parent");
-            return false;
-        }
-        // Kiểm tra xem danh mục có được sử dụng trong bảng product_info không
-        if (isCategoryUsedInProduct(id)) {
-            System.out.println("Cannot delete category: it's being used in products");
-            return false;
-        }
+        String sql = "DELETE FROM category WHERE id = ?";
 
-        String query = "DELETE FROM category WHERE id = ?";
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query);
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
 
-            int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
-        } finally {
-            closeResources();
         }
     }
 
-    // Kiểm tra xem danh mục có được sử dụng làm parent_id không
-    private boolean isCategoryUsedAsParent(int id) {
-        String query = "SELECT COUNT(*) FROM category WHERE parent_id = ?";
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query);
-            ps.setInt(1, id);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeResources();
-        }
-        return false;
-    }
-
-    // Kiểm tra xem danh mục có được sử dụng trong bảng product_info không
-    private boolean isCategoryUsedInProduct(int id) {
-        String query = "SELECT COUNT(*) FROM product_info WHERE cate_id = ?";
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query);
-            ps.setInt(1, id);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeResources();
-        }
-        return false;
-    }
-
-    // Lấy tất cả danh mục (không phân trang) - dùng để hiển thị dropdown
+    // Get active categories for dropdown
     public List<CategoryProduct> getAllCategoriesForDropdown() {
-        List<CategoryProduct> list = new ArrayList<>();
-        String query = "SELECT * FROM category WHERE active_flag = 1 ORDER BY name";
+        List<CategoryProduct> categories = new ArrayList<>();
+        String sql = "SELECT * FROM category WHERE active_flag = 1 ORDER BY name";
 
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query);
-            rs = ps.executeQuery();
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
-                CategoryProduct category = new CategoryProduct();
-                category.setId(rs.getInt("id"));
-                category.setName(rs.getString("name"));
-                category.setParentId(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setActiveFlag(rs.getBoolean("active_flag"));
-                list.add(category);
+                categories.add(mapResultSetToCategory(rs, false));
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            closeResources();
         }
-        return list;
+
+        return categories;
     }
 
-    // Lấy danh sách danh mục cha cho dropdown
+    // Get parent categories for dropdown
     public List<CategoryProductParent> getCategoryParentsForDropdown() {
-        return categoryParentDAO.getAllCategoryParents();
+        return parentDAO.getAllCategoryParents();
     }
 
-    // Kiểm tra parent_id có hợp lệ không
-    public boolean isValidParentId(Integer parentId) {
-        if (parentId == null) {
-            return true; // NULL là hợp lệ
-        }
-        return categoryParentDAO.getCategoryParentById(parentId) != null;
-    }
-
-    // Lấy danh mục theo parent_id
+    // Get categories by parent ID
     public List<CategoryProduct> getCategoriesByParentId(Integer parentId) {
-        List<CategoryProduct> list = new ArrayList<>();
-        String query = "SELECT * FROM category WHERE parent_id ";
-        
-        if (parentId == null) {
-            query += "IS NULL";
-        } else {
-            query += "= ?";
-        }
-        query += " AND active_flag = 1 ORDER BY name";
+        List<CategoryProduct> categories = new ArrayList<>();
+        String sql = "SELECT * FROM category WHERE " + 
+                    (parentId == null ? "parent_id IS NULL" : "parent_id = ?") +
+                    " AND active_flag = 1 ORDER BY name";
 
-        try {
-            conn = new Context().getJDBCConnection();
-            ps = conn.prepareStatement(query);
-            
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             if (parentId != null) {
                 ps.setInt(1, parentId);
             }
-            
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                CategoryProduct category = new CategoryProduct();
-                category.setId(rs.getInt("id"));
-                category.setName(rs.getString("name"));
-                category.setParentId(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setActiveFlag(rs.getBoolean("active_flag"));
-                list.add(category);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    categories.add(mapResultSetToCategory(rs, false));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            closeResources();
         }
-        return list;
+
+        return categories;
     }
 
-    // Đóng các tài nguyên
-    private void closeResources() {
-        try {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    // Helper methods
+    private CategoryProduct mapResultSetToCategory(ResultSet rs, boolean includeParentName) 
+            throws SQLException {
+        CategoryProduct category = new CategoryProduct();
+        category.setId(rs.getInt("id"));
+        category.setName(rs.getString("name"));
+        category.setParentId(rs.getObject("parent_id", Integer.class));
+        category.setActiveFlag(rs.getBoolean("active_flag"));
+
+        if (includeParentName) {
+            category.setParentName(rs.getString("parent_name"));
+        }
+
+        return category;
+    }
+
+    private String getSortField(String sortField) {
+        if (sortField == null) return "c.id";
+
+        switch (sortField.toLowerCase()) {
+            case "name": return "c.name";
+            case "parent_name": return "cp.name";
+            case "active_flag": return "c.active_flag";
+            default: return "c.id";
         }
     }
-}
+
+    private String getSortFieldSimple(String sortField) {
+        if (sortField == null) return "id";
+
+        switch (sortField.toLowerCase()) {
+            case "name": return "name";
+            case "active_flag": return "active_flag";
+            default: return "id";
+        }
+    }
+
+    private String getSortDirection(String sortDir) {
+        return "desc".equalsIgnoreCase(sortDir) ? "DESC" : "ASC";
+    }
+
+    private void setParameters(PreparedStatement ps, List<Object> params) throws SQLException {
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
+    }
+    }

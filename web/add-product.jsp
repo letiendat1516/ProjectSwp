@@ -3,17 +3,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ page import="model.Users" session="true" %>
 <!DOCTYPE html>
-<%
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-    response.setHeader("Pragma", "no-cache");
-    response.setDateHeader("Expires", 0);
-    
-    Users user = (Users) session.getAttribute("user");
-    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
-%>
+
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -251,7 +241,6 @@
             <p>Nhập thông tin chi tiết để thêm sản phẩm vào hệ thống kho</p>
         </div>        <div class="nav-buttons">
             <a href="product-list" class="btn btn-primary">← Quay lại Danh Sách</a>
-            <a href="Admin.jsp" class="btn btn-secondary">🏠 Trang Admin</a>
         </div>
 
         <!-- Error/Success Messages -->
@@ -355,29 +344,7 @@
                         <div class="form-help">Để trống nếu sản phẩm không có hạn sử dụng</div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="storageLocation">Vị Trí Lưu Trữ</label>
-                        <select id="storageLocation" name="storageLocation" class="form-control">
-                            <option value="">-- Chọn vị trí lưu trữ --</option>
-                            <c:forEach var="location" items="${storageLocations}">
-                                <option value="${location}" 
-                                        ${formData.storageLocation[0] == location ? 'selected' : ''}>
-                                    ${location}
-                                </option>
-                            </c:forEach>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="imageUrl">URL Hình Ảnh</label>
-                        <input type="url" id="imageUrl" name="imageUrl" class="form-control" 
-                               value="${formData.imageUrl[0]}" placeholder="https://example.com/image.jpg">
-                        <div class="form-help">Link đến hình ảnh sản phẩm</div>
-                    </div>
-                </div>
-
-                <!-- Description and Notes -->
-                <div class="form-grid">
+                    <!-- Description and Notes moved inside the form-grid with full-width -->
                     <div class="form-group full-width">
                         <label class="form-label" for="description">Mô Tả Sản Phẩm</label>
                         <textarea id="description" name="description" class="form-control" 
@@ -410,32 +377,6 @@
         document.getElementById('code').addEventListener('input', function() {
             this.value = this.value.toUpperCase();
         });
-
-        // Image preview functionality
-        document.getElementById('imageUrl').addEventListener('input', function() {
-            const url = this.value;
-            const preview = document.getElementById('imagePreview');
-            
-            if (url && isValidUrl(url)) {
-                preview.src = url;
-                preview.style.display = 'block';
-                preview.onerror = function() {
-                    this.style.display = 'none';
-                };
-            } else {
-                preview.style.display = 'none';
-            }
-        });
-
-        function isValidUrl(string) {
-            try {
-                new URL(string);
-                return true;
-            } catch (_) {
-                return false;
-            }
-        }
-
         // Form validation
         document.querySelector('form').addEventListener('submit', function(e) {
             const requiredFields = document.querySelectorAll('[required]');

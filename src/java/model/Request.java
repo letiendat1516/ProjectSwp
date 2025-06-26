@@ -7,6 +7,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -27,12 +28,12 @@ public class Request {
     private String email;
     private String approve_by;
     private String warehouse;
-    private ArrayList<RequestItem> items;
+    private List<RequestItem> items;
 
     public Request() {
     }
 
-    public Request(String id, String fullname, int user_id, String role, Date day_request, String status, String reason, String supplier, String address, String phone, String email, String approve_by, String warehouse, ArrayList<RequestItem> items) {
+    public Request(String id, String fullname, int user_id, String role, Date day_request, String status, String reason, String supplier, String address, String phone, String email, String approve_by, String warehouse, List<RequestItem> items) {
         this.id = id;
         this.fullname = fullname;
         this.user_id = user_id;
@@ -153,14 +154,13 @@ public class Request {
         this.warehouse = warehouse;
     }
 
-    public ArrayList<RequestItem> getItems() {
+    public List<RequestItem> getItems() {
         return items;
     }
 
-    public void setItems(ArrayList<RequestItem> items) {
+    public void setItems(List<RequestItem> items) {
         this.items = items;
     }
 
    
-
 }

@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-package controller;
+package controller; // Controller for deleting a material unit
 
 import java.io.IOException;
 
@@ -22,11 +22,30 @@ public class DeleteMaterialUnitServlet extends HttpServlet {
     public void init() {
         materialUnitDAO = new MaterialUnitDAO();
     }
-    
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+      protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        materialUnitDAO.deleteMaterialUnit(id);
-        response.sendRedirect("/material_unit/materialUnit");
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            boolean success = materialUnitDAO.deleteMaterialUnit(id);
+            
+            if (success) {
+                request.getSession().setAttribute("successMessage", "Xóa đơn vị thành công!");
+            } else {
+                request.getSession().setAttribute("errorMessage", "Không thể xóa đơn vị. Vui lòng thử lại.");
+            }
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("errorMessage", "ID đơn vị không hợp lệ.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.getSession().setAttribute("errorMessage", "Có lỗi xảy ra khi xóa đơn vị.");
+        }
+        
+        response.sendRedirect("materialUnit");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        doGet(request, response);
     }
 }
