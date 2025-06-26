@@ -952,7 +952,7 @@
                 const quantityInputs = document.querySelectorAll('input[name^="importQty_"]');
                 quantityInputs.forEach(input => {
                     input.addEventListener('change', function () {
-                        const value = parseInt(this.value) || 0;
+                        const value = pdarseInt(this.value) || 0;
                         const max = parseInt(this.getAttribute('max')) || 0;
 
                         if (value > max) {
@@ -986,7 +986,7 @@
 
             // Add CSS animations
             const style = document.createElement('style');
-            style.textContent = `
+            style.textContent = `đáy đa
                 @keyframes slideInRight {
                     from {
                         transform: translateX(100%);
