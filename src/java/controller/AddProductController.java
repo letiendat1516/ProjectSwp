@@ -66,7 +66,6 @@ public class AddProductController extends HttpServlet {
             String description = request.getParameter("description");
             String supplierIdStr = request.getParameter("supplierId");
             String expirationDateStr = request.getParameter("expirationDate");
-            String storageLocation = request.getParameter("storageLocation");
             String additionalNotes = request.getParameter("additionalNotes");
             
             // Validate required fields
@@ -109,20 +108,20 @@ public class AddProductController extends HttpServlet {
                 product.setExpirationDate(new Date(parsedDate.getTime()));
             }
             
-            if (storageLocation != null && !storageLocation.isEmpty()) {
-                product.setStorageLocation(storageLocation.trim());
-            }           
-            
             if (additionalNotes != null && !additionalNotes.isEmpty()) {
                 product.setAdditionalNotes(additionalNotes.trim());
             }              // Add product to database
+            System.out.println("DEBUG: Attempting to add product to database");
             boolean success = productDAO.addProduct(product, user.getId());
+            System.out.println("DEBUG: Add product result: " + success);
               if (success) {                // Set success message and forward to a success page
+                System.out.println("DEBUG: Product added successfully, forwarding to success page");
                 request.setAttribute("successMessage", "Sản phẩm đã được thêm thành công!");
                 request.setAttribute("productName", product.getName());
                 request.setAttribute("productCode", product.getCode());
                 request.getRequestDispatcher("/ProductSuccessNotification.jsp").forward(request, response);
             } else {
+                System.out.println("DEBUG: Product addition failed, returning to form with error");
                 loadDropdownData(request);
                 request.setAttribute("error", "Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.");
                 request.setAttribute("formData", request.getParameterMap());
@@ -153,12 +152,10 @@ public class AddProductController extends HttpServlet {
             List<CategoryProduct> categories = productDAO.getAllActiveCategories();
             List<Unit> units = productDAO.getAllActiveUnits();
             List<Supplier> suppliers = productDAO.getAllActiveSuppliers();
-            List<String> storageLocations = productDAO.getAllStorageLocations();
             
             request.setAttribute("categories", categories);
             request.setAttribute("units", units);
             request.setAttribute("suppliers", suppliers);
-            request.setAttribute("storageLocations", storageLocations);
         } catch (Exception e) {
             e.printStackTrace();
         }

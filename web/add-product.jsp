@@ -232,10 +232,22 @@
                 padding: 10px;
             }
         }
+        .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
         <div class="header">
             <h1>➕ Thêm Sản Phẩm Mới</h1>
             <p>Nhập thông tin chi tiết để thêm sản phẩm vào hệ thống kho</p>
@@ -370,6 +382,7 @@
                 </div>
             </form>
         </div>
+    </div>
     </div>
 
     <script>

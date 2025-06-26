@@ -213,12 +213,25 @@ public class ProductInfoDAO {
     //Thêm product mới
     public boolean addProduct(ProductInfo product, int createdBy) {
         String sql = "INSERT INTO product_info (name, code, cate_id, unit_id, price, status, description, " +
-                    "supplier_id, expiration_date, storage_location, additional_notes, created_by) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "supplier_id, expiration_date, additional_notes, created_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        System.out.println("DEBUG: Starting addProduct method");
+        System.out.println("DEBUG: Product data - Name: " + product.getName() + ", Code: " + product.getCode());
+        System.out.println("DEBUG: Category ID: " + product.getCate_id() + ", Unit ID: " + product.getUnit_id());
+        System.out.println("DEBUG: Price: " + product.getPrice() + ", Status: " + product.getStatus());
         
         try (Connection con = Context.getJDBCConnection(); 
              PreparedStatement stmt = con.prepareStatement(sql)) {
-              stmt.setString(1, product.getName());
+            
+            if (con == null) {
+                System.err.println("ERROR: Database connection is null!");
+                return false;
+            }
+            
+            System.out.println("DEBUG: Database connection successful");
+            
+            stmt.setString(1, product.getName());
             stmt.setString(2, product.getCode());
             stmt.setInt(3, product.getCate_id());
             stmt.setInt(4, product.getUnit_id());
@@ -234,14 +247,23 @@ public class ProductInfoDAO {
             }
             
             stmt.setDate(9, product.getExpirationDate());
-            stmt.setString(10, product.getStorageLocation());
-            stmt.setString(11, product.getAdditionalNotes());
-            stmt.setInt(12, createdBy);
+            stmt.setString(10, product.getAdditionalNotes());
+            stmt.setInt(11, createdBy);
             
+            System.out.println("DEBUG: All parameters set, executing query");
             int rowsAffected = stmt.executeUpdate();
+            System.out.println("DEBUG: Query executed, rows affected: " + rowsAffected);
+            
             return rowsAffected > 0;
             
         } catch (SQLException e) {
+            System.err.println("ERROR: SQL Exception in addProduct: " + e.getMessage());
+            System.err.println("ERROR: SQL State: " + e.getSQLState());
+            System.err.println("ERROR: Error Code: " + e.getErrorCode());
+            e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            System.err.println("ERROR: General Exception in addProduct: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -343,27 +365,6 @@ public class ProductInfoDAO {
         return suppliers;
     }
     
-    /**
-     * Get all storage locations for dropdown
-     * @return List of storage location names
-     */
-    //Lấy dữ liệu từ Storage Location
-    public List<String> getAllStorageLocations() {
-        List<String> locations = new ArrayList<>();
-        String sql = "SELECT name FROM storage_location WHERE active_flag = 1 ORDER BY name";
-        
-        try (Connection con = Context.getJDBCConnection(); 
-             PreparedStatement stmt = con.prepareStatement(sql); 
-             ResultSet rs = stmt.executeQuery()) {
-            
-            while (rs.next()) {
-                locations.add(rs.getString("name"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return locations;
-    }
     
     /**
      * Get a single product by ID for editing
@@ -371,13 +372,21 @@ public class ProductInfoDAO {
     //Lấy dữ liệu từ product dựa trên id 
 public ProductInfo getProductById(int productId) {
     String sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.price, p.status, p.description, " +
-                 "p.supplier_id, p.expiration_date, p.storage_location, p.additional_notes, " +
+                 "p.supplier_id, p.expiration_date, p.additional_notes, " +
                  "p.created_by, p.created_date, p.updated_by, p.updated_date " +
                  "FROM product_info p WHERE p.id = ? AND p.active_flag = 1";
+    
+    System.out.println("DEBUG: getProductById called with ID: " + productId);
     
     try (Connection con = Context.getJDBCConnection(); 
          PreparedStatement stmt = con.prepareStatement(sql)) {
         
+        if (con == null) {
+            System.err.println("ERROR: Database connection is null in getProductById!");
+            return null;
+        }
+        
+        System.out.println("DEBUG: Database connection successful in getProductById");
         stmt.setInt(1, productId);
         
         try (ResultSet rs = stmt.executeQuery()) {
@@ -393,7 +402,6 @@ public ProductInfo getProductById(int productId) {
                 product.setDescription(rs.getString("description"));
                 product.setSupplierId(rs.getInt("supplier_id"));
                 product.setExpirationDate(rs.getDate("expiration_date"));
-                product.setStorageLocation(rs.getString("storage_location"));
                 product.setAdditionalNotes(rs.getString("additional_notes"));
                 product.setCreatedBy(rs.getInt("created_by"));
                 
@@ -404,21 +412,25 @@ public ProductInfo getProductById(int productId) {
                 }
                 
                 product.setUpdatedBy(rs.getInt("updated_by"));
-                
                 java.sql.Timestamp updatedTimestamp = rs.getTimestamp("updated_date");
                 if (updatedTimestamp != null) {
                     product.setUpdatedDate(new java.sql.Date(updatedTimestamp.getTime()));
                 }
                 
                 // Debug log
-                System.out.println("DAO - Product loaded successfully: " + product.getName());
+                System.out.println("DEBUG: Product loaded successfully from DB: " + product.getName());
                 return product;
             } else {
-                System.out.println("DAO - No product found with ID: " + productId);
+                System.out.println("DEBUG: No product found with ID: " + productId + " in database");
             }
         }
     } catch (SQLException e) {
-        System.err.println("DAO - Error loading product: " + e.getMessage());
+        System.err.println("ERROR: SQL Exception in getProductById: " + e.getMessage());
+        System.err.println("ERROR: SQL State: " + e.getSQLState());
+        System.err.println("ERROR: Error Code: " + e.getErrorCode());
+        e.printStackTrace();
+    } catch (Exception e) {
+        System.err.println("ERROR: General Exception in getProductById: " + e.getMessage());
         e.printStackTrace();
     }
     return null;
@@ -433,7 +445,7 @@ public ProductInfo getProductById(int productId) {
         String sql = "UPDATE product_info SET " +
                      "name = ?, code = ?, cate_id = ?, unit_id = ?, price = ?, " +
                      "status = ?, description = ?, supplier_id = ?, expiration_date = ?, " +
-                     "storage_location = ?, additional_notes = ?, " +
+                     "additional_notes = ?, " +
                      "updated_by = ?, updated_date = CURRENT_TIMESTAMP " +
                      "WHERE id = ?";
         
@@ -455,11 +467,10 @@ public ProductInfo getProductById(int productId) {
             }
             
             stmt.setDate(9, product.getExpirationDate());
-            stmt.setString(10, product.getStorageLocation());
 
-            stmt.setString(11, product.getAdditionalNotes());
-            stmt.setInt(12, product.getUpdatedBy());
-            stmt.setInt(13, product.getId());
+            stmt.setString(10, product.getAdditionalNotes());
+            stmt.setInt(11, product.getUpdatedBy());
+            stmt.setInt(12, product.getId());
             
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
