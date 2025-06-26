@@ -197,10 +197,6 @@
                 height: 100%;
             }
 
-            .table th a:hover {
-                color: #007bff;
-            }
-
             .sort-icon {
                 font-size: 12px;
                 margin-left: 5px;
@@ -507,11 +503,6 @@
                                                     <a href="${pageContext.request.contextPath}/category/edit?id=${category.id}" 
                                                        class="btn btn-warning btn-sm" title="Chỉnh sửa">
                                                         ️Sửa
-                                                    </a>
-                                                    <a href="${pageContext.request.contextPath}/category/delete?id=${category.id}" 
-                                                       class="btn btn-danger btn-sm" 
-                                                       onclick="return confirmDelete('${category.name}')" title="Xóa">
-                                                        Xóa
                                                     </a>
                                                 </div>
                                             </td>

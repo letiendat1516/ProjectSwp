@@ -165,4 +165,8 @@ public class ProductInfo {
     public void setUpdatedDate(java.sql.Date updatedDate) {
         this.updatedDate = updatedDate;
     }
+
+    public void setStockQuantity(BigDecimal stockQty) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
