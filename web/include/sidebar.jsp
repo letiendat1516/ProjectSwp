@@ -131,5 +131,5 @@ if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
   <a href="${pageContext.request.contextPath}/passwordrequest" class="nav-item ${param.activePage == 'passwordrequest' ? 'active' : ''}">Password Request</a>
   <a href="${pageContext.request.contextPath}/ApproveListForward.jsp" class="nav-item ${param.activePage == 'approve' ? 'active' : ''}">Approve</a>
   <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="nav-item ${param.activePage == 'transaction' ? 'active' : ''}">Transaction</a>
-  <a href="#" class="nav-item ${param.activePage == 'statistic' ? 'active' : ''}">Statistic</a>
+  <a href="StatisticSupplierEvaluation.jsp" class="nav-item ${param.activePage == 'statistic' ? 'active' : ''}">Statistic</a>
 </div>
