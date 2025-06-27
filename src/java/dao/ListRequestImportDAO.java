@@ -127,11 +127,10 @@ public class ListRequestImportDAO {
                 .append("poi.quantity, poi.note ")
                 .append("FROM purchase_order_info po ")
                 .append("LEFT JOIN purchase_order_items poi ON po.id = poi.purchase_id ")
-                .append("WHERE po.status IN ('completed', 'rejected') "); // Thêm 'rejected' vào đây
+                .append("WHERE po.status IN ('completed', 'rejected') ");
 
-        // Thêm điều kiện tìm kiếm
+        // Thêm điều kiện tìm kiếm - BỔ SUNG THÊM SUPPLIER
         if (searchValue != null && !searchValue.trim().isEmpty() && searchType != null) {
-            String searchPattern = "%" + searchValue.trim() + "%";
             switch (searchType) {
                 case "requestId":
                     sql.append("AND po.id LIKE ? ");
@@ -141,6 +140,9 @@ public class ListRequestImportDAO {
                     break;
                 case "productCode":
                     sql.append("AND poi.product_code LIKE ? ");
+                    break;
+                case "supplier":  // THÊM CASE MỚI
+                    sql.append("AND po.supplier LIKE ? ");
                     break;
             }
         }
@@ -157,7 +159,9 @@ public class ListRequestImportDAO {
                 ps.setString(1, searchPattern);
             }
 
+            System.out.println("Executing completed items SQL: " + sql.toString()); // Debug log
             rs = ps.executeQuery();
+
             while (rs.next()) {
                 ApprovedRequestItem item = new ApprovedRequestItem();
                 item.setRequestId(rs.getString("request_id"));
@@ -170,17 +174,26 @@ public class ListRequestImportDAO {
                 item.setProductName(rs.getString("product_name"));
                 item.setProductCode(rs.getString("product_code"));
                 item.setProductFullName(rs.getString("product_full_name"));
-                item.setPrice(rs.getDouble("price"));
+
+                // Xử lý giá trị null cho price
+                Double price = rs.getDouble("price");
+                item.setPrice(rs.wasNull() ? 0.0 : price);
+
                 item.setUnit(rs.getString("unit"));
-                item.setQuantity(rs.getDouble("quantity"));
+
+                // Xử lý giá trị null cho quantity
+                Double quantity = rs.getDouble("quantity");
+                item.setQuantity(rs.wasNull() ? 0.0 : quantity);
+
                 item.setNote(rs.getString("note"));
-                item.setReasonDetail(rs.getString("reason")); // Thêm lý do từ chối
+                item.setReasonDetail(rs.getString("reason"));
                 list.add(item);
             }
 
             System.out.println("Fetched completed/rejected items count: " + list.size());
 
         } catch (SQLException e) {
+            System.err.println("Error in getCompletedRequestItems: " + e.getMessage());
             e.printStackTrace();
         } finally {
             closeResources();

@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -907,7 +908,7 @@
                             </div>
                         </c:if>
 
-                        <!-- Tab Navigation - PHẦN MỚI THÊM -->
+                        <!-- Tab Navigation -->
                         <div class="tab-container">
                             <div class="tab-nav">
                                 <button class="tab-button active" onclick="switchTab('approved-requests')" id="tab-approved">
@@ -962,7 +963,7 @@
                             </div>
 
                             <!-- Hiển thị kết quả tìm kiếm -->
-                            <c:if test="${not empty param.searchValue}">
+                            <c:if test="${not empty param.searchValue && (param.type == 'purchase' || empty param.type)}">
                                 <div class="alert alert-info mb-3">
                                     <div class="alert-icon">
                                         <i class="fas fa-info-circle"></i>
@@ -1037,7 +1038,7 @@
                                                                 <a href="${pageContext.request.contextPath}/import-confirm?id=${item.requestId}" class="btn btn-sm btn-success">
                                                                     <i class="fas fa-check"></i> Xử lý nhập kho
                                                                 </a>
-
+                                                                
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -1073,6 +1074,7 @@
                                 </nav>
                             </c:if>
                         </div>
+
                         <!-- Tab Content: Lịch sử nhập kho -->
                         <div id="history" class="tab-content">
                             <!-- Bộ lọc và tìm kiếm cho lịch sử -->
@@ -1086,15 +1088,15 @@
                                         <div class="filter-item">
                                             <label class="form-label">Tìm kiếm theo:</label>
                                             <select name="historySearchType" class="form-control">
-                                                <option value="requestId">Mã đơn</option>
-                                                <option value="productName">Tên sản phẩm</option>
-                                                <option value="productCode">Mã sản phẩm</option>
-                                                <option value="supplier">Nhà cung cấp</option>
+                                                <option value="requestId" ${param.historySearchType == 'requestId' ? 'selected' : ''}>Mã đơn</option>
+                                                <option value="productName" ${param.historySearchType == 'productName' ? 'selected' : ''}>Tên sản phẩm</option>
+                                                <option value="productCode" ${param.historySearchType == 'productCode' ? 'selected' : ''}>Mã sản phẩm</option>
+                                                <option value="supplier" ${param.historySearchType == 'supplier' ? 'selected' : ''}>Nhà cung cấp</option>
                                             </select>
                                         </div>
                                         <div class="filter-item">
                                             <label class="form-label">Từ khóa:</label>
-                                            <input type="text" name="historySearchValue" 
+                                            <input type="text" name="historySearchValue" value="${param.historySearchValue}"
                                                    class="form-control" placeholder="Nhập từ khóa tìm kiếm..."
                                                    autocomplete="off">
                                         </div>
@@ -1114,6 +1116,32 @@
                                     </div>
                                 </form>
                             </div>
+
+                            <!-- Hiển thị kết quả tìm kiếm lịch sử -->
+                            <c:if test="${not empty param.historySearchValue && param.type == 'history'}">
+                                <div class="alert alert-info mb-3">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">Kết quả tìm kiếm lịch sử</div>
+                                        <div>
+                                            Tìm kiếm "<strong>${param.historySearchValue}</strong>" theo 
+                                            <strong>
+                                                <c:choose>
+                                                    <c:when test="${param.historySearchType == 'requestId'}">Mã đơn</c:when>
+                                                    <c:when test="${param.historySearchType == 'productName'}">Tên sản phẩm</c:when>
+                                                    <c:when test="${param.historySearchType == 'productCode'}">Mã sản phẩm</c:when>
+                                                    <c:when test="${param.historySearchType == 'supplier'}">Nhà cung cấp</c:when>
+                                                </c:choose>
+                                            </strong>
+                                        </div>
+                                        <div class="mt-2">
+                                            Tìm thấy <strong>${not empty historyItems ? historyItems.size() : 0}</strong> kết quả.
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:if>
 
                             <!-- Bảng lịch sử nhập kho -->
                             <div class="table-container">
@@ -1141,6 +1169,9 @@
                                                         <div style="color: gray;">
                                                             <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i>
                                                             <p>Không có lịch sử nhập kho nào để hiển thị.</p>
+                                                            <c:if test="${not empty param.historySearchValue}">
+                                                                <p class="text-muted">Thử tìm kiếm với từ khóa khác hoặc thay đổi tiêu chí tìm kiếm.</p>
+                                                            </c:if>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -1193,7 +1224,7 @@
                                                         </td>
                                                         <td>
                                                             <div class="d-flex gap-2">
-
+                                                                
                                                                 <a href="LishSupplier" class="btn btn-sm btn-warning btn-icon">
                                                                     <i class="fas fa-star"></i> Đánh giá
                                                                 </a>
@@ -1212,19 +1243,19 @@
                                 <nav aria-label="History pagination" class="d-flex justify-content-center">
                                     <ul class="pagination">
                                         <li class="page-item ${historyCurrentPage == 1 ? 'disabled' : ''}">
-                                            <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=history&page=${historyCurrentPage - 1}" aria-label="Previous">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=history&page=${historyCurrentPage - 1}&historySearchType=${param.historySearchType}&historySearchValue=${param.historySearchValue}" aria-label="Previous">
                                                 <i class="fas fa-chevron-left"></i>
                                             </a>
                                         </li>
 
                                         <c:forEach begin="1" end="${historyTotalPages}" var="i">
                                             <li class="page-item ${historyCurrentPage == i ? 'active' : ''}">
-                                                <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=history&page=${i}">${i}</a>
+                                                <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=history&page=${i}&historySearchType=${param.historySearchType}&historySearchValue=${param.historySearchValue}">${i}</a>
                                             </li>
                                         </c:forEach>
 
                                         <li class="page-item ${historyCurrentPage == historyTotalPages ? 'disabled' : ''}">
-                                            <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=history&page=${historyCurrentPage + 1}" aria-label="Next">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=history&page=${historyCurrentPage + 1}&historySearchType=${param.historySearchType}&historySearchValue=${param.historySearchValue}" aria-label="Next">
                                                 <i class="fas fa-chevron-right"></i>
                                             </a>
                                         </li>
@@ -1325,8 +1356,10 @@
                                 // Biến global để lưu giá trị tìm kiếm
                                 var searchValue = '${param.searchValue}' || '';
                                 var searchType = '${param.searchType}' || '';
+                                var historySearchValue = '${param.historySearchValue}' || '';
+                                var historySearchType = '${param.historySearchType}' || '';
 
-                                // FUNCTION CHUYỂN ĐỔI TAB - PHẦN MỚI THÊM
+                                // FUNCTION CHUYỂN ĐỔI TAB - ĐÃ SỬA
                                 function switchTab(tabName) {
                                     // Ẩn tất cả tab content
                                     var tabContents = document.querySelectorAll('.tab-content');
@@ -1346,20 +1379,31 @@
                                     // Active tab button tương ứng
                                     if (tabName === 'approved-requests') {
                                         document.getElementById('tab-approved').classList.add('active');
+                                        // Cập nhật URL để giữ trạng thái
+                                        history.replaceState(null, null, '${pageContext.request.contextPath}/request/list?type=purchase');
                                     } else if (tabName === 'history') {
                                         document.getElementById('tab-history').classList.add('active');
+                                        // Cập nhật URL để giữ trạng thái
+                                        history.replaceState(null, null, '${pageContext.request.contextPath}/request/list?type=history');
                                     }
 
                                     // Lưu trạng thái tab hiện tại
                                     localStorage.setItem('activeTab', tabName);
                                 }
 
-                                // Khôi phục tab đã chọn khi load trang
+                                // Khôi phục tab dựa trên URL parameter - ĐÃ SỬA
                                 document.addEventListener('DOMContentLoaded', function () {
-                                    var activeTab = localStorage.getItem('activeTab');
-                                    if (activeTab && document.getElementById(activeTab)) {
-                                        switchTab(activeTab);
+                                    var urlParams = new URLSearchParams(window.location.search);
+                                    var type = urlParams.get('type');
+
+                                    if (type === 'history') {
+                                        switchTab('history');
+                                    } else {
+                                        switchTab('approved-requests');
                                     }
+
+                                    // Highlight search results
+                                    highlightSearchResults();
                                 });
 
                                 // Xử lý đóng alert sau 5 giây
@@ -1374,9 +1418,6 @@
                                             errorAlert.style.display = 'none';
                                         }
                                     }, 5000);
-
-                                    // Highlight search results
-                                    highlightSearchResults();
                                 });
 
                                 // Xuất lịch sử ra Excel
@@ -1479,14 +1520,23 @@
                                     }, 3000);
                                 }
 
-                                // Hàm highlight kết quả tìm kiếm
+                                // Hàm highlight kết quả tìm kiếm - ĐÃ SỬA
                                 function highlightSearchResults() {
-                                    if (searchValue && searchValue.trim() !== '') {
-                                        var searchables = document.querySelectorAll('.searchable');
+                                    var currentTab = document.querySelector('.tab-content.active').id;
+                                    var currentSearchValue = '';
+
+                                    if (currentTab === 'approved-requests') {
+                                        currentSearchValue = searchValue;
+                                    } else if (currentTab === 'history') {
+                                        currentSearchValue = historySearchValue;
+                                    }
+
+                                    if (currentSearchValue && currentSearchValue.trim() !== '') {
+                                        var searchables = document.querySelectorAll('#' + currentTab + ' .searchable');
                                         searchables.forEach(function (element) {
                                             var text = element.textContent;
                                             var highlightedText = text.replace(
-                                                    new RegExp('(' + escapeRegExp(searchValue) + ')', 'gi'),
+                                                    new RegExp('(' + escapeRegExp(currentSearchValue) + ')', 'gi'),
                                                     '<mark>$1</mark>'
                                                     );
                                             element.innerHTML = highlightedText;
@@ -1499,14 +1549,14 @@
                                     return string.replace(/[.*+?^$()()|[\]\\]/g, '\\$&');
                                 }
 
-                                // Hàm xóa tìm kiếm
+                                // Hàm xóa tìm kiếm - ĐÃ SỬA
                                 function clearSearch() {
                                     document.querySelector('select[name="searchType"]').value = 'requestId';
                                     document.querySelector('input[name="searchValue"]').value = '';
                                     window.location.href = '${pageContext.request.contextPath}/request/list?type=purchase';
                                 }
 
-                                // Hàm xóa tìm kiếm lịch sử
+                                // Hàm xóa tìm kiếm lịch sử - ĐÃ SỬA
                                 function clearHistorySearch() {
                                     document.querySelector('select[name="historySearchType"]').value = 'requestId';
                                     document.querySelector('input[name="historySearchValue"]').value = '';
@@ -1716,7 +1766,7 @@
                         
                         2. TAB LỊCH SỬ NHẬP KHO:
                         - Xem lịch sử tất cả các đơn nhập kho đã hoàn thành hoặc bị từ chối
-                        - Tìm kiếm theo nhiều tiêu chí khác nhau
+                        - Tìm kiếm theo nhiều tiêu chí khác nhau (mã đơn, tên sản phẩm, mã sản phẩm, nhà cung cấp)
                         - Xuất dữ liệu ra file Excel
                         - Đánh giá nhà cung cấp
                         
@@ -1807,6 +1857,3 @@
         </div>
     </body>
 </html>
-
-
-

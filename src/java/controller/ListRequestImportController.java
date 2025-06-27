@@ -17,82 +17,109 @@ import model.Supplier;
 @WebServlet("/request/list")
 public class ListRequestImportController extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+  @Override
+  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+          throws ServletException, IOException {
 
-        // Tạo instance của DAO
-        ListRequestImportDAO dao = new ListRequestImportDAO();
+      // Tạo instance của DAO
+      ListRequestImportDAO dao = new ListRequestImportDAO();
 
-        // Debug: Test connection
-        dao.testConnection();
+      // Lấy loại request (purchase hoặc history)
+      String type = request.getParameter("type");
+      if (type == null) {
+          type = "purchase"; // Mặc định là purchase
+      }
 
-        // Lấy tham số tìm kiếm từ request
-        String searchType = request.getParameter("searchType");
-        String searchValue = request.getParameter("searchValue");
+      // Lấy tham số tìm kiếm dựa trên loại
+      String searchType = null;
+      String searchValue = null;
 
-        System.out.println("Search parameters - Type: " + searchType + ", Value: " + searchValue);
+      if ("history".equals(type)) {
+          // Tìm kiếm cho lịch sử
+          searchType = request.getParameter("historySearchType");
+          searchValue = request.getParameter("historySearchValue");
+      } else {
+          // Tìm kiếm cho yêu cầu đã duyệt
+          searchType = request.getParameter("searchType");
+          searchValue = request.getParameter("searchValue");
+      }
 
-        // Lấy danh sách ApprovedRequestItem với tham số tìm kiếm
-        List<ApprovedRequestItem> approvedItems = dao.getApprovedRequestItems(searchType, searchValue);
-        List<ApprovedRequestItem> completedItems = dao.getCompletedRequestItems(searchType, searchValue);
+      System.out.println("Request type: " + type);
+      System.out.println("Search parameters - Type: " + searchType + ", Value: " + searchValue);
 
-        // Debug logs
-        System.out.println("Approved items size: " + (approvedItems != null ? approvedItems.size() : "null"));
-        System.out.println("Completed items size: " + (completedItems != null ? completedItems.size() : "null"));
+      // Lấy dữ liệu dựa trên loại request
+      List<ApprovedRequestItem> approvedItems = new ArrayList<>();
+      List<ApprovedRequestItem> completedItems = new ArrayList<>();
 
-        // Rest of your code...
-        SupplierDAO sd = new SupplierDAO();
-        List<Supplier> listSupplier = new ArrayList<>();
-        for (int i = 0; i < completedItems.size(); i++) {
-            if (completedItems.get(i).getSupplier() != null) {
-                Supplier s = sd.getSupplierByName(completedItems.get(i).getSupplier());
-                if (s != null) {
-                    listSupplier.add(s);
-                }
-            }
-        }
+      if ("history".equals(type)) {
+          // Chỉ lấy lịch sử khi cần
+          completedItems = dao.getCompletedRequestItems(searchType, searchValue);
+          // Lấy approved items không có tìm kiếm để hiển thị số lượng
+          approvedItems = dao.getApprovedRequestItems(null, null);
+      } else {
+          // Lấy approved items với tìm kiếm
+          approvedItems = dao.getApprovedRequestItems(searchType, searchValue);
+          // Lấy completed items không có tìm kiếm để hiển thị số lượng
+          completedItems = dao.getCompletedRequestItems(null, null);
+      }
 
-        // Gửi danh sách và tham số tìm kiếm sang JSP
-        request.setAttribute("items", approvedItems);
-        request.setAttribute("historyItems", completedItems);
-        request.setAttribute("searchType", searchType);
-        request.setAttribute("searchValue", searchValue);
-        request.setAttribute("supplier", listSupplier);
+      // Debug logs
+      System.out.println("Approved items size: " + (approvedItems != null ? approvedItems.size() : "null"));
+      System.out.println("Completed items size: " + (completedItems != null ? completedItems.size() : "null"));
 
-        request.getRequestDispatcher("/ListRequestImport.jsp").forward(request, response);
-    }
+      // Lấy thông tin supplier
+      SupplierDAO sd = new SupplierDAO();
+      List<Supplier> listSupplier = new ArrayList<>();
+      for (ApprovedRequestItem item : completedItems) {
+          if (item.getSupplier() != null) {
+              Supplier s = sd.getSupplierByName(item.getSupplier());
+              if (s != null) {
+                  listSupplier.add(s);
+              }
+          }
+      }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+      // Gửi dữ liệu sang JSP
+      request.setAttribute("items", approvedItems);
+      request.setAttribute("historyItems", completedItems);
+      request.setAttribute("searchType", searchType);
+      request.setAttribute("searchValue", searchValue);
+      request.setAttribute("supplier", listSupplier);
+      request.setAttribute("requestType", type);
 
-        ListRequestImportDAO dao = new ListRequestImportDAO();
-        String requestId = request.getParameter("id");
-        String note = request.getParameter("note");
-        String approveDate = request.getParameter("approveDate");
+      request.getRequestDispatcher("/ListRequestImport.jsp").forward(request, response);
+  }
 
-        // Validate parameters
-        if (requestId == null || requestId.trim().isEmpty()
-                || approveDate == null || approveDate.trim().isEmpty()) {
+  @Override
+  protected void doPost(HttpServletRequest request, HttpServletResponse response)
+          throws ServletException, IOException {
 
-            System.err.println("Invalid parameters: requestId=" + requestId + ", approveDate=" + approveDate);
-            response.sendRedirect(request.getContextPath() + "/request/list?error=invalid_data");
-            return;
-        }
+      ListRequestImportDAO dao = new ListRequestImportDAO();
+      String requestId = request.getParameter("id");
+      String note = request.getParameter("note");
+      String approveDate = request.getParameter("approveDate");
 
-        try {
-            // Cập nhật trạng thái yêu cầu thành 'completed'
-            dao.updateRequestStatus(requestId, "completed", approveDate);
+      // Validate parameters
+      if (requestId == null || requestId.trim().isEmpty()
+              || approveDate == null || approveDate.trim().isEmpty()) {
 
-            // Chuyển hướng về danh sách với thông báo thành công
-            response.sendRedirect(request.getContextPath() + "/request/list?message=approve_success");
+          System.err.println("Invalid parameters: requestId=" + requestId + ", approveDate=" + approveDate);
+          response.sendRedirect(request.getContextPath() + "/request/list?error=invalid_data");
+          return;
+      }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("SQLException occurred while updating request status for requestId: "
-                    + requestId + ", Error: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/request/list?error=approve_failed");
-        }
-    }
+      try {
+          // Cập nhật trạng thái yêu cầu thành 'completed'
+          dao.updateRequestStatus(requestId, "completed", approveDate);
+
+          // Chuyển hướng về danh sách với thông báo thành công
+          response.sendRedirect(request.getContextPath() + "/request/list?message=approve_success");
+
+      } catch (SQLException e) {
+          e.printStackTrace();
+          System.err.println("SQLException occurred while updating request status for requestId: "
+                  + requestId + ", Error: " + e.getMessage());
+          response.sendRedirect(request.getContextPath() + "/request/list?error=approve_failed");
+      }
+  }
 }
