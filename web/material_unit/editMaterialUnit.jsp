@@ -1,7 +1,22 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!-- Edit Material Unit Page: Edit details of a material unit -->
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
+
+<%@page import="model.Users"%>
+<%
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
+
 <html>
 <head>
     <meta charset="UTF-8">
