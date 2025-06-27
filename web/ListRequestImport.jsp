@@ -837,7 +837,7 @@
                 <div class="stats-grid">
                     <div class="stat-card success">
                         <div class="stat-value">${not empty items ? items.size() : 0}</div>
-                        <div class="stat-label">Yêu cầu đã duyệt</div>
+                        <div class="stat-label">Yêu cầu đơn nhập kho đã duyệt</div>
                         <div class="stat-change positive">
                             <i class="fas fa-arrow-up"></i> Đang chờ xử lý
                         </div>
@@ -913,7 +913,7 @@
                             <div class="tab-nav">
                                 <button class="tab-button active" onclick="switchTab('approved-requests')" id="tab-approved">
                                     <i class="fas fa-clock"></i>
-                                    Yêu cầu đã duyệt
+                                    Yêu cầu đơn nhập kho đã duyệt
                                     <span class="tab-badge">${not empty items ? items.size() : 0}</span>
                                 </button>
                                 <button class="tab-button" onclick="switchTab('history')" id="tab-history">
@@ -1012,7 +1012,7 @@
                                                     <td colspan="11" class="text-center py-4">
                                                         <div style="color: gray;">
                                                             <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i>
-                                                            <p>Không có yêu cầu đã duyệt nào để hiển thị.</p>
+                                                            <p>Không có yêu cầu đơn nhập kho đã duyệt nào để hiển thị.</p>
                                                             <c:if test="${not empty param.searchValue}">
                                                                 <p class="text-muted">Thử tìm kiếm với từ khóa khác hoặc thay đổi tiêu chí tìm kiếm.</p>
                                                             </c:if>
