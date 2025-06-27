@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -493,6 +492,11 @@
                 color: #991b1b;
             }
 
+            .status-rejected {
+                background-color: #fee2e2;
+                color: #991b1b;
+            }
+
             .d-flex {
                 display: flex !important;
             }
@@ -557,7 +561,7 @@
                 position: relative;
                 width: auto;
                 margin: 1.75rem auto;
-                max-width: 500px;
+                max-width: 800px;
             }
 
             .modal-content {
@@ -661,6 +665,111 @@
                 color: var(--danger);
             }
 
+            .layout-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                flex: 1;
+                padding: 20px;
+                background: #f5f5f5;
+            }
+
+            /* Tab Styles - PHẦN MỚI THÊM */
+            .tab-container {
+                margin-bottom: 1.5rem;
+            }
+
+            .tab-nav {
+                display: flex;
+                background-color: white;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                overflow: hidden;
+            }
+
+            .tab-button {
+                flex: 1;
+                padding: 1rem 1.5rem;
+                background: transparent;
+                border: none;
+                color: var(--gray-600);
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            .tab-button:hover {
+                background-color: var(--gray-50);
+                color: var(--gray-800);
+            }
+
+            .tab-button.active {
+                background-color: var(--primary);
+                color: white;
+            }
+
+            .tab-button.active::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background-color: var(--primary-dark);
+            }
+
+            .tab-content {
+                display: none;
+            }
+
+            .tab-content.active {
+                display: block;
+            }
+
+            .tab-badge {
+                background-color: var(--gray-200);
+                color: var(--gray-700);
+                padding: 0.2rem 0.5rem;
+                border-radius: 1rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+                margin-left: 0.5rem;
+            }
+
+            .tab-button.active .tab-badge {
+                background-color: rgba(255, 255, 255, 0.2);
+                color: white;
+            }
+
+            .row {
+                display: flex;
+                flex-wrap: wrap;
+                margin: -0.5rem;
+            }
+
+            .col-md-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+                padding: 0.5rem;
+            }
+
+            .table-sm th,
+            .table-sm td {
+                padding: 0.5rem;
+                font-size: 0.875rem;
+            }
+
+            .mt-3 {
+                margin-top: 1rem;
+            }
+
             @media (max-width: 768px) {
                 .filter-row {
                     flex-direction: column;
@@ -696,173 +805,188 @@
                 .stats-grid {
                     grid-template-columns: 1fr;
                 }
-            }
-                        .layout-container {
-                display: flex;
-                min-height: 100vh;
-            }
 
-            .main-content {
-                flex: 1;
-                padding: 20px;
-                background: #f5f5f5;
+                .tab-nav {
+                    flex-direction: column;
+                }
+
+                .tab-button {
+                    justify-content: flex-start;
+                }
+
+                .col-md-6 {
+                    flex: 0 0 100%;
+                    max-width: 100%;
+                }
             }
         </style>
     </head>
     <body>
-         <div class="layout-container">
+        <div class="layout-container">
             <jsp:include page="/include/sidebar.jsp" />
             <div class="main-content">
-            <!-- Breadcrumbs -->
-            <div class="breadcrumbs mb-4">
-                <a href="${pageContext.request.contextPath}/Admin.jsp">Trang chủ</a>
-                <span class="separator"><i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i></span>
-                <span class="current">Danh sách yêu cầu nhập kho</span>
-            </div>
+                <!-- Breadcrumbs -->
+                <div class="breadcrumbs mb-4">
+                    <a href="${pageContext.request.contextPath}/Admin.jsp">Trang chủ</a>
+                    <span class="separator"><i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i></span>
+                    <span class="current">Danh sách yêu cầu nhập kho</span>
+                </div>
 
-            <!-- Statistics Cards -->
-            <div class="stats-grid">
-                <div class="stat-card success">
-                    <div class="stat-value">${not empty items ? items.size() : 0}</div>
-                    <div class="stat-label">Yêu cầu đã duyệt</div>
-                    <div class="stat-change positive">
-                        <i class="fas fa-arrow-up"></i> Đang chờ xử lý
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card success">
+                        <div class="stat-value">${not empty items ? items.size() : 0}</div>
+                        <div class="stat-label">Yêu cầu đã duyệt</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> Đang chờ xử lý
+                        </div>
+                    </div>
+                    <div class="stat-card info">
+                        <div class="stat-value">${not empty historyItems ? historyItems.size() : 0}</div>
+                        <div class="stat-label">Đã hoàn thành</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-check-circle"></i> Nhập kho thành công
+                        </div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-value">${(not empty items ? items.size() : 0) + (not empty historyItems ? historyItems.size() : 0)}</div>
+                        <div class="stat-label">Tổng yêu cầu</div>
+                        <div class="stat-change">
+                            <i class="fas fa-chart-line"></i> Tất cả yêu cầu
+                        </div>
                     </div>
                 </div>
-                <div class="stat-card info">
-                    <div class="stat-value">${not empty historyItems ? historyItems.size() : 0}</div>
-                    <div class="stat-label">Đã hoàn thành</div>
-                    <div class="stat-change positive">
-                        <i class="fas fa-check-circle"></i> Nhập kho thành công
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h1 class="mb-0">Quản lý yêu cầu nhập kho</h1>
                     </div>
-                </div>
-                <div class="stat-card warning">
-                    <div class="stat-value">${(not empty items ? items.size() : 0) + (not empty historyItems ? historyItems.size() : 0)}</div>
-                    <div class="stat-label">Tổng yêu cầu</div>
-                    <div class="stat-change">
-                        <i class="fas fa-chart-line"></i> Tất cả yêu cầu
-                    </div>
-                </div>
-            </div>
 
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h1 class="mb-0">Danh sách yêu cầu nhập kho</h1>
-                </div>
-
-                <div class="card-body">
-                    <!-- Thông báo -->
-                    <c:if test="${param.message != null}">
-                        <div class="alert alert-success" id="successAlert">
-                            <div class="alert-icon">
-                                <i class="fas fa-check"></i>
-                            </div>
-                            <div class="alert-content">
-                                <div class="alert-title">Thành công</div>
-                                <c:choose>
-                                    <c:when test="${param.message eq 'approve_success'}">Phê duyệt nhập kho thành công!</c:when>
-                                    <c:when test="${param.message eq 'reject_success'}">Từ chối yêu cầu thành công!</c:when>
-                                    <c:otherwise>Thao tác thành công!</c:otherwise>
-                                </c:choose>
-                            </div>
-                            <div class="alert-close" onclick="this.parentElement.style.display = 'none'">
-                                <i class="fas fa-times"></i>
-                            </div>
-                        </div>
-                    </c:if>
-
-                    <c:if test="${param.error != null}">
-                        <div class="alert alert-danger" id="errorAlert">
-                            <div class="alert-icon">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <div class="alert-content">
-                                <div class="alert-title">Lỗi</div>
-                                <c:choose>
-                                    <c:when test="${param.error eq 'invalid_id'}">ID yêu cầu không hợp lệ!</c:when>
-                                    <c:when test="${param.error eq 'request_not_found'}">Không tìm thấy yêu cầu!</c:when>
-                                    <c:when test="${param.error eq 'approve_failed'}">Không thể phê duyệt nhập kho!</c:when>
-                                    <c:when test="${param.error eq 'invalid_data'}">Dữ liệu không hợp lệ!</c:when>
-                                    <c:when test="${param.error eq 'permission_denied'}">Bạn không có quyền thực hiện hành động này!</c:when>
-                                    <c:when test="${param.error eq 'invalid_quantity'}">Số lượng nhập không hợp lệ!</c:when>
-                                    <c:when test="${param.error eq 'invalid_action'}">Hành động không hợp lệ!</c:when>
-                                    <c:when test="${param.error eq 'processing_failed'}">Xử lý yêu cầu thất bại!</c:when>
-                                </c:choose>
-                            </div>
-                            <div class="alert-close" onclick="this.parentElement.style.display = 'none'">
-                                <i class="fas fa-times"></i>
-                            </div>
-                        </div>
-                    </c:if>
-
-                    <!-- Bộ lọc và tìm kiếm cải tiến -->
-                    <div class="filter-panel mb-4">
-                        <div class="filter-title">
-                            <i class="fas fa-search"></i> Tìm kiếm và lọc dữ liệu
-                        </div>
-                        <form action="${pageContext.request.contextPath}/request/list" method="get" id="searchForm">
-                            <input type="hidden" name="type" value="purchase">
-                            <div class="filter-row">
-                                <div class="filter-item">
-                                    <label class="form-label">Tìm kiếm theo:</label>
-                                    <select name="searchType" class="form-control" required>
-                                        <option value="requestId" ${param.searchType == 'requestId' ? 'selected' : ''}>Mã yêu cầu</option>
-                                        <option value="productName" ${param.searchType == 'productName' ? 'selected' : ''}>Tên sản phẩm</option>
-                                        <option value="productCode" ${param.searchType == 'productCode' ? 'selected' : ''}>Mã sản phẩm</option>
-                                    </select>
+                    <div class="card-body">
+                        <!-- Thông báo -->
+                        <c:if test="${param.message != null}">
+                            <div class="alert alert-success" id="successAlert">
+                                <div class="alert-icon">
+                                    <i class="fas fa-check"></i>
                                 </div>
-                                <div class="filter-item">
-                                    <label class="form-label">Từ khóa:</label>
-                                    <input type="text" name="searchValue" value="${param.searchValue}" 
-                                           class="form-control" placeholder="Nhập từ khóa tìm kiếm..."
-                                           autocomplete="off">
+                                <div class="alert-content">
+                                    <div class="alert-title">Thành công</div>
+                                    <c:choose>
+                                        <c:when test="${param.message eq 'approve_success'}">Phê duyệt nhập kho thành công!</c:when>
+                                        <c:when test="${param.message eq 'reject_success'}">Từ chối yêu cầu thành công!</c:when>
+                                        <c:otherwise>Thao tác thành công!</c:otherwise>
+                                    </c:choose>
                                 </div>
-                                <div class="filter-item">
-                                    <div class="search-group">
-                                        <button type="submit" class="btn btn-primary btn-icon">
-                                            <i class="fas fa-search"></i> Tìm kiếm
-                                        </button>
-                                        <button type="button" class="btn btn-secondary btn-icon" onclick="clearSearch()">
-                                            <i class="fas fa-times"></i> Xóa
-                                        </button>
+                                <div class="alert-close" onclick="this.parentElement.style.display = 'none'">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                            </div>
+                        </c:if>
+
+                        <c:if test="${param.error != null}">
+                            <div class="alert alert-danger" id="errorAlert">
+                                <div class="alert-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <div class="alert-title">Lỗi</div>
+                                    <c:choose>
+                                        <c:when test="${param.error eq 'invalid_id'}">ID yêu cầu không hợp lệ!</c:when>
+                                        <c:when test="${param.error eq 'request_not_found'}">Không tìm thấy yêu cầu!</c:when>
+                                        <c:when test="${param.error eq 'approve_failed'}">Không thể phê duyệt nhập kho!</c:when>
+                                        <c:when test="${param.error eq 'invalid_data'}">Dữ liệu không hợp lệ!</c:when>
+                                        <c:when test="${param.error eq 'permission_denied'}">Bạn không có quyền thực hiện hành động này!</c:when>
+                                        <c:when test="${param.error eq 'invalid_quantity'}">Số lượng nhập không hợp lệ!</c:when>
+                                        <c:when test="${param.error eq 'invalid_action'}">Hành động không hợp lệ!</c:when>
+                                        <c:when test="${param.error eq 'processing_failed'}">Xử lý yêu cầu thất bại!</c:when>
+                                    </c:choose>
+                                </div>
+                                <div class="alert-close" onclick="this.parentElement.style.display = 'none'">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                            </div>
+                        </c:if>
+
+                        <!-- Tab Navigation - PHẦN MỚI THÊM -->
+                        <div class="tab-container">
+                            <div class="tab-nav">
+                                <button class="tab-button active" onclick="switchTab('approved-requests')" id="tab-approved">
+                                    <i class="fas fa-clock"></i>
+                                    Yêu cầu đã duyệt
+                                    <span class="tab-badge">${not empty items ? items.size() : 0}</span>
+                                </button>
+                                <button class="tab-button" onclick="switchTab('history')" id="tab-history">
+                                    <i class="fas fa-history"></i>
+                                    Lịch sử nhập kho
+                                    <span class="tab-badge">${not empty historyItems ? historyItems.size() : 0}</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Yêu cầu đã duyệt -->
+                        <div id="approved-requests" class="tab-content active">
+                            <!-- Bộ lọc và tìm kiếm cải tiến -->
+                            <div class="filter-panel mb-4">
+                                <div class="filter-title">
+                                    <i class="fas fa-search"></i> Tìm kiếm yêu cầu đã duyệt
+                                </div>
+                                <form action="${pageContext.request.contextPath}/request/list" method="get" id="searchForm">
+                                    <input type="hidden" name="type" value="purchase">
+                                    <div class="filter-row">
+                                        <div class="filter-item">
+                                            <label class="form-label">Tìm kiếm theo:</label>
+                                            <select name="searchType" class="form-control" required>
+                                                <option value="requestId" ${param.searchType == 'requestId' ? 'selected' : ''}>Mã yêu cầu</option>
+                                                <option value="productName" ${param.searchType == 'productName' ? 'selected' : ''}>Tên sản phẩm</option>
+                                                <option value="productCode" ${param.searchType == 'productCode' ? 'selected' : ''}>Mã sản phẩm</option>
+                                            </select>
+                                        </div>
+                                        <div class="filter-item">
+                                            <label class="form-label">Từ khóa:</label>
+                                            <input type="text" name="searchValue" value="${param.searchValue}" 
+                                                   class="form-control" placeholder="Nhập từ khóa tìm kiếm..."
+                                                   autocomplete="off">
+                                        </div>
+                                        <div class="filter-item">
+                                            <div class="search-group">
+                                                <button type="submit" class="btn btn-primary btn-icon">
+                                                    <i class="fas fa-search"></i> Tìm kiếm
+                                                </button>
+                                                <button type="button" class="btn btn-secondary btn-icon" onclick="clearSearch()">
+                                                    <i class="fas fa-times"></i> Xóa
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Hiển thị kết quả tìm kiếm -->
+                            <c:if test="${not empty param.searchValue}">
+                                <div class="alert alert-info mb-3">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">Kết quả tìm kiếm</div>
+                                        <div>
+                                            Tìm kiếm "<strong>${param.searchValue}</strong>" theo 
+                                            <strong>
+                                                <c:choose>
+                                                    <c:when test="${param.searchType == 'requestId'}">Mã yêu cầu</c:when>
+                                                    <c:when test="${param.searchType == 'productName'}">Tên sản phẩm</c:when>
+                                                    <c:when test="${param.searchType == 'productCode'}">Mã sản phẩm</c:when>
+                                                </c:choose>
+                                            </strong>
+                                        </div>
+                                        <div class="mt-2">
+                                            Tìm thấy <strong>${not empty items ? items.size() : 0}</strong> yêu cầu đã duyệt.
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
-                    </div>
+                            </c:if>
 
-                    <!-- Hiển thị kết quả tìm kiếm -->
-                    <c:if test="${not empty param.searchValue}">
-                        <div class="alert alert-info mb-3">
-                            <div class="alert-icon">
-                                <i class="fas fa-info-circle"></i>
-                            </div>
-                            <div class="alert-content">
-                                <div class="alert-title">Kết quả tìm kiếm</div>
-                                <div>
-                                    Tìm kiếm "<strong>${param.searchValue}</strong>" theo 
-                                    <strong>
-                                        <c:choose>
-                                            <c:when test="${param.searchType == 'requestId'}">Mã yêu cầu</c:when>
-                                            <c:when test="${param.searchType == 'productName'}">Tên sản phẩm</c:when>
-                                            <c:when test="${param.searchType == 'productCode'}">Mã sản phẩm</c:when>
-                                        </c:choose>
-                                    </strong>
-                                </div>
-                                <div class="mt-2">
-                                    Tìm thấy <strong>${not empty items ? items.size() : 0}</strong> yêu cầu đã duyệt và 
-                                    <strong>${not empty historyItems ? historyItems.size() : 0}</strong> yêu cầu đã hoàn thành.
-                                </div>
-                            </div>
-                        </div>
-                    </c:if>
-
-                    <!-- Bảng danh sách yêu cầu nhập đã duyệt -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h2 class="mb-0">Danh sách các yêu cầu đã duyệt</h2>
-                        </div>
-                        <div class="card-body">
+                            <!-- Bảng danh sách yêu cầu nhập đã duyệt -->
                             <div class="table-container">
                                 <table class="table table-hover">
                                     <thead>
@@ -887,7 +1011,7 @@
                                                     <td colspan="11" class="text-center py-4">
                                                         <div style="color: gray;">
                                                             <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i>
-                                                            <p>Không có dữ liệu để hiển thị.</p>
+                                                            <p>Không có yêu cầu đã duyệt nào để hiển thị.</p>
                                                             <c:if test="${not empty param.searchValue}">
                                                                 <p class="text-muted">Thử tìm kiếm với từ khóa khác hoặc thay đổi tiêu chí tìm kiếm.</p>
                                                             </c:if>
@@ -913,9 +1037,7 @@
                                                                 <a href="${pageContext.request.contextPath}/import-confirm?id=${item.requestId}" class="btn btn-sm btn-success">
                                                                     <i class="fas fa-check"></i> Xử lý nhập kho
                                                                 </a>
-                                                                <button type="button" class="btn btn-sm btn-info" onclick="viewDetails('${item.requestId}')">
-                                                                    <i class="fas fa-eye"></i> Chi tiết
-                                                                </button>
+
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -925,756 +1047,340 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Phân trang -->
-                    <c:if test="${totalPages > 1}">
-                        <nav aria-label="Page navigation" class="d-flex justify-content-center">
-                            <ul class="pagination">
-                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${currentPage - 1}&searchType=${param.searchType}&searchValue=${param.searchValue}" aria-label="Previous">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </a>
-                                </li>
+                            <!-- Phân trang cho yêu cầu đã duyệt -->
+                            <c:if test="${totalPages > 1}">
+                                <nav aria-label="Page navigation" class="d-flex justify-content-center">
+                                    <ul class="pagination">
+                                        <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${currentPage - 1}&searchType=${param.searchType}&searchValue=${param.searchValue}" aria-label="Previous">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </a>
+                                        </li>
 
-                                <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${i}&searchType=${param.searchType}&searchValue=${param.searchValue}">${i}</a>
-                                    </li>
-                                </c:forEach>
-
-                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${currentPage + 1}&searchType=${param.searchType}&searchValue=${param.searchValue}" aria-label="Next">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </c:if>
-                </div>
-
-                <div class="card-footer">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-warning btn-icon" onclick="showNotifications()">
-                                <i class="fas fa-bell"></i> Thông báo
-                            </button>
-                            <button type="button" class="btn btn-info btn-icon" onclick="showHelp()">
-                                <i class="fas fa-question-circle"></i> Trợ giúp
-                            </button>
-                        </div>
-                        <a href="${pageContext.request.contextPath}/Admin.jsp" class="btn btn-primary btn-icon">
-                            <i class="fas fa-arrow-left"></i> Quay lại Trang chủ
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Lịch sử nhập kho -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h2 class="mb-0">Lịch sử nhập kho</h2>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-warning btn-sm btn-icon" onclick="exportHistoryToExcel()">
-                            <i class="fas fa-file-excel"></i> Xuất Excel
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-container">
-                        <table class="table table-hover" id="historyTable">
-                            <thead>
-                                <tr>
-                                    <th>STT</th>
-                                    <th>Mã đơn</th>
-                                    <th>Ngày nhập</th>
-                                    <th>Tên sản phẩm</th>
-                                    <th>Mã sản phẩm</th>
-                                    <th>Nhà cung cấp</th>
-                                    <th>Số lượng</th>
-                                    <th>Đơn giá</th>
-                                    <th>Thành tiền</th>
-                                    <th>Trạng thái</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody id="historyTableBody">
-                                <c:choose>
-                                    <c:when test="${empty historyItems}">
-                                        <tr>
-                                            <td colspan="11" class="text-center py-4">
-                                                <div style="color: gray;">
-                                                    <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i>
-                                                    <p>Không có dữ liệu để hiển thị.</p>
-                                                    <c:if test="${not empty param.searchValue}">
-                                                        <p class="text-muted">Thử tìm kiếm với từ khóa khác hoặc thay đổi tiêu chí tìm kiếm.</p>
-                                                    </c:if>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <c:forEach var="item" items="${historyItems}" varStatus="status">                                                                   
-                                            <tr>
-                                                <td>${status.index + 1}</td>
-
-                                                <td class="searchable">${item.requestId}</td>
-                                                <td>${item.dayRequest}</td>
-                                                <td class="searchable">${item.productName != null ? item.productName : 'No items'}</td>
-                                                <td class="searchable">${item.productCode != null ? item.productCode : 'N/A'}</td>
-                                                <td class="searchable">${item.supplier}</td>
-                                                <td><fmt:formatNumber value="${item.quantity != null ? item.quantity : 0}" pattern="#,##0.##" /></td>
-                                                <td><fmt:formatNumber value="${item.price != null ? item.price : 0}" pattern="#,##0.## VNĐ" /></td>
-                                                <td><fmt:formatNumber value="${(item.quantity != null ? item.quantity : 0) * (item.price != null ? item.price : 0)}" pattern="#,##0.## VNĐ" /></td>
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${item.status == 'completed' || item.status == 'COMPLETED'}">
-                                                            <span class="status-badge status-completed">
-                                                                <i class="fas fa-check-circle"></i> Hoàn thành
-                                                            </span>
-                                                        </c:when>
-                                                        <c:when test="${item.status == 'pending' || item.status == 'PENDING'}">
-                                                            <span class="status-badge status-pending">
-                                                                <i class="fas fa-clock"></i> Chờ xử lý
-                                                            </span>
-                                                        </c:when>
-                                                        <c:when test="${item.status == 'processing' || item.status == 'PROCESSING'}">
-                                                            <span class="status-badge status-processing">
-                                                                <i class="fas fa-spinner"></i> Đang xử lý
-                                                            </span>
-                                                        </c:when>
-                                                        <c:when test="${item.status == 'cancelled' || item.status == 'CANCELLED'}">
-                                                            <span class="status-badge status-cancelled">
-                                                                <i class="fas fa-times-circle"></i> Đã hủy
-                                                            </span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="status-badge status-completed">
-                                                                <i class="fas fa-check-circle"></i> Hoàn thành
-                                                            </span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-
-                                                <td>${item.requestId}</td>
-                                                <td>${item.productName != null ? item.productName : 'No items'}</td>
-                                                <td>${item.productCode != null ? item.productCode : 'N/A'}</td>
-                                                <td>${item.supplier}</td>
-
-                                                <td>
-                                                    <a href="LishSupplier" class="btn btn-sm btn-info btn-icon">
-                                                        <i class="fas fa-star"></i> Đánh giá
-                                                    </a>
-                                                </td>
-                                            </tr>
+                                        <c:forEach begin="1" end="${totalPages}" var="i">
+                                            <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                                <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${i}&searchType=${param.searchType}&searchValue=${param.searchValue}">${i}</a>
+                                            </li>
                                         </c:forEach>
-                                    </c:otherwise>
-                                </c:choose>
-                            </tbody>
-                        </table>
+
+                                        <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=purchase&page=${currentPage + 1}&searchType=${param.searchType}&searchValue=${param.searchValue}" aria-label="Next">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </c:if>
+                        </div>
+                        <!-- Tab Content: Lịch sử nhập kho -->
+                        <div id="history" class="tab-content">
+                            <!-- Bộ lọc và tìm kiếm cho lịch sử -->
+                            <div class="filter-panel mb-4">
+                                <div class="filter-title">
+                                    <i class="fas fa-search"></i> Tìm kiếm lịch sử nhập kho
+                                </div>
+                                <form action="${pageContext.request.contextPath}/request/list" method="get" id="historySearchForm">
+                                    <input type="hidden" name="type" value="history">
+                                    <div class="filter-row">
+                                        <div class="filter-item">
+                                            <label class="form-label">Tìm kiếm theo:</label>
+                                            <select name="historySearchType" class="form-control">
+                                                <option value="requestId">Mã đơn</option>
+                                                <option value="productName">Tên sản phẩm</option>
+                                                <option value="productCode">Mã sản phẩm</option>
+                                                <option value="supplier">Nhà cung cấp</option>
+                                            </select>
+                                        </div>
+                                        <div class="filter-item">
+                                            <label class="form-label">Từ khóa:</label>
+                                            <input type="text" name="historySearchValue" 
+                                                   class="form-control" placeholder="Nhập từ khóa tìm kiếm..."
+                                                   autocomplete="off">
+                                        </div>
+                                        <div class="filter-item">
+                                            <div class="search-group">
+                                                <button type="submit" class="btn btn-primary btn-icon">
+                                                    <i class="fas fa-search"></i> Tìm kiếm
+                                                </button>
+                                                <button type="button" class="btn btn-secondary btn-icon" onclick="clearHistorySearch()">
+                                                    <i class="fas fa-times"></i> Xóa
+                                                </button>
+                                                <button type="button" class="btn btn-warning btn-icon" onclick="exportHistoryToExcel()">
+                                                    <i class="fas fa-file-excel"></i> Xuất Excel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Bảng lịch sử nhập kho -->
+                            <div class="table-container">
+                                <table class="table table-hover" id="historyTable">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Mã đơn</th>
+                                            <th>Ngày nhập</th>
+                                            <th>Tên sản phẩm</th>
+                                            <th>Mã sản phẩm</th>
+                                            <th>Nhà cung cấp</th>
+                                            <th>Số lượng</th>
+                                            <th>Đơn giá</th>
+                                            <th>Thành tiền</th>
+                                            <th>Trạng thái</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyTableBody">
+                                        <c:choose>
+                                            <c:when test="${empty historyItems}">
+                                                <tr>
+                                                    <td colspan="11" class="text-center py-4">
+                                                        <div style="color: gray;">
+                                                            <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i>
+                                                            <p>Không có lịch sử nhập kho nào để hiển thị.</p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:forEach var="item" items="${historyItems}" varStatus="status">                                                                   
+                                                    <tr>
+                                                        <td>${status.index + 1}</td>
+                                                        <td class="searchable">${item.requestId}</td>
+                                                        <td>${item.dayRequest}</td>
+                                                        <td class="searchable">${item.productName != null ? item.productName : 'No items'}</td>
+                                                        <td class="searchable">${item.productCode != null ? item.productCode : 'N/A'}</td>
+                                                        <td class="searchable">${item.supplier}</td>
+                                                        <td><fmt:formatNumber value="${item.quantity != null ? item.quantity : 0}" pattern="#,##0.##" /></td>
+                                                        <td><fmt:formatNumber value="${item.price != null ? item.price : 0}" pattern="#,##0.## VNĐ" /></td>
+                                                        <td><fmt:formatNumber value="${(item.quantity != null ? item.quantity : 0) * (item.price != null ? item.price : 0)}" pattern="#,##0.## VNĐ" /></td>
+                                                        <td>
+                                                            <c:choose>
+                                                                <c:when test="${item.status == 'completed' || item.status == 'COMPLETED'}">
+                                                                    <span class="status-badge status-completed">
+                                                                        <i class="fas fa-check-circle"></i> Hoàn thành
+                                                                    </span>
+                                                                </c:when>
+                                                                <c:when test="${item.status == 'rejected' || item.status == 'REJECTED'}">
+                                                                    <span class="status-badge status-rejected">
+                                                                        <i class="fas fa-times-circle"></i> Từ chối
+                                                                    </span>
+                                                                </c:when>
+                                                                <c:when test="${item.status == 'pending' || item.status == 'PENDING'}">
+                                                                    <span class="status-badge status-pending">
+                                                                        <i class="fas fa-clock"></i> Chờ xử lý
+                                                                    </span>
+                                                                </c:when>
+                                                                <c:when test="${item.status == 'processing' || item.status == 'PROCESSING'}">
+                                                                    <span class="status-badge status-processing">
+                                                                        <i class="fas fa-spinner"></i> Đang xử lý
+                                                                    </span>
+                                                                </c:when>
+                                                                <c:when test="${item.status == 'cancelled' || item.status == 'CANCELLED'}">
+                                                                    <span class="status-badge status-cancelled">
+                                                                        <i class="fas fa-ban"></i> Đã hủy
+                                                                    </span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="status-badge status-completed">
+                                                                        <i class="fas fa-question-circle"></i> ${item.status}
+                                                                    </span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex gap-2">
+
+                                                                <a href="LishSupplier" class="btn btn-sm btn-warning btn-icon">
+                                                                    <i class="fas fa-star"></i> Đánh giá
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Phân trang cho lịch sử -->
+                            <c:if test="${historyTotalPages > 1}">
+                                <nav aria-label="History pagination" class="d-flex justify-content-center">
+                                    <ul class="pagination">
+                                        <li class="page-item ${historyCurrentPage == 1 ? 'disabled' : ''}">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=history&page=${historyCurrentPage - 1}" aria-label="Previous">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </a>
+                                        </li>
+
+                                        <c:forEach begin="1" end="${historyTotalPages}" var="i">
+                                            <li class="page-item ${historyCurrentPage == i ? 'active' : ''}">
+                                                <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=history&page=${i}">${i}</a>
+                                            </li>
+                                        </c:forEach>
+
+                                        <li class="page-item ${historyCurrentPage == historyTotalPages ? 'disabled' : ''}">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/request/list?type=history&page=${historyCurrentPage + 1}" aria-label="Next">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </c:if>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-warning btn-icon" onclick="showNotifications()">
+                                    <i class="fas fa-bell"></i> Thông báo
+                                </button>
+                                <button type="button" class="btn btn-info btn-icon" onclick="showHelp()">
+                                    <i class="fas fa-question-circle"></i> Trợ giúp
+                                </button>
+                            </div>
+                            <a href="${pageContext.request.contextPath}/Admin.jsp" class="btn btn-primary btn-icon">
+                                <i class="fas fa-arrow-left"></i> Quay lại Trang chủ
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Modal xác nhận phê duyệt nhập kho -->
-        <div id="approveModal" class="modal">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Xác nhận phê duyệt nhập kho</h5>
-                        <button type="button" class="modal-close" onclick="closeApproveModal()">
-                            <i class="fas fa-times"></i>
-                        </button>
+            <!-- Modal xác nhận phê duyệt nhập kho -->
+            <div id="approveModal" class="modal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Xác nhận phê duyệt nhập kho</h5>
+                            <button type="button" class="modal-close" onclick="closeApproveModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <form id="approveForm" action="${pageContext.request.contextPath}/request/list" method="post">
+                            <div class="modal-body">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div style="width: 3rem; height: 3rem; background-color: #d1fae5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-check-circle" style="font-size: 1.5rem; color: #10b981;"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="mb-1">Xác nhận nhập kho</h2>
+                                        <p class="mb-0 text-muted">Hàng hóa sẽ được cập nhật vào kho sau khi phê duyệt.</p>
+                                    </div>
+                                </div>
+
+                                <input type="hidden" id="requestIdInput" name="id" value="">
+                                <p>Bạn đang phê duyệt nhập kho yêu cầu có ID: <strong id="approveRequestId"></strong></p>
+
+                                <div class="form-group">
+                                    <label for="approveNote" class="form-label">Ghi chú:</label>
+                                    <textarea id="approveNote" name="note" class="form-control" rows="3" placeholder="Nhập ghi chú phê duyệt (nếu có)"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="approveDate" class="form-label">Ngày nhập kho:</label>
+                                    <input type="date" id="approveDate" name="approveDate" class="form-control" value="${currentDate}" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" onclick="closeApproveModal()">
+                                    Hủy bỏ
+                                </button>
+                                <button type="submit" class="btn btn-success btn-icon">
+                                    <i class="fas fa-check-circle"></i> Xác nhận nhập kho
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    <form id="approveForm" action="${pageContext.request.contextPath}/request/list" method="post">
-                        <div class="modal-body">
-                            <div class="d-flex align-items-center gap-3 mb-3">
-                                <div style="width: 3rem; height: 3rem; background-color: #d1fae5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas fa-check-circle" style="font-size: 1.5rem; color: #10b981;"></i>
-                                </div>
-                                <div>
-                                    <h2 class="mb-1">Xác nhận nhập kho</h2>
-                                    <p class="mb-0 text-muted">Hàng hóa sẽ được cập nhật vào kho sau khi phê duyệt.</p>
-                                </div>
-                            </div>
+                </div>
+            </div>
 
-                            <input type="hidden" id="requestIdInput" name="id" value="">
-                            <p>Bạn đang phê duyệt nhập kho yêu cầu có ID: <strong id="approveRequestId"></strong></p>
-
-                            <div class="form-group">
-                                <label for="approveNote" class="form-label">Ghi chú:</label>
-                                <textarea id="approveNote" name="note" class="form-control" rows="3" placeholder="Nhập ghi chú phê duyệt (nếu có)"></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="approveDate" class="form-label">Ngày nhập kho:</label>
-                                <input type="date" id="approveDate" name="approveDate" class="form-control" value="${currentDate}" required>
-                            </div>
+            <!-- Modal chi tiết yêu cầu -->
+            <div id="detailModal" class="modal">
+                <div class="modal-dialog" style="max-width: 800px;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Chi tiết yêu cầu nhập kho</h5>
+                            <button type="button" class="modal-close" onclick="closeDetailModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body" id="detailModalBody">
+                            <!-- Nội dung chi tiết sẽ được load bằng JavaScript -->
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" onclick="closeApproveModal()">
-                                Hủy bỏ
-                            </button>
-                            <button type="submit" class="btn btn-success btn-icon">
-                                <i class="fas fa-check-circle"></i> Xác nhận nhập kho
+                            <button type="button" class="btn btn-secondary" onclick="closeDetailModal()">
+                                Đóng
                             </button>
                         </div>
-                    </form>
-                </div>
-                            </div>
-                            </div>
-            </div>
-
-        <!-- Modal chi tiết yêu cầu -->
-        <div id="detailModal" class="modal">
-            <div class="modal-dialog" style="max-width: 800px;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Chi tiết yêu cầu nhập kho</h5>
-                        <button type="button" class="modal-close" onclick="closeDetailModal()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body" id="detailModalBody">
-                        <!-- Nội dung chi tiết sẽ được load bằng JavaScript -->
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onclick="closeDetailModal()">
-                            Đóng
-                        </button>
                     </div>
                 </div>
             </div>
-        </div>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+            <script>
+                                // Biến global để lưu giá trị tìm kiếm
+                                var searchValue = '${param.searchValue}' || '';
+                                var searchType = '${param.searchType}' || '';
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-        <script>
-                            // Biến global để lưu giá trị tìm kiếm
-                            var searchValue = '${param.searchValue}' || '';
-                            var searchType = '${param.searchType}' || '';
-
-                            // Xử lý đóng alert sau 5 giây
-                            window.addEventListener('DOMContentLoaded', function () {
-                                setTimeout(function () {
-                                    var successAlert = document.getElementById('successAlert');
-                                    var errorAlert = document.getElementById('errorAlert');
-                                    if (successAlert) {
-                                        successAlert.style.display = 'none';
-                                    }
-                                    if (errorAlert) {
-                                        errorAlert.style.display = 'none';
-                                    }
-                                }, 5000);
-
-                                // Highlight search results
-                                highlightSearchResults();
-                            });
-
-                            // Xuất lịch sử ra Excel
-                            function exportHistoryToExcel() {
-                                try {
-                                    var table = document.getElementById('historyTable');
-                                    if (!table) {
-                                        showNotification('Không tìm thấy bảng dữ liệu!', 'error');
-                                        return;
-                                    }
-
-                                    // Tạo workbook mới
-                                    var wb = XLSX.utils.book_new();
-
-                                    // Lấy dữ liệu từ bảng
-                                    var ws_data = [];
-                                    var rows = table.querySelectorAll('tr');
-
-                                    // Thêm tiêu đề
-                                    ws_data.push(['LỊCH SỬ NHẬP KHO']);
-                                    ws_data.push(['Ngày xuất: ' + new Date().toLocaleDateString('vi-VN')]);
-                                    ws_data.push([]); // Dòng trống
-
-                                    rows.forEach(function (row, index) {
-                                        var rowData = [];
-                                        var cells = row.querySelectorAll('th, td');
-
-                                        // Bỏ qua cột thao tác (cột cuối)
-                                        for (var i = 0; i < cells.length - 1; i++) {
-                                            var cellText = cells[i].textContent.trim();
-                                            // Xử lý các ký tự đặc biệt
-                                            cellText = cellText.replace(/\s+/g, ' ');
-                                            rowData.push(cellText);
-                                        }
-
-                                        if (rowData.length > 0 && rowData.some(cell => cell !== '')) {
-                                            ws_data.push(rowData);
-                                        }
+                                // FUNCTION CHUYỂN ĐỔI TAB - PHẦN MỚI THÊM
+                                function switchTab(tabName) {
+                                    // Ẩn tất cả tab content
+                                    var tabContents = document.querySelectorAll('.tab-content');
+                                    tabContents.forEach(function (content) {
+                                        content.classList.remove('active');
                                     });
 
-                                    // Tạo worksheet
-                                    var ws = XLSX.utils.aoa_to_sheet(ws_data);
+                                    // Bỏ active cho tất cả tab button
+                                    var tabButtons = document.querySelectorAll('.tab-button');
+                                    tabButtons.forEach(function (button) {
+                                        button.classList.remove('active');
+                                    });
 
-                                    // Thiết lập độ rộng cột
-                                    var colWidths = [
-                                        {wch: 5}, // STT
-                                        {wch: 15}, // Mã đơn
-                                        {wch: 12}, // Ngày nhập
-                                        {wch: 25}, // Tên sản phẩm
-                                        {wch: 15}, // Mã sản phẩm
-                                        {wch: 20}, // Nhà cung cấp
-                                        {wch: 10}, // Số lượng
-                                        {wch: 15}, // Đơn giá
-                                        {wch: 15}, // Thành tiền
-                                        {wch: 12}  // Trạng thái
-                                    ];
-                                    ws['!cols'] = colWidths;
+                                    // Hiển thị tab được chọn
+                                    document.getElementById(tabName).classList.add('active');
 
-                                    // Thêm worksheet vào workbook
-                                    XLSX.utils.book_append_sheet(wb, ws, "Lịch sử nhập kho");
+                                    // Active tab button tương ứng
+                                    if (tabName === 'approved-requests') {
+                                        document.getElementById('tab-approved').classList.add('active');
+                                    } else if (tabName === 'history') {
+                                        document.getElementById('tab-history').classList.add('active');
+                                    }
 
-                                    // Tạo tên file với timestamp
-                                    var fileName = 'Lich_su_nhap_kho_' + new Date().toISOString().slice(0, 10) + '.xlsx';
-
-                                    // Xuất file
-                                    XLSX.writeFile(wb, fileName);
-
-                                    showNotification('Xuất file Excel thành công!', 'success');
-
-                                } catch (error) {
-                                    console.error('Lỗi khi xuất Excel:', error);
-                                    showNotification('Có lỗi xảy ra khi xuất file Excel!', 'error');
+                                    // Lưu trạng thái tab hiện tại
+                                    localStorage.setItem('activeTab', tabName);
                                 }
-                            }
 
-                            // Xem chi tiết yêu cầu
-                            function viewDetails(requestId) {
-                                document.getElementById('detailModal').style.display = 'block';
-                                document.body.style.overflow = 'hidden';
-                                loadRequestDetails(requestId);
-                            }
-
-                            function loadRequestDetails(requestId) {
-                                // Tìm thông tin từ bảng hiện tại
-                                var approvedRows = document.querySelectorAll('#approvedTableBody tr');
-                                var requestData = null;
-
-                                approvedRows.forEach(function (row) {
-                                    var cells = row.querySelectorAll('td');
-                                    if (cells.length > 1 && cells[1].textContent.trim() === requestId) {
-                                        requestData = {
-                                            requestId: cells[1].textContent.trim(),
-                                            dayRequest: cells[2].textContent.trim(),
-                                            supplier: cells[3].textContent.trim(),
-                                            productName: cells[4].textContent.trim(),
-                                            productCode: cells[5].textContent.trim(),
-                                            unit: cells[6].textContent.trim(),
-                                            quantity: cells[7].textContent.trim(),
-                                            price: cells[8].textContent.trim(),
-                                            note: cells[9].textContent.trim()
-                                        };
+                                // Khôi phục tab đã chọn khi load trang
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    var activeTab = localStorage.getItem('activeTab');
+                                    if (activeTab && document.getElementById(activeTab)) {
+                                        switchTab(activeTab);
                                     }
                                 });
 
-                                if (requestData) {
-                                    document.getElementById('detailModalBody').innerHTML = `
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6><i class="fas fa-info-circle"></i> Thông tin yêu cầu</h6>
-                                <table class="table table-sm">
-                                    <tr><td><strong>Mã yêu cầu:</strong></td><td>${requestData.requestId}</td></tr>
-                                    <tr><td><strong>Ngày tạo:</strong></td><td>${requestData.dayRequest}</td></tr>
-                                    <tr><td><strong>Trạng thái:</strong></td><td><span class="status-badge status-pending">Đã duyệt</span></td></tr>
-                                    <tr><td><strong>Ghi chú:</strong></td><td>${requestData.note}</td></tr>
-                                </table>
-                            </div>
-                            <div class="col-md-6">
-                                <h6><i class="fas fa-building"></i> Thông tin nhà cung cấp</h6>
-                                <table class="table table-sm">
-                                    <tr><td><strong>Tên:</strong></td><td>${requestData.supplier}</td></tr>
-                                    <tr><td><strong>Địa chỉ:</strong></td><td>Đang cập nhật...</td></tr>
-                                    <tr><td><strong>Điện thoại:</strong></td><td>Đang cập nhật...</td></tr>
-                                    <tr><td><strong>Email:</strong></td><td>Đang cập nhật...</td></tr>
-                                </table>
-                            </div>
-                        </div>
-                        <hr>
-                        <h6><i class="fas fa-box"></i> Chi tiết sản phẩm</h6>
-                        <table class="table table-sm table-bordered">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Tên sản phẩm</th>
-                                    <th>Mã sản phẩm</th>
-                                    <th>Đơn vị</th>
-                                    <th>Số lượng</th>
-                                    <th>Đơn giá</th>
-                                    <th>Thành tiền</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>${requestData.productName}</td>
-                                    <td>${requestData.productCode}</td>
-                                    <td>${requestData.unit}</td>
-                                    <td>${requestData.quantity}</td>
-                                    <td>${requestData.price}</td>
-                                    <td class="text-end"><strong>Đang tính toán...</strong></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="mt-3">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i>
-                                <strong>Lưu ý:</strong> Thông tin chi tiết có thể được cập nhật thêm từ hệ thống.
-                            </div>
-                        </div>
-                    `;
-                                } else {
-                                    document.getElementById('detailModalBody').innerHTML = `
-                        <div class="text-center py-4">
-                            <i class="fas fa-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
-                            <h5 class="mt-3">Không tìm thấy thông tin</h5>
-                            <p class="text-muted">Không thể tải thông tin chi tiết cho yêu cầu này.</p>
-                        </div>
-                    `;
-                                }
-                            }
-
-                            // Modal management functions
-                            function closeDetailModal() {
-                                document.getElementById('detailModal').style.display = 'none';
-                                document.body.style.overflow = '';
-                            }
-
-                            function openApproveModal(requestId) {
-                                document.getElementById('approveRequestId').textContent = requestId;
-                                document.getElementById('requestIdInput').value = requestId;
-                                document.getElementById('approveModal').style.display = 'block';
-                                document.body.style.overflow = 'hidden';
-                            }
-
-                            function closeApproveModal() {
-                                document.getElementById('approveModal').style.display = 'none';
-                                document.body.style.overflow = '';
-                            }
-
-                            // Đóng modal khi click bên ngoài
-                            window.onclick = function (event) {
-                                if (event.target.className === 'modal') {
-                                    event.target.style.display = 'none';
-                                    document.body.style.overflow = '';
-                                }
-                            };
-
-                            // Xóa tìm kiếm
-                            function clearSearch() {
-                                document.querySelector('input[name="searchValue"]').value = '';
-                                document.querySelector('select[name="searchType"]').selectedIndex = 0;
-                                window.location.href = '${pageContext.request.contextPath}/request/list?type=purchase';
-                            }
-
-                            // Highlight search results
-                            function highlightSearchResults() {
-                                if (searchValue && searchValue.trim() !== '') {
-                                    var searchableElements = document.querySelectorAll('.searchable');
-                                    searchableElements.forEach(function (element) {
-                                        var text = element.textContent || element.innerText;
-                                        if (text && text.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1) {
-                                            var lowerText = text.toLowerCase();
-                                            var lowerSearch = searchValue.toLowerCase();
-                                            var startIndex = lowerText.indexOf(lowerSearch);
-
-                                            if (startIndex !== -1) {
-                                                var before = text.substring(0, startIndex);
-                                                var match = text.substring(startIndex, startIndex + searchValue.length);
-                                                var after = text.substring(startIndex + searchValue.length);
-                                                element.innerHTML = before + '<mark>' + match + '</mark>' + after;
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-
-                            // Helper functions
-                            function showNotification(message, type = 'info') {
-                                var notification = document.createElement('div');
-                                notification.className = `alert alert-${type}`;
-                                notification.style.position = 'fixed';
-                                notification.style.top = '20px';
-                                notification.style.right = '20px';
-                                notification.style.zIndex = '9999';
-                                notification.style.minWidth = '300px';
-                                notification.innerHTML = `
-                    <div class="alert-icon">
-                        <i class="fas fa-$(type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info-circle')"></i>
-                    </div>
-                    <div class="alert-content">
-                        <div class="alert-title">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
-                        <div>${message}</div>
-                    </div>
-                `;
-                                document.body.appendChild(notification);
-                                setTimeout(() => {
-                                    notification.remove();
-                                }, 3000);
-                            }
-
-                            // Hiển thị thông báo
-                            function showNotifications() {
-                                alert('Bạn có 3 thông báo mới!\n1. Yêu cầu #REQ001 đã được xử lý\n2. Nhà cung cấp ABC đã gửi báo giá\n3. Kho A sắp hết hàng');
-                            }
-
-                            // Hiển thị trợ giúp
-                            function showHelp() {
-                                alert('Hướng dẫn sử dụng:\n1. Sử dụng bộ lọc để tìm kiếm yêu cầu\n2. Click "Chi tiết" để xem thông tin đầy đủ\n3. Click "Xử lý nhập kho" để phê duyệt\n4. Sử dụng "Xuất Excel" để tải dữ liệu lịch sử');
-                            }
-
-                            // Tìm kiếm theo thời gian thực
-                            document.addEventListener('DOMContentLoaded', function () {
-                                var searchInput = document.querySelector('input[name="searchValue"]');
-                                var searchForm = document.getElementById('searchForm');
-                                if (searchInput) {
-                                    searchInput.addEventListener('keypress', function (e) {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            searchForm.submit();
-                                        }
-                                    });
-                                    if (searchInput.value === '') {
-                                        searchInput.focus();
-                                    }
-                                }
-
-                                // Keyboard shortcuts
-                                document.addEventListener('keydown', function (e) {
-                                    if (e.ctrlKey && e.key === 'f') {
-                                        e.preventDefault();
-                                        if (searchInput) {
-                                            searchInput.focus();
-                                            searchInput.select();
-                                        }
-                                    }
-
-                                    if (e.key === 'Escape' && document.activeElement === searchInput) {
-                                        clearSearch();
-                                    }
-                                });
-                            });
-
-                            // Thêm loading state cho form tìm kiếm
-                            document.getElementById('searchForm').addEventListener('submit', function () {
-                                var submitBtn = this.querySelector('button[type="submit"]');
-                                var originalText = submitBtn.innerHTML;
-                                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tìm...';
-                                submitBtn.disabled = true;
-
-                                setTimeout(function () {
-                                    submitBtn.innerHTML = originalText;
-                                    submitBtn.disabled = false;
-                                }, 3000);
-                            });
-
-                            // Thêm tooltip cho các nút
-                            function addTooltips() {
-                                var tooltipElements = [
-                                    {selector: '.btn-primary', text: 'Tìm kiếm dữ liệu'},
-                                    {selector: '.btn-secondary', text: 'Xóa bộ lọc'},
-                                    {selector: '.btn-success', text: 'Xử lý nhập kho'},
-                                    {selector: '.btn-info', text: 'Xem chi tiết'},
-                                    {selector: '.btn-warning', text: 'Thao tác đặc biệt'}
-                                ];
-
-                                tooltipElements.forEach(function (item) {
-                                    var elements = document.querySelectorAll(item.selector);
-                                    elements.forEach(function (el) {
-                                        el.setAttribute('title', item.text);
-                                    });
-                                });
-                            }
-
-                            // Gọi function thêm tooltip
-                            addTooltips();
-
-                            // Auto-refresh data every 5 minutes
-                            setInterval(function () {
-                                if (document.hasFocus()) {
-                                    console.log('Auto-refreshing data...');
-                                }
-                            }, 300000); // 5 minutes
-
-                            // Fallback function nếu highlight phức tạp không hoạt động
-                            function basicHighlight() {
-                                if (searchValue && searchValue.trim() !== '') {
-                                    var searchableElements = document.querySelectorAll('.searchable');
-                                    searchableElements.forEach(function (element) {
-                                        var text = element.textContent;
-                                        if (text && text.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1) {
-                                            element.style.backgroundColor = '#fff3cd';
-                                            element.style.fontWeight = 'bold';
-                                        }
-                                    });
-                                }
-                            }
-
-                            // Sử dụng basic highlight nếu có lỗi
-                            try {
-                                highlightSearchResults();
-                            } catch (e) {
-                                console.log('Using basic highlight due to error:', e);
-                                basicHighlight();
-                            }
-
-                            // Initialize page
-                            document.addEventListener('DOMContentLoaded', function () {
-                                // Add row hover effects
-                                var tableRows = document.querySelectorAll('.table tbody tr');
-                                tableRows.forEach(function (row) {
-                                    row.addEventListener('mouseenter', function () {
-                                        this.style.backgroundColor = '#f8f9fa';
-                                    });
-                                    row.addEventListener('mouseleave', function () {
-                                        this.style.backgroundColor = '';
-                                    });
-                                });
-
-                                // Show welcome message
-                                if (window.location.search.indexOf('welcome=1') > -1) {
-                                    showNotification('Chào mừng bạn đến với hệ thống quản lý yêu cầu nhập kho!', 'success');
-                                }
-                            });
-
-                            // Add context menu for right-click actions
-                            document.addEventListener('contextmenu', function (e) {
-                                var target = e.target.closest('tr');
-                                if (target && target.querySelector('td')) {
-                                    e.preventDefault();
-                                    showContextMenu(e.pageX, e.pageY, target);
-                                }
-                            });
-
-                            function showContextMenu(x, y, row) {
-                                var existingMenu = document.getElementById('contextMenu');
-                                if (existingMenu) {
-                                    existingMenu.remove();
-                                }
-
-                                var menu = document.createElement('div');
-                                menu.id = 'contextMenu';
-                                menu.style.cssText = `
-                    position: absolute;
-                    left: ${x}px;
-                    top: ${y}px;
-                    background: white;
-                    border: 1px solid #ccc;
-                    border-radius: 4px;
-                    padding: 8px 0;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                    z-index: 1000;
-                    min-width: 150px;
-                `;
-
-                                var cells = row.querySelectorAll('td');
-                                if (cells.length > 1) {
-                                    var requestId = cells[1].textContent.trim();
-
-                                    menu.innerHTML = `
-                        <div style="padding: 8px 16px; cursor: pointer;" onmouseover="this.style.backgroundColor='#f5f5f5'" onmouseout="this.style.backgroundColor=''" onclick="viewDetails('${requestId}'); document.getElementById('contextMenu').remove();">
-                            <i class="fas fa-eye"></i> Xem chi tiết
-                        </div>
-                        <div style="padding: 8px 16px; cursor: pointer;" onmouseover="this.style.backgroundColor='#f5f5f5'" onmouseout="this.style.backgroundColor=''" onclick="copyToClipboard('${requestId}'); document.getElementById('contextMenu').remove();">
-                            <i class="fas fa-copy"></i> Sao chép mã
-                        </div>
-                        <hr style="margin: 4px 0;">
-                        <div style="padding: 8px 16px; cursor: pointer; color: #dc3545;" onmouseover="this.style.backgroundColor='#f5f5f5'" onmouseout="this.style.backgroundColor=''" onclick="alert('Chức năng này cần quyền admin!'); document.getElementById('contextMenu').remove();">
-                            <i class="fas fa-trash"></i> Xóa
-                        </div>
-                    `;
-                                }
-
-                                document.body.appendChild(menu);
-
-                                setTimeout(() => {
-                                    document.addEventListener('click', function removeMenu() {
-                                        if (menu)
-                                            menu.remove();
-                                        document.removeEventListener('click', removeMenu);
-                                    });
-                                }, 100);
-                            }
-
-                            // Copy to clipboard function
-                            function copyToClipboard(text) {
-                                if (navigator.clipboard) {
-                                    navigator.clipboard.writeText(text).then(function () {
-                                        showNotification('Đã sao chép mã: ' + text, 'success');
-                                    });
-                                } else {
-                                    // Fallback for older browsers
-                                    var textArea = document.createElement("textarea");
-                                    textArea.value = text;
-                                    document.body.appendChild(textArea);
-                                    textArea.focus();
-                                    textArea.select();
-                                    try {
-                                        document.execCommand('copy');
-                                        showNotification('Đã sao chép mã: ' + text, 'success');
-                                    } catch (err) {
-                                        showNotification('Không thể sao chép!', 'error');
-                                    }
-                                    document.body.removeChild(textArea);
-                                }
-                            }
-
-                            // Print functionality
-                            function printTable() {
-                                window.print();
-                            }
-
-                            // Thêm animation cho highlight
-                            function animateHighlight() {
-                                var marks = document.querySelectorAll('mark');
-                                marks.forEach(function (mark, index) {
+                                // Xử lý đóng alert sau 5 giây
+                                window.addEventListener('DOMContentLoaded', function () {
                                     setTimeout(function () {
-                                        mark.style.animation = 'highlight-pulse 0.5s ease-in-out';
-                                    }, index * 100);
-                                });
-                            }
+                                        var successAlert = document.getElementById('successAlert');
+                                        var errorAlert = document.getElementById('errorAlert');
+                                        if (successAlert) {
+                                            successAlert.style.display = 'none';
+                                        }
+                                        if (errorAlert) {
+                                            errorAlert.style.display = 'none';
+                                        }
+                                    }, 5000);
 
-                            // CSS animation cho highlight
-                            var style = document.createElement('style');
-                            style.textContent = '@keyframes highlight-pulse { 0% { background-color: #fff3cd; } 50% { background-color: #ffc107; } 100% { background-color: #fff3cd; } }';
-                            document.head.appendChild(style);
-
-                            // Gọi animation sau khi highlight
-                            setTimeout(animateHighlight, 500);
-
-                            // Validate Excel export
-                            function validateExcelExport() {
-                                var historyRows = document.querySelectorAll('#historyTableBody tr');
-                                var hasData = false;
-
-                                historyRows.forEach(function (row) {
-                                    var cells = row.querySelectorAll('td');
-                                    if (cells.length > 1 && !cells[0].textContent.includes('Không có dữ liệu')) {
-                                        hasData = true;
-                                    }
+                                    // Highlight search results
+                                    highlightSearchResults();
                                 });
 
-                                if (!hasData) {
-                                    showNotification('Không có dữ liệu để xuất!', 'warning');
-                                    return false;
-                                }
-
-                                return true;
-                            }
-
-                            // Enhanced Excel export with validation
-                            function exportHistoryToExcel() {
-                                if (!validateExcelExport()) {
-                                    return;
-                                }
-
-                                showNotification('Đang chuẩn bị xuất file Excel...', 'info');
-
-                                setTimeout(function () {
+                                // Xuất lịch sử ra Excel
+                                function exportHistoryToExcel() {
                                     try {
                                         var table = document.getElementById('historyTable');
                                         if (!table) {
@@ -1682,83 +1388,425 @@
                                             return;
                                         }
 
+                                        // Tạo workbook mới
                                         var wb = XLSX.utils.book_new();
+                                        // Lấy dữ liệu từ bảng
                                         var ws_data = [];
-
-                                        // Header information
-                                        ws_data.push(['LỊCH SỬ NHẬP KHO']);
-                                        ws_data.push(['Hệ thống quản lý kho']);
-                                        ws_data.push(['Ngày xuất: ' + new Date().toLocaleDateString('vi-VN')]);
-                                        ws_data.push(['Thời gian: ' + new Date().toLocaleTimeString('vi-VN')]);
-                                        ws_data.push([]);
-
                                         var rows = table.querySelectorAll('tr');
+                                        // Thêm tiêu đề
+                                        ws_data.push(['LỊCH SỬ NHẬP KHO']);
+                                        ws_data.push(['Ngày xuất: ' + new Date().toLocaleDateString('vi-VN')]);
+                                        ws_data.push([]); // Dòng trống
 
                                         rows.forEach(function (row, index) {
                                             var rowData = [];
                                             var cells = row.querySelectorAll('th, td');
-
+                                            // Bỏ qua cột thao tác (cột cuối)
                                             for (var i = 0; i < cells.length - 1; i++) {
                                                 var cellText = cells[i].textContent.trim();
+                                                // Xử lý các ký tự đặc biệt
                                                 cellText = cellText.replace(/\s+/g, ' ');
                                                 rowData.push(cellText);
                                             }
 
-                                            if (rowData.length > 0 && rowData.some(cell => cell !== '' && !cell.includes('Không có dữ liệu'))) {
+                                            if (rowData.length > 0 && rowData.some(cell => cell !== '')) {
                                                 ws_data.push(rowData);
                                             }
                                         });
-
-                                        // Summary
-                                        ws_data.push([]);
-                                        ws_data.push(['TỔNG KẾT:']);
-                                        ws_data.push(['Tổng số bản ghi: ' + (ws_data.length - 7)]);
-                                        ws_data.push(['Xuất bởi: Hệ thống quản lý kho']);
-
+                                        // Tạo worksheet
                                         var ws = XLSX.utils.aoa_to_sheet(ws_data);
-
+                                        // Thiết lập độ rộng cột
                                         var colWidths = [
-                                            {wch: 5}, {wch: 15}, {wch: 12}, {wch: 25}, {wch: 15},
-                                            {wch: 20}, {wch: 10}, {wch: 15}, {wch: 15}, {wch: 12}
+                                            {wch: 5}, // STT
+                                            {wch: 15}, // Mã đơn
+                                            {wch: 12}, // Ngày nhập
+                                            {wch: 25}, // Tên sản phẩm
+                                            {wch: 15}, // Mã sản phẩm
+                                            {wch: 20}, // Nhà cung cấp
+                                            {wch: 10}, // Số lượng
+                                            {wch: 15}, // Đơn giá
+                                            {wch: 15}, // Thành tiền
+                                            {wch: 12}  // Trạng thái
                                         ];
                                         ws['!cols'] = colWidths;
-
+                                        // Thêm worksheet vào workbook
                                         XLSX.utils.book_append_sheet(wb, ws, "Lịch sử nhập kho");
-
-                                        var fileName = 'Lich_su_nhap_kho_' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '_' +
-                                                new Date().toTimeString().slice(0, 8).replace(/:/g, '') + '.xlsx';
-
+                                        // Tạo tên file với timestamp
+                                        var fileName = 'Lich_su_nhap_kho_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+                                        // Xuất file
                                         XLSX.writeFile(wb, fileName);
 
-                                        showNotification('Xuất file Excel thành công! File: ' + fileName, 'success');
+                                        showNotification('Xuất file Excel thành công!', 'success');
 
                                     } catch (error) {
                                         console.error('Lỗi khi xuất Excel:', error);
-                                        showNotification('Có lỗi xảy ra khi xuất file Excel: ' + error.message, 'error');
+                                        showNotification('Có lỗi xảy ra khi xuất file Excel!', 'error');
                                     }
-                                }, 1000);
-                            }
-
-                            // Enhanced search with debounce
-                            var searchTimeout;
-                            function debounceSearch() {
-                                clearTimeout(searchTimeout);
-                                searchTimeout = setTimeout(function () {
-                                    var searchInput = document.querySelector('input[name="searchValue"]');
-                                    if (searchInput && searchInput.value.length >= 2) {
-                                        // Có thể thêm tìm kiếm real-time ở đây
-                                        console.log('Searching for:', searchInput.value);
-                                    }
-                                }, 500);
-                            }
-
-                            // Add search input listener
-                            document.addEventListener('DOMContentLoaded', function () {
-                                var searchInput = document.querySelector('input[name="searchValue"]');
-                                if (searchInput) {
-                                    searchInput.addEventListener('input', debounceSearch);
                                 }
-                            });
-        </script>
+
+                                // Hàm hiển thị thông báo
+                                function showNotification(message, type) {
+                                    var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                                    var icon = type === 'success' ? 'fa-check' : 'fa-exclamation-triangle';
+
+                                    var notification = document.createElement('div');
+                                    notification.className = 'alert ' + alertClass;
+                                    notification.style.position = 'fixed';
+                                    notification.style.top = '20px';
+                                    notification.style.right = '20px';
+                                    notification.style.zIndex = '9999';
+                                    notification.style.minWidth = '300px';
+                                    notification.innerHTML = `
+                        <div class="alert-icon">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">$(type === 'success' ? 'Thành công' : 'Lỗi')</div>
+                            <div>${message}</div>
+                        </div>
+                        <div class="alert-close" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    `;
+
+                                    document.body.appendChild(notification);
+
+                                    // Tự động ẩn sau 3 giây
+                                    setTimeout(function () {
+                                        if (notification.parentNode) {
+                                            notification.parentNode.removeChild(notification);
+                                        }
+                                    }, 3000);
+                                }
+
+                                // Hàm highlight kết quả tìm kiếm
+                                function highlightSearchResults() {
+                                    if (searchValue && searchValue.trim() !== '') {
+                                        var searchables = document.querySelectorAll('.searchable');
+                                        searchables.forEach(function (element) {
+                                            var text = element.textContent;
+                                            var highlightedText = text.replace(
+                                                    new RegExp('(' + escapeRegExp(searchValue) + ')', 'gi'),
+                                                    '<mark>$1</mark>'
+                                                    );
+                                            element.innerHTML = highlightedText;
+                                        });
+                                    }
+                                }
+
+                                // Hàm escape RegExp
+                                function escapeRegExp(string) {
+                                    return string.replace(/[.*+?^$()()|[\]\\]/g, '\\$&');
+                                }
+
+                                // Hàm xóa tìm kiếm
+                                function clearSearch() {
+                                    document.querySelector('select[name="searchType"]').value = 'requestId';
+                                    document.querySelector('input[name="searchValue"]').value = '';
+                                    window.location.href = '${pageContext.request.contextPath}/request/list?type=purchase';
+                                }
+
+                                // Hàm xóa tìm kiếm lịch sử
+                                function clearHistorySearch() {
+                                    document.querySelector('select[name="historySearchType"]').value = 'requestId';
+                                    document.querySelector('input[name="historySearchValue"]').value = '';
+                                    window.location.href = '${pageContext.request.contextPath}/request/list?type=history';
+                                }
+
+                                // Hàm xem chi tiết yêu cầu đã duyệt
+                                function viewDetails(requestId) {
+                                    loadRequestDetails(requestId);
+                                    document.getElementById('detailModal').style.display = 'block';
+                                }
+
+                                // Hàm xem chi tiết lịch sử
+                                function viewHistoryDetails(requestId) {
+                                    loadHistoryDetails(requestId);
+                                    document.getElementById('detailModal').style.display = 'block';
+                                }
+
+                                // Hàm load chi tiết yêu cầu đã duyệt
+                                function loadRequestDetails(requestId) {
+                                    // Tìm thông tin từ bảng hiện tại
+                                    var approvedRows = document.querySelectorAll('#approvedTableBody tr');
+                                    var requestData = null;
+
+                                    approvedRows.forEach(function (row) {
+                                        var cells = row.querySelectorAll('td');
+                                        if (cells.length > 1 && cells[1].textContent.trim() === requestId) {
+                                            requestData = {
+                                                requestId: cells[1].textContent.trim(),
+                                                dayRequest: cells[2].textContent.trim(),
+                                                supplier: cells[3].textContent.trim(),
+                                                productName: cells[4].textContent.trim(),
+                                                productCode: cells[5].textContent.trim(),
+                                                unit: cells[6].textContent.trim(),
+                                                quantity: cells[7].textContent.trim(),
+                                                price: cells[8].textContent.trim(),
+                                                note: cells[9].textContent.trim()
+                                            };
+                                        }
+                                    });
+
+                                    if (requestData) {
+                                        document.getElementById('detailModalBody').innerHTML = `
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-info-circle"></i> Thông tin yêu cầu</h6>
+                                    <table class="table table-sm">
+                                        <tr><td><strong>Mã yêu cầu:</strong></td><td>${requestData.requestId}</td></tr>
+                                        <tr><td><strong>Ngày tạo:</strong></td><td>${requestData.dayRequest}</td></tr>
+                                        <tr><td><strong>Nhà cung cấp:</strong></td><td>${requestData.supplier}</td></tr>
+                                        <tr><td><strong>Ghi chú:</strong></td><td>${requestData.note}</td></tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-box"></i> Thông tin sản phẩm</h6>
+                                    <table class="table table-sm">
+                                        <tr><td><strong>Tên sản phẩm:</strong></td><td>${requestData.productName}</td></tr>
+                                        <tr><td><strong>Mã sản phẩm:</strong></td><td>${requestData.productCode}</td></tr>
+                                        <tr><td><strong>Đơn vị:</strong></td><td>${requestData.unit}</td></tr>
+                                        <tr><td><strong>Số lượng:</strong></td><td>${requestData.quantity}</td></tr>
+                                        <tr><td><strong>Đơn giá:</strong></td><td>${requestData.price}</td></tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Trạng thái:</strong> Đã duyệt - Chờ xử lý nhập kho
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex gap-2">
+                                    <a href="${pageContext.request.contextPath}/import-confirm?id=${requestData.requestId}" 
+                                       class="btn btn-success btn-sm">
+                                        <i class="fas fa-check"></i> Xử lý nhập kho
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                                    } else {
+                                        document.getElementById('detailModalBody').innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Không tìm thấy thông tin chi tiết cho yêu cầu này.
+                            </div>
+                        `;
+                                    }
+                                }
+
+                                // Hàm load chi tiết lịch sử
+                                function loadHistoryDetails(requestId) {
+                                    // Tìm thông tin từ bảng lịch sử
+                                    var historyRows = document.querySelectorAll('#historyTableBody tr');
+                                    var historyData = null;
+
+                                    historyRows.forEach(function (row) {
+                                        var cells = row.querySelectorAll('td');
+                                        if (cells.length > 1 && cells[1].textContent.trim() === requestId) {
+                                            // Lấy text từ status badge
+                                            var statusCell = cells[9];
+                                            var statusText = statusCell.textContent.trim();
+
+                                            historyData = {
+                                                requestId: cells[1].textContent.trim(),
+                                                dayRequest: cells[2].textContent.trim(),
+                                                productName: cells[3].textContent.trim(),
+                                                productCode: cells[4].textContent.trim(),
+                                                supplier: cells[5].textContent.trim(),
+                                                quantity: cells[6].textContent.trim(),
+                                                price: cells[7].textContent.trim(),
+                                                totalAmount: cells[8].textContent.trim(),
+                                                status: statusText,
+                                                statusRaw: statusCell.querySelector('.status-badge') ?
+                                                        statusCell.querySelector('.status-badge').className : ''
+                                            };
+                                        }
+                                    });
+
+                                    if (historyData) {
+                                        var statusClass = '';
+                                        var statusIcon = '';
+                                        var statusMessage = '';
+
+                                        // Xác định loại trạng thái và hiển thị tương ứng
+                                        if (historyData.statusRaw.includes('status-completed')) {
+                                            statusClass = 'alert-success';
+                                            statusIcon = 'fa-check-circle';
+                                            statusMessage = 'Đã hoàn thành nhập kho - Sản phẩm đã được cập nhật vào kho';
+                                        } else if (historyData.statusRaw.includes('status-rejected')) {
+                                            statusClass = 'alert-danger';
+                                            statusIcon = 'fa-times-circle';
+                                            statusMessage = 'Yêu cầu đã bị từ chối - Không thực hiện nhập kho';
+                                        } else if (historyData.statusRaw.includes('status-cancelled')) {
+                                            statusClass = 'alert-warning';
+                                            statusIcon = 'fa-ban';
+                                            statusMessage = 'Yêu cầu đã bị hủy';
+                                        } else {
+                                            statusClass = 'alert-info';
+                                            statusIcon = 'fa-info-circle';
+                                            statusMessage = 'Trạng thái: ' + historyData.status;
+                                        }
+
+                                        document.getElementById('detailModalBody').innerHTML = `
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-history"></i> Thông tin nhập kho</h6>
+                                    <table class="table table-sm">
+                                        <tr><td><strong>Mã đơn:</strong></td><td>${historyData.requestId}</td></tr>
+                                        <tr><td><strong>Ngày nhập:</strong></td><td>${historyData.dayRequest}</td></tr>
+                                        <tr><td><strong>Nhà cung cấp:</strong></td><td>${historyData.supplier}</td></tr>
+                                        <tr><td><strong>Trạng thái:</strong></td><td>${historyData.status}</td></tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-box"></i> Thông tin sản phẩm</h6>
+                                    <table class="table table-sm">
+                                        <tr><td><strong>Tên sản phẩm:</strong></td><td>${historyData.productName}</td></tr>
+                                        <tr><td><strong>Mã sản phẩm:</strong></td><td>${historyData.productCode}</td></tr>
+                                        <tr><td><strong>Số lượng:</strong></td><td>${historyData.quantity}</td></tr>
+                                        <tr><td><strong>Đơn giá:</strong></td><td>${historyData.price}</td></tr>
+                                        <tr><td><strong>Thành tiền:</strong></td><td>${historyData.totalAmount}</td></tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="alert ${statusClass}">
+                                    <i class="fas ${statusIcon}"></i>
+                                    <strong>${statusMessage}</strong>
+                                </div>
+                            </div>
+                        `;
+                                    } else {
+                                        document.getElementById('detailModalBody').innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Không tìm thấy thông tin chi tiết cho đơn hàng này.
+                            </div>
+                        `;
+                                    }
+                                }
+
+                                // Hàm đóng modal chi tiết
+                                function closeDetailModal() {
+                                    document.getElementById('detailModal').style.display = 'none';
+                                }
+
+                                // Hàm đóng modal phê duyệt
+                                function closeApproveModal() {
+                                    document.getElementById('approveModal').style.display = 'none';
+                                }
+
+                                // Hàm hiển thị thông báo
+                                function showNotifications() {
+                                    alert('Chức năng thông báo đang được phát triển!');
+                                }
+
+                                // Hàm hiển thị trợ giúp
+                                function showHelp() {
+                                    var helpContent = `
+                        HƯỚNG DẪN SỬ DỤNG:
+                        
+                        1. TAB YÊU CẦU ĐÃ DUYỆT:
+                        - Xem danh sách các yêu cầu nhập kho đã được phê duyệt
+                        - Sử dụng chức năng tìm kiếm để lọc theo mã yêu cầu, tên sản phẩm, mã sản phẩm
+                        - Nhấn "Xử lý nhập kho" để thực hiện nhập kho
+                        - Nhấn "Chi tiết" để xem thông tin đầy đủ
+                        
+                        2. TAB LỊCH SỬ NHẬP KHO:
+                        - Xem lịch sử tất cả các đơn nhập kho đã hoàn thành hoặc bị từ chối
+                        - Tìm kiếm theo nhiều tiêu chí khác nhau
+                        - Xuất dữ liệu ra file Excel
+                        - Đánh giá nhà cung cấp
+                        
+                        3. CHỨC NĂNG KHÁC:
+                        - Thống kê hiển thị tổng quan về tình trạng nhập kho
+                        - Phân trang để dễ dàng điều hướng
+                        - Giao diện responsive, tương thích với mobile
+                    `;
+                                    alert(helpContent);
+                                }
+
+                                // Xử lý click ngoài modal để đóng
+                                window.onclick = function (event) {
+                                    var detailModal = document.getElementById('detailModal');
+                                    var approveModal = document.getElementById('approveModal');
+
+                                    if (event.target == detailModal) {
+                                        detailModal.style.display = 'none';
+                                    }
+                                    if (event.target == approveModal) {
+                                        approveModal.style.display = 'none';
+                                    }
+                                }
+
+                                // Xử lý phím ESC để đóng modal
+                                document.addEventListener('keydown', function (event) {
+                                    if (event.key === 'Escape') {
+                                        closeDetailModal();
+                                        closeApproveModal();
+                                    }
+                                });
+
+                                // Xử lý form tìm kiếm với Enter
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    var searchInputs = document.querySelectorAll('input[name="searchValue"], input[name="historySearchValue"]');
+                                    searchInputs.forEach(function (input) {
+                                        input.addEventListener('keypress', function (e) {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                this.closest('form').submit();
+                                            }
+                                        });
+                                    });
+                                });
+
+                                // Hàm format số tiền
+                                function formatCurrency(amount) {
+                                    return new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND'
+                                    }).format(amount);
+                                }
+
+                                // Hàm format ngày tháng
+                                function formatDate(dateString) {
+                                    var date = new Date(dateString);
+                                    return date.toLocaleDateString('vi-VN', {
+                                        year: 'numeric',
+                                        month: '2-digit',
+                                        day: '2-digit'
+                                    });
+                                }
+
+                                // Auto refresh page mỗi 5 phút để cập nhật dữ liệu mới
+                                setInterval(function () {
+                                    if (document.visibilityState === 'visible') {
+                                        // Chỉ refresh khi trang đang được xem
+                                        console.log('Auto refreshing data...');
+                                        // Có thể thêm AJAX call để refresh data thay vì reload trang
+                                    }
+                                }, 300000); // 5 phút
+
+                                // Khởi tạo tooltips nếu có
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    // Thêm tooltip cho các button
+                                    var buttons = document.querySelectorAll('.btn');
+                                    buttons.forEach(function (button) {
+                                        if (button.title) {
+                                            button.addEventListener('mouseenter', function () {
+                                                // Có thể thêm custom tooltip
+                                            });
+                                        }
+                                    });
+                                });
+
+                                console.log('ListRequestImport.jsp loaded successfully');
+            </script>
+        </div>
     </body>
 </html>
+
+
+

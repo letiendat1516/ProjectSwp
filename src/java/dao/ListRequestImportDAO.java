@@ -49,7 +49,6 @@ public class ListRequestImportDAO {
 
         // Thêm điều kiện tìm kiếm
         if (searchValue != null && !searchValue.trim().isEmpty() && searchType != null) {
-            String searchPattern = "%" + searchValue.trim() + "%";
             switch (searchType) {
                 case "requestId":
                     sql.append("AND po.id LIKE ? ");
@@ -70,12 +69,15 @@ public class ListRequestImportDAO {
             ps = conn.prepareStatement(sql.toString());
 
             // Set parameter nếu có tìm kiếm
+            int paramIndex = 1;
             if (searchValue != null && !searchValue.trim().isEmpty() && searchType != null) {
                 String searchPattern = "%" + searchValue.trim() + "%";
-                ps.setString(1, searchPattern);
+                ps.setString(paramIndex, searchPattern);
             }
 
+            System.out.println("Executing SQL: " + sql.toString()); // Debug log
             rs = ps.executeQuery();
+
             while (rs.next()) {
                 ApprovedRequestItem item = new ApprovedRequestItem();
                 item.setRequestId(rs.getString("request_id"));
@@ -88,9 +90,17 @@ public class ListRequestImportDAO {
                 item.setProductName(rs.getString("product_name"));
                 item.setProductCode(rs.getString("product_code"));
                 item.setProductFullName(rs.getString("product_full_name"));
-                item.setPrice(rs.getDouble("price"));
+
+                // Xử lý giá trị null cho price
+                Double price = rs.getDouble("price");
+                item.setPrice(rs.wasNull() ? 0.0 : price);
+
                 item.setUnit(rs.getString("unit"));
-                item.setQuantity(rs.getDouble("quantity"));
+
+                // Xử lý giá trị null cho quantity
+                Double quantity = rs.getDouble("quantity");
+                item.setQuantity(rs.wasNull() ? 0.0 : quantity);
+
                 item.setNote(rs.getString("note"));
                 item.setReasonDetail(null);
                 list.add(item);
@@ -99,6 +109,7 @@ public class ListRequestImportDAO {
             System.out.println("Fetched approved items count: " + list.size());
 
         } catch (SQLException e) {
+            System.err.println("Error in getApprovedRequestItems: " + e.getMessage());
             e.printStackTrace();
         } finally {
             closeResources();
@@ -528,6 +539,41 @@ public class ListRequestImportDAO {
             closeResources();
         }
         return list;
+    }
+
+    public void testConnection() {
+        try {
+            conn = Context.getJDBCConnection();
+            if (conn != null) {
+                System.out.println("Database connection successful!");
+
+                // Test query
+                String testSql = "SELECT COUNT(*) as total FROM purchase_order_info";
+                ps = conn.prepareStatement(testSql);
+                rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    System.out.println("Total records in purchase_order_info: " + rs.getInt("total"));
+                }
+
+                // Test approved records
+                String approvedSql = "SELECT COUNT(*) as approved_count FROM purchase_order_info WHERE status = 'approved'";
+                ps = conn.prepareStatement(approvedSql);
+                rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    System.out.println("Approved records count: " + rs.getInt("approved_count"));
+                }
+
+            } else {
+                System.out.println("Database connection failed!");
+            }
+        } catch (SQLException e) {
+            System.err.println("Database connection error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeResources();
+        }
     }
 
 }
