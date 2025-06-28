@@ -3,7 +3,26 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Project/Java/SWP/ProjectSwp/src/java/controller/DeleteProductController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/UserManager.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/UserDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/model/CategoryProductParent.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category_product/list.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category_parent/list.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/CategoryProductController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/CategoryParentStatisticsController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/StatisticSupplierEvaluation.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category-parent-statistics.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/ListRequestImportDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/UserManager.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/CategoryProductDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/UserFilterServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/CategoryParentController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/model/CategoryProduct.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/WEB-INF/web.xml</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/StatisticSupplierEvaluation.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/CategoryParentDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/SupplierEvaluationDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category_parent/edit.jsp</file>
         </group>
     </open-files>
 </project-private>
