@@ -1,29 +1,36 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-// Model for product information
-
 import java.math.BigDecimal;
+import java.sql.Date;
 
+/**
+ * Model class for Product Information
+ * Represents a product in the warehouse management system
+ */
 public class ProductInfo {
+    private int id;
+    private String name;
+    private String code;
+    private int cate_id;
+    private int unit_id;
+    private BigDecimal price;
+    private String status;
+    private String description;
+    private int supplierId;
+    private Date expirationDate;
+    private String additionalNotes;
+    private int createdBy;
+    private Date createdDate;
+    private int updatedBy;
+    private Date updatedDate;
+    private BigDecimal stockQuantity;
 
-    private int id; // Product ID
-    private String name; // Product name
-    private String code; // Product code
-    private int cate_id; // Category ID
-    private int unit_id; // Unit ID
-    private BigDecimal price; // Product price
-    private String status; // Product status
-    private String description; // Product description
-
+    // Default constructor
     public ProductInfo() {
     }
 
-    public ProductInfo(int id, String name, String code, int cate_id, int unit_id, BigDecimal price, String status, String description) {
-        this.id = id;
+    // Constructor with basic fields
+    public ProductInfo(String name, String code, int cate_id, int unit_id, BigDecimal price, String status, String description) {
         this.name = name;
         this.code = code;
         this.cate_id = cate_id;
@@ -33,7 +40,7 @@ public class ProductInfo {
         this.description = description;
     }
 
-    // Getters và Setters
+    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -97,15 +104,6 @@ public class ProductInfo {
     public void setDescription(String description) {
         this.description = description;
     }
-    
-    // Additional fields for enhanced product management
-    private int supplierId; // Supplier ID
-    private java.sql.Date expirationDate; // Expiration date
-    private String additionalNotes; // Additional notes
-    private int createdBy; // Created by (user ID)
-    private java.sql.Date createdDate; // Creation date
-    private int updatedBy; // Updated by (user ID)
-    private java.sql.Date updatedDate; // Update date
 
     public int getSupplierId() {
         return supplierId;
@@ -115,16 +113,13 @@ public class ProductInfo {
         this.supplierId = supplierId;
     }
 
-    public java.sql.Date getExpirationDate() {
+    public Date getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(java.sql.Date expirationDate) {
+    public void setExpirationDate(Date expirationDate) {
         this.expirationDate = expirationDate;
     }
-
-
-
 
     public String getAdditionalNotes() {
         return additionalNotes;
@@ -142,11 +137,11 @@ public class ProductInfo {
         this.createdBy = createdBy;
     }
 
-    public java.sql.Date getCreatedDate() {
+    public Date getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(java.sql.Date createdDate) {
+    public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -158,15 +153,36 @@ public class ProductInfo {
         this.updatedBy = updatedBy;
     }
 
-    public java.sql.Date getUpdatedDate() {
+    public Date getUpdatedDate() {
         return updatedDate;
     }
 
-    public void setUpdatedDate(java.sql.Date updatedDate) {
+    public void setUpdatedDate(Date updatedDate) {
         this.updatedDate = updatedDate;
     }
 
-    public void setStockQuantity(BigDecimal stockQty) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public BigDecimal getStockQuantity() {
+        return stockQuantity;
+    }
+
+    public void setStockQuantity(BigDecimal stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    @Override
+    public String toString() {
+        return "ProductInfo{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", code='" + code + '\'' +
+                ", cate_id=" + cate_id +
+                ", unit_id=" + unit_id +
+                ", price=" + price +
+                ", status='" + status + '\'' +
+                ", description='" + description + '\'' +
+                ", supplierId=" + supplierId +
+                ", expirationDate=" + expirationDate +
+                ", additionalNotes='" + additionalNotes + '\'' +
+                '}';
     }
 }
