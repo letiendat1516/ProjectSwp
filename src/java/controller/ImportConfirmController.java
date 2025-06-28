@@ -47,6 +47,7 @@ public class ImportConfirmController extends HttpServlet {
         String requestId = request.getParameter("id");
         String action = request.getParameter("action");
         String importDate = request.getParameter("importDate");
+        String rejectReason = request.getParameter("rejectReason"); // Thêm dòng này
 
         // Validate parameters
         if (requestId == null || requestId.trim().isEmpty()) {
@@ -84,8 +85,17 @@ public class ImportConfirmController extends HttpServlet {
                 response.sendRedirect("import?message=approve_success");
 
             } else if ("reject".equalsIgnoreCase(action)) {
-                dao.updateRequestStatus(requestId, "rejected", null);
+                // Validate reject reason
+                if (rejectReason == null || rejectReason.trim().isEmpty()) {
+                    System.err.println("Reject reason is required for requestId: " + requestId);
+                    response.sendRedirect("import-confirm?id=" + requestId + "&error=reject_reason_required");
+                    return;
+                }
+                
+                // Cập nhật status thành rejected với lý do
+                dao.updateRequestStatusWithReason(requestId, "rejected", rejectReason.trim());
                 response.sendRedirect("import?message=reject_success");
+                
             } else {
                 System.err.println("Unknown action: " + action + " for requestId: " + requestId);
                 response.sendRedirect("import-confirm?id=" + requestId + "&error=invalid_action");

@@ -3,6 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/UserManager.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/UserDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/model/CategoryProductParent.java</file>
@@ -23,6 +24,20 @@
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/CategoryParentDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/SupplierEvaluationDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category_parent/edit.jsp</file>
+=======
+<<<<<<< HEAD
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/ListRequestImport.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/model/ApprovedRequestItem.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/include/sidebar.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/dao/ImportDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/web/WarehouseManagement.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/ListRequestImportController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/dao/ListRequestImportDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectWarehouse/src/java/controller/ImportConfirmController.java</file>
+=======
+            <file>file:/D:/Project/Java/SWP/ProjectSwp/src/java/controller/DeleteProductController.java</file>
+>>>>>>> d5a61402cd0f43a2480e459713c65bc5424fff36
+>>>>>>> 10afde5c4d347aa9aa3ece71059d98202100ead8
         </group>
     </open-files>
 </project-private>
