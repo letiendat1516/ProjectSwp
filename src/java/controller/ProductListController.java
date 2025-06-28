@@ -69,9 +69,10 @@ public class ProductListController extends HttpServlet {
         int totalProducts = productDAO.getTotalProductCount(search);
         int totalPages = (int) Math.ceil((double) totalProducts / pageSize);
         
-        // Calculate statistics
-        long lowStockCount = calculateLowStockCount(products);
-        long nearExpirationCount = calculateNearExpirationCount(products);
+        // Calculate statistics for all products (not just current page)
+        List<ProductStock> allProductsForStats = productDAO.getProductsWithStock(0, Integer.MAX_VALUE, search, sortBy, sortOrder);
+        long lowStockCount = calculateLowStockCount(allProductsForStats);
+        long nearExpirationCount = calculateNearExpirationCount(allProductsForStats);
         
         // Set attributes for JSP
         setRequestAttributes(request, products, page, totalPages, pageSize, totalProducts, 

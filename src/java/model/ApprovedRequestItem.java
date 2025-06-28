@@ -9,7 +9,6 @@ public class ApprovedRequestItem {
     private String address;
     private String phone;
     private String email;
-
     private String productName;
     private String productCode;
     private String productFullName;
@@ -18,6 +17,27 @@ public class ApprovedRequestItem {
     private double quantity;
     private String note;
     private String reasonDetail;
+
+    public ApprovedRequestItem(String requestId, String dayRequest, String status, String supplier, String address, String phone, String email, String productName, String productCode, String productFullName, double price, String unit, double quantity, String note, String reasonDetail) {
+        this.requestId = requestId;
+        this.dayRequest = dayRequest;
+        this.status = status;
+        this.supplier = supplier;
+        this.address = address;
+        this.phone = phone;
+        this.email = email;
+        this.productName = productName;
+        this.productCode = productCode;
+        this.productFullName = productFullName;
+        this.price = price;
+        this.unit = unit;
+        this.quantity = quantity;
+        this.note = note;
+        this.reasonDetail = reasonDetail;
+    }
+
+    public ApprovedRequestItem() {
+    }
 
     // Getters & Setters
     public String getRequestId() {
@@ -138,5 +158,26 @@ public class ApprovedRequestItem {
 
     public void setReasonDetail(String reasonDetail) {
         this.reasonDetail = reasonDetail;
+    }
+
+    @Override
+    public String toString() {
+        return "ApprovedRequestItem{"
+                + "requestId='" + requestId + '\''
+                + ", dayRequest='" + dayRequest + '\''
+                + ", status='" + status + '\''
+                + ", supplier='" + supplier + '\''
+                + ", address='" + address + '\''
+                + ", phone='" + phone + '\''
+                + ", email='" + email + '\''
+                + ", productName='" + productName + '\''
+                + ", productCode='" + productCode + '\''
+                + ", productFullName='" + productFullName + '\''
+                + ", price=" + price
+                + ", unit='" + unit + '\''
+                + ", quantity=" + quantity
+                + ", note='" + note + '\''
+                + ", reasonDetail='" + reasonDetail + '\''
+                + '}';
     }
 }
