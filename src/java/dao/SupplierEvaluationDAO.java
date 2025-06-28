@@ -265,17 +265,7 @@ public class SupplierEvaluationDAO {
         SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
         List<Supplier> list = sed.staticRated("desc");
         System.out.println(list.size());
-        List<Float> listStar = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            List<SupplierEvaluation> lse = sed.getSupplierEvaluationByID(list.get(i).getSupplierID());
-            float star = 0;
-            for (int j = 0; j < lse.size(); j++) {
-                star = star + lse.get(j).getAvgRate();
-            }
-            star = star / lse.size() * 1.0f;
-            listStar.add(star);
-        }
-        System.out.println(listStar.size());
+        
     }
 
 }

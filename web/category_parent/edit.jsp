@@ -303,15 +303,6 @@
                                           rows="4" maxlength="1000" placeholder="Nhập mô tả cho danh mục...">${categoryParent.description}</textarea>
                             </div>
 
-                            <div class="form-group">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="activeFlag" 
-                                           name="activeFlag" value="1" ${categoryParent.activeFlag ? 'checked' : ''}>
-                                    <label class="form-check-label" for="activeFlag">
-                                        ✓ Kích hoạt danh mục
-                                    </label>
-                                </div>
-                            </div>
 
                             <div class="button-group">
                                 <a href="${pageContext.request.contextPath}/category-parent/list" 

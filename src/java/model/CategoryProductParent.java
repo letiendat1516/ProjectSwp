@@ -70,7 +70,7 @@ public class CategoryProductParent {
     public void setUpdateDate(LocalDateTime updateDate) {
         this.updateDate = updateDate;
     }
-    
+
     public int getChildCount() {
         return childCount;
     }
@@ -78,4 +78,34 @@ public class CategoryProductParent {
     public void setChildCount(int childCount) {
         this.childCount = childCount;
     }
+    // Thêm methods format
+
+    public String getFormattedCreateDate() {
+        if (createDate != null) {
+            return createDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        }
+        return null;
+    }
+
+    public String getFormattedCreateTime() {
+        if (createDate != null) {
+            return createDate.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
+        }
+        return null;
+    }
+
+    public String getFormattedUpdateDate() {
+        if (updateDate != null) {
+            return updateDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        }
+        return null;
+    }
+
+    public String getFormattedUpdateTime() {
+        if (updateDate != null) {
+            return updateDate.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
+        }
+        return null;
+    }
+
 }
