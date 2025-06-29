@@ -8,7 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import dao.CategoryParentDAO;
+import dao.CategoryParentStatisticsDAO;
 import model.CategoryProductParent;
 import model.Users;
 import com.google.gson.Gson;
@@ -18,13 +18,13 @@ import java.time.format.DateTimeFormatter;
 
 public class CategoryParentStatisticsController extends HttpServlet {
     
-    private CategoryParentDAO dao;
+    private CategoryParentStatisticsDAO statisticsDAO;
     private Gson gson;
     
     @Override
     public void init() throws ServletException {
         System.out.println("=== CategoryParentStatisticsController INIT ===");
-        dao = new CategoryParentDAO();
+        statisticsDAO = new CategoryParentStatisticsDAO();
         gson = new Gson();
     }
     
@@ -57,7 +57,7 @@ public class CategoryParentStatisticsController extends HttpServlet {
             if ("filter".equals(action)) {
                 System.out.println("Processing filter request...");
                 handleFilterRequest(request, response);
-                return; // Important: return here to avoid forwarding to JSP
+                return;
             }
             
             // Load all statistics data for initial page load
@@ -132,19 +132,20 @@ public class CategoryParentStatisticsController extends HttpServlet {
                     result.put("success", false);
                     result.put("message", "Ngày bắt đầu phải trước ngày kết thúc");
                 } else {
-                    // Get filtered statistics
-                    Map<String, Integer> filteredStats = dao.getStatisticsByDateRange(startDate, endDate);
+                    // Get filtered statistics using new DAO method
+                    Map<String, Object> filteredStats = statisticsDAO.getFilteredStatistics(status, startDate, endDate);
                     
                     if (filteredStats == null) {
                         filteredStats = new HashMap<>();
-                        filteredStats.put("newParents", 0);
-                        filteredStats.put("activeNew", 0);
+                        filteredStats.put("totalParents", 0);
+                        filteredStats.put("activeParents", 0);
+                        filteredStats.put("inactiveParents", 0);
                     }
                     
                     result.put("success", true);
                     result.put("data", filteredStats);
                     result.put("message", "Đã lọc dữ liệu thành công. Tìm thấy " + 
-                              filteredStats.getOrDefault("newParents", 0) + " danh mục mới trong khoảng thời gian này.");
+                              filteredStats.getOrDefault("totalParents", 0) + " danh mục trong khoảng thời gian này.");
                     
                     System.out.println("Filter result: " + filteredStats);
                 }
@@ -175,40 +176,33 @@ public class CategoryParentStatisticsController extends HttpServlet {
         try {
             System.out.println("Getting statistics from DAO...");
             
-            // 1. Get general statistics
-            Map<String, Integer> stats = dao.getCategoryParentStatistics();
-            if (stats == null) {
-                stats = new HashMap<>();
-                stats.put("totalParents", 0);
-                stats.put("activeParents", 0);
-                stats.put("inactiveParents", 0);
-                stats.put("totalChildCategories", 0);
-                stats.put("totalProducts", 0);
-            }
+            // 1. Get overall statistics using new method
+            Map<String, Object> overallStats = statisticsDAO.getOverallStatistics();
+            
+            // Extract individual values
+            int totalParents = (int) overallStats.getOrDefault("totalParents", 0);
+            int activeParents = (int) overallStats.getOrDefault("activeParents", 0);
+            int inactiveParents = (int) overallStats.getOrDefault("inactiveParents", 0);
+            double activePercentage = (double) overallStats.getOrDefault("activePercentage", 0.0);
+            double inactivePercentage = (double) overallStats.getOrDefault("inactivePercentage", 0.0);
+            int monthlyDifference = (int) overallStats.getOrDefault("monthlyDifference", 0);
+            CategoryProductParent topParent = (CategoryProductParent) overallStats.get("topParent");
+            
+            // Create stats map for JSP compatibility
+            Map<String, Integer> stats = new HashMap<>();
+            stats.put("totalParents", totalParents);
+            stats.put("activeParents", activeParents);
+            stats.put("inactiveParents", inactiveParents);
+            
             request.setAttribute("stats", stats);
-            
-            // Calculate percentages
-            int totalParents = stats.getOrDefault("totalParents", 0);
-            int activeParents = stats.getOrDefault("activeParents", 0);
-            int inactiveParents = stats.getOrDefault("inactiveParents", 0);
-            
-            double activePercentage = totalParents > 0 ? (activeParents * 100.0 / totalParents) : 0;
-            double inactivePercentage = totalParents > 0 ? (inactiveParents * 100.0 / totalParents) : 0;
-            
+            request.setAttribute("topParent", topParent);
             request.setAttribute("activePercentage", String.format("%.1f", activePercentage));
             request.setAttribute("inactivePercentage", String.format("%.1f", inactivePercentage));
+            request.setAttribute("monthlyDifference", Math.abs(monthlyDifference));
+            request.setAttribute("monthlyDifferenceSign", monthlyDifference >= 0 ? "+" : "");
             
-            // 2. Get parent with most children
-            CategoryProductParent topParent = dao.getParentWithMostChildren();
-            if (topParent == null) {
-                topParent = new CategoryProductParent();
-                topParent.setName("N/A");
-                topParent.setChildCount(0);
-            }
-            request.setAttribute("topParent", topParent);
-            
-            // 3. Get statistics by parent (for table)
-            List<Map<String, Object>> parentStats = dao.getStatisticsByParent();
+            // 2. Get statistics by parent (for table)
+            List<Map<String, Object>> parentStats = statisticsDAO.getStatisticsByParent();
             if (parentStats == null) parentStats = new ArrayList<>();
             request.setAttribute("parentStats", parentStats);
             
@@ -233,65 +227,102 @@ public class CategoryParentStatisticsController extends HttpServlet {
             double totalActivePercentage = totalCategories > 0 ? (totalActiveCategories * 100.0 / totalCategories) : 0;
             request.setAttribute("totalActivePercentage", String.format("%.1f", totalActivePercentage));
             
-            // 4. Get distribution data (for pie chart)
-            Map<String, Integer> distribution = dao.getCategoryDistribution();
+            // 3. Get distribution data (for pie chart)
+            Map<String, Integer> distribution = statisticsDAO.getCategoryDistribution();
             if (distribution == null) distribution = new HashMap<>();
             String distributionJson = gson.toJson(distribution);
             request.setAttribute("distributionJson", distributionJson);
             
-            // 5. Get top parents by product count (for bar chart)
-            List<Map<String, Object>> topParents = dao.getTopParentsByProductCount(10);
+            // 4. Get top parents by product count (for bar chart)
+            List<Map<String, Object>> topParents = statisticsDAO.getTopParentsByProductCount(10);
             if (topParents == null) topParents = new ArrayList<>();
             String topParentsJson = gson.toJson(topParents);
             request.setAttribute("topParentsJson", topParentsJson);
             
-            // 6. Get monthly statistics (for line chart)
-            List<Map<String, Object>> monthlyStats = dao.getMonthlyStatistics();
+            // 5. Get monthly statistics (for line chart)
+            List<Map<String, Object>> monthlyStats = statisticsDAO.getMonthlyStatistics();
             if (monthlyStats == null) monthlyStats = new ArrayList<>();
             String monthlyStatsJson = gson.toJson(monthlyStats);
             request.setAttribute("monthlyStatsJson", monthlyStatsJson);
             
-            // 7. Get recently added parents
-            List<CategoryProductParent> recentParents = dao.getRecentlyAddedParents(5);
+            // 6. Get recently added parents
+            List<CategoryProductParent> recentParents = statisticsDAO.getRecentlyAddedParents(5);
             if (recentParents == null) recentParents = new ArrayList<>();
             request.setAttribute("recentParents", recentParents);
             
-            // 8. Get comparison with last month - Using current date
-            LocalDate currentDate = LocalDate.now(); // Real-time date
-            LocalDate firstDayThisMonth = currentDate.withDayOfMonth(1);
-            LocalDate lastDayThisMonth = currentDate;
-            LocalDate firstDayLastMonth = firstDayThisMonth.minusMonths(1);
-            LocalDate lastDayLastMonth = firstDayLastMonth.withDayOfMonth(firstDayLastMonth.lengthOfMonth());
+            // 7. Get time-based statistics
+            Map<String, Object> timeStats = statisticsDAO.getTimeBasedStatistics();
+            if (timeStats == null) {
+                timeStats = new HashMap<>();
+                timeStats.put("thisMonth", 0);
+                timeStats.put("thisQuarter", 0);
+                timeStats.put("lastSixMonths", 0);
+                timeStats.put("thisYear", 0);
+                timeStats.put("currentYear", LocalDate.now().getYear());
+                timeStats.put("thisMonthPeriod", "Tháng " + LocalDate.now().getMonthValue() + "/" + LocalDate.now().getYear());
+                timeStats.put("thisQuarterPeriod", "Quý " + ((LocalDate.now().getMonthValue() - 1) / 3 + 1) + "/" + LocalDate.now().getYear());
+                timeStats.put("lastSixMonthsPeriod", 
+                    LocalDate.now().minusMonths(6).format(DateTimeFormatter.ofPattern("MM/yyyy")) + " - " + 
+                    LocalDate.now().format(DateTimeFormatter.ofPattern("MM/yyyy")));
+            }
+            request.setAttribute("timeStats", timeStats);
             
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-            
-            Map<String, Integer> lastMonthStats = dao.getStatisticsByDateRange(
-                firstDayLastMonth.format(formatter), 
-                lastDayLastMonth.format(formatter)
-            );
-            Map<String, Integer> thisMonthStats = dao.getStatisticsByDateRange(
-                firstDayThisMonth.format(formatter), 
-                lastDayThisMonth.format(formatter)
-            );
-            
-            int lastMonthNew = lastMonthStats != null ? lastMonthStats.getOrDefault("newParents", 0) : 0;
-            int thisMonthNew = thisMonthStats != null ? thisMonthStats.getOrDefault("newParents", 0) : 0;
-            int difference = thisMonthNew - lastMonthNew;
-            
-            request.setAttribute("monthlyDifference", difference);
-            request.setAttribute("monthlyDifferenceSign", difference >= 0 ? "+" : "");
-            
-            // Add current month info for display
+            // 8. Add current date info for display
+            LocalDate currentDate = LocalDate.now();
             request.setAttribute("currentMonth", currentDate.getMonth().toString());
             request.setAttribute("currentYear", currentDate.getYear());
             
             System.out.println("Statistics data loaded successfully");
-            System.out.println("Date range - Last month: " + firstDayLastMonth + " to " + lastDayLastMonth);
-            System.out.println("Date range - This month: " + firstDayThisMonth + " to " + lastDayThisMonth);
+            System.out.println("Total parents: " + totalParents);
+            System.out.println("Active parents: " + activeParents);
+            System.out.println("Inactive parents: " + inactiveParents);
+            System.out.println("Top parent: " + (topParent != null ? topParent.getName() : "N/A"));
+            System.out.println("Time stats loaded: " + timeStats);
             
         } catch (Exception e) {
             System.out.println("ERROR in loadStatisticsData: " + e.getMessage());
             e.printStackTrace();
+            
+            // Set default values to prevent JSP errors
+            Map<String, Integer> emptyStats = new HashMap<>();
+            emptyStats.put("totalParents", 0);
+            emptyStats.put("activeParents", 0);
+            emptyStats.put("inactiveParents", 0);
+            request.setAttribute("stats", emptyStats);
+            
+            CategoryProductParent emptyTopParent = new CategoryProductParent();
+            emptyTopParent.setName("N/A");
+            emptyTopParent.setChildCount(0);
+            request.setAttribute("topParent", emptyTopParent);
+            
+            request.setAttribute("activePercentage", "0.0");
+            request.setAttribute("inactivePercentage", "0.0");
+            request.setAttribute("monthlyDifference", 0);
+            request.setAttribute("monthlyDifferenceSign", "");
+            request.setAttribute("parentStats", new ArrayList<>());
+            request.setAttribute("distributionJson", "{}");
+            request.setAttribute("topParentsJson", "[]");
+            request.setAttribute("monthlyStatsJson", "[]");
+            request.setAttribute("recentParents", new ArrayList<>());
+            request.setAttribute("totalCategories", 0);
+            request.setAttribute("totalActiveCategories", 0);
+            request.setAttribute("totalInactiveCategories", 0);
+            request.setAttribute("totalProducts", 0);
+            request.setAttribute("totalActivePercentage", "0.0");
+            
+            // Default time stats
+            Map<String, Object> emptyTimeStats = new HashMap<>();
+            emptyTimeStats.put("thisMonth", 0);
+            emptyTimeStats.put("thisQuarter", 0);
+            emptyTimeStats.put("lastSixMonths", 0);
+            emptyTimeStats.put("thisYear", 0);
+            emptyTimeStats.put("currentYear", LocalDate.now().getYear());
+            emptyTimeStats.put("thisMonthPeriod", "Tháng " + LocalDate.now().getMonthValue() + "/" + LocalDate.now().getYear());
+            emptyTimeStats.put("thisQuarterPeriod", "Quý " + ((LocalDate.now().getMonthValue() - 1) / 3 + 1) + "/" + LocalDate.now().getYear());
+            emptyTimeStats.put("lastSixMonthsPeriod", 
+                LocalDate.now().minusMonths(6).format(DateTimeFormatter.ofPattern("MM/yyyy")) + " - " + 
+                LocalDate.now().format(DateTimeFormatter.ofPattern("MM/yyyy")));
+            request.setAttribute("timeStats", emptyTimeStats);
         }
     }
 }
