@@ -8,7 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.annotation.WebServlet;
 import dao.CategoryParentDAO;
 import model.CategoryProductParent;
 import model.Users;
@@ -17,7 +16,6 @@ import java.util.HashMap;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-@WebServlet("/category-parent/statistics")
 public class CategoryParentStatisticsController extends HttpServlet {
     
     private CategoryParentDAO dao;

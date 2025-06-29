@@ -648,7 +648,7 @@
               <div class="toolbar">
     <div style="display: flex; gap: 10px;">
         <a href="${pageContext.request.contextPath}/category-parent/create" class="btn btn-primary">+ Thêm danh mục</a>
-        <a href="${pageContext.request.contextPath}/category_parent/statistics" class="btn btn-success">Thống kê danh mục</a>
+        <a href="${pageContext.request.contextPath}/category-parent/statistics" class="btn btn-success">Thống kê danh mục</a>
     </div>
     <form method="get" class="search-form">
         <input type="text" name="search" class="form-input" 

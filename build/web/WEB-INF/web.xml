@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
 
     <!-- ========== SERVLET DEFINITIONS ========== -->
+    
+    <!-- Category Parent Controller (đã có @WebServlet annotation) -->
+    <!-- Không cần khai báo servlet cho CategoryParentController vì đã dùng annotation -->
   
     <!-- Category Servlet -->
     <servlet>
@@ -149,7 +154,7 @@
         <servlet-class>controller.SubmitRequoteFormServlet</servlet-class>
     </servlet>
     
-    <!-- Category Parent Statistics Servlet - MOVE TO HERE -->
+    <!-- Category Parent Statistics Servlet -->
     <servlet>
         <servlet-name>CategoryParentStatisticsController</servlet-name>
         <servlet-class>controller.CategoryParentStatisticsController</servlet-class>
@@ -303,10 +308,10 @@
         <url-pattern>/submitrequoteform</url-pattern>
     </servlet-mapping>
     
-    <!-- Category Parent Statistics Mapping -->
+    <!-- Category Parent Statistics Mapping - SỬA LẠI URL -->
     <servlet-mapping>
         <servlet-name>CategoryParentStatisticsController</servlet-name>
-        <url-pattern>/category_parent/statistics</url-pattern>
+        <url-pattern>/category-parent/statistics</url-pattern>
     </servlet-mapping>
 
     <!-- ========== FILTERS ========== -->
