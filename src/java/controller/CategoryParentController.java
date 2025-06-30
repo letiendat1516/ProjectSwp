@@ -135,6 +135,7 @@ public class CategoryParentController extends HttpServlet {
 
         int pageSize = 10;
 
+        // Get filter parameters
         String searchKeyword = request.getParameter("search");
         if (searchKeyword != null) {
             searchKeyword = searchKeyword.trim();
@@ -143,6 +144,8 @@ public class CategoryParentController extends HttpServlet {
             }
         }
 
+        String status = request.getParameter("status");
+        String childCountFilter = request.getParameter("childCountFilter");
         String sortField = request.getParameter("sortField");
         String sortDir = request.getParameter("sortDir");
 
@@ -153,16 +156,12 @@ public class CategoryParentController extends HttpServlet {
             sortDir = "asc";
         }
 
-        List<CategoryProductParent> categories = dao.getAllCategoryParents(
-                page, pageSize, searchKeyword, sortField, sortDir);
+        // Use filtered method from DAO
+        List<CategoryProductParent> categories = dao.getFilteredParentCategories(
+                searchKeyword, status, childCountFilter, sortField, sortDir, page, pageSize);
 
-        int totalCategories = dao.countCategoryParents(searchKeyword);
+        int totalCategories = dao.countFilteredParentCategories(searchKeyword, status, childCountFilter);
         int totalPages = (int) Math.ceil((double) totalCategories / pageSize);
-
-        for (CategoryProductParent category : categories) {
-            int childCount = dao.getChildCategoryCount(category.getId());
-            category.setChildCount(childCount);
-        }
         
         int startRecord = 0;
         int endRecord = 0;
@@ -192,6 +191,10 @@ public class CategoryParentController extends HttpServlet {
         request.setAttribute("sortField", sortField);
         request.setAttribute("sortDir", sortDir);
         request.setAttribute("totalCategoryParents", totalCategories);
+        
+        // Set filter parameters for JSP
+        request.setAttribute("status", status);
+        request.setAttribute("childCountFilter", childCountFilter);
 
         showMessage(request);
 

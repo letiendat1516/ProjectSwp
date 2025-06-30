@@ -17,6 +17,8 @@ public class CategoryProductDAO {
         this.parentDAO = new CategoryParentDAO();
     }
 
+    // ===================== PHƯƠNG THỨC CŨ GIỮ NGUYÊN =====================
+
     // Get categories with parent info (paginated, searchable, sortable)
     public List<CategoryProduct> getAllCategoriesWithParent(int page, int pageSize, 
             String searchKeyword, String sortField, String sortDir) {
@@ -345,7 +347,359 @@ public class CategoryProductDAO {
         return categories;
     }
 
-    // Helper methods
+    // ===================== CÁC PHƯƠNG THỨC MỚI =====================
+
+    /**
+     * Tìm kiếm danh mục với bộ lọc nâng cao và phân trang
+     */
+    public List<CategoryProduct> searchCategoriesWithFilters(String searchKeyword, Integer status, Integer parentId,
+                                                           String sortField, String sortDir, int offset, int limit) {
+        List<CategoryProduct> categories = new ArrayList<>();
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT c.id, c.name, c.parent_id, c.active_flag, c.create_date, c.update_date, cp.name as parent_name ");
+        sql.append("FROM category c LEFT JOIN category_parent cp ON c.parent_id = cp.id WHERE 1=1 ");
+
+        List<Object> params = new ArrayList<>();
+
+        // Thêm điều kiện tìm kiếm
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            sql.append("AND LOWER(c.name) LIKE LOWER(?) ");
+            params.add("%" + searchKeyword.trim() + "%");
+        }
+
+        // Thêm điều kiện lọc theo trạng thái
+        if (status != null) {
+            sql.append("AND c.active_flag = ? ");
+            params.add(status == 1);
+        }
+
+        // Thêm điều kiện lọc theo parent
+        if (parentId != null) {
+            sql.append("AND c.parent_id = ? ");
+            params.add(parentId);
+        }
+
+        // Thêm ORDER BY
+        sql.append("ORDER BY ");
+        switch (sortField != null ? sortField : "id") {
+            case "name":
+                sql.append("c.name ");
+                break;
+            case "parent_name":
+                sql.append("cp.name ");
+                break;
+            case "active_flag":
+                sql.append("c.active_flag ");
+                break;
+            case "create_date":
+                sql.append("c.create_date ");
+                break;
+            case "update_date":
+                sql.append("c.update_date ");
+                break;
+            default:
+                sql.append("c.id ");
+                break;
+        }
+
+        // Thêm direction
+        sql.append("desc".equalsIgnoreCase(sortDir) ? "DESC " : "ASC ");
+
+        // Thêm LIMIT và OFFSET
+        sql.append("LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            setParameters(ps, params);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    categories.add(mapResultSetToCategory(rs, true));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return categories;
+    }
+
+    /**
+     * Đếm tổng số danh mục với bộ lọc
+     */
+    public int countCategoriesWithFilters(String searchKeyword, Integer status, Integer parentId) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) FROM category c WHERE 1=1 ");
+
+        List<Object> params = new ArrayList<>();
+
+        // Thêm điều kiện tìm kiếm
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            sql.append("AND LOWER(c.name) LIKE LOWER(?) ");
+            params.add("%" + searchKeyword.trim() + "%");
+        }
+
+        // Thêm điều kiện lọc theo trạng thái
+        if (status != null) {
+            sql.append("AND c.active_flag = ? ");
+            params.add(status == 1);
+        }
+
+        // Thêm điều kiện lọc theo parent
+        if (parentId != null) {
+            sql.append("AND c.parent_id = ? ");
+            params.add(parentId);
+        }
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            setParameters(ps, params);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Toggle trạng thái active/inactive của danh mục
+     */
+    public boolean toggleCategoryStatus(int categoryId) {
+        String sql = "UPDATE category SET active_flag = NOT active_flag, update_date = NOW() WHERE id = ?";
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, categoryId);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Lấy tất cả danh mục cha đang active để làm filter
+     */
+    public List<CategoryProductParent> getAllActiveParentCategories() {
+        return parentDAO.getAllCategoryParents(); // Sử dụng method có sẵn
+    }
+
+    /**
+     * Lấy tất cả danh mục đang active
+     */
+    public List<CategoryProduct> getAllActiveCategories() {
+        List<CategoryProduct> categories = new ArrayList<>();
+        String sql = "SELECT c.id, c.name, c.parent_id, c.active_flag, c.create_date, c.update_date, cp.name as parent_name " +
+                    "FROM category c LEFT JOIN category_parent cp ON c.parent_id = cp.id " +
+                    "WHERE c.active_flag = 1 ORDER BY c.name ASC";
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                categories.add(mapResultSetToCategory(rs, true));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return categories;
+    }
+
+    /**
+     * Lấy danh mục theo parent ID với parent name
+     */
+    public List<CategoryProduct> getCategoriesByParentIdWithParentName(Integer parentId) {
+        List<CategoryProduct> categories = new ArrayList<>();
+        String sql = "SELECT c.id, c.name, c.parent_id, c.active_flag, c.create_date, c.update_date, cp.name as parent_name " +
+                    "FROM category c LEFT JOIN category_parent cp ON c.parent_id = cp.id " +
+                    "WHERE " + (parentId == null ? "c.parent_id IS NULL" : "c.parent_id = ?") +
+                    " ORDER BY c.name ASC";
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            if (parentId != null) {
+                ps.setInt(1, parentId);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    categories.add(mapResultSetToCategory(rs, true));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return categories;
+    }
+
+    /**
+     * Lấy tổng số danh mục
+     */
+    public int getTotalCategoriesCount() {
+        String sql = "SELECT COUNT(*) FROM category";
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Lấy thống kê danh mục theo trạng thái
+     */
+    public int getCategoriesCountByStatus(boolean activeFlag) {
+        String sql = "SELECT COUNT(*) FROM category WHERE active_flag = ?";
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setBoolean(1, activeFlag);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Lấy thống kê danh mục theo parent ID
+     */
+    public int getCategoriesCountByParentId(Integer parentId) {
+        String sql = "SELECT COUNT(*) FROM category WHERE " + 
+                    (parentId == null ? "parent_id IS NULL" : "parent_id = ?");
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            if (parentId != null) {
+                ps.setInt(1, parentId);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Kiểm tra danh mục có sản phẩm hay không (để quyết định có thể xóa không)
+     */
+    public boolean hasCategoryProducts(int categoryId) {
+        String sql = "SELECT COUNT(*) FROM product WHERE category_id = ?";
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, categoryId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
+     * Lấy danh mục theo tên (for search suggestion)
+     */
+    public List<CategoryProduct> getCategoriesByName(String name, int limit) {
+        List<CategoryProduct> categories = new ArrayList<>();
+        String sql = "SELECT c.id, c.name, c.parent_id, c.active_flag, c.create_date, c.update_date, cp.name as parent_name " +
+                    "FROM category c LEFT JOIN category_parent cp ON c.parent_id = cp.id " +
+                    "WHERE LOWER(c.name) LIKE LOWER(?) AND c.active_flag = 1 " +
+                    "ORDER BY c.name ASC LIMIT ?";
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + name.trim() + "%");
+            ps.setInt(2, limit);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    categories.add(mapResultSetToCategory(rs, true));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return categories;
+    }
+
+    /**
+     * Cập nhật trạng thái hàng loạt
+     */
+    public boolean updateCategoriesStatus(List<Integer> categoryIds, boolean activeFlag) {
+        if (categoryIds == null || categoryIds.isEmpty()) {
+            return false;
+        }
+
+        StringBuilder sql = new StringBuilder("UPDATE category SET active_flag = ?, update_date = NOW() WHERE id IN (");
+        for (int i = 0; i < categoryIds.size(); i++) {
+            if (i > 0) sql.append(",");
+            sql.append("?");
+        }
+        sql.append(")");
+
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            ps.setBoolean(1, activeFlag);
+            for (int i = 0; i < categoryIds.size(); i++) {
+                ps.setInt(i + 2, categoryIds.get(i));
+            }
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // ===================== HELPER METHODS =====================
+
+    // Helper methods (giữ nguyên)
     private CategoryProduct mapResultSetToCategory(ResultSet rs, boolean includeParentName) 
             throws SQLException {
         CategoryProduct category = new CategoryProduct();
@@ -411,5 +765,27 @@ public class CategoryProductDAO {
         for (int i = 0; i < params.size(); i++) {
             ps.setObject(i + 1, params.get(i));
         }
+    }
+
+    /**
+     * Validate sort field để tránh SQL injection
+     */
+    private boolean isValidSortField(String sortField) {
+        if (sortField == null) return false;
+
+        String[] allowedFields = {"id", "name", "parent_name", "active_flag", "create_date", "update_date"};
+        for (String field : allowedFields) {
+            if (field.equals(sortField)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Validate sort direction để tránh SQL injection
+     */
+    private boolean isValidSortDirection(String sortDir) {
+        return "asc".equalsIgnoreCase(sortDir) || "desc".equalsIgnoreCase(sortDir);
     }
 }

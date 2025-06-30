@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import model.CategoryProductParent;
 import DBContext.Context;
@@ -36,42 +37,66 @@ public class CategoryParentDAO {
     }
     
     /**
-     * Get list with pagination and search
+     * Get filtered parent categories with all filter options
      */
-    public List<CategoryProductParent> getAllCategoryParents(int page, int pageSize, 
-                                                           String searchKeyword, 
-                                                           String sortField, 
-                                                           String sortDir) {
+    public List<CategoryProductParent> getFilteredParentCategories(String searchName, String status, 
+            String childCountFilter, String sortBy, String sortOrder, int page, int pageSize) {
+        
         List<CategoryProductParent> list = new ArrayList<>();
         
-        // Build SQL query
-        StringBuilder sql = new StringBuilder("SELECT * FROM category_parent WHERE 1=1");
+        // Build SQL with filters
+        StringBuilder sql = new StringBuilder(
+            "SELECT cp.*, COUNT(c.id) as child_count " +
+            "FROM category_parent cp " +
+            "LEFT JOIN category c ON cp.id = c.parent_id " +
+            "WHERE 1=1 ");
         
-        // Add search condition if exists
-        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            sql.append(" AND (name LIKE ? OR description LIKE ?)");
+        // Add search condition
+        if (searchName != null && !searchName.trim().isEmpty()) {
+            sql.append("AND (cp.name LIKE ? OR cp.description LIKE ?) ");
+        }
+        
+        // Add status filter
+        if (status != null && !status.isEmpty()) {
+            sql.append("AND cp.active_flag = ? ");
+        }
+        
+        // Group by for child count
+        sql.append("GROUP BY cp.id, cp.name, cp.description, cp.active_flag, cp.create_date, cp.update_date ");
+        
+        // Add child count filter
+        if (childCountFilter != null && !childCountFilter.isEmpty()) {
+            switch (childCountFilter) {
+                case "0":
+                    sql.append("HAVING COUNT(c.id) = 0 ");
+                    break;
+                case "1-5":
+                    sql.append("HAVING COUNT(c.id) BETWEEN 1 AND 5 ");
+                    break;
+                case "6-10":
+                    sql.append("HAVING COUNT(c.id) BETWEEN 6 AND 10 ");
+                    break;
+                case "10+":
+                    sql.append("HAVING COUNT(c.id) > 10 ");
+                    break;
+            }
         }
         
         // Add sorting
-        sql.append(" ORDER BY ");
-        if ("name".equals(sortField)) {
-            sql.append("name");
-        } else if ("description".equals(sortField)) {
-            sql.append("description");
-        } else if ("active_flag".equals(sortField)) {
-            sql.append("active_flag");
+        String[] allowedSortColumns = {"id", "name", "create_date", "update_date"};
+        if (sortBy != null && Arrays.asList(allowedSortColumns).contains(sortBy)) {
+            sql.append("ORDER BY cp.").append(sortBy);
+            if ("desc".equalsIgnoreCase(sortOrder)) {
+                sql.append(" DESC ");
+            } else {
+                sql.append(" ASC ");
+            }
         } else {
-            sql.append("id");
-        }
-        
-        if ("desc".equalsIgnoreCase(sortDir)) {
-            sql.append(" DESC");
-        } else {
-            sql.append(" ASC");
+            sql.append("ORDER BY cp.id ASC ");
         }
         
         // Add pagination
-        sql.append(" LIMIT ? OFFSET ?");
+        sql.append("LIMIT ? OFFSET ?");
         
         try (Connection conn = new Context().getJDBCConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -79,10 +104,15 @@ public class CategoryParentDAO {
             int paramIndex = 1;
             
             // Set search parameters
-            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                String searchPattern = "%" + searchKeyword + "%";
+            if (searchName != null && !searchName.trim().isEmpty()) {
+                String searchPattern = "%" + searchName.trim() + "%";
                 ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
+            }
+            
+            // Set status parameter
+            if (status != null && !status.isEmpty()) {
+                ps.setInt(paramIndex++, Integer.parseInt(status));
             }
             
             // Set pagination parameters
@@ -90,19 +120,120 @@ public class CategoryParentDAO {
             ps.setInt(paramIndex++, pageSize);
             ps.setInt(paramIndex, offset);
             
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    CategoryProductParent category = createCategoryFromResultSet(rs);
-                    list.add(category);
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                CategoryProductParent parent = new CategoryProductParent();
+                parent.setId(rs.getInt("id"));
+                parent.setName(rs.getString("name"));
+                parent.setDescription(rs.getString("description"));
+                parent.setActiveFlag(rs.getBoolean("active_flag"));
+                parent.setChildCount(rs.getInt("child_count"));
+                
+                if (rs.getTimestamp("create_date") != null) {
+                    parent.setCreateDate(rs.getTimestamp("create_date").toLocalDateTime());
                 }
+                if (rs.getTimestamp("update_date") != null) {
+                    parent.setUpdateDate(rs.getTimestamp("update_date").toLocalDateTime());
+                }
+                
+                list.add(parent);
             }
             
         } catch (SQLException e) {
-            System.out.println("Error when getting paginated list: " + e.getMessage());
+            System.out.println("Error in getFilteredParentCategories: " + e.getMessage());
             e.printStackTrace();
         }
         
         return list;
+    }
+    
+    /**
+     * Count filtered parent categories for pagination
+     */
+    public int countFilteredParentCategories(String searchName, String status, String childCountFilter) {
+        StringBuilder sql = new StringBuilder(
+            "SELECT COUNT(DISTINCT cp.id) as total_count " +
+            "FROM category_parent cp " +
+            "LEFT JOIN category c ON cp.id = c.parent_id " +
+            "WHERE 1=1 ");
+        
+        // Add search condition
+        if (searchName != null && !searchName.trim().isEmpty()) {
+            sql.append("AND (cp.name LIKE ? OR cp.description LIKE ?) ");
+        }
+        
+        // Add status filter
+        if (status != null && !status.isEmpty()) {
+            sql.append("AND cp.active_flag = ? ");
+        }
+        
+        // For child count filter, we need a subquery
+        if (childCountFilter != null && !childCountFilter.isEmpty()) {
+            sql = new StringBuilder(
+                "SELECT COUNT(*) FROM (" +
+                "SELECT cp.id " +
+                "FROM category_parent cp " +
+                "LEFT JOIN category c ON cp.id = c.parent_id " +
+                "WHERE 1=1 ");
+            
+            if (searchName != null && !searchName.trim().isEmpty()) {
+                sql.append("AND (cp.name LIKE ? OR cp.description LIKE ?) ");
+            }
+            
+            if (status != null && !status.isEmpty()) {
+                sql.append("AND cp.active_flag = ? ");
+            }
+            
+            sql.append("GROUP BY cp.id ");
+            
+            switch (childCountFilter) {
+                case "0":
+                    sql.append("HAVING COUNT(c.id) = 0 ");
+                    break;
+                case "1-5":
+                    sql.append("HAVING COUNT(c.id) BETWEEN 1 AND 5 ");
+                    break;
+                case "6-10":
+                    sql.append("HAVING COUNT(c.id) BETWEEN 6 AND 10 ");
+                    break;
+                case "10+":
+                    sql.append("HAVING COUNT(c.id) > 10 ");
+                    break;
+            }
+            
+            sql.append(") as filtered_parents");
+        }
+        
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            
+            int paramIndex = 1;
+            
+            // Set search parameters
+            if (searchName != null && !searchName.trim().isEmpty()) {
+                String searchPattern = "%" + searchName.trim() + "%";
+                ps.setString(paramIndex++, searchPattern);
+                ps.setString(paramIndex++, searchPattern);
+            }
+            
+            // Set status parameter
+            if (status != null && !status.isEmpty()) {
+                ps.setInt(paramIndex++, Integer.parseInt(status));
+            }
+            
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Error in countFilteredParentCategories: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return 0;
     }
     
     /**
@@ -112,50 +243,16 @@ public class CategoryParentDAO {
                                                                           String searchKeyword, 
                                                                           String sortField, 
                                                                           String sortDir) {
-        List<CategoryProductParent> list = getAllCategoryParents(page, pageSize, searchKeyword, sortField, sortDir);
-        
-        // Add child count for each parent
-        for (CategoryProductParent parent : list) {
-            int childCount = getTotalChildCategoryCount(parent.getId());
-            parent.setChildCount(childCount);
-        }
-        
-        return list;
+        // Use the new filtered method with null status and childCountFilter
+        return getFilteredParentCategories(searchKeyword, null, null, sortField, sortDir, page, pageSize);
     }
     
     /**
      * Count total parent categories (for pagination)
      */
     public int countCategoryParents(String searchKeyword) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM category_parent WHERE 1=1");
-        
-        // Add search condition if exists
-        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            sql.append(" AND (name LIKE ? OR description LIKE ?)");
-        }
-        
-        try (Connection conn = new Context().getJDBCConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            
-            // Set search parameters
-            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                String searchPattern = "%" + searchKeyword + "%";
-                ps.setString(1, searchPattern);
-                ps.setString(2, searchPattern);
-            }
-            
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-            
-        } catch (SQLException e) {
-            System.out.println("Error when counting category parent: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        return 0;
+        // Use the new count method with null filters
+        return countFilteredParentCategories(searchKeyword, null, null);
     }
     
     /**
@@ -171,7 +268,10 @@ public class CategoryParentDAO {
             
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return createCategoryFromResultSet(rs);
+                    CategoryProductParent category = createCategoryFromResultSet(rs);
+                    // Also get child count
+                    category.setChildCount(getTotalChildCategoryCount(id));
+                    return category;
                 }
             }
             

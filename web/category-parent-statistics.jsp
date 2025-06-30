@@ -415,7 +415,6 @@
 
                     <div class="export-buttons">
                         <button class="btn-export btn-excel" onclick="exportToExcel()">📊 Xuất Excel</button>
-                        <button class="btn-export btn-pdf" onclick="exportToPDF()">📄 Xuất PDF</button>
                     </div>
                 </div>
 

@@ -111,12 +111,19 @@
                 gap: 10px;
             }
 
-            .form-input {
+            .form-input, .form-select {
                 padding: 10px;
                 border: 1px solid #ddd;
                 border-radius: 4px;
                 font-size: 14px;
+            }
+
+            .form-input {
                 width: 250px;
+            }
+
+            .form-select {
+                width: 150px;
             }
 
             .btn {
@@ -166,6 +173,34 @@
             .btn-sm {
                 padding: 8px 15px;
                 font-size: 13px;
+            }
+
+            /* Filter Panel */
+            .filter-panel {
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 5px;
+                margin-bottom: 20px;
+                border: 1px solid #dee2e6;
+            }
+
+            .filter-row {
+                display: flex;
+                gap: 15px;
+                align-items: end;
+                flex-wrap: wrap;
+            }
+
+            .filter-group {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .filter-group label {
+                font-weight: 500;
+                color: #555;
+                font-size: 14px;
             }
 
             /* Table Styles */
@@ -330,13 +365,21 @@
                 .form-input {
                     width: 100%;
                 }
-                
+
                 .table th, .table td {
                     padding: 8px;
                     font-size: 12px;
                 }
+
+                .filter-row {
+                    flex-direction: column;
+                }
+
+                .filter-group {
+                    width: 100%;
+                }
             }
-            
+
             .layout-container {
                 display: flex;
                 min-height: 100vh;
@@ -347,7 +390,7 @@
                 padding: 20px;
                 background: #f5f5f5;
             }
-            
+
             .header {
                 text-align: center;
                 margin-bottom: 30px;
@@ -376,6 +419,70 @@
                 color: #3f51b5;
                 font-size: 2rem;
                 margin-bottom: 10px;
+            }
+            /* Filter Section Styles */
+            .filter-section {
+                background: white;
+                padding: 20px;
+                margin-bottom: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                border: 1px solid #e9ecef;
+            }
+
+            .filter-row {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 15px;
+                align-items: end;
+            }
+
+            .filter-item {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .filter-item label {
+                margin-bottom: 5px;
+                font-weight: 500;
+                color: #555;
+                font-size: 14px;
+            }
+
+            .filter-input,
+            .filter-select {
+                padding: 8px 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+                transition: border-color 0.3s;
+            }
+
+            .filter-input:focus,
+            .filter-select:focus {
+                outline: none;
+                border-color: #007bff;
+            }
+
+            .filter-actions {
+                display: flex;
+                gap: 10px;
+                align-items: flex-end;
+            }
+
+            .filter-actions button {
+                flex: 1;
+            }
+
+            /* Responsive cho filter */
+            @media (max-width: 768px) {
+                .filter-row {
+                    grid-template-columns: 1fr;
+                }
+
+                .filter-actions {
+                    margin-top: 10px;
+                }
             }
         </style>
     </head>
@@ -426,26 +533,63 @@
                 <!-- Thanh công cụ -->
                 <div class="toolbar">
                     <div style="display: flex; gap: 10px;">
-                    <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">+ Thêm danh mục loại sản phẩm</a>
-                    <a href="${pageContext.request.contextPath}/category-parent/statistics" class="btn btn-success">Thống kê danh mục loại sản phẩm</a>
+                        <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">+ Thêm danh mục loại sản phẩm</a>
+                        <a href="${pageContext.request.contextPath}/category-parent/statistics" class="btn btn-success">Thống kê danh mục loại sản phẩm</a>
                     </div>
-                    <form method="get" class="search-form">
-                        <!-- Giữ lại sort parameters khi search -->
-                        <c:if test="${not empty sortField}">
-                            <input type="hidden" name="sortField" value="${sortField}">
-                        </c:if>
-                        <c:if test="${not empty sortDir}">
-                            <input type="hidden" name="sortDir" value="${sortDir}">
-                        </c:if>
+                </div>
 
-                        <input type="text" name="search" class="form-input" 
-                               placeholder="Tìm kiếm danh mục..." value="${searchKeyword}">
-                        <button type="submit" class="btn btn-secondary">Tìm kiếm</button>
-
-                        <!-- Nút clear search -->
-                        <c:if test="${not empty searchKeyword}">
-                            <a href="?sortField=${sortField}&sortDir=${sortDir}" class="btn btn-info">✕ Xóa tìm kiếm</a>
-                        </c:if>
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <h3 style="margin-bottom: 15px; color: #333;">Bộ lọc</h3>
+                    <form id="filterForm" method="get" action="${pageContext.request.contextPath}/category/list">
+                        <div class="filter-row">
+                            <div class="filter-item">
+                                <label>Tìm kiếm:</label>
+                                <input type="text" name="search" value="${searchKeyword}" 
+                                       placeholder="Nhập tên danh mục..." class="filter-input">
+                            </div>
+                            <div class="filter-item">
+                                <label>Trạng thái:</label>
+                                <select name="status" class="filter-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="1" ${status == '1' ? 'selected' : ''}>Hoạt động</option>
+                                    <option value="0" ${status == '0' ? 'selected' : ''}>Không hoạt động</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label>Danh mục cha:</label>
+                                <select name="parentId" class="filter-select">
+                                    <option value="">Tất cả</option>
+                                    <c:forEach var="parent" items="${parentCategories}">
+                                        <option value="${parent.id}" ${parentId == parent.id ? 'selected' : ''}>
+                                            ${parent.name}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label>Sắp xếp theo:</label>
+                                <select name="sortField" class="filter-select">
+                                    <option value="id" ${sortField == 'id' ? 'selected' : ''}>ID</option>
+                                    <option value="name" ${sortField == 'name' ? 'selected' : ''}>Tên</option>
+                                    <option value="parent_name" ${sortField == 'parent_name' ? 'selected' : ''}>Danh mục cha</option>
+                                    <option value="active_flag" ${sortField == 'active_flag' ? 'selected' : ''}>Trạng thái</option>
+                                    <option value="create_date" ${sortField == 'create_date' ? 'selected' : ''}>Ngày tạo</option>
+                                    <option value="update_date" ${sortField == 'update_date' ? 'selected' : ''}>Ngày cập nhật</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label>Thứ tự:</label>
+                                <select name="sortDir" class="filter-select">
+                                    <option value="asc" ${sortDir == 'asc' ? 'selected' : ''}>Tăng dần</option>
+                                    <option value="desc" ${sortDir == 'desc' ? 'selected' : ''}>Giảm dần</option>
+                                </select>
+                            </div>
+                            <div class="filter-actions">
+                                <button type="submit" class="btn btn-primary">Lọc</button>
+                                <button type="button" class="btn btn-secondary" onclick="resetFilter()">Đặt lại</button>
+                            </div>
+                        </div>
                     </form>
                 </div>
 
@@ -457,7 +601,7 @@
                                 <thead>
                                     <tr>
                                         <th>
-                                            <a href="?sortField=id&sortDir=${sortField eq 'id' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                            <a href="?sortField=id&sortDir=${sortField eq 'id' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
                                                 ID 
                                                 <c:if test="${sortField eq 'id'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
@@ -465,7 +609,7 @@
                                             </a>
                                         </th>
                                         <th>
-                                            <a href="?sortField=name&sortDir=${sortField eq 'name' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                            <a href="?sortField=name&sortDir=${sortField eq 'name' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
                                                 Tên 
                                                 <c:if test="${sortField eq 'name'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
@@ -473,7 +617,7 @@
                                             </a>
                                         </th>
                                         <th>
-                                            <a href="?sortField=parent_name&sortDir=${sortField eq 'parent_name' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                            <a href="?sortField=parent_name&sortDir=${sortField eq 'parent_name' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
                                                 Danh mục 
                                                 <c:if test="${sortField eq 'parent_name'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
@@ -481,7 +625,7 @@
                                             </a>
                                         </th>
                                         <th>
-                                            <a href="?sortField=active_flag&sortDir=${sortField eq 'active_flag' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                            <a href="?sortField=active_flag&sortDir=${sortField eq 'active_flag' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
                                                 Trạng thái 
                                                 <c:if test="${sortField eq 'active_flag'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
@@ -489,7 +633,7 @@
                                             </a>
                                         </th>
                                         <th>
-                                            <a href="?sortField=create_date&sortDir=${sortField eq 'create_date' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                            <a href="?sortField=create_date&sortDir=${sortField eq 'create_date' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
                                                 Ngày tạo 
                                                 <c:if test="${sortField eq 'create_date'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
@@ -497,7 +641,7 @@
                                             </a>
                                         </th>
                                         <th>
-                                            <a href="?sortField=update_date&sortDir=${sortField eq 'update_date' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                            <a href="?sortField=update_date&sortDir=${sortField eq 'update_date' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
                                                 Ngày cập nhật 
                                                 <c:if test="${sortField eq 'update_date'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
@@ -523,7 +667,8 @@
                                                 </c:choose>
                                             </td>
                                             <td>
-                                                <span class="badge ${category.activeFlag ? 'badge-success' : 'badge-secondary'}">
+                                                <span class="badge ${category.activeFlag ? 'badge-success' : 'badge-secondary'}" 
+                                                      id="status-${category.id}">
                                                     ${category.activeFlag ? 'Hoạt động' : 'Không hoạt động'}
                                                 </span>
                                             </td>
@@ -555,8 +700,15 @@
                                                 <div class="action-buttons">
                                                     <a href="${pageContext.request.contextPath}/category/edit?id=${category.id}" 
                                                        class="btn btn-warning btn-sm" title="Chỉnh sửa">
-                                                        ️Sửa
+                                                        ✏️ Sửa
                                                     </a>
+                                                    <button type="button" 
+                                                            class="btn ${category.activeFlag ? 'btn-danger' : 'btn-success'} btn-sm" 
+                                                            id="toggle-${category.id}"
+                                                            onclick="toggleCategoryStatus(${category.id})" 
+                                                            title="${category.activeFlag ? 'Vô hiệu hóa' : 'Kích hoạt'}">
+                                                        ${category.activeFlag ? '❌' : '✅'}
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -568,8 +720,8 @@
                             <div class="empty-state">
                                 <h3>Không có danh mục nào</h3>
                                 <c:choose>
-                                    <c:when test="${not empty searchKeyword}">
-                                        <p>Không tìm thấy danh mục nào với từ khóa "<strong>${searchKeyword}</strong>"</p>
+                                    <c:when test="${not empty searchKeyword or not empty status or not empty parentId}">
+                                        <p>Không tìm thấy danh mục nào với bộ lọc hiện tại</p>
                                         <a href="${pageContext.request.contextPath}/category/list" class="btn btn-info">← Xem tất cả danh mục</a>
                                     </c:when>
                                     <c:otherwise>
@@ -589,21 +741,21 @@
                             <!-- First page -->
                             <c:if test="${currentPage > 1}">
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=${currentPage-1}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">Trước</a>
+                                    <a class="page-link" href="?page=${currentPage-1}&search=${searchKeyword}&status=${status}&parentId=${parentId}&sortField=${sortField}&sortDir=${sortDir}">Trước</a>
                                 </li>
                             </c:if>
 
                             <!-- Page numbers -->
                             <c:forEach begin="${startPage}" end="${endPage}" var="i">
                                 <li class="page-item ${i eq currentPage ? 'active' : ''}">
-                                    <a class="page-link" href="?page=${i}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">${i}</a>
+                                    <a class="page-link" href="?page=${i}&search=${searchKeyword}&status=${status}&parentId=${parentId}&sortField=${sortField}&sortDir=${sortDir}">${i}</a>
                                 </li>
                             </c:forEach>
 
                             <!-- Next page -->
                             <c:if test="${currentPage < totalPages}">
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=${currentPage+1}&search=${searchKeyword}&sortField=${sortField}&sortDir=${sortDir}">Sau</a>
+                                    <a class="page-link" href="?page=${currentPage+1}&search=${searchKeyword}&status=${status}&parentId=${parentId}&sortField=${sortField}&sortDir=${sortDir}">Sau</a>
                                 </li>
                             </c:if>
                         </ul>
@@ -624,6 +776,91 @@
                     setTimeout(function () {
                         alert.style.display = 'none';
                     }, 5000);
+                });
+            });
+
+            // Auto submit form when filter changes
+            document.getElementById('status').addEventListener('change', function () {
+                document.getElementById('filterForm').submit();
+            });
+
+            document.getElementById('parentId').addEventListener('change', function () {
+                document.getElementById('filterForm').submit();
+            });
+
+            document.getElementById('sortField').addEventListener('change', function () {
+                document.getElementById('filterForm').submit();
+            });
+
+            document.getElementById('sortDir').addEventListener('change', function () {
+                document.getElementById('filterForm').submit();
+            });
+
+            // Toggle category status function
+            function toggleCategoryStatus(categoryId) {
+                fetch('${pageContext.request.contextPath}/category/toggle-status?id=' + categoryId, {
+                    method: 'GET'
+                })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update status badge
+                                const statusBadge = document.getElementById('status-' + categoryId);
+                                statusBadge.textContent = data.newStatus;
+                                statusBadge.className = 'badge ' + data.statusClass;
+
+                                // Update toggle button
+                                const toggleBtn = document.getElementById('toggle-' + categoryId);
+                                toggleBtn.textContent = data.buttonText;
+                                toggleBtn.className = 'btn ' + data.buttonClass + ' btn-sm';
+                                toggleBtn.title = data.newStatus === 'Hoạt động' ? 'Vô hiệu hóa' : 'Kích hoạt';
+
+                                // Show success message
+                                showMessage(data.message, 'success');
+                            } else {
+                                showMessage(data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showMessage('Đã xảy ra lỗi khi cập nhật trạng thái', 'error');
+                        });
+            }
+
+            // Show message function
+            function showMessage(message, type) {
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert ${alertClass}`;
+                alertDiv.innerHTML = `
+            ${message}
+                    <button type="button" class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+                `;
+
+                // Insert after header
+                const header = document.querySelector('.header');
+                header.parentNode.insertBefore(alertDiv, header.nextSibling);
+
+                // Auto hide after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 5000);
+            }
+            // Reset filter function
+            function resetFilter() {
+                window.location.href = '${pageContext.request.contextPath}/category/list';
+            }
+
+// Auto-submit form when select changes (optional)
+            document.addEventListener('DOMContentLoaded', function () {
+                const selects = document.querySelectorAll('.filter-select');
+                selects.forEach(select => {
+                    select.addEventListener('change', function () {
+                        // Uncomment if you want auto-submit
+                        // document.getElementById('filterForm').submit();
+                    });
                 });
             });
         </script>
