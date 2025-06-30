@@ -931,7 +931,7 @@
                                 <div class="filter-title">
                                     <i class="fas fa-search"></i> Tìm kiếm yêu cầu đã duyệt
                                 </div>
-                                <form action="${pageContext.request.contextPath}/request/list" method="get" id="searchForm">
+                                <form action="list" method="get" id="searchForm">
                                     <input type="hidden" name="type" value="purchase">
                                     <div class="filter-row">
                                         <div class="filter-item">
