@@ -12,9 +12,9 @@ import java.util.logging.Logger;
 
 public class Context {
     public static Connection getJDBCConnection() {
-        String url = "jdbc:mysql://localhost:3306/warehouse_offical";
+        String url = "jdbc:mysql://localhost:3306/swp";
         String user = "root";
-        String password = "letiendat";
+        String password = "tunganh2005";
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             
