@@ -31,7 +31,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Danh sách danh mục loại sản phẩm</title>
+        <title>Danh sách danh mục sản phẩm</title>
         <style>
             * {
                 margin: 0;
@@ -123,7 +123,7 @@
             }
 
             .form-select {
-                width: 150px;
+                width: 200px;
             }
 
             .btn {
@@ -270,8 +270,14 @@
                 color: white;
             }
 
+            .badge-primary {
+                background: #007bff;
+                color: white;
+            }
+
             .text-muted {
                 color: #6c757d;
+                font-style: italic;
             }
 
             /* Action Buttons */
@@ -398,10 +404,11 @@
             .header-user {
                 display: flex;
                 align-items: center;
+                justify-content: center;
+                gap: 20px;
             }
             .label {
                 color: #888;
-                width: 120px;
             }
             .logout-btn {
                 background: red;
@@ -491,41 +498,29 @@
             <jsp:include page="/include/sidebar.jsp" />
             <div class="main-content">
                 <div class="header">
-                    <h1 class="page-title">Quản lý danh mục loại sản phẩm</h1>
+                    <h1 class="page-title">Quản lý danh mục loại sản phẩm</h1>
                     <div class="header-user">
-                        <label class="label"><%= user.getFullname()%></label>
-                        <a href="logout" class="logout-btn">Đăng xuất</a>
+                        <label class="label">Xin chào, <%= user.getFullname()%></label>
+                        <a href="${pageContext.request.contextPath}/login.jsp" class="logout-btn">Đăng xuất</a>
                     </div>
                 </div>
 
                 <!-- Navigation Buttons -->
                 <div class="nav-buttons">
                     <a href="/ProjectWarehouse/categoriesforward.jsp" class="btn btn-info">← Quay lại trang trước</a>
-                    <a href="${pageContext.request.contextPath}/category-parent/list" class="btn btn-success">Quản lý danh mục</a>
                 </div>
 
                 <!-- Thông báo -->
-                <c:if test="${not empty param.message}">
+                <c:if test="${not empty successMessage}">
                     <div class="alert alert-success">
-                        <c:choose>
-                            <c:when test="${param.message eq 'create_success'}">Thêm danh mục thành công!</c:when>
-                            <c:when test="${param.message eq 'update_success'}">Cập nhật danh mục thành công!</c:when>
-                            <c:when test="${param.message eq 'delete_success'}">Xóa danh mục thành công!</c:when>
-                            <c:otherwise>${param.message}</c:otherwise>
-                        </c:choose>
+                        ${successMessage}
                         <button type="button" class="alert-close" onclick="this.parentElement.style.display = 'none'">&times;</button>
                     </div>
                 </c:if>
 
-                <c:if test="${not empty param.error}">
+                <c:if test="${not empty errorMessage}">
                     <div class="alert alert-danger">
-                        <c:choose>
-                            <c:when test="${param.error eq 'invalid_id'}">ID không hợp lệ!</c:when>
-                            <c:when test="${param.error eq 'category_not_found'}">Không tìm thấy danh mục!</c:when>
-                            <c:when test="${param.error eq 'invalid_data'}">Dữ liệu không hợp lệ!</c:when>
-                            <c:when test="${param.error eq 'delete_failed'}">Không thể xóa danh mục!</c:when>
-                            <c:otherwise>${param.error}</c:otherwise>
-                        </c:choose>
+                        ${errorMessage}
                         <button type="button" class="alert-close" onclick="this.parentElement.style.display = 'none'">&times;</button>
                     </div>
                 </c:if>
@@ -533,8 +528,8 @@
                 <!-- Thanh công cụ -->
                 <div class="toolbar">
                     <div style="display: flex; gap: 10px;">
-                        <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">+ Thêm danh mục loại sản phẩm</a>
-                        <a href="${pageContext.request.contextPath}/category-parent/statistics" class="btn btn-success">Thống kê danh mục loại sản phẩm</a>
+                        <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">+ Thêm danh mục</a>
+                        <a href="${pageContext.request.contextPath}/category/statistics" class="btn btn-primary">Thống kê danh mục loại sản phẩm</a> 
                     </div>
                 </div>
 
@@ -557,34 +552,18 @@
                                 </select>
                             </div>
                             <div class="filter-item">
-                                <label>Danh mục cha:</label>
+                                <label>Danh mục cha:</label>
                                 <select name="parentId" class="filter-select">
                                     <option value="">Tất cả</option>
-                                    <c:forEach var="parent" items="${parentCategories}">
-                                        <option value="${parent.id}" ${parentId == parent.id ? 'selected' : ''}>
-                                            ${parent.name}
+                                    <option value="-1" ${parentId == -1 ? 'selected' : ''}>Danh mục gốc</option>
+                                    <c:forEach var="root" items="${rootCategories}">
+                                        <option value="${root.id}" ${parentId == root.id ? 'selected' : ''}>
+                                            ${root.name}
                                         </option>
                                     </c:forEach>
                                 </select>
                             </div>
-                            <div class="filter-item">
-                                <label>Sắp xếp theo:</label>
-                                <select name="sortField" class="filter-select">
-                                    <option value="id" ${sortField == 'id' ? 'selected' : ''}>ID</option>
-                                    <option value="name" ${sortField == 'name' ? 'selected' : ''}>Tên</option>
-                                    <option value="parent_name" ${sortField == 'parent_name' ? 'selected' : ''}>Danh mục cha</option>
-                                    <option value="active_flag" ${sortField == 'active_flag' ? 'selected' : ''}>Trạng thái</option>
-                                    <option value="create_date" ${sortField == 'create_date' ? 'selected' : ''}>Ngày tạo</option>
-                                    <option value="update_date" ${sortField == 'update_date' ? 'selected' : ''}>Ngày cập nhật</option>
-                                </select>
-                            </div>
-                            <div class="filter-item">
-                                <label>Thứ tự:</label>
-                                <select name="sortDir" class="filter-select">
-                                    <option value="asc" ${sortDir == 'asc' ? 'selected' : ''}>Tăng dần</option>
-                                    <option value="desc" ${sortDir == 'desc' ? 'selected' : ''}>Giảm dần</option>
-                                </select>
-                            </div>
+
                             <div class="filter-actions">
                                 <button type="submit" class="btn btn-primary">Lọc</button>
                                 <button type="button" class="btn btn-secondary" onclick="resetFilter()">Đặt lại</button>
@@ -610,7 +589,7 @@
                                         </th>
                                         <th>
                                             <a href="?sortField=name&sortDir=${sortField eq 'name' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
-                                                Tên 
+                                                Tên danh mục 
                                                 <c:if test="${sortField eq 'name'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
                                                 </c:if>
@@ -618,7 +597,7 @@
                                         </th>
                                         <th>
                                             <a href="?sortField=parent_name&sortDir=${sortField eq 'parent_name' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
-                                                Danh mục 
+                                                Danh mục cha 
                                                 <c:if test="${sortField eq 'parent_name'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
                                                 </c:if>
@@ -655,14 +634,16 @@
                                     <c:forEach var="category" items="${categories}">
                                         <tr>
                                             <td>#${category.id}</td>
-                                            <td>${category.name}</td>
+                                            <td>
+                                                <strong>${category.name}</strong>
+                                            </td>
                                             <td>
                                                 <c:choose>
                                                     <c:when test="${not empty category.parentName}">
                                                         <span class="badge badge-info">${category.parentName}</span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="text-muted">Không có</span>
+                                                        <span class="badge badge-primary">Danh mục gốc</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
@@ -700,14 +681,14 @@
                                                 <div class="action-buttons">
                                                     <a href="${pageContext.request.contextPath}/category/edit?id=${category.id}" 
                                                        class="btn btn-warning btn-sm" title="Chỉnh sửa">
-                                                        ✏️ Sửa
+                                                        Sửa
                                                     </a>
                                                     <button type="button" 
                                                             class="btn ${category.activeFlag ? 'btn-danger' : 'btn-success'} btn-sm" 
                                                             id="toggle-${category.id}"
                                                             onclick="toggleCategoryStatus(${category.id})" 
                                                             title="${category.activeFlag ? 'Vô hiệu hóa' : 'Kích hoạt'}">
-                                                        ${category.activeFlag ? '❌' : '✅'}
+                                                        ${category.activeFlag ? 'vô hiệu hóa' : 'kích hoạt'}
                                                     </button>
                                                 </div>
                                             </td>
@@ -726,7 +707,7 @@
                                     </c:when>
                                     <c:otherwise>
                                         <p>Hãy thêm danh mục đầu tiên của bạn</p>
-                                        <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">+ Thêm danh mục loại sản phẩm</a>
+                                        <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">+ Thêm danh mục</a>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
@@ -765,10 +746,6 @@
         </div>
 
         <script>
-            function confirmDelete(categoryName) {
-                return confirm('Bạn có chắc chắn muốn xóa danh mục "' + categoryName + '"?\n\nHành động này không thể hoàn tác!');
-            }
-
             // Auto hide alerts after 5 seconds
             document.addEventListener('DOMContentLoaded', function () {
                 const alerts = document.querySelectorAll('.alert');
@@ -779,90 +756,228 @@
                 });
             });
 
-            // Auto submit form when filter changes
-            document.getElementById('status').addEventListener('change', function () {
-                document.getElementById('filterForm').submit();
-            });
-
-            document.getElementById('parentId').addEventListener('change', function () {
-                document.getElementById('filterForm').submit();
-            });
-
-            document.getElementById('sortField').addEventListener('change', function () {
-                document.getElementById('filterForm').submit();
-            });
-
-            document.getElementById('sortDir').addEventListener('change', function () {
-                document.getElementById('filterForm').submit();
-            });
-
-            // Toggle category status function
+            // Toggle category status function với CONFIRM
             function toggleCategoryStatus(categoryId) {
+                // Lấy thông tin hiện tại
+                const statusBadge = document.getElementById('status-' + categoryId);
+                const toggleBtn = document.getElementById('toggle-' + categoryId);
+                const currentStatus = statusBadge.textContent.trim();
+
+                // Lấy tên danh mục từ bảng
+                const categoryName = findCategoryNameById(categoryId);
+
+                // Tạo message confirm dựa trên trạng thái hiện tại
+                let confirmMessage;
+                if (currentStatus === 'Hoạt động') {
+                    confirmMessage = `Bạn có chắc chắn muốn VÔ HIỆU HÓA danh mục`;
+                } else {
+                    confirmMessage = `Bạn có chắc chắn muốn KÍCH HOẠT danh mục`;
+                }
+
+                // Hiển thị confirm dialog
+                if (!confirm(confirmMessage)) {
+                    return; // Người dùng hủy bỏ
+                }
+
+                // Thêm loading effect
+                addLoadingEffect(toggleBtn);
+                const originalBtnText = toggleBtn.textContent;
+
                 fetch('${pageContext.request.contextPath}/category/toggle-status?id=' + categoryId, {
                     method: 'GET'
                 })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // Update status badge
-                                const statusBadge = document.getElementById('status-' + categoryId);
+                                // Update status badge của danh mục hiện tại
                                 statusBadge.textContent = data.newStatus;
                                 statusBadge.className = 'badge ' + data.statusClass;
 
                                 // Update toggle button
-                                const toggleBtn = document.getElementById('toggle-' + categoryId);
                                 toggleBtn.textContent = data.buttonText;
                                 toggleBtn.className = 'btn ' + data.buttonClass + ' btn-sm';
                                 toggleBtn.title = data.newStatus === 'Hoạt động' ? 'Vô hiệu hóa' : 'Kích hoạt';
 
-                                // Show success message
-                                showMessage(data.message, 'success');
+                                // Hiển thị thông báo thành công
+                                showSuccessMessage(data.newStatus === 'Hoạt động' ?
+                                        `Đã kích hoạt danh mục "${categoryName}" thành công!` :
+                                        `Đã vô hiệu hóa danh mục "${categoryName}" thành công!`
+                                        );
+
+                                // Nếu vô hiệu hóa và có danh mục con, cập nhật tất cả danh mục con
+                                if (data.childrenDeactivated === true && data.newStatus === 'Không hoạt động') {
+                                    updateChildCategoriesStatus(categoryId, false);
+                                    showInfoMessage(`Đã tự động vô hiệu hóa các danh mục con liên quan.`);
+                                }
                             } else {
-                                showMessage(data.message, 'error');
+                                // Hiển thị lỗi
+                                console.error('Failed to toggle status:', data.message);
+                                showErrorMessage(data.message || 'Có lỗi xảy ra khi thay đổi trạng thái danh mục.');
+
+                                // Nếu lỗi do danh mục cha inactive, hiển thị tooltip
+                                if (data.message && data.message.includes('danh mục cha')) {
+                                    showTooltip(toggleBtn, data.message);
+                                }
                             }
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            showMessage('Đã xảy ra lỗi khi cập nhật trạng thái', 'error');
+                            showErrorMessage('Có lỗi xảy ra khi kết nối đến server. Vui lòng thử lại.');
+                        })
+                        .finally(() => {
+                            // Remove loading effect
+                            removeLoadingEffect(toggleBtn);
                         });
             }
 
-            // Show message function
-            function showMessage(message, type) {
-                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-                const alertDiv = document.createElement('div');
-                alertDiv.className = `alert ${alertClass}`;
-                alertDiv.innerHTML = `
-            ${message}
-                    <button type="button" class="alert-close" onclick="this.parentElement.remove()">&times;</button>
-                `;
-
-                // Insert after header
-                const header = document.querySelector('.header');
-                header.parentNode.insertBefore(alertDiv, header.nextSibling);
-
-                // Auto hide after 5 seconds
-                setTimeout(() => {
-                    if (alertDiv.parentNode) {
-                        alertDiv.remove();
-                    }
-                }, 5000);
+            // Hàm hiển thị thông báo thành công
+            function showSuccessMessage(message) {
+                showNotification(message, 'success', 'fas fa-check-circle');
             }
+
+            // Hàm hiển thị thông báo lỗi
+            function showErrorMessage(message) {
+                showNotification(message, 'danger', 'fas fa-exclamation-circle');
+            }
+
+            // Hàm hiển thị thông báo thông tin
+            function showInfoMessage(message) {
+                showNotification(message, 'info', 'fas fa-info-circle');
+            }
+
+            // Hàm chung để hiển thị thông báo
+            function showNotification(message, type, icon) {
+                // Tạo unique ID cho notification
+                const notificationId = 'notification-' + Date.now();
+
+                const alertHtml = `
+          <div id="${notificationId}" class="alert alert-${type} alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 500px;">
+              <i class="${icon} me-2"></i>
+            ${message}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" onclick="document.getElementById('${notificationId}').remove()"></button>
+          </div>
+      `;
+
+                // Thêm vào body
+                document.body.insertAdjacentHTML('beforeend', alertHtml);
+
+                // Tự động ẩn sau một khoảng thời gian
+                const autoHideTime = type === 'danger' ? 5000 : 3000;
+                setTimeout(() => {
+                    const notification = document.getElementById(notificationId);
+                    if (notification) {
+                        notification.remove();
+                    }
+                }, autoHideTime);
+            }
+
+            // Hàm cập nhật trạng thái của tất cả danh mục con trên UI
+            function updateChildCategoriesStatus(parentId, isActive) {
+                // Tìm tất cả các row trong table
+                const rows = document.querySelectorAll('.table tbody tr');
+
+                rows.forEach(row => {
+                    // Lấy cell chứa danh mục cha
+                    const parentCell = row.cells[2]; // Cột thứ 3 là danh mục cha
+                    const parentBadge = parentCell.querySelector('.badge-info');
+
+                    if (parentBadge) {
+                        // Lấy tên danh mục cha từ badge
+                        const parentName = parentBadge.textContent.trim();
+
+                        // Tìm tên của danh mục hiện tại
+                        const currentCategoryName = findCategoryNameById(parentId);
+
+                        // Nếu danh mục này có cha là danh mục đang được toggle
+                        if (parentName === currentCategoryName) {
+                            // Lấy ID của danh mục con từ cột đầu tiên
+                            const childId = row.cells[0].textContent.replace('#', '');
+
+                            // Cập nhật status badge
+                            const childStatusBadge = document.getElementById('status-' + childId);
+                            if (childStatusBadge) {
+                                childStatusBadge.textContent = isActive ? 'Hoạt động' : 'Không hoạt động';
+                                childStatusBadge.className = isActive ? 'badge badge-success' : 'badge badge-secondary';
+                            }
+
+                            // Cập nhật toggle button
+                            const childToggleBtn = document.getElementById('toggle-' + childId);
+                            if (childToggleBtn) {
+                                childToggleBtn.textContent = isActive ? 'vô hiệu hóa' : 'kích hoạt';  // ← SỬA LẠI
+                                childToggleBtn.className = isActive ? 'btn btn-danger btn-sm' : 'btn btn-success btn-sm';
+                                childToggleBtn.title = isActive ? 'Vô hiệu hóa' : 'Kích hoạt';
+                            }
+
+
+                            // Đệ quy: cập nhật con của con
+                            updateChildCategoriesStatus(childId, isActive);
+                        }
+                    }
+                });
+            }
+
+            // Hàm tìm tên danh mục theo ID
+            function findCategoryNameById(categoryId) {
+                const rows = document.querySelectorAll('.table tbody tr');
+                for (let row of rows) {
+                    const id = row.cells[0].textContent.replace('#', '');
+                    if (id === categoryId.toString()) {
+                        return row.cells[1].querySelector('strong').textContent.trim();
+                    }
+                }
+                return 'Danh mục #' + categoryId; // Fallback nếu không tìm thấy
+            }
+
+            // Hiển thị tooltip thông báo lỗi
+            function showTooltip(element, message) {
+                // Tạo tooltip element
+                const tooltip = document.createElement('div');
+                tooltip.className = 'custom-tooltip';
+                tooltip.textContent = message;
+                tooltip.style.cssText = `
+          position: absolute;
+          background: #dc3545;
+          color: white;
+          padding: 8px 12px;
+          border-radius: 4px;
+          font-size: 12px;
+          z-index: 1000;
+          max-width: 250px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      `;
+
+                // Thêm vào body
+                document.body.appendChild(tooltip);
+
+                // Định vị tooltip
+                const rect = element.getBoundingClientRect();
+                tooltip.style.top = (rect.top - tooltip.offsetHeight - 5) + 'px';
+                tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
+
+                // Tự động ẩn sau 3 giây
+                setTimeout(() => {
+                    tooltip.remove();
+                }, 3000);
+            }
+
+            // Thêm hiệu ứng loading khi toggle
+            function addLoadingEffect(button) {
+                button.disabled = true;
+                button.style.opacity = '0.6';
+                button.style.cursor = 'wait';
+                button.textContent = '⏳';
+            }
+
+            function removeLoadingEffect(button) {
+                button.disabled = false;
+                button.style.opacity = '1';
+                button.style.cursor = 'pointer';
+            }
+
             // Reset filter function
             function resetFilter() {
                 window.location.href = '${pageContext.request.contextPath}/category/list';
             }
-
-// Auto-submit form when select changes (optional)
-            document.addEventListener('DOMContentLoaded', function () {
-                const selects = document.querySelectorAll('.filter-select');
-                selects.forEach(select => {
-                    select.addEventListener('change', function () {
-                        // Uncomment if you want auto-submit
-                        // document.getElementById('filterForm').submit();
-                    });
-                });
-            });
         </script>
     </body>
 </html>

@@ -25,7 +25,7 @@ public class SupplierDAO {
     private ResultSet rs = null;
 
     public Supplier getSupplierByID(int id) {
-        String sql = "select * from swp.supplier where id = " + id;
+        String sql = "select * from supplier where id = " + id;
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
@@ -284,7 +284,7 @@ public class SupplierDAO {
     }
 
     public Supplier getSupplierByName(String name) {
-        String sql = "select * from swp.supplier where name = \"" + name + "\"";
+        String sql = "select * from supplier where name = \"" + name + "\"";
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
@@ -308,7 +308,7 @@ public class SupplierDAO {
 
     public static void main(String[] args) {
         SupplierDAO sd = new SupplierDAO();
-        Supplier s = sd.getSupplierByName("Công ty TNHH Bao Bì Bình Minh");
+        Supplier s = sd.getSupplierByID(1);
         System.out.println(s.getSupplierID());
         // limit (offset),(limit)
 //        List<Supplier> l = sd.getSuppliersByPageFilter(2, 10, "all", "");

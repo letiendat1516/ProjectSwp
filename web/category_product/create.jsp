@@ -1,5 +1,20 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+%>
+<%@page import="model.Users"%>
+<%
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
+
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -223,6 +238,23 @@
                 box-shadow: 0 0 0 2px rgba(40,167,69,0.25);
             }
 
+            /* Category hierarchy styles */
+            .category-level-0 {
+                font-weight: bold;
+            }
+
+            .category-level-1 {
+                padding-left: 20px;
+            }
+
+            .category-level-2 {
+                padding-left: 40px;
+            }
+
+            .category-level-3 {
+                padding-left: 60px;
+            }
+
             /* Responsive */
             @media (max-width: 768px) {
                 .container {
@@ -251,15 +283,49 @@
                 padding: 20px;
                 background: #f5f5f5;
             }
+
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .header-user {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+                margin-top: 10px;
+            }
+
+            .logout-btn {
+                background: #dc3545;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 4px;
+                text-decoration: none;
+            }
+
+            .logout-btn:hover {
+                background: #c82333;
+            }
         </style>
     </head>
     <body>
         <div class="layout-container">
             <jsp:include page="/include/sidebar.jsp" />
             <div class="main-content">
+                <!-- Header -->
+                <div class="header">
+                    <h1>Quản lý danh mục sản phẩm</h1>
+                    <div class="header-user">
+                        <span>Xin chào, <%= user.getFullname() %></span>
+                        <a href="logout" class="logout-btn">Đăng xuất</a>
+                    </div>
+                </div>
+
                 <div class="card">
                     <div class="card-header">
-                        Thêm danh mục loại sản phẩm mới
+                        Thêm danh mục sản phẩm mới
                     </div>
                     <div class="card-body">
                         <!-- Thông báo lỗi -->
@@ -282,7 +348,7 @@
 
                         <form method="post" action="${pageContext.request.contextPath}/category/create" id="categoryForm">
                             <div class="form-group">
-                                <label for="name" class="form-label">Tên danh mục loại sản phẩm <span class="text-danger">*</span></label>
+                                <label for="name" class="form-label">Tên danh mục sản phẩm <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="name" name="name" 
                                        value="${param.name}" required maxlength="255" 
                                        placeholder="Nhập tên danh mục sản phẩm...">
@@ -290,16 +356,25 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="parentId" class="form-label">Danh mục</label>
+                                <label for="parentId" class="form-label">Danh mục cha</label>
                                 <select class="form-select" id="parentId" name="parentId">
                                     <option value="">-- Chọn danh mục (không bắt buộc) --</option>
-                                    <c:forEach var="parent" items="${parentCategories}">
-                                        <option value="${parent.id}" ${param.parentId eq parent.id ? 'selected' : ''}>
-                                            ${parent.name}
+                                    <c:forEach var="category" items="${allCategories}">
+                                        <option value="${category.id}" 
+                                                ${param.parentId eq category.id ? 'selected' : ''}
+                                                class="${empty category.parentId ? 'category-level-0' : 'category-level-1'}">
+                                            <c:choose>
+                                                <c:when test="${empty category.parentId}">
+                                                    ${category.name}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    └─ ${category.name}
+                                                </c:otherwise>
+                                            </c:choose>
                                         </option>
                                     </c:forEach>
                                 </select>
-                                <div class="text-muted">Chọn danh mục để tạo cấu trúc phân cấp</div>
+                                <div class="text-muted">Chọn danh mục cha để tạo cấu trúc phân cấp</div>
                             </div>
 
                             <div class="form-group">
@@ -315,14 +390,13 @@
                             <div class="button-group">
                                 <a href="${pageContext.request.contextPath}/category/list" 
                                    class="btn btn-secondary">← Hủy</a>
-                                <button type="submit" class="btn btn-primary">Thêm danh mục loại sản phẩm</button>
+                                <button type="submit" class="btn btn-primary">Thêm danh mục sản phẩm</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-
 
         <script>
             // Xử lý đóng alert
@@ -332,6 +406,14 @@
                     button.addEventListener('click', function () {
                         this.parentElement.style.display = 'none';
                     });
+                });
+                
+                // Auto hide alerts after 5 seconds
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function (alert) {
+                    setTimeout(function () {
+                        alert.style.display = 'none';
+                    }, 5000);
                 });
             });
 

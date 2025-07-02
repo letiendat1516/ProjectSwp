@@ -305,56 +305,6 @@ public class PurchaseQuotedDAO {
             return false;
         }
     }
-
-    /**
-     * Xóa Purchase Order và tất cả items liên quan
-     */
-    public boolean deletePurchaseOrder(String orderId) {
-        if (orderId == null || orderId.trim().isEmpty()) {
-            System.err.println("Order ID is null or empty");
-            return false;
-        }
-
-        String deleteItemsSql = "DELETE FROM purchase_order_items WHERE purchase_id = ?";
-        String deleteOrderSql = "DELETE FROM purchase_order_info WHERE id = ?";
-
-        try (Connection con = Context.getJDBCConnection()) {
-            con.setAutoCommit(false); // Bắt đầu transaction
-
-            try {
-                // Xóa items trước
-                try (PreparedStatement stmt1 = con.prepareStatement(deleteItemsSql)) {
-                    stmt1.setString(1, orderId);
-                    int itemsDeleted = stmt1.executeUpdate();
-                    System.out.println("Deleted " + itemsDeleted + " items for Purchase Order: " + orderId);
-                }
-
-                // Xóa Purchase Order
-                try (PreparedStatement stmt2 = con.prepareStatement(deleteOrderSql)) {
-                    stmt2.setString(1, orderId);
-                    int orderDeleted = stmt2.executeUpdate();
-
-                    if (orderDeleted > 0) {
-                        con.commit(); // Commit transaction
-                        System.out.println("✅ Purchase Order deleted successfully: " + orderId);
-                        return true;
-                    } else {
-                        con.rollback(); // Rollback nếu không xóa được order
-                        System.err.println("❌ Purchase Order not found: " + orderId);
-                        return false;
-                    }
-                }
-            } catch (SQLException e) {
-                con.rollback(); // Rollback nếu có lỗi
-                throw e;
-            }
-        } catch (SQLException e) {
-            System.err.println("Error in deletePurchaseOrder: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     /**
      * Cập nhật đơn báo giá đã tồn tại (khi báo giá lại) - Cập nhật thông tin
      * Purchase Order - Cập nhật/thay thế tất cả items

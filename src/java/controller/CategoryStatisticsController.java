@@ -8,23 +8,23 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import dao.CategoryParentStatisticsDAO;
-import model.CategoryProductParent;
+import dao.CategoryStatisticsDAO;
 import model.Users;
 import com.google.gson.Gson;
 import java.util.HashMap;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class CategoryParentStatisticsController extends HttpServlet {
+public class CategoryStatisticsController extends HttpServlet {
     
-    private CategoryParentStatisticsDAO statisticsDAO;
+    private CategoryStatisticsDAO statisticsDAO;
     private Gson gson;
     
     @Override
     public void init() throws ServletException {
-        System.out.println("=== CategoryParentStatisticsController INIT ===");
-        statisticsDAO = new CategoryParentStatisticsDAO();
+        System.out.println("=== CategoryStatisticsController INIT ===");
+        statisticsDAO = new CategoryStatisticsDAO();
         gson = new Gson();
     }
     
@@ -32,7 +32,7 @@ public class CategoryParentStatisticsController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        System.out.println("=== CategoryParentStatisticsController doGet called ===");
+        System.out.println("=== CategoryStatisticsController doGet called ===");
         System.out.println("Request method: " + request.getMethod());
         System.out.println("Action parameter: " + request.getParameter("action"));
         
@@ -49,7 +49,7 @@ public class CategoryParentStatisticsController extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         
         try {
-            System.out.println("Loading statistics data...");
+            System.out.println("Loading category statistics data...");
             
             // Check if this is an AJAX request for filtered data
             String action = request.getParameter("action");
@@ -64,14 +64,14 @@ public class CategoryParentStatisticsController extends HttpServlet {
             loadStatisticsData(request);
             
             // Forward to JSP at root level
-            System.out.println("Forwarding to: /category-parent-statistics.jsp");
-            request.getRequestDispatcher("/category-parent-statistics.jsp").forward(request, response);
+            System.out.println("Forwarding to: /category-statistics.jsp");
+            request.getRequestDispatcher("/category-statistics.jsp").forward(request, response);
             
         } catch (Exception e) {
             System.out.println("ERROR in doGet: " + e.getMessage());
             e.printStackTrace();
             request.setAttribute("errorMessage", "Lỗi khi tải dữ liệu thống kê: " + e.getMessage());
-            request.getRequestDispatcher("/category-parent-statistics.jsp").forward(request, response);
+            request.getRequestDispatcher("/category-statistics.jsp").forward(request, response);
         }
     }
     
@@ -79,7 +79,7 @@ public class CategoryParentStatisticsController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        System.out.println("=== CategoryParentStatisticsController doPost called ===");
+        System.out.println("=== CategoryStatisticsController doPost called ===");
         
         // Check if this is an AJAX filter request
         String action = request.getParameter("action");
@@ -120,8 +120,10 @@ public class CategoryParentStatisticsController extends HttpServlet {
             String startDate = request.getParameter("startDate");
             String endDate = request.getParameter("endDate");
             String status = request.getParameter("status");
+            String parentId = request.getParameter("parentId");
             
-            System.out.println("Filter request - Start: " + startDate + ", End: " + endDate + ", Status: " + status);
+            System.out.println("Filter request - Start: " + startDate + ", End: " + endDate + 
+                             ", Status: " + status + ", ParentId: " + parentId);
             
             // Validate dates
             if (startDate != null && endDate != null && !startDate.isEmpty() && !endDate.isEmpty()) {
@@ -132,20 +134,20 @@ public class CategoryParentStatisticsController extends HttpServlet {
                     result.put("success", false);
                     result.put("message", "Ngày bắt đầu phải trước ngày kết thúc");
                 } else {
-                    // Get filtered statistics using new DAO method
-                    Map<String, Object> filteredStats = statisticsDAO.getFilteredStatistics(status, startDate, endDate);
+                    // Get filtered statistics
+                    Map<String, Object> filteredStats = statisticsDAO.getFilteredStatistics(status, parentId, startDate, endDate);
                     
                     if (filteredStats == null) {
                         filteredStats = new HashMap<>();
-                        filteredStats.put("totalParents", 0);
-                        filteredStats.put("activeParents", 0);
-                        filteredStats.put("inactiveParents", 0);
+                        filteredStats.put("totalCategories", 0);
+                        filteredStats.put("activeCategories", 0);
+                        filteredStats.put("inactiveCategories", 0);
                     }
                     
                     result.put("success", true);
                     result.put("data", filteredStats);
                     result.put("message", "Đã lọc dữ liệu thành công. Tìm thấy " + 
-                              filteredStats.getOrDefault("totalParents", 0) + " danh mục trong khoảng thời gian này.");
+                              filteredStats.getOrDefault("totalCategories", 0) + " loại sản phẩm trong khoảng thời gian này.");
                     
                     System.out.println("Filter result: " + filteredStats);
                 }
@@ -174,83 +176,42 @@ public class CategoryParentStatisticsController extends HttpServlet {
      */
     private void loadStatisticsData(HttpServletRequest request) {
         try {
-            System.out.println("Getting statistics from DAO...");
+            System.out.println("Getting category statistics from DAO...");
             
-            // 1. Get overall statistics using new method
-            Map<String, Object> overallStats = statisticsDAO.getOverallStatistics();
+            // 1. Get basic statistics
+            Map<String, Object> basicStats = statisticsDAO.getBasicStatistics();
             
-            // Extract individual values
-            int totalParents = (int) overallStats.getOrDefault("totalParents", 0);
-            int activeParents = (int) overallStats.getOrDefault("activeParents", 0);
-            int inactiveParents = (int) overallStats.getOrDefault("inactiveParents", 0);
-            double activePercentage = (double) overallStats.getOrDefault("activePercentage", 0.0);
-            double inactivePercentage = (double) overallStats.getOrDefault("inactivePercentage", 0.0);
-            int monthlyDifference = (int) overallStats.getOrDefault("monthlyDifference", 0);
-            CategoryProductParent topParent = (CategoryProductParent) overallStats.get("topParent");
+            int totalCategories = (int) basicStats.getOrDefault("totalCategories", 0);
+            int activeCategories = (int) basicStats.getOrDefault("activeCategories", 0);
+            int inactiveCategories = (int) basicStats.getOrDefault("inactiveCategories", 0);
             
             // Create stats map for JSP compatibility
             Map<String, Integer> stats = new HashMap<>();
-            stats.put("totalParents", totalParents);
-            stats.put("activeParents", activeParents);
-            stats.put("inactiveParents", inactiveParents);
-            
+            stats.put("totalCategories", totalCategories);
+            stats.put("activeCategories", activeCategories);
+            stats.put("inactiveCategories", inactiveCategories);
             request.setAttribute("stats", stats);
-            request.setAttribute("topParent", topParent);
-            request.setAttribute("activePercentage", String.format("%.1f", activePercentage));
-            request.setAttribute("inactivePercentage", String.format("%.1f", inactivePercentage));
+            
+            // 2. Get percentage statistics
+            Map<String, Double> percentages = statisticsDAO.getPercentageStatistics();
+            request.setAttribute("activePercentage", String.format("%.1f", percentages.getOrDefault("activePercentage", 0.0)));
+            request.setAttribute("inactivePercentage", String.format("%.1f", percentages.getOrDefault("inactivePercentage", 0.0)));
+            
+            // 3. Get category with most products (SỬ DỤNG PHƯƠNG THỨC MỚI)
+            Map<String, Object> topCategory = statisticsDAO.getCategoryWithMostProducts();
+            request.setAttribute("topCategory", topCategory);
+            
+            // 4. Get most recently added category (THÊM MỚI)
+            Map<String, Object> mostRecentCategory = statisticsDAO.getMostRecentlyAddedCategory();
+            request.setAttribute("mostRecentCategory", mostRecentCategory);
+            
+            // 5. Get monthly growth
+            Map<String, Integer> monthlyGrowth = statisticsDAO.getMonthlyGrowth();
+            int monthlyDifference = monthlyGrowth.getOrDefault("difference", 0);
             request.setAttribute("monthlyDifference", Math.abs(monthlyDifference));
             request.setAttribute("monthlyDifferenceSign", monthlyDifference >= 0 ? "+" : "");
             
-            // 2. Get statistics by parent (for table)
-            List<Map<String, Object>> parentStats = statisticsDAO.getStatisticsByParent();
-            if (parentStats == null) parentStats = new ArrayList<>();
-            request.setAttribute("parentStats", parentStats);
-            
-            // Calculate totals for summary row
-            int totalCategories = 0;
-            int totalActiveCategories = 0;
-            int totalInactiveCategories = 0;
-            int totalProducts = 0;
-            
-            for (Map<String, Object> stat : parentStats) {
-                totalCategories += (Integer) stat.getOrDefault("totalCategories", 0);
-                totalActiveCategories += (Integer) stat.getOrDefault("activeCategories", 0);
-                totalInactiveCategories += (Integer) stat.getOrDefault("inactiveCategories", 0);
-                totalProducts += (Integer) stat.getOrDefault("totalProducts", 0);
-            }
-            
-            request.setAttribute("totalCategories", totalCategories);
-            request.setAttribute("totalActiveCategories", totalActiveCategories);
-            request.setAttribute("totalInactiveCategories", totalInactiveCategories);
-            request.setAttribute("totalProducts", totalProducts);
-            
-            double totalActivePercentage = totalCategories > 0 ? (totalActiveCategories * 100.0 / totalCategories) : 0;
-            request.setAttribute("totalActivePercentage", String.format("%.1f", totalActivePercentage));
-            
-            // 3. Get distribution data (for pie chart)
-            Map<String, Integer> distribution = statisticsDAO.getCategoryDistribution();
-            if (distribution == null) distribution = new HashMap<>();
-            String distributionJson = gson.toJson(distribution);
-            request.setAttribute("distributionJson", distributionJson);
-            
-            // 4. Get top parents by product count (for bar chart)
-            List<Map<String, Object>> topParents = statisticsDAO.getTopParentsByProductCount(10);
-            if (topParents == null) topParents = new ArrayList<>();
-            String topParentsJson = gson.toJson(topParents);
-            request.setAttribute("topParentsJson", topParentsJson);
-            
-            // 5. Get monthly statistics (for line chart)
-            List<Map<String, Object>> monthlyStats = statisticsDAO.getMonthlyStatistics();
-            if (monthlyStats == null) monthlyStats = new ArrayList<>();
-            String monthlyStatsJson = gson.toJson(monthlyStats);
-            request.setAttribute("monthlyStatsJson", monthlyStatsJson);
-            
-            // 6. Get recently added parents
-            List<CategoryProductParent> recentParents = statisticsDAO.getRecentlyAddedParents(5);
-            if (recentParents == null) recentParents = new ArrayList<>();
-            request.setAttribute("recentParents", recentParents);
-            
-            // 7. Get time-based statistics
+            // 6. Get time-based statistics
             Map<String, Object> timeStats = statisticsDAO.getTimeBasedStatistics();
             if (timeStats == null) {
                 timeStats = new HashMap<>();
@@ -267,16 +228,71 @@ public class CategoryParentStatisticsController extends HttpServlet {
             }
             request.setAttribute("timeStats", timeStats);
             
-            // 8. Add current date info for display
+            // 7. Get recently added categories with statistics (SỬ DỤNG PHƯƠNG THỨC MỚI)
+            List<Map<String, Object>> recentCategories = statisticsDAO.getRecentCategoriesWithStats(5);
+            if (recentCategories == null) recentCategories = new ArrayList<>();
+            request.setAttribute("recentCategories", recentCategories);
+            
+            // 8. Get top categories by product count
+            List<Map<String, Object>> topCategoriesByProducts = statisticsDAO.getTopCategoriesByProducts(10);
+            if (topCategoriesByProducts == null) topCategoriesByProducts = new ArrayList<>();
+            request.setAttribute("topCategoriesByProducts", topCategoriesByProducts);
+            
+            // 9. Get category distribution for chart
+            List<Map<String, Object>> categoryDistribution = statisticsDAO.getCategoryDistribution();
+            if (categoryDistribution == null) categoryDistribution = new ArrayList<>();
+            request.setAttribute("categoryDistribution", categoryDistribution);
+            
+            // 10. Get statistics by parent category (for table)
+            List<Map<String, Object>> categoryStatsByParent = statisticsDAO.getStatisticsByParentCategory();
+            if (categoryStatsByParent == null) categoryStatsByParent = new ArrayList<>();
+            request.setAttribute("categoryStatsByParent", categoryStatsByParent);
+            
+            // Calculate totals for summary row
+            int totalCategoryCount = 0;
+            int totalActiveCount = 0;
+            int totalInactiveCount = 0;
+            int totalProductCount = 0;
+            
+            for (Map<String, Object> stat : categoryStatsByParent) {
+                totalCategoryCount += (Integer) stat.getOrDefault("categoryCount", 0);
+                totalActiveCount += (Integer) stat.getOrDefault("activeCount", 0);
+                totalInactiveCount += (Integer) stat.getOrDefault("inactiveCount", 0);
+                totalProductCount += (Integer) stat.getOrDefault("productCount", 0);
+            }
+            
+            request.setAttribute("totalCategoryCount", totalCategoryCount);
+            request.setAttribute("totalActiveCount", totalActiveCount);
+            request.setAttribute("totalInactiveCount", totalInactiveCount);
+            request.setAttribute("totalProductCount", totalProductCount);
+            
+            // 11. Get monthly trend data (for line chart)
+            List<Map<String, Object>> monthlyTrend = statisticsDAO.getMonthlyTrend();
+            if (monthlyTrend == null) monthlyTrend = new ArrayList<>();
+            String monthlyTrendJson = gson.toJson(monthlyTrend);
+            request.setAttribute("monthlyTrendJson", monthlyTrendJson);
+            
+            // 12. Get product distribution by category (for bar chart)
+            List<Map<String, Object>> productDistribution = statisticsDAO.getProductDistributionByCategory(10);
+            if (productDistribution == null) productDistribution = new ArrayList<>();
+            String productDistributionJson = gson.toJson(productDistribution);
+            request.setAttribute("productDistributionJson", productDistributionJson);
+            
+            // 13. Get category statistics summary (THÊM MỚI - Tổng hợp tất cả)
+            Map<String, Object> categoryStatsSummary = statisticsDAO.getCategoryStatisticsSummary();
+            request.setAttribute("categoryStatsSummary", categoryStatsSummary);
+            
+            // 14. Add current date info for display
             LocalDate currentDate = LocalDate.now();
             request.setAttribute("currentMonth", currentDate.getMonth().toString());
             request.setAttribute("currentYear", currentDate.getYear());
             
-            System.out.println("Statistics data loaded successfully");
-            System.out.println("Total parents: " + totalParents);
-            System.out.println("Active parents: " + activeParents);
-            System.out.println("Inactive parents: " + inactiveParents);
-            System.out.println("Top parent: " + (topParent != null ? topParent.getName() : "N/A"));
+            System.out.println("Category statistics data loaded successfully");
+            System.out.println("Total categories: " + totalCategories);
+            System.out.println("Active categories: " + activeCategories);
+            System.out.println("Inactive categories: " + inactiveCategories);
+            System.out.println("Top category: " + topCategory);
+            System.out.println("Most recent category: " + mostRecentCategory);
             System.out.println("Time stats loaded: " + timeStats);
             
         } catch (Exception e) {
@@ -285,30 +301,36 @@ public class CategoryParentStatisticsController extends HttpServlet {
             
             // Set default values to prevent JSP errors
             Map<String, Integer> emptyStats = new HashMap<>();
-            emptyStats.put("totalParents", 0);
-            emptyStats.put("activeParents", 0);
-            emptyStats.put("inactiveParents", 0);
+            emptyStats.put("totalCategories", 0);
+            emptyStats.put("activeCategories", 0);
+            emptyStats.put("inactiveCategories", 0);
             request.setAttribute("stats", emptyStats);
             
-            CategoryProductParent emptyTopParent = new CategoryProductParent();
-            emptyTopParent.setName("N/A");
-            emptyTopParent.setChildCount(0);
-            request.setAttribute("topParent", emptyTopParent);
+            Map<String, Object> emptyTopCategory = new HashMap<>();
+            emptyTopCategory.put("name", "N/A");
+            emptyTopCategory.put("totalProducts", 0);
+            emptyTopCategory.put("activeProducts", 0);
+            emptyTopCategory.put("parentName", "N/A");
+            request.setAttribute("topCategory", emptyTopCategory);
+            
+            Map<String, Object> emptyRecentCategory = new HashMap<>();
+            emptyRecentCategory.put("name", "N/A");
+            emptyRecentCategory.put("createDateFormatted", "N/A");
+            emptyRecentCategory.put("daysSinceCreated", 0);
+            emptyRecentCategory.put("productCount", 0);
+            request.setAttribute("mostRecentCategory", emptyRecentCategory);
             
             request.setAttribute("activePercentage", "0.0");
             request.setAttribute("inactivePercentage", "0.0");
             request.setAttribute("monthlyDifference", 0);
             request.setAttribute("monthlyDifferenceSign", "");
-            request.setAttribute("parentStats", new ArrayList<>());
-            request.setAttribute("distributionJson", "{}");
-            request.setAttribute("topParentsJson", "[]");
-            request.setAttribute("monthlyStatsJson", "[]");
-            request.setAttribute("recentParents", new ArrayList<>());
-            request.setAttribute("totalCategories", 0);
-            request.setAttribute("totalActiveCategories", 0);
-            request.setAttribute("totalInactiveCategories", 0);
-            request.setAttribute("totalProducts", 0);
-            request.setAttribute("totalActivePercentage", "0.0");
+            request.setAttribute("recentCategories", new ArrayList<>());
+            request.setAttribute("topCategoriesByProducts", new ArrayList<>());
+            request.setAttribute("categoryDistribution", new ArrayList<>());
+            request.setAttribute("categoryStatsByParent", new ArrayList<>());
+            request.setAttribute("monthlyTrendJson", "[]");
+            request.setAttribute("productDistributionJson", "[]");
+            request.setAttribute("categoryStatsSummary", new HashMap<>());
             
             // Default time stats
             Map<String, Object> emptyTimeStats = new HashMap<>();
@@ -323,6 +345,11 @@ public class CategoryParentStatisticsController extends HttpServlet {
                 LocalDate.now().minusMonths(6).format(DateTimeFormatter.ofPattern("MM/yyyy")) + " - " + 
                 LocalDate.now().format(DateTimeFormatter.ofPattern("MM/yyyy")));
             request.setAttribute("timeStats", emptyTimeStats);
+            
+            request.setAttribute("totalCategoryCount", 0);
+            request.setAttribute("totalActiveCount", 0);
+            request.setAttribute("totalInactiveCount", 0);
+            request.setAttribute("totalProductCount", 0);
         }
     }
 }

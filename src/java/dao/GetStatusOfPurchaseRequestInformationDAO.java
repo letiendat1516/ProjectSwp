@@ -227,38 +227,6 @@ public class GetStatusOfPurchaseRequestInformationDAO {
         }
         return 0;
     }
-
-    /**
-     * Xóa yêu cầu và tất cả items liên quan
-     */
-    public boolean deleteRequest(String requestId) {
-        if (requestId == null || requestId.trim().isEmpty()) {
-            return false;
-        }
-
-        try (Connection con = Context.getJDBCConnection()) {
-            con.setAutoCommit(false); // Bắt đầu transaction
-
-            // Xóa items trước (foreign key constraint)
-            String deleteItemsSql = "DELETE FROM request_items WHERE request_id = ?";
-            try (PreparedStatement deleteItemsStmt = con.prepareStatement(deleteItemsSql)) {
-                deleteItemsStmt.setString(1, requestId);
-                deleteItemsStmt.executeUpdate();
-            }
-
-            // Xóa request chính
-            String sql = "DELETE FROM request WHERE id = ?";
-            try (PreparedStatement stmt = con.prepareStatement(sql)) {
-                stmt.setString(1, requestId);
-                int rowsAffected = stmt.executeUpdate();
-                con.commit(); // Commit transaction
-                return rowsAffected > 0;
-            }
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
     /**
      * Cập nhật trạng thái yêu cầu thành "approved"
      */

@@ -432,10 +432,6 @@
                                                 <input type="hidden" name="statusFilter" value="${param.statusFilter}">
                                                 <input type="hidden" name="requestIdFilter" value="${param.requestIdFilter}">
                                                 <input type="hidden" name="index" value="${param.index}">
-                                                <button type="submit" class="action-btn delete-btn" onclick="return confirm('Bạn có chắc muốn xóa đơn hàng này?')">
-                                                    <span class="material-icons">delete</span>
-                                                    <span>Xóa</span>
-                                                </button>
                                             </form>
 
                                             <!-- Nút xem chi tiết -->

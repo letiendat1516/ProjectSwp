@@ -84,18 +84,7 @@ public class ApprovePurchaseRequestServlet extends HttpServlet {
         GetStatusOfPurchaseRequestInformationDAO dao = new GetStatusOfPurchaseRequestInformationDAO();
 
         try {
-            if ("delete".equals(action)) {
-                String requestId = request.getParameter("requestId");
-                if (requestId != null && !requestId.isEmpty()) {
-                    boolean isDeleted = dao.deleteRequest(requestId);
-                    if (isDeleted) {
-                        // Redirect về trang hiện tại với các tham số lọc
-                        String redirectUrl = buildRedirectUrl(request);
-                        response.sendRedirect(redirectUrl);
-                        return;
-                    }
-                }
-            } else if ("approve".equals(action)) {
+            if ("approve".equals(action)) {
                 String requestId = request.getParameter("requestId");
                 if (requestId != null && !requestId.isEmpty()) {
                     boolean isApproved = dao.updateApprovedStatus(requestId);
@@ -136,10 +125,10 @@ public class ApprovePurchaseRequestServlet extends HttpServlet {
                     }
                 }
             }
-            
+
             // Nếu không có action đặc biệt, xử lý như request thông thường
             processRequest(request, response);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Đã xảy ra lỗi khi xử lý yêu cầu: " + e.getMessage());

@@ -91,21 +91,7 @@ public class ApprovePurchaseQuotedServlet extends HttpServlet {
         PurchaseQuotedDAO dao = new PurchaseQuotedDAO();
 
         try {
-            if ("delete".equals(action)) {
-                String orderId = request.getParameter("orderId");
-                if (orderId != null && !orderId.isEmpty()) {
-                    boolean isDeleted = dao.deletePurchaseOrder(orderId);
-                    if (isDeleted) {
-                        System.out.println("✅ Purchase Order deleted successfully: " + orderId);
-                        // Redirect về trang hiện tại với các tham số lọc
-                        String redirectUrl = buildRedirectUrl(request);
-                        response.sendRedirect(redirectUrl);
-                        return;
-                    } else {
-                        System.err.println("❌ Failed to delete Purchase Order: " + orderId);
-                    }
-                }
-            } else if ("approve".equals(action)) {
+            if ("approve".equals(action)) {
                 String orderId = request.getParameter("orderId");
                 if (orderId != null && !orderId.isEmpty()) {
                     // Sử dụng updateStatus thay vì updatePurchaseOrderStatus
