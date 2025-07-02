@@ -304,6 +304,23 @@
                             </a>
                         </div>
                     </div>
+
+                    <!-- Categories Department - MỚI THÊM -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Danh mục Phòng ban</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-container">
+                                <span class="material-icons">domain</span>
+                            </div>
+                            <h4 class="card-title">Quản lý Phòng ban</h4>
+                            <p class="card-text">Thêm, sửa, xóa và xem thông tin về các phòng ban trong tổ chức.</p>
+                            <a href="department/list" class="btn btn-primary">
+                                Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

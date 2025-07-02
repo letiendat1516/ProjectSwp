@@ -1,11 +1,26 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+%>
+<%@page import="model.Users"%>
+<%
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
+
 <!DOCTYPE html>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Chỉnh sửa danh mục loại sản phẩm</title>
+        <title>Chỉnh sửa danh mục sản phẩm</title>
         <style>
             * {
                 margin: 0;
@@ -99,8 +114,8 @@
 
             .form-control:focus, .form-select:focus {
                 outline: none;
-                border-color: #007bff;
-                box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+                border-color: #ffc107;
+                box-shadow: 0 0 0 2px rgba(255,193,7,0.25);
             }
 
             .text-muted {
@@ -197,6 +212,11 @@
                 color: white;
             }
 
+            .badge-info {
+                background: #17a2b8;
+                color: white;
+            }
+
             .form-check {
                 display: flex;
                 align-items: center;
@@ -221,20 +241,32 @@
                 cursor: pointer;
                 font-weight: 500;
             }
+            
             /* Info Section */
+            .info-section {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 5px;
+                margin-bottom: 20px;
+                border-left: 4px solid #17a2b8;
+            }
+
             .info-item {
-                margin-bottom: 15px;
-                padding: 10px 0;
-                border-bottom: 1px solid #eee;
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #e9ecef;
             }
 
             .info-item:last-child {
                 border-bottom: none;
+                margin-bottom: 0;
             }
 
             .info-label {
                 font-weight: bold;
-                margin-bottom: 5px;
+                color: #666;
             }
 
             .note {
@@ -250,6 +282,45 @@
                 display: flex;
                 gap: 15px;
                 margin-bottom: 25px;
+            }
+
+            /* Category hierarchy styles */
+            .category-level-0 {
+                font-weight: bold;
+            }
+
+            .category-level-1 {
+                padding-left: 20px;
+            }
+
+            .category-level-2 {
+                padding-left: 40px;
+            }
+
+            /* Header */
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .header-user {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+                margin-top: 10px;
+            }
+
+            .logout-btn {
+                background: #dc3545;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 4px;
+                text-decoration: none;
+            }
+
+            .logout-btn:hover {
+                background: #c82333;
             }
 
             /* Responsive */
@@ -269,6 +340,10 @@
                 .nav-buttons {
                     flex-direction: column;
                 }
+
+                .info-item {
+                    flex-direction: column;
+                }
             }
 
             .layout-container {
@@ -284,14 +359,23 @@
         </style>
     </head>
     <body>
-
         <div class="layout-container">
             <jsp:include page="/include/sidebar.jsp" />
             <div class="main-content">
+                <!-- Header -->
+                <div class="header">
+                    <h1>Quản lý danh mục sản phẩm</h1>
+                    <div class="header-user">
+                        <span>Xin chào, <%= user.getFullname() %></span>
+                        <a href="logout" class="logout-btn">Đăng xuất</a>
+                    </div>
+                </div>
+
+
                 <!-- Form chỉnh sửa -->
                 <div class="card">
                     <div class="card-header card-header-warning">
-                        Chỉnh sửa danh mục loại sản phẩm
+                        Chỉnh sửa danh mục sản phẩm
                     </div>
                     <div class="card-body">
                         <c:if test="${error != null}">
@@ -301,23 +385,37 @@
                             </div>
                         </c:if>
 
-                        <form action="${pageContext.request.contextPath}/category/edit" method="post">
+                        <form action="${pageContext.request.contextPath}/category/edit" method="post" id="editForm">
                             <input type="hidden" name="id" value="${category.id}">
 
                             <div class="form-group">
-                                <label for="name" class="form-label">Tên danh mục loại sản phẩm <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="name" name="name" value="${category.name}" required>
+                                <label for="name" class="form-label">Tên danh mục sản phẩm <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="${category.name}" required maxlength="255"
+                                       placeholder="Nhập tên danh mục sản phẩm...">
+                                <div class="text-muted">Tên danh mục phải duy nhất và không được trùng lặp</div>
                             </div>
 
                             <div class="form-group">
-                                <label for="parentId" class="form-label">Danh mục </label>
+                                <label for="parentId" class="form-label">Danh mục cha</label>
                                 <select class="form-select" id="parentId" name="parentId">
-                                    <option value="0">-- Không có danh mục  --</option>
-                                    <c:forEach items="${parentCategories}" var="parent">
-                                        <option value="${parent.id}" ${category.parentId == parent.id ? 'selected' : ''}>${parent.name}</option>
+                                    <option value="">-- Không có danh mục cha --</option>
+                                    <c:forEach items="${allCategories}" var="cat">
+                                        <option value="${cat.id}" 
+                                                ${category.parentId == cat.id ? 'selected' : ''}
+                                                class="${empty cat.parentId ? 'category-level-0' : 'category-level-1'}">
+                                            <c:choose>
+                                                <c:when test="${empty cat.parentId}">
+                                                    ${cat.name}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    └─ ${cat.name}
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </option>
                                     </c:forEach>
                                 </select>
-                                <div class="text-muted">Chọn danh mục  từ danh sách có sẵn</div>
+                                <div class="text-muted">Chọn danh mục cha để tạo cấu trúc phân cấp</div>
                             </div>
 
                             <div class="form-group">
@@ -336,7 +434,7 @@
                                     ← Hủy
                                 </a>
                                 <button type="submit" class="btn btn-warning">
-                                    💾 Cập nhật
+                                    💾 Cập nhật thay đổi
                                 </button>
                             </div>
                         </form>
@@ -354,6 +452,46 @@
                         this.parentElement.style.display = 'none';
                     });
                 });
+
+                // Auto hide alerts after 5 seconds
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function (alert) {
+                    setTimeout(function () {
+                        alert.style.display = 'none';
+                    }, 5000);
+                });
+            });
+
+            // Form validation
+            document.getElementById('editForm').addEventListener('submit', function (e) {
+                const nameInput = document.getElementById('name');
+                const name = nameInput.value.trim();
+
+                if (!name) {
+                    e.preventDefault();
+                    alert('⚠️ Vui lòng nhập tên danh mục!');
+                    nameInput.focus();
+                    return;
+                }
+
+                if (name.length > 255) {
+                    e.preventDefault();
+                    alert('⚠️ Tên danh mục không được vượt quá 255 ký tự!');
+                    nameInput.focus();
+                    return;
+                }
+            });
+
+            // Real-time validation
+            document.getElementById('name').addEventListener('input', function () {
+                const value = this.value.trim();
+                this.classList.remove('error', 'success');
+
+                if (value && value.length <= 255) {
+                    this.classList.add('success');
+                } else if (value.length > 255) {
+                    this.classList.add('error');
+                }
             });
         </script>
     </body>
