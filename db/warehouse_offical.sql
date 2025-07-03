@@ -126,7 +126,6 @@ MODIFY status ENUM('pending', 'approved', 'rejected', 'completed');
 ALTER TABLE product_info
 ADD COLUMN supplier_id INT,
     ADD COLUMN expiration_date DATE,
-    ADD COLUMN storage_location VARCHAR(100),
     ADD COLUMN image_url VARCHAR(255),
     ADD COLUMN additional_notes TEXT,
     ADD COLUMN created_by INT,
@@ -143,21 +142,7 @@ CREATE TABLE storage_location (
     description TEXT,
     active_flag TINYINT(1) DEFAULT 1
 );
-INSERT INTO storage_location (name, description)
-VALUES ('Kho A - Tầng 1', 'Khu vực lưu trữ chính tầng 1'),
-    ('Kho A - Tầng 2', 'Khu vực lưu trữ chính tầng 2'),
-    ('Kho B - Lạnh', 'Khu vực bảo quản lạnh'),
-    (
-        'Kho C - Nguyên liệu',
-        'Khu vực lưu trữ nguyên liệu'
-    ),
-    (
-        'Kho D - Thành phẩm',
-        'Khu vực lưu trữ thành phẩm'
-    ),
-    ('Văn phòng', 'Khu vực văn phòng'),
-    ('Kho ngoài', 'Khu vực lưu trữ bên ngoài');
--- INSERT SAMPLE DATA
+I -- INSERT SAMPLE DATA
 -- Insert roles
 INSERT INTO role (role_name)
 VALUES ('Admin'),

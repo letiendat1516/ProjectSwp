@@ -219,19 +219,25 @@
                 cursor: pointer;
                 text-decoration: none;
             }
+            .logout-btn {
+                background: red;
+                color: #fff;
+                border: #007BFF;
+                padding: 8px 16px;
+                border-radius: 4px;
+                cursor: pointer;
+                text-decoration: none;
+            }
             .logout-btn:hover {
                 background: orange;
             }
-            .page-title {
-                color: #3f51b5;
-                font-size: 2rem;
-                margin-bottom: 10px;
-            }
         </style>
+
     </head>
     <body>
         <div class="layout-container">
-            <div class="main-content"> 
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
                 <div class="header">
                     <h1 class="page-title">Yêu Cầu Cần Phê Duyệt</h1>
                     <div class="header-user">
@@ -283,5 +289,6 @@
                 </div>
             </div>
         </div>
+                        
     </body>
 </html>

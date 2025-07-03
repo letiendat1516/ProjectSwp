@@ -3,14 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/controller/UserManager.java</file>
-            <file>file:/E:/VSCODE/swp/ProjectSwp/web/material_unit/editMaterialUnit.jsp</file>
-            <file>file:/E:/VSCODE/swp/ProjectSwp/web/material_unit/materialUnit.jsp</file>
-            <file>file:/E:/VSCODE/swp/ProjectSwp/web/product-list.jsp</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/web/login.jsp</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/web/WEB-INF/web.xml</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/controller/RolePermissionServlet.java</file>
             <file>file:/E:/VSCODE/swp/ProjectSwp/web/Admin.jsp</file>
-            <file>file:/E:/VSCODE/swp/ProjectSwp/web/include/sidebar.jsp</file>
             <file>file:/E:/VSCODE/swp/ProjectSwp/web/UserManager.jsp</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/web/permission.jsp</file>
             <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/dao/UserDAO.java</file>
+            <file>file:/E:/VSCODE/swp/ProjectSwp/src/java/controller/LoginServlet.java</file>
         </group>
     </open-files>
 </project-private>

@@ -14,15 +14,12 @@
     response.setDateHeader("Expires", 0); // Proxies
 %>
 
-
-
 <%
-Users user = (Users) session.getAttribute("user");
-if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
-    response.sendRedirect("login.jsp");
-    return;
-}
-
+    Users user = (Users) session.getAttribute("user");
+    if (user == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
 %>
 
 <html>
@@ -131,8 +128,8 @@ if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
             <c:if test="${not empty error}">
                 <div class="error-message">${error}</div>
             </c:if>
-            <c:if test="${not empty sessionScope.message}">
-                <div class="success-message">${sessionScope.message}</div>
+            <c:if test="${not empty message}">
+                <div class="success-message">${message}</div>
                 <c:remove var="message" scope="session"/>
             </c:if>
 

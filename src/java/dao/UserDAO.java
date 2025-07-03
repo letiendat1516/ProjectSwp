@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import model.ForgotPasswordRequest;
+import model.Permission;
+import model.Role;
 import model.Users;
 
 public class UserDAO extends Context {
@@ -72,26 +74,97 @@ public class UserDAO extends Context {
         return list;
     }
 
-    public void updateUserRole(int userId, int roleId) throws SQLException {
-        String checkSql = "SELECT COUNT(*) FROM user_role WHERE user_id = ?";
-        try (Connection connection = Context.getJDBCConnection(); PreparedStatement checkStmt = connection.prepareStatement(checkSql)) {
-            checkStmt.setInt(1, userId);
-            ResultSet rs = checkStmt.executeQuery();
-            if (rs.next() && rs.getInt(1) > 0) {
-                String updateSql = "UPDATE user_role SET role_id = ? WHERE user_id = ?";
-                try (PreparedStatement updateStmt = connection.prepareStatement(updateSql)) {
-                    updateStmt.setInt(1, roleId);
-                    updateStmt.setInt(2, userId);
-                    updateStmt.executeUpdate();
-                }
-            } else {
-                String insertSql = "INSERT INTO user_role (user_id, role_id) VALUES (?, ?)";
-                try (PreparedStatement insertStmt = connection.prepareStatement(insertSql)) {
-                    insertStmt.setInt(1, userId);
-                    insertStmt.setInt(2, roleId);
-                    insertStmt.executeUpdate();
+    public List<Permission> getAllPermissions() {
+        List<Permission> list = new ArrayList<>();
+        String sql = "SELECT * FROM permission";
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Permission p = new Permission(
+                        rs.getInt("id"),
+                        rs.getString("code"),
+                        rs.getString("name")
+                );
+                list.add(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Role> getAllRoles() {
+        List<Role> list = new ArrayList<>();
+        String sql = "SELECT * FROM role";
+        try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Role r = new Role(
+                        rs.getInt("id"),
+                        rs.getString("role_name")
+                );
+                list.add(r);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Integer> getPermissionIdsByRoleId(int roleId) {
+        List<Integer> list = new ArrayList<>();
+        String sql = "SELECT permission_id FROM role_permission WHERE role_id = ?";
+        try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(rs.getInt(1));
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<String> getUserPermissions(int userId) {
+        List<String> codes = new ArrayList<>();
+        String sql = "SELECT p.code FROM user_role ur "
+                + "JOIN role_permission rp ON ur.role_id = rp.role_id "
+                + "JOIN permission p ON rp.permission_id = p.id "
+                + "WHERE ur.user_id = ?";
+        try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    codes.add(rs.getString(1));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return codes;
+    }
+
+    public void addPermissionsToRole(int roleId, List<Integer> permissionIds) {
+        String sql = "INSERT INTO role_permission (role_id, permission_id) VALUES (?, ?)";
+        try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            for (int permissionId : permissionIds) {
+                ps.setInt(1, roleId);
+                ps.setInt(2, permissionId);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deletePermissionsByRoleId(int roleId) {
+        String sql = "DELETE FROM role_permission WHERE role_id = ?";
+        try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -489,7 +562,7 @@ public class UserDAO extends Context {
 
         return dob;
     }
-    
+
     public static void main(String[] args) {
         UserDAO ud = new UserDAO();
         Users u = ud.login("admin", "123");

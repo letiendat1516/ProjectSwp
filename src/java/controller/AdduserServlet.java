@@ -1,6 +1,6 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+     * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+     * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 package controller;
 
@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import model.Users;
 
 /**
@@ -20,15 +21,6 @@ import model.Users;
  */
 public class AdduserServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -46,32 +38,14 @@ public class AdduserServlet extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+            throws ServletException, IOException {}
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String fullname = request.getParameter("fullname");
@@ -101,9 +75,9 @@ public class AdduserServlet extends HttpServlet {
         }
         user.setDob(dob); // Đặt giá trị ngày sinh
         if (dob != null) {
-        java.time.LocalDate birthDate = dob.toLocalDate();
-        java.time.LocalDate today = java.time.LocalDate.now();
-        int age = java.time.Period.between(birthDate, today).getYears();
+            java.time.LocalDate birthDate = dob.toLocalDate();
+            java.time.LocalDate today = java.time.LocalDate.now();
+            int age = java.time.Period.between(birthDate, today).getYears();
 
             if (age < 18 || age > 60) {
                 request.setAttribute("error", "Tuổi người dùng phải từ 18 đến 60!");
@@ -117,10 +91,8 @@ public class AdduserServlet extends HttpServlet {
         try {
             UserDAO userDAO = new UserDAO();
             userDAO.addUser(user, roleId);
-
-            HttpSession session = request.getSession();
-            session.setAttribute("message", "User added successfully!");
-            response.sendRedirect("AddUser.jsp");
+            request.setAttribute("message", "User added successfully!");
+            response.sendRedirect("addser");
         } catch (Exception e) {
             request.setAttribute("error", "Failed to add user: " + e.getMessage());
             request.getRequestDispatcher("AddUser.jsp").forward(request, response);

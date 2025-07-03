@@ -18,7 +18,7 @@
 
 <%
 Users user = (Users) session.getAttribute("user");
-if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
+if (user == null) {
     response.sendRedirect("login.jsp");
     return;
 }

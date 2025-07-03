@@ -39,8 +39,7 @@ public class DeleteProductController extends HttpServlet {
         
         if (productIdStr == null || productIdStr.trim().isEmpty()) {
             System.out.println("DeleteProductController: Product ID is null or empty");
-            String errorMsg = URLEncoder.encode("Không tìm thấy sản phẩm!", StandardCharsets.UTF_8);
-            response.sendRedirect("product-list?error=" + errorMsg);
+            showAlertAndBack(response, "Không tìm thấy sản phẩm!");
             return;
         }
         
@@ -51,48 +50,32 @@ public class DeleteProductController extends HttpServlet {
             ProductInfo product = productDAO.getProductById(productId);
             if (product == null) {
                 System.out.println("DeleteProductController: Product not found in database");
-                String errorMsg = URLEncoder.encode("Sản phẩm không tồn tại!", StandardCharsets.UTF_8);
-                response.sendRedirect("product-list?error=" + errorMsg);
+                showAlertAndBack(response, "Sản phẩm không tồn tại!");
                 return;
             }
             
             System.out.println("DeleteProductController: Found product = " + product.getName());
             
-            // Check if product can be safely deleted
-            boolean canDelete = productDAO.canDeleteProduct(productId);
-            System.out.println("DeleteProductController: Can delete product = " + canDelete);
-              if (!canDelete) {
-                System.out.println("DeleteProductController: Product has dependencies, cannot delete");
-                String errorMsg = URLEncoder.encode("Không thể xóa sản phẩm này vì nó đang được sử dụng trong hệ thống (có trong kho, yêu cầu nhập/xuất)!", StandardCharsets.UTF_8);
-                response.sendRedirect("update-product?id=" + productId + "&error=" + errorMsg);
-                return;
-            }
-            
-            // Perform deletion
-            System.out.println("DeleteProductController: Attempting to delete product");
+            // Always perform soft delete
             boolean success = productDAO.deleteProduct(productId);
-            System.out.println("DeleteProductController: Delete operation result = " + success);
+            System.out.println("DeleteProductController: Soft delete operation result = " + success);
               if (success) {
                 // Log the deletion activity
-                System.out.println("Product deleted successfully: " + product.getName() + " (ID: " + productId + ") by user: " + user.getUsername());
+                System.out.println("Product soft deleted successfully: " + product.getName() + " (ID: " + productId + ") by user: " + user.getUsername());
                 
-                // Redirect to product list with success message
-                String successMsg = URLEncoder.encode("Đã xóa sản phẩm '" + product.getName() + "' thành công!", StandardCharsets.UTF_8);
-                response.sendRedirect("product-list?success=" + successMsg);
+                // Redirect to product list
+                response.sendRedirect("product-list");
             } else {
-                System.out.println("DeleteProductController: Delete operation failed");
-                String errorMsg = URLEncoder.encode("Có lỗi xảy ra khi xóa sản phẩm. Vui lòng thử lại!", StandardCharsets.UTF_8);
-                response.sendRedirect("update-product?id=" + productId + "&error=" + errorMsg);
+                System.out.println("DeleteProductController: Soft delete operation failed");
+                showAlertAndBack(response, "Có lỗi xảy ra khi xóa sản phẩm. Vui lòng thử lại!");
             }
               } catch (NumberFormatException e) {
             System.out.println("DeleteProductController: Invalid product ID format - " + e.getMessage());
-            String errorMsg = URLEncoder.encode("ID sản phẩm không hợp lệ!", StandardCharsets.UTF_8);
-            response.sendRedirect("product-list?error=" + errorMsg);
+            showAlertAndBack(response, "ID sản phẩm không hợp lệ!");
         } catch (Exception e) {
             System.out.println("DeleteProductController: Exception occurred - " + e.getMessage());
             e.printStackTrace();
-            String errorMsg = URLEncoder.encode("Có lỗi hệ thống xảy ra!", StandardCharsets.UTF_8);
-            response.sendRedirect("product-list?error=" + errorMsg);
+            showAlertAndBack(response, "Có lỗi hệ thống xảy ra!");
         }
     }
     
@@ -101,5 +84,10 @@ public class DeleteProductController extends HttpServlet {
             throws ServletException, IOException {
         // Redirect POST requests to GET
         doGet(request, response);
+    }
+
+    private void showAlertAndBack(HttpServletResponse response, String message) throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        response.getWriter().write("<script>alert('" + message.replace("'", "\\'") + "'); window.history.back();</script>");
     }
 }
