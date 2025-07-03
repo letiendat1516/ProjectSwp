@@ -605,7 +605,7 @@
 
                 <!-- Navigation Buttons -->
                 <div class="nav-buttons">
-                    <a href="/ProjectWarehouse/dashboard.jsp" class="btn btn-info">← Quay lại Dashboard</a>
+                    <a href="/ProjectWarehouse/categoriesforward.jsp" class="btn btn-info">← Quay lại</a>
                 </div>
 
                 <!-- Thông báo -->

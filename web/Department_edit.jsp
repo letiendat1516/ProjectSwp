@@ -329,14 +329,13 @@
             </div>
 
                 <div class="form-header">
-                    <h2>✏️ Chỉnh sửa phòng ban: ${department.deptName}</h2>
+                    <h2>Chỉnh sửa phòng ban: ${department.deptName}</h2>
                 </div>
 
                 <!-- Navigation Buttons -->
                 <div class="nav-buttons">
                     <a href="${pageContext.request.contextPath}/department/list" class="btn btn-info">← Quay lại danh sách</a>
-                    <a href="${pageContext.request.contextPath}/department/detail?id=${department.id}" class="btn btn-warning">👁️ Xem chi tiết</a>
-                </div>
+                 </div>
 
                 <!-- Department Info -->
                 <div class="department-info">
@@ -360,7 +359,7 @@
                     
                     <!-- Basic Information -->
                     <div class="form-section">
-                        <h3>📋 Thông tin cơ bản</h3>
+                        <h3>Thông tin cơ bản</h3>
                         
                         <div class="form-row">
                             <div class="form-group">
@@ -402,7 +401,7 @@
 
                     <!-- Contact Information -->
                     <div class="form-section">
-                        <h3>📞 Thông tin liên hệ</h3>
+                        <h3>Thông tin liên hệ</h3>
                         
                         <div class="form-row">
                             <div class="form-group">
@@ -434,7 +433,7 @@
 
                     <!-- Manager Assignment -->
                     <div class="form-section">
-                        <h3>👤 Trưởng phòng</h3>
+                        <h3>Trưởng phòng</h3>
                         
                         <div class="form-group">
                             <label for="managerId">Chọn trưởng phòng</label>
@@ -460,7 +459,7 @@
 
                     <!-- Status Control -->
                     <div class="form-section">
-                        <h3>⚙️ Trạng thái</h3>
+                        <h3>Trạng thái</h3>
                         
                         <div class="form-group">
                             <div class="status-toggle">
@@ -486,24 +485,13 @@
                     <!-- Form Actions -->
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">
-                            💾 Cập nhật phòng ban
+                            Cập nhật phòng ban
                         </button>
                         <a href="${pageContext.request.contextPath}/department/list" class="btn btn-secondary">
-                            ❌ Hủy bỏ
+                            Hủy bỏ
                         </a>
                     </div>
                 </form>
-
-                <!-- Audit Information -->
-                <div class="audit-info">
-                    <strong>Thông tin kiểm toán:</strong><br>
-                    Tạo bởi: ${department.createdByName} vào 
-                    <fmt:formatDate value="${department.createDate}" pattern="dd/MM/yyyy HH:mm:ss"/><br>
-                    <c:if test="${not empty department.updatedByName}">
-                        Cập nhật lần cuối bởi: ${department.updatedByName} vào 
-                        <fmt:formatDate value="${department.updateDate}" pattern="dd/MM/yyyy HH:mm:ss"/>
-                    </c:if>
-                </div>
             </div>
         </div>
 

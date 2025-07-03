@@ -60,7 +60,6 @@
                 color: #3f51b5;
                 font-size: 2rem;
                 margin-bottom: 10px;
-
             }
 
             .lead {
@@ -70,10 +69,10 @@
             }
 
             .card-container {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: space-between;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
                 gap: 20px;
+                justify-content: center;
             }
 
             .card {
@@ -81,7 +80,6 @@
                 border-radius: 10px;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 transition: transform 0.3s, box-shadow 0.3s;
-                width: calc(33.333% - 20px);
                 margin-bottom: 20px;
             }
 
@@ -183,18 +181,6 @@
                 margin-right: 5px;
             }
 
-            /* Responsive styles */
-            @media (max-width: 900px) {
-                .card {
-                    width: calc(50% - 15px);
-                }
-            }
-
-            @media (max-width: 600px) {
-                .card {
-                    width: 100%;
-                }
-            }
             .layout-container {
                 display: flex;
                 min-height: 150vh;
@@ -221,8 +207,24 @@
             .logout-btn:hover {
                 background: orange;
             }
-        </style>
 
+            /* Responsive styles */
+            @media (max-width: 1200px) {
+                .card-container {
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                }
+            }
+
+            @media (max-width: 768px) {
+                .card-container {
+                    grid-template-columns: 1fr;
+                }
+                
+                .page-title {
+                    font-size: 1.5rem;
+                }
+            }
+        </style>
     </head>
     <body>
         <div class="layout-container">
@@ -249,6 +251,23 @@
                             <h4 class="card-title">Quản lý Danh mục Sản phẩm</h4>
                             <p class="card-text">Thêm, sửa, xóa và xem các danh mục sản phẩm trong hệ thống.</p>
                             <a href="category/list" class="btn btn-primary">
+                                Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Categories Department - XẾP BÊN CẠNH -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Danh mục Phòng ban</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-container">
+                                <span class="material-icons">domain</span>
+                            </div>
+                            <h4 class="card-title">Quản lý Phòng ban</h4>
+                            <p class="card-text">Thêm, sửa, xóa và xem thông tin về các phòng ban trong tổ chức.</p>
+                            <a href="department/list" class="btn btn-primary">
                                 Truy cập <span class="material-icons btn-icon">arrow_forward</span>
                             </a>
                         </div>
@@ -288,35 +307,18 @@
                         </div>
                     </div>   
 
-                    <!-- Categories Product -->
+                    <!-- Product Management -->
                     <div class="card">
                         <div class="card-header">
-                            <h3>Danh mục Sản phẩm</h3>
+                            <h3>Quản lý Sản phẩm</h3>
                         </div>
                         <div class="card-body">
                             <div class="icon-container">
                                 <span class="material-icons">inventory</span>
                             </div>
                             <h4 class="card-title">Quản lý Sản phẩm</h4>
-                            <p class="card-text">Thêm, sửa, xóa và xem thông tin về các sản phẩm.</p>
+                            <p class="card-text">Thêm, sửa, xóa và xem thông tin chi tiết về các sản phẩm.</p>
                             <a href="product-list" class="btn btn-primary">
-                                Truy cập <span class="material-icons btn-icon">arrow_forward</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Categories Department - MỚI THÊM -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Danh mục Phòng ban</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="icon-container">
-                                <span class="material-icons">domain</span>
-                            </div>
-                            <h4 class="card-title">Quản lý Phòng ban</h4>
-                            <p class="card-text">Thêm, sửa, xóa và xem thông tin về các phòng ban trong tổ chức.</p>
-                            <a href="department/list" class="btn btn-primary">
                                 Truy cập <span class="material-icons btn-icon">arrow_forward</span>
                             </a>
                         </div>

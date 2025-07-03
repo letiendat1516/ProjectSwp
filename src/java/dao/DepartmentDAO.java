@@ -31,12 +31,12 @@ public class DepartmentDAO {
                    manager.phone as manager_phone,
                    creator.fullname as created_by_name,
                    updater.fullname as updated_by_name,
-                   COUNT(CASE WHEN u.active_flag = 1 THEN u.id END) as employee_count
+                   COUNT(DISTINCT CASE WHEN u.active_flag = 1 THEN u.id END) as employee_count
             FROM department d
             LEFT JOIN users manager ON d.manager_id = manager.id
             LEFT JOIN users creator ON d.created_by = creator.id
             LEFT JOIN users updater ON d.updated_by = updater.id
-            LEFT JOIN users u ON d.id = u.department_id AND u.active_flag = 1
+            LEFT JOIN users u ON d.id = u.department_id
             GROUP BY d.id, d.dept_code, d.dept_name, d.description, d.manager_id, 
                      d.phone, d.email, d.active_flag, d.created_by, d.create_date, 
                      d.updated_by, d.update_date, manager.fullname, manager.email, 
@@ -75,12 +75,12 @@ public class DepartmentDAO {
                    manager.phone as manager_phone,
                    creator.fullname as created_by_name,
                    updater.fullname as updated_by_name,
-                   COUNT(CASE WHEN u.active_flag = 1 THEN u.id END) as employee_count
+                   COUNT(DISTINCT CASE WHEN u.active_flag = 1 THEN u.id END) as employee_count
             FROM department d
             LEFT JOIN users manager ON d.manager_id = manager.id
             LEFT JOIN users creator ON d.created_by = creator.id
             LEFT JOIN users updater ON d.updated_by = updater.id
-            LEFT JOIN users u ON d.id = u.department_id AND u.active_flag = 1
+            LEFT JOIN users u ON d.id = u.department_id
             WHERE 1=1
             """);
         
@@ -232,12 +232,12 @@ public class DepartmentDAO {
                    manager.phone as manager_phone,
                    creator.fullname as created_by_name,
                    updater.fullname as updated_by_name,
-                   COUNT(CASE WHEN u.active_flag = 1 THEN u.id END) as employee_count
+                   COUNT(DISTINCT CASE WHEN u.active_flag = 1 THEN u.id END) as employee_count
             FROM department d
             LEFT JOIN users manager ON d.manager_id = manager.id
             LEFT JOIN users creator ON d.created_by = creator.id
             LEFT JOIN users updater ON d.updated_by = updater.id
-            LEFT JOIN users u ON d.id = u.department_id AND u.active_flag = 1
+            LEFT JOIN users u ON d.id = u.department_id
             WHERE d.id = ?
             GROUP BY d.id, d.dept_code, d.dept_name, d.description, d.manager_id, 
                      d.phone, d.email, d.active_flag, d.created_by, d.create_date, 
@@ -335,9 +335,49 @@ public class DepartmentDAO {
     }
     
     /**
-     * Update department
+     * Validate if user can be manager of a department
+     * Kiểm tra xem user có thuộc phòng ban đó không
+     */
+    public boolean canBeManager(int userId, int departmentId) {
+        String sql = """
+            SELECT COUNT(*) 
+            FROM users u
+            WHERE u.id = ? 
+            AND u.department_id = ?
+            AND u.active_flag = 1
+            """;
+        
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, userId);
+            ps.setInt(2, departmentId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error in canBeManager: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Update department (with manager validation)
      */
     public boolean updateDepartment(Department department) {
+        // Nếu có manager_id, kiểm tra xem người đó có thuộc phòng ban không
+        if (department.getManagerId() != null) {
+            if (!canBeManager(department.getManagerId(), department.getId())) {
+                System.out.println("Manager must be from the same department");
+                return false;
+            }
+        }
+        
         String sql = """
             UPDATE department 
             SET dept_code = ?, dept_name = ?, description = ?, manager_id = ?, 
@@ -395,9 +435,15 @@ public class DepartmentDAO {
     }
     
     /**
-     * Assign manager to department
+     * Assign manager to department (with validation)
      */
     public boolean assignManager(int departmentId, int managerId, int updatedBy) {
+        // Kiểm tra xem người được gán có thuộc phòng ban không
+        if (!canBeManager(managerId, departmentId)) {
+            System.out.println("User " + managerId + " is not in department " + departmentId);
+            return false;
+        }
+        
         String sql = """
             UPDATE department 
             SET manager_id = ?, updated_by = ?, update_date = ?
@@ -448,7 +494,7 @@ public class DepartmentDAO {
     }
     
     /**
-     * Get employees by department ID - ĐÃ SỬA LỖI LOCALDATETIME
+     * Get employees by department ID
      */
     public List<Map<String, Object>> getEmployeesByDepartmentId(int departmentId) {
         List<Map<String, Object>> employees = new ArrayList<>();
@@ -491,7 +537,7 @@ public class DepartmentDAO {
                     employee.put("phone", rsUser.getString("phone"));
                     employee.put("active", rsUser.getBoolean("active_flag"));
                     
-                    // ĐÃ SỬA: Convert LocalDateTime thành String
+                    // Convert LocalDateTime thành String
                     Timestamp createDate = rsUser.getTimestamp("create_date");
                     if (createDate != null) {
                         LocalDateTime dateTime = createDate.toLocalDateTime();
@@ -531,17 +577,23 @@ public class DepartmentDAO {
     
     /**
      * Get available users that can be assigned as managers
+     * CHỈ LẤY NGƯỜI TRONG PHÒNG BAN ĐÓ
      */
     public List<Map<String, Object>> getAvailableManagers(int departmentId) {
         List<Map<String, Object>> managers = new ArrayList<>();
         
-        // Query đơn giản để lấy users trước
+        // Query chỉ lấy users thuộc phòng ban này
         String userSql = """
             SELECT u.id, u.username, u.fullname, u.email, u.phone
             FROM users u
             WHERE u.active_flag = 1 
-            AND (u.department_id IS NULL OR u.department_id = ?)
-            AND u.id NOT IN (SELECT manager_id FROM department WHERE manager_id IS NOT NULL AND id != ?)
+            AND u.department_id = ?
+            AND u.id NOT IN (
+                SELECT manager_id 
+                FROM department 
+                WHERE manager_id IS NOT NULL 
+                AND id != ?
+            )
             ORDER BY u.fullname
             """;
         
@@ -556,8 +608,8 @@ public class DepartmentDAO {
         try (Connection conn = new Context().getJDBCConnection();
              PreparedStatement psUser = conn.prepareStatement(userSql)) {
             
-            psUser.setInt(1, departmentId);
-            psUser.setInt(2, departmentId);
+            psUser.setInt(1, departmentId); // department_id của user phải = departmentId
+            psUser.setInt(2, departmentId); // loại trừ manager của phòng ban khác
             
             try (ResultSet rsUser = psUser.executeQuery()) {
                 while (rsUser.next()) {
