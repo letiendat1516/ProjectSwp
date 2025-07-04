@@ -187,6 +187,7 @@
                 font-weight: bold;
                 border-bottom: 2px solid #dee2e6;
                 position: relative;
+                white-space: nowrap;
             }
 
             .table th a {
@@ -291,7 +292,19 @@
                 border-left: 4px solid #007bff;
             }
 
+            /* Date time styles */
+            .date-time {
+                font-size: 12px;
+                color: #666;
+            }
+
             /* Responsive */
+            @media (max-width: 1200px) {
+                .table-container {
+                    overflow-x: auto;
+                }
+            }
+
             @media (max-width: 768px) {
                 .container {
                     padding: 15px;
@@ -306,10 +319,6 @@
                     flex-direction: column;
                 }
 
-                .table-container {
-                    overflow-x: auto;
-                }
-
                 .action-buttons {
                     flex-direction: column;
                 }
@@ -321,7 +330,13 @@
                 .form-input {
                     width: 100%;
                 }
+                
+                .table th, .table td {
+                    padding: 8px;
+                    font-size: 12px;
+                }
             }
+            
             .layout-container {
                 display: flex;
                 min-height: 100vh;
@@ -361,13 +376,10 @@
                 color: #3f51b5;
                 font-size: 2rem;
                 margin-bottom: 10px;
-
             }
         </style>
     </head>
     <body>
-
-
         <div class="layout-container">
             <jsp:include page="/include/sidebar.jsp" />
             <div class="main-content">
@@ -378,7 +390,6 @@
                         <a href="logout" class="logout-btn">Đăng xuất</a>
                     </div>
                 </div>
-
 
                 <!-- Navigation Buttons -->
                 <div class="nav-buttons">
@@ -412,10 +423,12 @@
                     </div>
                 </c:if>
 
-
                 <!-- Thanh công cụ -->
                 <div class="toolbar">
+                    <div style="display: flex; gap: 10px;">
                     <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">+ Thêm danh mục loại sản phẩm</a>
+                    <a href="${pageContext.request.contextPath}/category-parent/statistics" class="btn btn-success">Thống kê danh mục loại sản phẩm</a>
+                    </div>
                     <form method="get" class="search-form">
                         <!-- Giữ lại sort parameters khi search -->
                         <c:if test="${not empty sortField}">
@@ -475,6 +488,22 @@
                                                 </c:if>
                                             </a>
                                         </th>
+                                        <th>
+                                            <a href="?sortField=create_date&sortDir=${sortField eq 'create_date' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                                Ngày tạo 
+                                                <c:if test="${sortField eq 'create_date'}">
+                                                    <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
+                                                </c:if>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="?sortField=update_date&sortDir=${sortField eq 'update_date' ? reverseSortDir : 'asc'}&search=${searchKeyword}">
+                                                Ngày cập nhật 
+                                                <c:if test="${sortField eq 'update_date'}">
+                                                    <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
+                                                </c:if>
+                                            </a>
+                                        </th>
                                         <th>Thao tác</th>
                                     </tr>
                                 </thead>
@@ -497,6 +526,30 @@
                                                 <span class="badge ${category.activeFlag ? 'badge-success' : 'badge-secondary'}">
                                                     ${category.activeFlag ? 'Hoạt động' : 'Không hoạt động'}
                                                 </span>
+                                            </td>
+                                            <td>
+                                                <div class="date-time">
+                                                    <c:choose>
+                                                        <c:when test="${not empty category.createdAt}">
+                                                            ${dateTimeFormatter.format(category.createdAt)}
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted">--</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="date-time">
+                                                    <c:choose>
+                                                        <c:when test="${not empty category.updatedAt}">
+                                                            ${dateTimeFormatter.format(category.updatedAt)}
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted">--</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
@@ -554,7 +607,6 @@
                                 </li>
                             </c:if>
                         </ul>
-
                     </div>
                 </c:if>
             </div>

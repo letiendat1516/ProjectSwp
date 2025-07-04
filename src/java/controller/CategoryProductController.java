@@ -2,6 +2,8 @@ package controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,7 +23,8 @@ public class CategoryProductController extends HttpServlet {
   private static final String DEFAULT_SORT_DIR = "asc";
   private static final String SORT_ASC = "asc";
   private static final String SORT_DESC = "desc";
-  private static final String[] ALLOWED_SORT_FIELDS = {"id", "name", "parent_name", "active_flag"};
+  // THÊM create_date và update_date vào danh sách được phép sort
+  private static final String[] ALLOWED_SORT_FIELDS = {"id", "name", "parent_name", "active_flag", "create_date", "update_date"};
 
   // Initialize DAO when servlet is created
   @Override
@@ -145,11 +148,17 @@ public class CategoryProductController extends HttpServlet {
       request.setAttribute("sortField", sortField);
       request.setAttribute("sortDir", sortDir);
       request.setAttribute("totalCategories", totalCategories);
+      
+      // 8. THÊM DateTimeFormatter để format date trong JSP
+      DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+      DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+      request.setAttribute("dateFormatter", dateFormatter);
+      request.setAttribute("dateTimeFormatter", dateTimeFormatter);
 
-      // 8. Display message if any
+      // 9. Display message if any
       showMessage(request);
 
-      // 9. Forward to JSP page
+      // 10. Forward to JSP page
       request.getRequestDispatcher("/category_product/list.jsp").forward(request, response);
   }
 
@@ -206,8 +215,12 @@ public class CategoryProductController extends HttpServlet {
 
       // 6. Handle active status
       category.setActiveFlag("1".equals(activeFlagStr));
+      
+      // 7. Set thời gian tạo (sẽ được database tự động set nhưng có thể set ở đây nếu cần)
+      // category.setCreatedAt(LocalDateTime.now());
+      // category.setUpdatedAt(LocalDateTime.now());
 
-      // 7. Save to database
+      // 8. Save to database
       boolean success = categoryDAO.addCategory(category);
 
       if (success) {
@@ -242,9 +255,13 @@ public class CategoryProductController extends HttpServlet {
           // 3. Get list of parent categories
           List<CategoryProductParent> parentCategories = categoryDAO.getCategoryParentsForDropdown();
           
-          // 4. Send data to JSP
+          // 4. THÊM DateTimeFormatter
+          DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+          
+          // 5. Send data to JSP
           request.setAttribute("category", category);
           request.setAttribute("parentCategories", parentCategories);
+          request.setAttribute("dateTimeFormatter", dateTimeFormatter);
 
           request.getRequestDispatcher("/category_product/edit.jsp").forward(request, response);
 
@@ -298,8 +315,11 @@ public class CategoryProductController extends HttpServlet {
 
           // 5. Handle active status
           category.setActiveFlag("1".equals(activeFlagStr));
+          
+          // 6. Thời gian cập nhật sẽ được database tự động set qua ON UPDATE CURRENT_TIMESTAMP
+          // Nhưng có thể set ở đây nếu cần: category.setUpdatedAt(LocalDateTime.now());
 
-          // 6. Update database
+          // 7. Update database
           boolean success = categoryDAO.updateCategory(category);
 
           if (success) {

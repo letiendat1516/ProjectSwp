@@ -112,6 +112,7 @@
               padding: 15px;
               border-radius: 5px;
               margin-bottom: 20px;
+              position: relative;
           }
 
           .alert-success {
@@ -127,11 +128,14 @@
           }
 
           .alert-close {
-              float: right;
+              position: absolute;
+              top: 10px;
+              right: 15px;
               background: none;
               border: none;
               font-size: 20px;
               cursor: pointer;
+              color: inherit;
           }
 
           /* Toolbar */
@@ -168,6 +172,7 @@
               text-decoration: none;
               display: inline-block;
               transition: all 0.3s;
+              text-align: center;
           }
 
           .btn-primary {
@@ -206,89 +211,199 @@
           }
 
           .btn-sm {
-              padding: 6px 12px;
+              padding: 6px 10px;
               font-size: 12px;
-              min-width: 50px;
+              min-width: 35px;
+              border-radius: 3px;
           }
 
-          /* Table Styles - Updated for better balance */
-          .table-container {
-              border: 1px solid #ddd;
-              border-radius: 5px;
-              overflow: hidden;
-              overflow-x: auto;
+          .btn-sm:disabled {
+              opacity: 0.6;
+              cursor: not-allowed;
           }
 
-          .table {
-              width: 100%;
-              border-collapse: collapse;
-              min-width: 800px;
-          }
+/* Table Styles - Updated for better balance */
+.table-container {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    overflow-x: auto;
+}
 
-          .table th {
-              background: #f8f9fa;
-              padding: 12px 10px;
-              text-align: left;
-              font-weight: bold;
-              border-bottom: 2px solid #dee2e6;
-              white-space: nowrap;
-          }
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1100px;
+}
 
-          .table th a {
-              color: #333;
-              text-decoration: none;
-          }
+.table th {
+    background: #f8f9fa;
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+}
 
-          .table td {
-              padding: 12px 10px;
-              border-bottom: 1px solid #dee2e6;
-              vertical-align: middle;
-          }
+.table th a {
+    color: #333;
+    text-decoration: none;
+}
 
-          .table tbody tr:hover {
-              background: #f5f5f5;
-          }
+.table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: middle;
+}
 
-          /* Specific column widths for better balance */
-          .table th:nth-child(1), 
-          .table td:nth-child(1) {
-              width: 8%;
-              text-align: center;
-          }
+.table tbody tr:hover {
+    background: #f5f5f5;
+}
 
-          .table th:nth-child(2), 
-          .table td:nth-child(2) {
-              width: 25%;
-              font-weight: 500;
-          }
+/* Specific column widths - UPDATED for better balance */
+.table th:nth-child(1), 
+.table td:nth-child(1) {
+    width: 5%;
+    text-align: center;
+}
 
-          .table th:nth-child(3), 
-          .table td:nth-child(3) {
-              width: 30%;
-              max-width: 200px;
-              word-wrap: break-word;
-              overflow-wrap: break-word;
-              line-height: 1.4;
-          }
+.table th:nth-child(2), 
+.table td:nth-child(2) {
+    width: 15%;
+    font-weight: 500;
+}
 
-          .table th:nth-child(4), 
-          .table td:nth-child(4) {
-              width: 12%;
-              text-align: center;
-          }
+/* Mô tả - Giảm độ rộng */
+.table th:nth-child(3), 
+.table td:nth-child(3) {
+    width: 20%;
+    max-width: 200px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.4;
+    font-size: 13px;
+}
 
-          .table th:nth-child(5), 
-          .table td:nth-child(5) {
-              width: 15%;
-              text-align: center;
-          }
+.table th:nth-child(4), 
+.table td:nth-child(4) {
+    width: 12%;
+    text-align: center;
+}
 
-          .table th:nth-child(6), 
-          .table td:nth-child(6) {
-              width: 10%;
-              text-align: center;
-          }
+.table th:nth-child(5), 
+.table td:nth-child(5) {
+    width: 8%;
+    text-align: center;
+}
 
+.table th:nth-child(6), 
+.table td:nth-child(6) {
+    width: 12%;
+    text-align: center;
+}
+
+.table th:nth-child(7), 
+.table td:nth-child(7) {
+    width: 14%;
+    text-align: center;
+}
+
+.table th:nth-child(8), 
+.table td:nth-child(8) {
+    width: 14%;
+    text-align: center;
+}
+
+/* Date time display */
+.date-time {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.3;
+}
+
+.date-time small {
+    display: block;
+    color: #999;
+    font-size: 11px;
+}
+
+/* Badge Styles */
+.badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.badge-success {
+    background: #28a745;
+    color: white;
+    min-width: 70px;
+}
+
+.badge-secondary {
+    background: #6c757d;
+    color: white;
+    min-width: 90px;
+}
+
+.badge-info {
+    background: #17a2b8;
+    color: white;
+    min-width: 25px;
+    padding: 4px 8px;
+}
+
+/* Action Buttons - Compact */
+.action-buttons {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+
+.btn-sm {
+    padding: 5px 8px;
+    font-size: 12px;
+    min-width: 32px;
+    border-radius: 3px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+    .table {
+        min-width: 1000px;
+    }
+    
+    .table th:nth-child(3), 
+    .table td:nth-child(3) {
+        max-width: 180px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .table {
+        min-width: 950px;
+        font-size: 13px;
+    }
+    
+    .table th, 
+    .table td {
+        padding: 8px 6px;
+    }
+    
+    .date-time {
+        font-size: 11px;
+    }
+    
+    .date-time small {
+        font-size: 10px;
+    }
+}
           /* Badge Styles */
           .badge {
               padding: 6px 12px;
@@ -321,11 +436,12 @@
               color: #6c757d;
           }
 
-          /* Action Buttons */
+          /* Action Buttons - Updated */
           .action-buttons {
               display: flex;
-              gap: 8px;
+              gap: 5px;
               justify-content: center;
+              flex-wrap: wrap;
           }
 
           /* Pagination */
@@ -376,32 +492,7 @@
               color: #6c757d;
           }
 
-          /* Responsive */
-          @media (max-width: 1200px) {
-              .table th:nth-child(3), 
-              .table td:nth-child(3) {
-                  max-width: 150px;
-              }
-          }
-
-          @media (max-width: 992px) {
-              .table th:nth-child(2), 
-              .table td:nth-child(2) {
-                  width: 20%;
-              }
-              
-              .table th:nth-child(3), 
-              .table td:nth-child(3) {
-                  width: 25%;
-                  max-width: 120px;
-              }
-              
-              .table th:nth-child(5), 
-              .table td:nth-child(5) {
-                  width: 12%;
-              }
-          }
-
+          /* Responsive adjustments for action buttons */
           @media (max-width: 768px) {
               .container {
                   padding: 15px;
@@ -452,14 +543,73 @@
               }
               
               .btn-sm {
-                  padding: 4px 8px;
+                  padding: 4px 6px;
                   font-size: 11px;
+                  min-width: 30px;
               }
 
               .action-buttons {
-                  flex-direction: column;
+                  gap: 3px;
               }
           }
+
+          @media (max-width: 1200px) {
+              .table th:nth-child(3), 
+              .table td:nth-child(3) {
+                  max-width: 150px;
+              }
+          }
+
+          @media (max-width: 992px) {
+              .table th:nth-child(2), 
+              .table td:nth-child(2) {
+                  width: 20%;
+              }
+              
+              .table th:nth-child(3), 
+              .table td:nth-child(3) {
+                  width: 25%;
+                  max-width: 120px;
+              }
+              
+              .table th:nth-child(5), 
+              .table td:nth-child(5) {
+                  width: 12%;
+              }
+          }
+          /* Statistics Button Specific Styles */
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #218838, #1ea085);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+}
+
+/* Icon spacing */
+.nav-buttons .btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Responsive cho nav buttons */
+@media (max-width: 768px) {
+    .nav-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .nav-buttons .btn {
+        justify-content: center;
+        text-align: center;
+    }
+}
+
       </style>
   </head>
   <body>
@@ -483,26 +633,29 @@
               <c:if test="${not empty successMessage}">
                   <div class="alert alert-success">
                       ${successMessage}
-                      <button type="button" class="alert-close" onclick="this.parentElement.style.display = 'none'">&times;</button>
+                      <button type="button" class="alert-close" onclick="this.parentElement.remove()">&times;</button>
                   </div>
               </c:if>
 
               <c:if test="${not empty errorMessage}">
                   <div class="alert alert-danger">
                       ${errorMessage}
-                      <button type="button" class="alert-close" onclick="this.parentElement.style.display = 'none'">&times;</button>
+                      <button type="button" class="alert-close" onclick="this.parentElement.remove()">&times;</button>
                   </div>
               </c:if>
 
               <!-- Thanh công cụ -->
               <div class="toolbar">
-                  <a href="${pageContext.request.contextPath}/category-parent/create" class="btn btn-primary">+ Thêm danh mục</a>
-                  <form method="get" class="search-form">
-                      <input type="text" name="search" class="form-input" 
-                             placeholder="Tìm kiếm..." value="${searchKeyword}">
-                      <button type="submit" class="btn btn-secondary">Tìm kiếm</button>
-                  </form>
-              </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="${pageContext.request.contextPath}/category-parent/create" class="btn btn-primary">+ Thêm danh mục</a>
+        <a href="${pageContext.request.contextPath}/category-parent/statistics" class="btn btn-success">Thống kê danh mục</a>
+    </div>
+    <form method="get" class="search-form">
+        <input type="text" name="search" class="form-input" 
+               placeholder="Tìm kiếm..." value="${searchKeyword}">
+        <button type="submit" class="btn btn-secondary">Tìm kiếm</button>
+    </form>
+</div>
 
               <!-- Bảng danh sách -->
               <div class="table-container">
@@ -525,6 +678,8 @@
                                       <th>Trạng thái</th>
                                       <th>Số danh mục loại sản phẩm</th>
                                       <th>Thao tác</th>
+                                      <th>Ngày tạo</th>
+<th>Ngày cập nhật</th>
                                   </tr>
                               </thead>
                               <tbody>
@@ -541,9 +696,31 @@
                                           </td>
                                           <td><span class="badge badge-info">${category.childCount}</span></td>
                                           <td>
+    <c:if test="${not empty category.createDate}">
+        ${category.createDate.toLocalDate()}
+        <br><small class="text-muted">${category.createDate.toLocalTime()}</small>
+    </c:if>
+</td>
+<td>
+    <c:if test="${not empty category.updateDate}">
+        ${category.updateDate.toLocalDate()}
+        <br><small class="text-muted">${category.updateDate.toLocalTime()}</small>
+    </c:if>
+</td>
+
+                                          <td>
                                               <div class="action-buttons">
+                                                  <!-- Nút Toggle Status -->
+                                                  <button onclick="toggleStatus(${category.id}, ${category.childCount})" 
+                                                          class="btn btn-sm ${category.activeFlag ? 'btn-danger' : 'btn-success'}"
+                                                          title="${category.activeFlag ? 'Vô hiệu hóa' : 'Kích hoạt'}"
+                                                          id="toggle-btn-${category.id}">
+                                                      ${category.activeFlag ? '❌' : '✅'}
+                                                  </button>
+                                                  
+                                                  <!-- Nút Sửa -->
                                                   <a href="${pageContext.request.contextPath}/category-parent/edit?id=${category.id}" 
-                                                     class="btn btn-warning btn-sm">Sửa</a>
+                                                     class="btn btn-warning btn-sm" title="Chỉnh sửa">Sửa️</a>
                                               </div>
                                           </td>
                                       </tr>
@@ -589,23 +766,61 @@
       </div>
 
       <script>
-          function toggleStatus(id) {
-              fetch('${pageContext.request.contextPath}/category-parent/toggle-status?id=' + id, {
-                  method: 'GET'
-              })
-                      .then(response => response.json())
-                      .then(data => {
-                          if (data.success) {
-                              const statusElement = document.getElementById('status-' + id);
-                              statusElement.textContent = data.newStatus;
-                              statusElement.className = 'badge ' + (data.statusClass === 'badge-success' ? 'badge-success' : 'badge-secondary');
-                          } else {
-                              alert('Lỗi: ' + data.message);
-                          }
-                      })
-                      .catch(error => {
-                          alert('Có lỗi xảy ra khi cập nhật trạng thái');
-                      });
+          function toggleStatus(id, childCount) {
+        // Disable button during request
+        const button = document.getElementById('toggle-btn-' + id);
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '⏳';
+        
+        fetch('${pageContext.request.contextPath}/category-parent/toggle-status?id=' + id, {
+            method: 'GET'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update status badge
+                const statusElement = document.getElementById('status-' + id);
+                statusElement.textContent = data.newStatus;
+                statusElement.className = 'badge ' + data.statusClass;
+                
+                // Update button
+                button.className = 'btn btn-sm ' + data.buttonClass;
+                button.innerHTML = data.buttonText;
+                button.title = data.newStatus === 'Hoạt động' ? 'Vô hiệu hóa' : 'Kích hoạt';
+            } else {
+                // Chỉ reset button về trạng thái cũ, không hiện thông báo lỗi
+                button.innerHTML = originalText;
+            }
+            button.disabled = false;
+        })
+        .catch(error => {
+            // Chỉ reset button, không hiện thông báo lỗi
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+    }
+
+
+          // Helper function to show alerts
+          function showAlert(type, message) {
+              const alertDiv = document.createElement('div');
+              alertDiv.className = `alert alert-${type}`;
+              alertDiv.innerHTML = `
+                  ${message}
+                  <button type="button" class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+              `;
+              
+              const container = document.querySelector('.main-content');
+              const firstChild = container.querySelector('.header').nextElementSibling;
+              container.insertBefore(alertDiv, firstChild);
+              
+              // Auto remove after 5 seconds
+              setTimeout(() => {
+                  if (alertDiv.parentNode) {
+                      alertDiv.remove();
+                  }
+              }, 5000);
           }
       </script>
   </body>

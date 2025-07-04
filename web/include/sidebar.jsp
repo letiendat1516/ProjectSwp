@@ -116,5 +116,5 @@ Description: Reusable sidebar component - extracted from Dashboard.jsp
     <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="nav-item">Giao dịch</a>
     <a href="Profile.jsp" class="nav-item">Thông tin cá nhân</a>
     <a href="Admin.jsp" class="nav-item">Trang chủ (Chỉ Admin)</a>
-
+    <a href="StatisticSupplierEvaluation.jsp" class="nav-item">Thống kê</a>
 </div>

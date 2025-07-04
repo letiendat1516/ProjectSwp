@@ -1,16 +1,16 @@
-    package dao;
+package dao;
 
-    import java.sql.Connection;
-    import java.sql.PreparedStatement;
-    import java.sql.ResultSet;
-    import java.sql.SQLException;
-    import java.util.ArrayList;
-    import java.util.List;
-    import model.CategoryProduct;
-    import model.CategoryProductParent;
-    import DBContext.Context;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import model.CategoryProduct;
+import model.CategoryProductParent;
+import DBContext.Context;
 
-    public class CategoryProductDAO {
+public class CategoryProductDAO {
     private CategoryParentDAO parentDAO;
 
     public CategoryProductDAO() {
@@ -23,7 +23,7 @@
 
         List<CategoryProduct> categories = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-            "SELECT c.id, c.name, c.parent_id, c.active_flag, cp.name as parent_name " +
+            "SELECT c.id, c.name, c.parent_id, c.active_flag, c.create_date, c.update_date, cp.name as parent_name " +
             "FROM category c LEFT JOIN category_parent cp ON c.parent_id = cp.id WHERE 1=1"
         );
 
@@ -66,7 +66,8 @@
             String searchKeyword, String sortField, String sortDir) {
 
         List<CategoryProduct> categories = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM category WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT id, name, parent_id, active_flag, create_date, update_date FROM category WHERE 1=1");
+
         List<Object> params = new ArrayList<>();
 
         // Add search condition - simple lowercase comparison
@@ -134,7 +135,7 @@
 
     // Get category by ID
     public CategoryProduct getCategoryById(int id) {
-        String sql = "SELECT * FROM category WHERE id = ?";
+        String sql = "SELECT id, name, parent_id, active_flag, create_date, update_date FROM category WHERE id = ?";
 
         try (Connection conn = new Context().getJDBCConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -155,9 +156,9 @@
 
     // Get category with parent info by ID
     public CategoryProduct getCategoryWithParentById(int id) {
-        String sql = "SELECT c.id, c.name, c.parent_id, c.active_flag, cp.name as parent_name " +
-                    "FROM category c LEFT JOIN category_parent cp ON c.parent_id = cp.id " +
-                    "WHERE c.id = ?";
+        String sql = "SELECT c.id, c.name, c.parent_id, c.active_flag, c.create_date, c.update_date, cp.name as parent_name " +
+            "FROM category c LEFT JOIN category_parent cp ON c.parent_id = cp.id " +
+            "WHERE c.id = ?";
 
         try (Connection conn = new Context().getJDBCConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -223,7 +224,7 @@
             return false;
         }
 
-        String sql = "INSERT INTO category (name, parent_id, active_flag) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO category (name, parent_id, active_flag, create_date, update_date) VALUES (?, ?, ?, NOW(), NOW())";
 
         try (Connection conn = new Context().getJDBCConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -256,7 +257,7 @@
             return false;
         }
 
-        String sql = "UPDATE category SET name = ?, parent_id = ?, active_flag = ? WHERE id = ?";
+        String sql = "UPDATE category SET name = ?, parent_id = ?, active_flag = ?, update_date = NOW() WHERE id = ?";
 
         try (Connection conn = new Context().getJDBCConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -297,7 +298,7 @@
     // Get active categories for dropdown
     public List<CategoryProduct> getAllCategoriesForDropdown() {
         List<CategoryProduct> categories = new ArrayList<>();
-        String sql = "SELECT * FROM category WHERE active_flag = 1 ORDER BY name";
+        String sql = "SELECT id, name, parent_id, active_flag, create_date, update_date FROM category WHERE active_flag = 1 ORDER BY name";
 
         try (Connection conn = new Context().getJDBCConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -321,9 +322,9 @@
     // Get categories by parent ID
     public List<CategoryProduct> getCategoriesByParentId(Integer parentId) {
         List<CategoryProduct> categories = new ArrayList<>();
-        String sql = "SELECT * FROM category WHERE " + 
-                    (parentId == null ? "parent_id IS NULL" : "parent_id = ?") +
-                    " AND active_flag = 1 ORDER BY name";
+        String sql = "SELECT id, name, parent_id, active_flag, create_date, update_date FROM category WHERE " + 
+            (parentId == null ? "parent_id IS NULL" : "parent_id = ?") +
+            " AND active_flag = 1 ORDER BY name";
 
         try (Connection conn = new Context().getJDBCConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -352,6 +353,23 @@
         category.setName(rs.getString("name"));
         category.setParentId(rs.getObject("parent_id", Integer.class));
         category.setActiveFlag(rs.getBoolean("active_flag"));
+        
+        // Xử lý date fields với try-catch để tránh lỗi
+        try {
+            if (rs.getTimestamp("create_date") != null) {
+                category.setCreatedAt(rs.getTimestamp("create_date").toLocalDateTime());
+            }
+        } catch (SQLException e) {
+            // Column không tồn tại hoặc null, bỏ qua
+        }
+        
+        try {
+            if (rs.getTimestamp("update_date") != null) {
+                category.setUpdatedAt(rs.getTimestamp("update_date").toLocalDateTime());
+            }
+        } catch (SQLException e) {
+            // Column không tồn tại hoặc null, bỏ qua
+        }
 
         if (includeParentName) {
             category.setParentName(rs.getString("parent_name"));
@@ -367,6 +385,8 @@
             case "name": return "c.name";
             case "parent_name": return "cp.name";
             case "active_flag": return "c.active_flag";
+            case "create_date": return "c.create_date";
+            case "update_date": return "c.update_date";
             default: return "c.id";
         }
     }
@@ -377,6 +397,8 @@
         switch (sortField.toLowerCase()) {
             case "name": return "name";
             case "active_flag": return "active_flag";
+            case "create_date": return "create_date";
+            case "update_date": return "update_date";
             default: return "id";
         }
     }
@@ -390,4 +412,4 @@
             ps.setObject(i + 1, params.get(i));
         }
     }
-    }
+}

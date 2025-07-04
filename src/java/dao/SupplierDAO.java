@@ -25,7 +25,7 @@ public class SupplierDAO {
     private ResultSet rs = null;
 
     public Supplier getSupplierByID(int id) {
-        String sql = "select * from swp.supplier where id = " + id;
+        String sql = "select * from supplier where id = " + id;
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
@@ -171,6 +171,7 @@ public class SupplierDAO {
         List<Supplier> list = new ArrayList<>();
         String sql = "SELECT * FROM supplier ORDER BY id LIMIT ?, ?";
         try {
+            System.out.println(sql);
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
             ps.setInt(1, (pageIndex - 1) * pageSize);
@@ -284,7 +285,7 @@ public class SupplierDAO {
     }
 
     public Supplier getSupplierByName(String name) {
-        String sql = "select * from swp.supplier where name = \"" + name + "\"";
+        String sql = "select * from supplier where name = \"" + name + "\"";
         try {
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
@@ -309,10 +310,12 @@ public class SupplierDAO {
     public static void main(String[] args) {
         SupplierDAO sd = new SupplierDAO();
         Supplier s = sd.getSupplierByName("Công ty TNHH Bao Bì Bình Minh");
+        int n = sd.countTotalSuppliers();
+        System.out.println(n);
         System.out.println(s.getSupplierID());
         // limit (offset),(limit)
-//        List<Supplier> l = sd.getSuppliersByPageFilter(2, 10, "all", "");
-//        System.out.println(Math.ceil((double)l.size()/5));
+        List<Supplier> l = sd.getSuppliersByPage(2, 5);
+        System.out.println(l.get(0).getEmail());
     }
 
 }

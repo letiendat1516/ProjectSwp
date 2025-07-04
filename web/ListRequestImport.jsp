@@ -1225,7 +1225,7 @@
                                                         <td>
                                                             <div class="d-flex gap-2">
                                                                 
-                                                                <a href="LishSupplier" class="btn btn-sm btn-warning btn-icon">
+                                                                <a href="${pageContext.request.contextPath}/LishSupplier" class="btn btn-sm btn-warning btn-icon">
                                                                     <i class="fas fa-star"></i> Đánh giá
                                                                 </a>
                                                             </div>
