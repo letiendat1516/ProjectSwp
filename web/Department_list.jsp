@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <%
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
@@ -10,28 +11,18 @@
 <%@page import="model.Users"%>
 <%
     Users user = (Users) session.getAttribute("user");
-    if (user == null || !"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName())) {
+    if (user == null || (!"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName()))) {
         response.sendRedirect("login.jsp");
         return;
     }
 %>
-
-<%-- Tính toán reverseSortDir --%>
-<c:set var="reverseSortDir" value="${sortDir eq 'asc' ? 'desc' : 'asc'}" />
-
-<%-- Tính toán phân trang hiển thị --%>
-<c:set var="startPage" value="${currentPage - 2 > 0 ? currentPage - 2 : 1}" />
-<c:set var="endPage" value="${startPage + 4 < totalPages ? startPage + 4 : totalPages}" />
-<c:if test="${endPage - startPage < 4 && totalPages > 5}">
-    <c:set var="startPage" value="${endPage - 4 > 0 ? endPage - 4 : 1}" />
-</c:if>
 
 <!DOCTYPE html>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Danh sách danh mục sản phẩm</title>
+        <title>Quản lý phòng ban</title>
         <style>
             * {
                 margin: 0;
@@ -48,7 +39,7 @@
             }
 
             .container {
-                max-width: 1200px;
+                max-width: 1400px;
                 margin: 0 auto;
                 background: white;
                 padding: 30px;
@@ -241,6 +232,7 @@
             .table td {
                 padding: 12px 15px;
                 border-bottom: 1px solid #dee2e6;
+                vertical-align: top;
             }
 
             .table tbody tr:hover {
@@ -275,6 +267,11 @@
                 color: white;
             }
 
+            .badge-warning {
+                background: #ffc107;
+                color: #212529;
+            }
+
             .text-muted {
                 color: #6c757d;
                 font-style: italic;
@@ -284,6 +281,7 @@
             .action-buttons {
                 display: flex;
                 gap: 8px;
+                flex-wrap: wrap;
             }
 
             /* Pagination */
@@ -337,6 +335,31 @@
             .date-time {
                 font-size: 12px;
                 color: #666;
+            }
+
+            /* Contact info styles */
+            .contact-info {
+                font-size: 13px;
+                color: #555;
+            }
+
+            .contact-info i {
+                margin-right: 5px;
+                color: #007bff;
+            }
+
+            .department-info {
+                margin-bottom: 8px;
+            }
+
+            .manager-info {
+                font-weight: 500;
+                color: #28a745;
+            }
+
+            .employee-count {
+                font-weight: bold;
+                color: #17a2b8;
             }
 
             /* Responsive */
@@ -481,6 +504,81 @@
                 flex: 1;
             }
 
+            /* Modal for employee list */
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.5);
+            }
+
+            .modal-content {
+                background-color: white;
+                margin: 15% auto;
+                padding: 20px;
+                border-radius: 8px;
+                width: 80%;
+                max-width: 800px;
+                max-height: 70vh;
+                overflow-y: auto;
+            }
+
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .close {
+                color: #aaa;
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+            .close:hover {
+                color: black;
+            }
+
+            /* Employee list in modal */
+            .employee-list {
+                list-style: none;
+                padding: 0;
+            }
+
+            .employee-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .employee-item:last-child {
+                border-bottom: none;
+            }
+
+            .employee-info {
+                flex: 1;
+            }
+
+            .employee-name {
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .employee-details {
+                font-size: 12px;
+                color: #666;
+            }
+
             /* Responsive cho filter */
             @media (max-width: 768px) {
                 .filter-row {
@@ -498,7 +596,7 @@
             <jsp:include page="/include/sidebar.jsp" />
             <div class="main-content">
                 <div class="header">
-                    <h1 class="page-title">Quản lý danh mục loại sản phẩm</h1>
+                    <h1 class="page-title">Quản lý phòng ban</h1>
                     <div class="header-user">
                         <label class="label">Xin chào, <%= user.getFullname()%></label>
                         <a href="${pageContext.request.contextPath}/login.jsp" class="logout-btn">Đăng xuất</a>
@@ -507,7 +605,7 @@
 
                 <!-- Navigation Buttons -->
                 <div class="nav-buttons">
-                    <a href="/ProjectWarehouse/categoriesforward.jsp" class="btn btn-info">← Quay lại trang trước</a>
+                    <a href="/ProjectWarehouse/categoriesforward.jsp" class="btn btn-info">← Quay lại</a>
                 </div>
 
                 <!-- Thông báo -->
@@ -528,20 +626,20 @@
                 <!-- Thanh công cụ -->
                 <div class="toolbar">
                     <div style="display: flex; gap: 10px;">
-                        <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">+ Thêm danh mục</a>
-                        <a href="${pageContext.request.contextPath}/category/statistics" class="btn btn-primary">Thống kê danh mục loại sản phẩm</a> 
+                        <a href="${pageContext.request.contextPath}/department/create" class="btn btn-primary">+ Thêm phòng ban</a>
+                        <a href="${pageContext.request.contextPath}/department/statistics" class="btn btn-info">📊 Thống kê phòng ban</a>
                     </div>
                 </div>
 
                 <!-- Filter Section -->
                 <div class="filter-section">
                     <h3 style="margin-bottom: 15px; color: #333;">Bộ lọc</h3>
-                    <form id="filterForm" method="get" action="${pageContext.request.contextPath}/category/list">
+                    <form id="filterForm" method="get" action="${pageContext.request.contextPath}/department/list">
                         <div class="filter-row">
                             <div class="filter-item">
                                 <label>Tìm kiếm:</label>
                                 <input type="text" name="search" value="${searchKeyword}" 
-                                       placeholder="Nhập tên danh mục..." class="filter-input">
+                                       placeholder="Nhập tên hoặc mã phòng ban..." class="filter-input">
                             </div>
                             <div class="filter-item">
                                 <label>Trạng thái:</label>
@@ -552,15 +650,11 @@
                                 </select>
                             </div>
                             <div class="filter-item">
-                                <label>Danh mục cha:</label>
-                                <select name="parentId" class="filter-select">
+                                <label>Có trưởng phòng:</label>
+                                <select name="hasManager" class="filter-select">
                                     <option value="">Tất cả</option>
-                                    <option value="-1" ${parentId == -1 ? 'selected' : ''}>Danh mục gốc</option>
-                                    <c:forEach var="root" items="${rootCategories}">
-                                        <option value="${root.id}" ${parentId == root.id ? 'selected' : ''}>
-                                            ${root.name}
-                                        </option>
-                                    </c:forEach>
+                                    <option value="1" ${hasManager == '1' ? 'selected' : ''}>Có trưởng phòng</option>
+                                    <option value="0" ${hasManager == '0' ? 'selected' : ''}>Chưa có trưởng phòng</option>
                                 </select>
                             </div>
 
@@ -575,12 +669,12 @@
                 <!-- Bảng danh sách -->
                 <div class="table-container">
                     <c:choose>
-                        <c:when test="${not empty categories}">
+                        <c:when test="${not empty departments}">
                             <table class="table">
                                 <thead>
                                     <tr>
                                         <th>
-                                            <a href="?sortField=id&sortDir=${sortField eq 'id' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
+                                            <a href="?sortField=id&sortDir=${sortField eq 'id' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&hasManager=${hasManager}">
                                                 ID 
                                                 <c:if test="${sortField eq 'id'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
@@ -588,23 +682,26 @@
                                             </a>
                                         </th>
                                         <th>
-                                            <a href="?sortField=name&sortDir=${sortField eq 'name' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
-                                                Tên danh mục 
-                                                <c:if test="${sortField eq 'name'}">
+                                            <a href="?sortField=dept_code&sortDir=${sortField eq 'dept_code' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&hasManager=${hasManager}">
+                                                Mã phòng ban 
+                                                <c:if test="${sortField eq 'dept_code'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
                                                 </c:if>
                                             </a>
                                         </th>
                                         <th>
-                                            <a href="?sortField=parent_name&sortDir=${sortField eq 'parent_name' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
-                                                Danh mục cha 
-                                                <c:if test="${sortField eq 'parent_name'}">
+                                            <a href="?sortField=dept_name&sortDir=${sortField eq 'dept_name' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&hasManager=${hasManager}">
+                                                Tên phòng ban 
+                                                <c:if test="${sortField eq 'dept_name'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
                                                 </c:if>
                                             </a>
                                         </th>
+                                        <th>Trưởng phòng</th>
+                                        <th>Thông tin liên hệ</th>
+                                        <th>Số nhân viên</th>
                                         <th>
-                                            <a href="?sortField=active_flag&sortDir=${sortField eq 'active_flag' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
+                                            <a href="?sortField=active_flag&sortDir=${sortField eq 'active_flag' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&hasManager=${hasManager}">
                                                 Trạng thái 
                                                 <c:if test="${sortField eq 'active_flag'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
@@ -612,17 +709,9 @@
                                             </a>
                                         </th>
                                         <th>
-                                            <a href="?sortField=create_date&sortDir=${sortField eq 'create_date' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
+                                            <a href="?sortField=create_date&sortDir=${sortField eq 'create_date' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&hasManager=${hasManager}">
                                                 Ngày tạo 
                                                 <c:if test="${sortField eq 'create_date'}">
-                                                    <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
-                                                </c:if>
-                                            </a>
-                                        </th>
-                                        <th>
-                                            <a href="?sortField=update_date&sortDir=${sortField eq 'update_date' ? reverseSortDir : 'asc'}&search=${searchKeyword}&status=${status}&parentId=${parentId}">
-                                                Ngày cập nhật 
-                                                <c:if test="${sortField eq 'update_date'}">
                                                     <span class="sort-icon">${sortDir eq 'asc' ? '↑' : '↓'}</span>
                                                 </c:if>
                                             </a>
@@ -631,64 +720,106 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="category" items="${categories}">
+                                    <c:forEach var="department" items="${departments}">
                                         <tr>
-                                            <td>#${category.id}</td>
+                                            <td>#${department.id}</td>
                                             <td>
-                                                <strong>${category.name}</strong>
+                                                <span class="badge badge-info">${department.deptCode}</span>
+                                            </td>
+                                            <td>
+                                                <div class="department-info">
+                                                    <strong>${department.deptName}</strong>
+                                                </div>
+                                                <c:if test="${not empty department.description}">
+                                                    <div class="text-muted" style="font-size: 12px; margin-top: 5px;">
+                                                        ${department.description}
+                                                    </div>
+                                                </c:if>
                                             </td>
                                             <td>
                                                 <c:choose>
-                                                    <c:when test="${not empty category.parentName}">
-                                                        <span class="badge badge-info">${category.parentName}</span>
+                                                    <c:when test="${not empty department.managerName}">
+                                                        <div class="manager-info">${department.managerName}</div>
+                                                        <c:if test="${not empty department.managerEmail}">
+                                                            <div class="contact-info">
+                                                                📧 ${department.managerEmail}
+                                                            </div>
+                                                        </c:if>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="badge badge-primary">Danh mục gốc</span>
+                                                        <span class="badge badge-warning">Chưa có trưởng phòng</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
                                             <td>
-                                                <span class="badge ${category.activeFlag ? 'badge-success' : 'badge-secondary'}" 
-                                                      id="status-${category.id}">
-                                                    ${category.activeFlag ? 'Hoạt động' : 'Không hoạt động'}
+                                                <c:if test="${not empty department.phone}">
+                                                    <div class="contact-info">
+                                                        📞 ${department.phone}
+                                                    </div>
+                                                </c:if>
+                                                <c:if test="${not empty department.email}">
+                                                    <div class="contact-info">
+                                                        📧 ${department.email}
+                                                    </div>
+                                                </c:if>
+                                                <c:if test="${empty department.phone && empty department.email}">
+                                                    <span class="text-muted">--</span>
+                                                </c:if>
+                                            </td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${department.employeeCount > 0}">
+                                                        <span class="employee-count">${department.employeeCount} người</span>
+                                                        <br>
+                                                        <!-- ĐÃ SỬA: Lưu tên phòng ban vào data attribute -->
+                                                        <button type="button" class="btn btn-info btn-sm" 
+                                                                data-department-id="${department.id}"
+                                                                data-department-name="${fn:escapeXml(department.deptName)}"
+                                                                onclick="showEmployeeList(this)" 
+                                                                title="Xem danh sách nhân viên">
+                                                            👥 Xem DS
+                                                        </button>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="text-muted">0 người</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <span class="badge ${department.activeFlag ? 'badge-success' : 'badge-secondary'}" 
+                                                      id="status-${department.id}">
+                                                    ${department.activeFlag ? 'Hoạt động' : 'Không hoạt động'}
                                                 </span>
                                             </td>
                                             <td>
                                                 <div class="date-time">
                                                     <c:choose>
-                                                        <c:when test="${not empty category.createdAt}">
-                                                            ${dateTimeFormatter.format(category.createdAt)}
+                                                        <c:when test="${not empty department.createDate}">
+                                                            ${department.createDate.format(dateTimeFormatter)}
                                                         </c:when>
                                                         <c:otherwise>
                                                             <span class="text-muted">--</span>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <div class="date-time">
-                                                    <c:choose>
-                                                        <c:when test="${not empty category.updatedAt}">
-                                                            ${dateTimeFormatter.format(category.updatedAt)}
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="text-muted">--</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </div>
+                                                <c:if test="${not empty department.createdByName}">
+                                                    <div class="text-muted" style="font-size: 11px;">
+                                                        Bởi: ${department.createdByName}
+                                                    </div>
+                                                </c:if>
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <a href="${pageContext.request.contextPath}/category/edit?id=${category.id}" 
+                                                    <a href="${pageContext.request.contextPath}/department/edit?id=${department.id}" 
                                                        class="btn btn-warning btn-sm" title="Chỉnh sửa">
                                                         Sửa
                                                     </a>
                                                     <button type="button" 
-                                                            class="btn ${category.activeFlag ? 'btn-danger' : 'btn-success'} btn-sm" 
-                                                            id="toggle-${category.id}"
-                                                            onclick="toggleCategoryStatus(${category.id})" 
-                                                            title="${category.activeFlag ? 'Vô hiệu hóa' : 'Kích hoạt'}">
-                                                        ${category.activeFlag ? 'vô hiệu hóa' : 'kích hoạt'}
+                                                            class="btn ${department.activeFlag ? 'btn-danger' : 'btn-success'} btn-sm" 
+                                                            id="toggle-${department.id}"
+                                                            onclick="toggleDepartmentStatus(${department.id})" 
+                                                            title="${department.activeFlag ? 'Vô hiệu hóa' : 'Kích hoạt'}">
+                                                        ${department.activeFlag ? 'Vô hiệu hóa' : 'Kích hoạt'}
                                                     </button>
                                                 </div>
                                             </td>
@@ -699,15 +830,15 @@
                         </c:when>
                         <c:otherwise>
                             <div class="empty-state">
-                                <h3>Không có danh mục nào</h3>
+                                <h3>Không có phòng ban nào</h3>
                                 <c:choose>
-                                    <c:when test="${not empty searchKeyword or not empty status or not empty parentId}">
-                                        <p>Không tìm thấy danh mục nào với bộ lọc hiện tại</p>
-                                        <a href="${pageContext.request.contextPath}/category/list" class="btn btn-info">← Xem tất cả danh mục</a>
+                                    <c:when test="${not empty searchKeyword or not empty status or not empty hasManager}">
+                                        <p>Không tìm thấy phòng ban nào với bộ lọc hiện tại</p>
+                                        <a href="${pageContext.request.contextPath}/department/list" class="btn btn-info">← Xem tất cả phòng ban</a>
                                     </c:when>
                                     <c:otherwise>
-                                        <p>Hãy thêm danh mục đầu tiên của bạn</p>
-                                        <a href="${pageContext.request.contextPath}/category/create" class="btn btn-primary">+ Thêm danh mục</a>
+                                        <p>Hãy thêm phòng ban đầu tiên của bạn</p>
+                                        <a href="${pageContext.request.contextPath}/department/create" class="btn btn-primary">+ Thêm phòng ban</a>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
@@ -719,29 +850,42 @@
                 <c:if test="${totalPages > 1}">
                     <div class="pagination-container">
                         <ul class="pagination">
-                            <!-- First page -->
+                            <!-- Previous page -->
                             <c:if test="${currentPage > 1}">
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=${currentPage-1}&search=${searchKeyword}&status=${status}&parentId=${parentId}&sortField=${sortField}&sortDir=${sortDir}">Trước</a>
+                                    <a class="page-link" href="?page=${currentPage-1}&search=${searchKeyword}&status=${status}&hasManager=${hasManager}&sortField=${sortField}&sortDir=${sortDir}">Trước</a>
                                 </li>
                             </c:if>
 
                             <!-- Page numbers -->
                             <c:forEach begin="${startPage}" end="${endPage}" var="i">
                                 <li class="page-item ${i eq currentPage ? 'active' : ''}">
-                                    <a class="page-link" href="?page=${i}&search=${searchKeyword}&status=${status}&parentId=${parentId}&sortField=${sortField}&sortDir=${sortDir}">${i}</a>
+                                    <a class="page-link" href="?page=${i}&search=${searchKeyword}&status=${status}&hasManager=${hasManager}&sortField=${sortField}&sortDir=${sortDir}">${i}</a>
                                 </li>
                             </c:forEach>
 
                             <!-- Next page -->
                             <c:if test="${currentPage < totalPages}">
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=${currentPage+1}&search=${searchKeyword}&status=${status}&parentId=${parentId}&sortField=${sortField}&sortDir=${sortDir}">Sau</a>
+                                    <a class="page-link" href="?page=${currentPage+1}&search=${searchKeyword}&status=${status}&hasManager=${hasManager}&sortField=${sortField}&sortDir=${sortDir}">Sau</a>
                                 </li>
                             </c:if>
                         </ul>
                     </div>
                 </c:if>
+            </div>
+        </div>
+
+        <!-- Modal xem danh sách nhân viên -->
+        <div id="employeeModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Danh sách nhân viên</h2>
+                    <span class="close" onclick="closeEmployeeModal()">&times;</span>
+                </div>
+                <div id="employeeListContent">
+                    <!-- Danh sách nhân viên sẽ được load vào đây -->
+                </div>
             </div>
         </div>
 
@@ -756,68 +900,46 @@
                 });
             });
 
-            // Toggle category status function với CONFIRM
-            function toggleCategoryStatus(categoryId) {
-                // Lấy thông tin hiện tại
-                const statusBadge = document.getElementById('status-' + categoryId);
-                const toggleBtn = document.getElementById('toggle-' + categoryId);
+            // Toggle department status function
+            function toggleDepartmentStatus(departmentId) {
+                const statusBadge = document.getElementById('status-' + departmentId);
+                const toggleBtn = document.getElementById('toggle-' + departmentId);
                 const currentStatus = statusBadge.textContent.trim();
 
-                // Lấy tên danh mục từ bảng
-                const categoryName = findCategoryNameById(categoryId);
+                const departmentName = findDepartmentNameById(departmentId);
 
-                // Tạo message confirm dựa trên trạng thái hiện tại
                 let confirmMessage;
                 if (currentStatus === 'Hoạt động') {
-                    confirmMessage = `Bạn có chắc chắn muốn VÔ HIỆU HÓA danh mục`;
+                    confirmMessage = `Bạn có chắc chắn muốn VÔ HIỆU HÓA phòng ban`;
                 } else {
-                    confirmMessage = `Bạn có chắc chắn muốn KÍCH HOẠT danh mục`;
+                    confirmMessage = `Bạn có chắc chắn muốn KÍCH HOẠT phòng ban`;
                 }
 
-                // Hiển thị confirm dialog
                 if (!confirm(confirmMessage)) {
-                    return; // Người dùng hủy bỏ
+                    return;
                 }
 
-                // Thêm loading effect
                 addLoadingEffect(toggleBtn);
-                const originalBtnText = toggleBtn.textContent;
 
-                fetch('${pageContext.request.contextPath}/category/toggle-status?id=' + categoryId, {
+                fetch('${pageContext.request.contextPath}/department/toggle-status?id=' + departmentId, {
                     method: 'GET'
                 })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // Update status badge của danh mục hiện tại
                                 statusBadge.textContent = data.newStatus;
                                 statusBadge.className = 'badge ' + data.statusClass;
 
-                                // Update toggle button
                                 toggleBtn.textContent = data.buttonText;
                                 toggleBtn.className = 'btn ' + data.buttonClass + ' btn-sm';
                                 toggleBtn.title = data.newStatus === 'Hoạt động' ? 'Vô hiệu hóa' : 'Kích hoạt';
 
-                                // Hiển thị thông báo thành công
                                 showSuccessMessage(data.newStatus === 'Hoạt động' ?
-                                        `Đã kích hoạt danh mục "${categoryName}" thành công!` :
-                                        `Đã vô hiệu hóa danh mục "${categoryName}" thành công!`
+                                        `Đã kích hoạt phòng ban thành công!` :
+                                        `Đã vô hiệu hóa phòng ban thành công!`
                                         );
-
-                                // Nếu vô hiệu hóa và có danh mục con, cập nhật tất cả danh mục con
-                                if (data.childrenDeactivated === true && data.newStatus === 'Không hoạt động') {
-                                    updateChildCategoriesStatus(categoryId, false);
-                                    showInfoMessage(`Đã tự động vô hiệu hóa các danh mục con liên quan.`);
-                                }
                             } else {
-                                // Hiển thị lỗi
-                                console.error('Failed to toggle status:', data.message);
-                                showErrorMessage(data.message || 'Có lỗi xảy ra khi thay đổi trạng thái danh mục.');
-
-                                // Nếu lỗi do danh mục cha inactive, hiển thị tooltip
-                                if (data.message && data.message.includes('danh mục cha')) {
-                                    showTooltip(toggleBtn, data.message);
-                                }
+                                showErrorMessage(data.message || 'Có lỗi xảy ra khi thay đổi trạng thái phòng ban.');
                             }
                         })
                         .catch(error => {
@@ -825,158 +947,122 @@
                             showErrorMessage('Có lỗi xảy ra khi kết nối đến server. Vui lòng thử lại.');
                         })
                         .finally(() => {
-                            // Remove loading effect
                             removeLoadingEffect(toggleBtn);
                         });
             }
 
-            // Hàm hiển thị thông báo thành công
-            function showSuccessMessage(message) {
-                showNotification(message, 'success', 'fas fa-check-circle');
-            }
+            // ĐÃ SỬA: Show employee list modal - lấy data từ button element
+            function showEmployeeList(button) {
+                const departmentId = button.getAttribute('data-department-id');
+                const departmentName = button.getAttribute('data-department-name');
+                
+                console.log('Department ID:', departmentId);
+                console.log('Department Name:', departmentName);
+                
+                document.getElementById('modalTitle').textContent = 'Danh sách nhân viên - ' + departmentName;
+                document.getElementById('employeeListContent').innerHTML = '<div style="text-align: center; padding: 20px;">Đang tải...</div>';
+                document.getElementById('employeeModal').style.display = 'block';
 
-            // Hàm hiển thị thông báo lỗi
-            function showErrorMessage(message) {
-                showNotification(message, 'danger', 'fas fa-exclamation-circle');
-            }
-
-            // Hàm hiển thị thông báo thông tin
-            function showInfoMessage(message) {
-                showNotification(message, 'info', 'fas fa-info-circle');
-            }
-
-            // Hàm chung để hiển thị thông báo
-            function showNotification(message, type, icon) {
-                // Tạo unique ID cho notification
-                const notificationId = 'notification-' + Date.now();
-
-                const alertHtml = `
-          <div id="${notificationId}" class="alert alert-${type} alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 500px;">
-              <i class="${icon} me-2"></i>
-            ${message}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" onclick="document.getElementById('${notificationId}').remove()"></button>
-          </div>
-      `;
-
-                // Thêm vào body
-                document.body.insertAdjacentHTML('beforeend', alertHtml);
-
-                // Tự động ẩn sau một khoảng thời gian
-                const autoHideTime = type === 'danger' ? 5000 : 3000;
-                setTimeout(() => {
-                    const notification = document.getElementById(notificationId);
-                    if (notification) {
-                        notification.remove();
-                    }
-                }, autoHideTime);
-            }
-
-            // Hàm cập nhật trạng thái của tất cả danh mục con trên UI
-            function updateChildCategoriesStatus(parentId, isActive) {
-                // Tìm tất cả các row trong table
-                const rows = document.querySelectorAll('.table tbody tr');
-
-                rows.forEach(row => {
-                    // Lấy cell chứa danh mục cha
-                    const parentCell = row.cells[2]; // Cột thứ 3 là danh mục cha
-                    const parentBadge = parentCell.querySelector('.badge-info');
-
-                    if (parentBadge) {
-                        // Lấy tên danh mục cha từ badge
-                        const parentName = parentBadge.textContent.trim();
-
-                        // Tìm tên của danh mục hiện tại
-                        const currentCategoryName = findCategoryNameById(parentId);
-
-                        // Nếu danh mục này có cha là danh mục đang được toggle
-                        if (parentName === currentCategoryName) {
-                            // Lấy ID của danh mục con từ cột đầu tiên
-                            const childId = row.cells[0].textContent.replace('#', '');
-
-                            // Cập nhật status badge
-                            const childStatusBadge = document.getElementById('status-' + childId);
-                            if (childStatusBadge) {
-                                childStatusBadge.textContent = isActive ? 'Hoạt động' : 'Không hoạt động';
-                                childStatusBadge.className = isActive ? 'badge badge-success' : 'badge badge-secondary';
+                fetch('${pageContext.request.contextPath}/department/employees?id=' + departmentId)
+                        .then(response => {
+                            console.log('Response status:', response.status);
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
                             }
-
-                            // Cập nhật toggle button
-                            const childToggleBtn = document.getElementById('toggle-' + childId);
-                            if (childToggleBtn) {
-                                childToggleBtn.textContent = isActive ? 'vô hiệu hóa' : 'kích hoạt';  // ← SỬA LẠI
-                                childToggleBtn.className = isActive ? 'btn btn-danger btn-sm' : 'btn btn-success btn-sm';
-                                childToggleBtn.title = isActive ? 'Vô hiệu hóa' : 'Kích hoạt';
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Data received:', data);
+                            if (data.success && data.employees && data.employees.length > 0) {
+                                let html = '<ul class="employee-list">';
+                                data.employees.forEach(emp => {
+                                    html += `
+                                        <li class="employee-item">
+                                            <div class="employee-info">
+                                                <div class="employee-name">\${emp.fullname || 'N/A'}</div>
+                                                <div class="employee-details">
+                                                    📧 \${emp.email || 'N/A'} | 📞 \${emp.phone || 'N/A'} | 
+                                                    Chức vụ: \${emp.roles || 'N/A'} | 
+                                                    Trạng thái: <span class="badge \${emp.active ? 'badge-success' : 'badge-secondary'}">\${emp.active ? 'Hoạt động' : 'Không hoạt động'}</span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    `;
+                                });
+                                html += '</ul>';
+                                document.getElementById('employeeListContent').innerHTML = html;
+                            } else {
+                                document.getElementById('employeeListContent').innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Phòng ban này chưa có nhân viên nào.</div>';
                             }
-
-
-                            // Đệ quy: cập nhật con của con
-                            updateChildCategoriesStatus(childId, isActive);
-                        }
-                    }
-                });
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            document.getElementById('employeeListContent').innerHTML = '<div style="text-align: center; padding: 20px; color: red;">Có lỗi xảy ra khi tải danh sách nhân viên.</div>';
+                        });
             }
 
-            // Hàm tìm tên danh mục theo ID
-            function findCategoryNameById(categoryId) {
+            // Close employee modal
+            function closeEmployeeModal() {
+                document.getElementById('employeeModal').style.display = 'none';
+            }
+
+            // Close modal when clicking outside
+            window.onclick = function (event) {
+                const modal = document.getElementById('employeeModal');
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            // Utility functions
+            function findDepartmentNameById(departmentId) {
                 const rows = document.querySelectorAll('.table tbody tr');
                 for (let row of rows) {
                     const id = row.cells[0].textContent.replace('#', '');
-                    if (id === categoryId.toString()) {
-                        return row.cells[1].querySelector('strong').textContent.trim();
+                    if (id === departmentId.toString()) {
+                        return row.cells[2].querySelector('strong').textContent.trim();
                     }
                 }
-                return 'Danh mục #' + categoryId; // Fallback nếu không tìm thấy
+                return 'Phòng ban #' + departmentId;
             }
 
-            // Hiển thị tooltip thông báo lỗi
-            function showTooltip(element, message) {
-                // Tạo tooltip element
-                const tooltip = document.createElement('div');
-                tooltip.className = 'custom-tooltip';
-                tooltip.textContent = message;
-                tooltip.style.cssText = `
-          position: absolute;
-          background: #dc3545;
-          color: white;
-          padding: 8px 12px;
-          border-radius: 4px;
-          font-size: 12px;
-          z-index: 1000;
-          max-width: 250px;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      `;
+            function showSuccessMessage(message) {
+                showNotification(message, 'success');
+            }
 
-                // Thêm vào body
-                document.body.appendChild(tooltip);
+            function showErrorMessage(message) {
+                showNotification(message, 'danger');
+            }
 
-                // Định vị tooltip
-                const rect = element.getBoundingClientRect();
-                tooltip.style.top = (rect.top - tooltip.offsetHeight - 5) + 'px';
-                tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
-
-                // Tự động ẩn sau 3 giây
+            function showNotification(message, type) {
+                const notificationId = 'notification-' + Date.now();
+                const alertHtml = `
+                    <div id="\${notificationId}" class="alert alert-\${type}" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 500px;">
+                        \${message}
+                        <button type="button" class="alert-close" onclick="document.getElementById('\${notificationId}').remove()">&times;</button>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', alertHtml);
                 setTimeout(() => {
-                    tooltip.remove();
+                    const notification = document.getElementById(notificationId);
+                    if (notification)
+                        notification.remove();
                 }, 3000);
             }
 
-            // Thêm hiệu ứng loading khi toggle
             function addLoadingEffect(button) {
                 button.disabled = true;
                 button.style.opacity = '0.6';
-                button.style.cursor = 'wait';
-                button.textContent = '⏳';
+                button.textContent = '⏳ Đang xử lý...';
             }
 
             function removeLoadingEffect(button) {
                 button.disabled = false;
                 button.style.opacity = '1';
-                button.style.cursor = 'pointer';
             }
 
-            // Reset filter function
             function resetFilter() {
-                window.location.href = '${pageContext.request.contextPath}/category/list';
+                window.location.href = '${pageContext.request.contextPath}/department/list';
             }
         </script>
     </body>

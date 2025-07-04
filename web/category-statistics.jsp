@@ -25,8 +25,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Thống kê danh mục</title>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <title>Thống kê danh mục loại sản phẩm</title>
         <style>
             * {
                 margin: 0;
@@ -150,6 +149,31 @@
             .stat-card.danger .value {
                 color: #dc3545;
             }
+            
+            /* Special cards for category statistics */
+            .stat-card.special {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+            
+            .stat-card.special h3 {
+                color: white;
+            }
+            
+            .stat-card.special .value {
+                color: white;
+                font-size: 24px;
+            }
+            
+            .stat-card.special .sub-text {
+                color: rgba(255,255,255,0.8);
+            }
+            
+            .stat-card.special .detail-info {
+                margin-top: 10px;
+                font-size: 14px;
+                color: rgba(255,255,255,0.9);
+            }
 
             /* Time-based statistics */
             .time-stats-container {
@@ -208,6 +232,7 @@
                 padding: 20px;
                 border-radius: 5px;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
             }
 
             .recent-list {
@@ -229,6 +254,39 @@
             .recent-date {
                 font-size: 12px;
                 color: #999;
+            }
+            
+            .recent-item .status-badge {
+                display: inline-block;
+                padding: 2px 8px;
+                border-radius: 12px;
+                font-size: 11px;
+                margin-left: 8px;
+            }
+            
+            .status-badge.active {
+                background: #d4edda;
+                color: #155724;
+            }
+            
+            .status-badge.inactive {
+                background: #f8d7da;
+                color: #721c24;
+            }
+
+            /* Chart container */
+            .chart-container {
+                background: white;
+                padding: 20px;
+                border-radius: 5px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
+            }
+
+            .chart-wrapper {
+                position: relative;
+                height: 300px;
+                margin-top: 20px;
             }
 
             /* Loading overlay */
@@ -293,6 +351,17 @@
             .btn-pdf {
                 background: #d32f2f;
             }
+
+            /* Category badge */
+            .category-badge {
+                display: inline-block;
+                padding: 4px 8px;
+                border-radius: 3px;
+                font-size: 12px;
+                background: #e9ecef;
+                color: #495057;
+                margin-left: 10px;
+            }
         </style>
     </head>
     <body>
@@ -306,7 +375,7 @@
             <div class="main-content">
                 <!-- Header -->
                 <div class="header">
-                    <h1 class="page-title">Thống kê danh mục</h1>
+                    <h1 class="page-title">Thống kê danh mục loại sản phẩm</h1>
                     <div class="header-user">
                         <span><%= user.getFullname()%></span>
                         <a href="${pageContext.request.contextPath}/logout" class="logout-btn">Đăng xuất</a>
@@ -315,8 +384,7 @@
 
                 <!-- Navigation -->
                 <div class="nav-buttons">
-                    <a href="${pageContext.request.contextPath}/category-parent/list" class="btn btn-info">← Quay lại</a>
-                    <a href="${pageContext.request.contextPath}/category/statistics" class="btn btn-success">📊 Thống kê loại sản phẩm</a>
+                    <a href="${pageContext.request.contextPath}/category/list" class="btn btn-info">← Quay lại</a>
                 </div>
 
                 <!-- Date info -->
@@ -334,10 +402,10 @@
                 <!-- Stats Cards -->
                 <div class="stats-container">
                     <div class="stat-card primary">
-                        <h3>Tổng số danh mục</h3>
+                        <h3>Tổng số danh mục loại sản phẩm</h3>
                         <div class="value">
                             <c:choose>
-                                <c:when test="${not empty stats.totalParents}">${stats.totalParents}</c:when>
+                                <c:when test="${not empty stats.totalCategories}">${stats.totalCategories}</c:when>
                                 <c:otherwise>0</c:otherwise>
                             </c:choose>
                         </div>
@@ -348,48 +416,52 @@
                         </div>
                     </div>
                     <div class="stat-card success">
-                        <h3>Danh mục hoạt động</h3>
+                        <h3>Loại sản phẩm hoạt động</h3>
                         <div class="value">
                             <c:choose>
-                                <c:when test="${not empty stats.activeParents}">${stats.activeParents}</c:when>
+                                <c:when test="${not empty stats.activeCategories}">${stats.activeCategories}</c:when>
                                 <c:otherwise>0</c:otherwise>
                             </c:choose>
                         </div>
                         <div class="sub-text">
                             <c:if test="${not empty activePercentage}">${activePercentage}%</c:if>
-                            </div>
                         </div>
-                        <div class="stat-card warning">
-                            <h3>Danh mục không hoạt động</h3>
-                            <div class="value">
+                    </div>
+                    <div class="stat-card warning">
+                        <h3>Loại sản phẩm ngừng kinh doanh</h3>
+                        <div class="value">
                             <c:choose>
-                                <c:when test="${not empty stats.inactiveParents}">${stats.inactiveParents}</c:when>
+                                <c:when test="${not empty stats.inactiveCategories}">${stats.inactiveCategories}</c:when>
                                 <c:otherwise>0</c:otherwise>
                             </c:choose>
                         </div>
                         <div class="sub-text">
                             <c:if test="${not empty inactivePercentage}">${inactivePercentage}%</c:if>
-                            </div>
                         </div>
-                        <div class="stat-card danger">
-                            <h3>Danh mục nhiều loại SP nhất</h3>
-                            <div class="value">
+                    </div>
+                    <div class="stat-card danger">
+                        <h3>Loại SP có nhiều sản phẩm nhất</h3>
+                        <div class="value">
                             <c:choose>
-                                <c:when test="${not empty topParent && not empty topParent.name}">${topParent.name}</c:when>
+                                <c:when test="${not empty topCategory && not empty topCategory.name}">${topCategory.name}</c:when>
                                 <c:otherwise>N/A</c:otherwise>
                             </c:choose>
                         </div>
                         <div class="sub-text">
-                            <c:if test="${not empty topParent && topParent.childCount > 0}">
-                                ${topParent.childCount} loại sản phẩm
+                            <c:if test="${not empty topCategory && topCategory.totalProducts > 0}">
+                                ${topCategory.totalProducts} sản phẩm
+                                <c:if test="${not empty topCategory.parentName}">
+                                    <br/>Thuộc: ${topCategory.parentName}
+                                </c:if>
                             </c:if>
                         </div>
                     </div>
                 </div>
-
+                
+               
                 <!-- Time-based Statistics -->
                 <div class="time-stats-container">
-                    <h3>Thống kê danh mục được thêm theo thời gian</h3>
+                    <h3>Thống kê danh mục loại sản phẩm được thêm theo thời gian</h3>
                     <div class="time-stats-grid">
                         <div class="time-stat-item">
                             <h4>Tháng này</h4>
@@ -415,45 +487,58 @@
 
                     <div class="export-buttons">
                         <button class="btn-export btn-excel" onclick="exportToExcel()">📊 Xuất Excel</button>
-                        <button class="btn-export btn-pdf" onclick="exportToPDF()">📄 Xuất PDF</button>
                     </div>
                 </div>
 
-                <!-- Recently Added -->
+                <!-- Recently Added Categories with Enhanced Info -->
                 <div class="recent-container">
-                    <h3>Danh mục được thêm gần đây</h3>
+                    <h3>Loại sản phẩm được thêm gần đây</h3>
                     <ul class="recent-list">
-                        <c:forEach items="${recentParents}" var="parent">
+                        <c:forEach items="${recentCategories}" var="category">
                             <li class="recent-item">
                                 <div>
-                                    <strong>${parent.name}</strong>
-                                    <span style="color: #666; font-size: 14px;"> - ${parent.childCount} loại sản phẩm</span>
+                                    <strong>${category.name}</strong>
+                                    <span class="category-badge">${category.parentName}</span>
+                                    <span style="color: #666; font-size: 14px;"> - ${category.productCount} sản phẩm</span>
+                                    <c:if test="${not empty category.activeProducts}">
+                                        <span style="color: #28a745; font-size: 12px;"> (${category.activeProducts} hoạt động)</span>
+                                    </c:if>
+                                    <span class="status-badge ${category.activeFlag ? 'active' : 'inactive'}">
+                                        ${category.activeFlag ? 'Đang hoạt động' : 'Ngừng hoạt động'}
+                                    </span>
                                 </div>
                                 <div class="recent-date">
-                                    <c:if test="${parent.createDate != null}">
-                                        ${parent.createDate.format(dateFormatter)}
+                                    <c:if test="${category.createDate != null}">
+                                        ${category.createDate.format(dateFormatter)}
+                                        <c:if test="${not empty category.daysSinceCreated}">
+                                            <br/><small>${category.daysSinceCreated} ngày trước</small>
+                                        </c:if>
                                     </c:if>
                                 </div>
                             </li>
                         </c:forEach>
-                        <c:if test="${empty recentParents}">
+                        <c:if test="${empty recentCategories}">
                             <li class="recent-item">
-                                <span style="color: #999;">Chưa có danh mục nào được thêm gần đây</span>
+                                <span style="color: #999;">Chưa có danh mục loại sản phẩm nào được thêm gần đây</span>
                             </li>
                         </c:if>
                     </ul>
                 </div>
+
             </div>
         </div>
 
         <script>
             // Store values from server
             const statsData = {
-                totalParents: ${stats.totalParents != null ? stats.totalParents : 0},
-                activeParents: ${stats.activeParents != null ? stats.activeParents : 0},
-                inactiveParents: ${stats.inactiveParents != null ? stats.inactiveParents : 0},
-                topParentName: '${topParent.name != null ? topParent.name : "N/A"}',
-                topParentChildCount: ${topParent.childCount != null ? topParent.childCount : 0},
+                totalCategories: ${stats.totalCategories != null ? stats.totalCategories : 0},
+                activeCategories: ${stats.activeCategories != null ? stats.activeCategories : 0},
+                inactiveCategories: ${stats.inactiveCategories != null ? stats.inactiveCategories : 0},
+                topCategoryName: '${topCategory.name != null ? topCategory.name : "N/A"}',
+                topCategoryProductCount: ${topCategory.totalProducts != null ? topCategory.totalProducts : 0},
+                topCategoryParentName: '${topCategory.parentName != null ? topCategory.parentName : "N/A"}',
+                mostRecentCategoryName: '${mostRecentCategory.name != null ? mostRecentCategory.name : "N/A"}',
+                mostRecentCategoryDate: '${mostRecentCategory.createDateFormatted != null ? mostRecentCategory.createDateFormatted : "N/A"}',
                 thisMonth: ${timeStats.thisMonth != null ? timeStats.thisMonth : 0},
                 thisMonthPeriod: '${timeStats.thisMonthPeriod != null ? timeStats.thisMonthPeriod : ""}',
                 thisQuarter: ${timeStats.thisQuarter != null ? timeStats.thisQuarter : 0},
@@ -464,61 +549,122 @@
                 currentYear: ${timeStats.currentYear != null ? timeStats.currentYear : 2025}
             };
 
+            // Chart data
+            const chartLabels = [];
+            const chartData = [];
+            const chartColors = [];
+            
+            <c:forEach items="${categoryDistribution}" var="item">
+                chartLabels.push('${item.name}');
+                chartData.push(${item.productCount});
+                chartColors.push('hsl(' + Math.random() * 360 + ', 70%, 60%)');
+            </c:forEach>
+
+            // Create chart
+            if (chartLabels.length > 0) {
+                const ctx = document.getElementById('categoryChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            data: chartData,
+                            backgroundColor: chartColors,
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    padding: 15,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return label + ': ' + value + ' sản phẩm (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
             // Export to Excel function
             function exportToExcel() {
                 let csvContent = '\ufeff'; // BOM for UTF-8
 
                 // Add header
-                csvContent += 'Thống kê danh mục - Xuất ngày: ' + new Date().toLocaleDateString('vi-VN') + '\n\n';
+                csvContent += 'Thống kê danh mục loại sản phẩm - Xuất ngày: ' + new Date().toLocaleDateString('vi-VN') + '\n\n';
 
                 // Add main statistics
                 csvContent += 'THỐNG KÊ TỔNG QUAN\n';
-                csvContent += 'Tổng số danh mục,' + statsData.totalParents + '\n';
-                csvContent += 'Danh mục hoạt động,' + statsData.activeParents + '\n';
-                csvContent += 'Danh mục không hoạt động,' + statsData.inactiveParents + '\n';
-                csvContent += 'Danh mục có nhiều loại SP nhất,"' + statsData.topParentName + '",' + statsData.topParentChildCount + ' loại\n\n';
+                csvContent += 'Tổng số danh mục loại sản phẩm,' + statsData.totalCategories + '\n';
+                csvContent += 'Loại sản phẩm hoạt động,' + statsData.activeCategories + '\n';
+                csvContent += 'Loại sản phẩm ngừng kinh doanh,' + statsData.inactiveCategories + '\n';
+                csvContent += 'Loại SP có nhiều sản phẩm nhất,"' + statsData.topCategoryName + '",' + statsData.topCategoryProductCount + ' sản phẩm,"Thuộc: ' + statsData.topCategoryParentName + '"\n';
+                csvContent += 'Loại SP được thêm gần đây nhất,"' + statsData.mostRecentCategoryName + '","' + statsData.mostRecentCategoryDate + '"\n\n';
 
                 // Add time-based statistics
                 csvContent += 'THỐNG KÊ THEO THỜI GIAN\n';
                 csvContent += 'Tháng này,' + statsData.thisMonth + ',"' + statsData.thisMonthPeriod + '"\n';
                 csvContent += 'Quý này,' + statsData.thisQuarter + ',"' + statsData.thisQuarterPeriod + '"\n';
                 csvContent += '6 tháng gần nhất,' + statsData.lastSixMonths + ',"' + statsData.lastSixMonthsPeriod + '"\n';
-                csvContent += 'Năm nay,' + statsData.thisYear + ',Năm ' + statsData.currentYear + '\n';
+                csvContent += 'Năm nay,' + statsData.thisYear + ',Năm ' + statsData.currentYear + '\n\n';
+
+                // Add distribution data
+                if (chartLabels.length > 0) {
+                    csvContent += 'PHÂN BỐ SẢN PHẨM THEO LOẠI\n';
+                    csvContent += 'Loại sản phẩm,Số lượng sản phẩm\n';
+                    for (let i = 0; i < chartLabels.length; i++) {
+                        csvContent += '"' + chartLabels[i] + '",' + chartData[i] + '\n';
+                    }
+                }
 
                 // Create blob and download
                 const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
                 const link = document.createElement('a');
                 const url = URL.createObjectURL(blob);
                 link.setAttribute('href', url);
-                link.setAttribute('download', 'thong_ke_danh_muc_' + new Date().getTime() + '.csv');
+                link.setAttribute('download', 'thong_ke_loai_san_pham_' + new Date().getTime() + '.csv');
                 link.style.visibility = 'hidden';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
             }
 
-            // Export to PDF function
-            function exportToPDF() {
-                alert('Chức năng xuất PDF đang được phát triển. Bạn có thể sử dụng chức năng in (Ctrl+P) để lưu thành PDF.');
-                window.print();
-            }
-
             // Add print styles
             const printStyles = document.createElement('style');
             printStyles.textContent = `
-        @media print {
-            .header-user, .nav-buttons, .export-buttons, .layout-container > :first-child {
-                display: none !important;
-            }
-            .main-content {
-                margin: 0;
-                padding: 20px;
-            }
-            .time-stat-item {
-                page-break-inside: avoid;
-            }
-        }
-    `;
+                @media print {
+                    .header-user, .nav-buttons, .export-buttons, .layout-container > :first-child {
+                        display: none !important;
+                    }
+                    .main-content {
+                        margin: 0;
+                        padding: 20px;
+                    }
+                    .time-stat-item, .recent-item {
+                        page-break-inside: avoid;
+                    }
+                    .chart-wrapper {
+                        height: 400px !important;
+                    }
+                }
+            `;
             document.head.appendChild(printStyles);
         </script>
     </body>
