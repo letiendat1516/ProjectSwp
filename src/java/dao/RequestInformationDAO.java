@@ -10,10 +10,10 @@ import java.util.Date;
 
 public class RequestInformationDAO {
 
-    public String addRequestInformationIntoDB(int user_id, String role, Date day_request,
-            String status, String reason, String supplier, String address, String phone, String email) {
+    public String addRequestInformationIntoDB(String fullname, String role, Date day_request,
+            String status, String reason) {
 
-        String insertSql = "INSERT INTO request (id, user_id, role, day_request, status, reason, supplier, address, phone, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertSql = "INSERT INTO request (id, fullname, role, day_request, status, reason) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection con = Context.getJDBCConnection(); PreparedStatement insertStmt = con.prepareStatement(insertSql)) {
 
@@ -22,15 +22,11 @@ public class RequestInformationDAO {
             System.out.println("Generated ID: " + nextId);
 
             insertStmt.setString(1, nextId);
-            insertStmt.setInt(2, user_id);
+            insertStmt.setString(2, fullname);
             insertStmt.setString(3, role);
             insertStmt.setDate(4, new java.sql.Date(day_request.getTime()));
             insertStmt.setString(5, status);
             insertStmt.setString(6, reason);
-            insertStmt.setString(7, supplier);
-            insertStmt.setString(8, address);
-            insertStmt.setString(9, phone);
-            insertStmt.setString(10, email);
 
             int result = insertStmt.executeUpdate();
             System.out.println("Request insert result: " + result);
@@ -84,9 +80,9 @@ public class RequestInformationDAO {
                                                                         
     public boolean addItemsIntoDB(String request_id, String[] productNameArr,
             String[] productCodeArr, String[] unitArr, int[] quantityArr,
-            String[] noteArr, String reasonDetail) {
+            String[] noteArr) {
 
-        String sql = "INSERT INTO request_items (request_id, product_name, product_code, unit, quantity, note, reason_detail) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO request_items (request_id, product_name, product_code, unit, quantity, note) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection con = Context.getJDBCConnection(); PreparedStatement stmt = con.prepareStatement(sql)) {
 
@@ -107,7 +103,6 @@ public class RequestInformationDAO {
                 stmt.setString(4, unitArr[i]);
                 stmt.setInt(5, quantityArr[i]); // ✅ Dùng setDouble thay vì setInt
                 stmt.setString(6, noteArr[i]);
-                stmt.setString(7, reasonDetail);
 
                 System.out.println("Inserting item " + (i + 1) + ": " + productNameArr[i]
                         + " - Code: " + productCodeArr[i] + " - Qty: " + quantityArr[i]);
