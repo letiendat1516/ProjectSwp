@@ -345,6 +345,28 @@ public class CategoryProductDAO {
         return categories;
     }
 
+    // Get potential parent categories (root categories + categories that have children)
+    public List<CategoryProduct> getPotentialParentCategories() {
+        List<CategoryProduct> categories = new ArrayList<>();
+        String sql = "SELECT DISTINCT c.id, c.name, c.parent_id, c.active_flag, c.create_date, c.update_date "
+                + "FROM category c "
+                + "WHERE c.active_flag = 1 AND ("
+                + "    c.parent_id IS NULL OR "  // Root categories
+                + "    EXISTS (SELECT 1 FROM category child WHERE child.parent_id = c.id)"  // Categories with children
+                + ") ORDER BY c.name";
+
+        try (Connection conn = new Context().getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                categories.add(mapResultSetToCategory(rs, false));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return categories;
+    }
+
     // Get categories by parent ID
     public List<CategoryProduct> getCategoriesByParentId(Integer parentId) {
         List<CategoryProduct> categories = new ArrayList<>();
