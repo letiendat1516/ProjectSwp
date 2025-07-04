@@ -143,6 +143,12 @@
         <servlet-name>CategoryParentStatisticsController</servlet-name>
         <servlet-class>controller.CategoryParentStatisticsController</servlet-class>
     </servlet>
+    
+    <!-- Category Statistics Servlet - THÊM MỚI -->
+    <servlet>
+        <servlet-name>CategoryStatisticsController</servlet-name>
+        <servlet-class>controller.CategoryStatisticsController</servlet-class>
+    </servlet>
     <!-- ========== SERVLET MAPPINGS ========== -->
     <!-- Category Mapping -->
 
@@ -285,6 +291,13 @@
         <servlet-name>CategoryParentStatisticsController</servlet-name>
         <url-pattern>/category-parent/statistics</url-pattern>
     </servlet-mapping>
+    
+    <!-- Category Statistics Mapping - THÊM MỚI -->
+    <servlet-mapping>
+        <servlet-name>CategoryStatisticsController</servlet-name>
+        <url-pattern>/category/statistics</url-pattern>
+    </servlet-mapping>
+
     <!-- ========== FILTERS ========== -->
     <!-- UTF-8 Encoding Filter -->
     <filter>
