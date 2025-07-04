@@ -98,8 +98,8 @@ public class CategoryProductController extends HttpServlet {
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Get list of all active categories for parent dropdown
-        List<CategoryProduct> allCategories = categoryDAO.getAllCategoriesForDropdown();
+        // Get list of potential parent categories for parent dropdown
+        List<CategoryProduct> allCategories = categoryDAO.getPotentialParentCategories();
         
         request.setAttribute("allCategories", allCategories);
 
@@ -189,8 +189,8 @@ public class CategoryProductController extends HttpServlet {
                 return;
             }
 
-            // 3. Get list of all categories for parent dropdown (excluding current category)
-            List<CategoryProduct> allCategories = categoryDAO.getAllCategoriesForDropdown();
+            // 3. Get list of potential parent categories for parent dropdown (excluding current category)
+            List<CategoryProduct> allCategories = categoryDAO.getPotentialParentCategories();
             // Remove current category and its children from list to prevent circular reference
             allCategories.removeIf(cat -> cat.getId() == id);
             
