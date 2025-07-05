@@ -3,6 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/RequoteForm.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/RequoteFormServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/PurchaseOrderForm.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/SubmitPurchaseOrderServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/PurchaseOrderFormServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/SubmitRequoteFormServlet.java</file>
+=======
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/include/sidebar.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/categoriesforward.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/CategoryProductController.java</file>
@@ -32,6 +40,7 @@
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/StatisticSupplierEvaluation.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/SupplierDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/SupplierEvaluationDAO.java</file>
+>>>>>>> adca7e8c1f43e062770085aab7baed94b3b0fbf9
         </group>
     </open-files>
 </project-private>
