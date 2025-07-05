@@ -8,6 +8,7 @@
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/CategoryProductController.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/Department_list.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/model/Department.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/DepartmentStatisticDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/CategoryStatisticsController.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/DepartmentDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category-statistics.jsp</file>
@@ -21,10 +22,12 @@
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/DBContext/Context.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/Department_create.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category_product/list.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/Department_statistics.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/Department_edit.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/CategoryStatisticsDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/StatisticSupplierEvaluation.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ApprovePurchaseRequestServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/DepartmentStatisticsController.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/WEB-INF/web.xml</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/StatisticSupplierEvaluation.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/SupplierDAO.java</file>

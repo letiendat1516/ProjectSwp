@@ -615,9 +615,8 @@
                 csvContent += 'Tổng số danh mục loại sản phẩm,' + statsData.totalCategories + '\n';
                 csvContent += 'Loại sản phẩm hoạt động,' + statsData.activeCategories + '\n';
                 csvContent += 'Loại sản phẩm ngừng kinh doanh,' + statsData.inactiveCategories + '\n';
-                csvContent += 'Loại SP có nhiều sản phẩm nhất,"' + statsData.topCategoryName + '",' + statsData.topCategoryProductCount + ' sản phẩm,"Thuộc: ' + statsData.topCategoryParentName + '"\n';
-                csvContent += 'Loại SP được thêm gần đây nhất,"' + statsData.mostRecentCategoryName + '","' + statsData.mostRecentCategoryDate + '"\n\n';
-
+                csvContent += 'Loại SP có nhiều sản phẩm nhất,"' + statsData.topCategoryName + '",' + statsData.topCategoryProductCount + ' sản phẩm \n';
+               
                 // Add time-based statistics
                 csvContent += 'THỐNG KÊ THEO THỜI GIAN\n';
                 csvContent += 'Tháng này,' + statsData.thisMonth + ',"' + statsData.thisMonthPeriod + '"\n';
