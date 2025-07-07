@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.mindrot.jbcrypt.BCrypt;
 import java.util.List;
 import model.Users;
 
@@ -48,6 +49,8 @@ public class AdduserServlet extends HttpServlet {
 
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        
         String fullname = request.getParameter("fullname");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
@@ -57,7 +60,8 @@ public class AdduserServlet extends HttpServlet {
 
         Users user = new Users();
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(hashedPassword);
+
         user.setFullname(fullname);
         user.setEmail(email);
         user.setPhone(phone);
@@ -69,7 +73,7 @@ public class AdduserServlet extends HttpServlet {
                 dob = java.sql.Date.valueOf(dobStr); // Format: yyyy-MM-dd
             }
         } catch (IllegalArgumentException e) {
-            request.setAttribute("error", "Date of Birth is invalid!");
+            request.setAttribute("error", "Ngày sinh không hợp lệ!");
             request.getRequestDispatcher("AddUser.jsp").forward(request, response);
             return;
         }
@@ -91,10 +95,11 @@ public class AdduserServlet extends HttpServlet {
         try {
             UserDAO userDAO = new UserDAO();
             userDAO.addUser(user, roleId);
-            request.setAttribute("message", "User added successfully!");
-            response.sendRedirect("addser");
+            HttpSession session = request.getSession();
+            session.setAttribute("message", "Thêm người dùng thành công!");
+            response.sendRedirect("AddUser.jsp");
         } catch (Exception e) {
-            request.setAttribute("error", "Failed to add user: " + e.getMessage());
+            request.setAttribute("error", "Không thể thêm người dùng");
             request.getRequestDispatcher("AddUser.jsp").forward(request, response);
         }
     }

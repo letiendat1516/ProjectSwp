@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Users;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
@@ -79,16 +80,28 @@ public class EdituserServlet extends HttpServlet {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             String username = request.getParameter("username");
+            String password = request.getParameter("password");
             String fullname = request.getParameter("fullname");
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
             String dobStr = request.getParameter("dob");
             int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
             int roleId = Integer.parseInt(request.getParameter("role"));
+            String hashedPassword;
+
+            UserDAO userDAO = new UserDAO();
+            if (password != null && !password.trim().isEmpty()) {
+                hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+            } else {
+                // Không đổi mật khẩu, giữ mật khẩu cũ
+                Users userOld = userDAO.getUserById(id);
+                hashedPassword = userOld.getPassword();
+            }
 
             Users user = new Users();
             user.setId(id);
             user.setUsername(username);
+            user.setPassword(hashedPassword);
             user.setFullname(fullname);
             user.setEmail(email);
             user.setPhone(phone);
@@ -100,9 +113,7 @@ public class EdituserServlet extends HttpServlet {
                     dob = java.sql.Date.valueOf(dobStr);
                 }
             } catch (IllegalArgumentException e) {
-                request.setAttribute("error", "Date of Birth is invalid!");
-
-                UserDAO userDAO = new UserDAO();
+                request.setAttribute("error", "Ngày sinh không hợp lệ!");
                 user = userDAO.getUserById(id);
                 request.setAttribute("editUser", user);
                 request.getRequestDispatcher("EditUser.jsp").forward(request, response);
@@ -118,7 +129,6 @@ public class EdituserServlet extends HttpServlet {
 
                 if (age < 18 || age > 60) {
                     request.setAttribute("error", "Tuổi người dùng phải từ 18 đến 60!");
-                    UserDAO userDAO = new UserDAO();
                     Users userOld = userDAO.getUserById(id);
                     request.setAttribute("editUser", userOld);
                     request.getRequestDispatcher("EditUser.jsp").forward(request, response);
@@ -127,14 +137,13 @@ public class EdituserServlet extends HttpServlet {
             }
             user.setActiveFlag(activeFlag);
 
-            UserDAO userDAO = new UserDAO();
             userDAO.updateUser(user, roleId);
 
             HttpSession session = request.getSession();
-            session.setAttribute("message", "User updated successfully!");
+            session.setAttribute("message", "Cập nhật người dùng thành công!");
             response.sendRedirect("usermanager");
         } catch (Exception e) {
-            request.setAttribute("error", "Error updating user: " + e.getMessage());
+            request.setAttribute("error", "Không thể cập nhật người dùng!");
             try {
                 int id = Integer.parseInt(request.getParameter("id"));
                 UserDAO userDAO = new UserDAO();

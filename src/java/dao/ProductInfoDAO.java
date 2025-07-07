@@ -214,60 +214,138 @@ public class ProductInfoDAO {
    */
   //Thêm product mới
   public boolean addProduct(ProductInfo product, int createdBy) {
-      String sql = "INSERT INTO product_info (name, code, cate_id, unit_id, price, status, description, " +
-                  "supplier_id, expiration_date, additional_notes, created_by) " +
-                  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      String productSql = "INSERT INTO product_info (name, code, cate_id, unit_id, price, status, description, " +
+                         "supplier_id, expiration_date, additional_notes, created_by) " +
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      
+      String stockSql = "INSERT INTO product_in_stock (product_id, qty, status) VALUES (?, ?, 'active')";
       
       System.out.println("DEBUG: Starting addProduct method");
       System.out.println("DEBUG: Product data - Name: " + product.getName() + ", Code: " + product.getCode());
       System.out.println("DEBUG: Category ID: " + product.getCate_id() + ", Unit ID: " + product.getUnit_id());
       System.out.println("DEBUG: Price: " + product.getPrice() + ", Status: " + product.getStatus());
+      System.out.println("DEBUG: Initial Stock Quantity: " + (product.getStockQuantity() != null ? product.getStockQuantity() : "0"));
       
-      try (Connection con = Context.getJDBCConnection(); 
-           PreparedStatement stmt = con.prepareStatement(sql)) {
-          
+      Connection con = null;
+      try {
+          con = Context.getJDBCConnection();
           if (con == null) {
               System.err.println("ERROR: Database connection is null!");
               return false;
           }
           
-          System.out.println("DEBUG: Database connection successful");
+          // Start transaction
+          con.setAutoCommit(false);
+          System.out.println("DEBUG: Database connection successful, transaction started");
           
-          stmt.setString(1, product.getName());
-          stmt.setString(2, product.getCode());
-          stmt.setInt(3, product.getCate_id());
-          stmt.setInt(4, product.getUnit_id());
-          stmt.setBigDecimal(5, product.getPrice());
-          stmt.setString(6, product.getStatus());
-          stmt.setString(7, product.getDescription());
+          int productId = -1;
           
-          // Handle supplier_id - set to null if 0 or not provided
-          if (product.getSupplierId() > 0) {
-              stmt.setInt(8, product.getSupplierId());
-          } else {
-              stmt.setNull(8, java.sql.Types.INTEGER);
+          // Insert into product_info table
+          try (PreparedStatement productStmt = con.prepareStatement(productSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+              productStmt.setString(1, product.getName());
+              productStmt.setString(2, product.getCode());
+              productStmt.setInt(3, product.getCate_id());
+              productStmt.setInt(4, product.getUnit_id());
+              productStmt.setBigDecimal(5, product.getPrice());
+              productStmt.setString(6, product.getStatus());
+              productStmt.setString(7, product.getDescription());
+              
+              // Handle supplier_id - set to null if 0 or not provided
+              if (product.getSupplierId() > 0) {
+                  productStmt.setInt(8, product.getSupplierId());
+              } else {
+                  productStmt.setNull(8, java.sql.Types.INTEGER);
+              }
+              
+              productStmt.setDate(9, product.getExpirationDate());
+              productStmt.setString(10, product.getAdditionalNotes());
+              productStmt.setInt(11, createdBy);
+              
+              System.out.println("DEBUG: Executing product insert query");
+              int rowsAffected = productStmt.executeUpdate();
+              
+              if (rowsAffected > 0) {
+                  // Get the generated product ID
+                  try (ResultSet generatedKeys = productStmt.getGeneratedKeys()) {
+                      if (generatedKeys.next()) {
+                          productId = generatedKeys.getInt(1);
+                          System.out.println("DEBUG: Product inserted successfully with ID: " + productId);
+                      } else {
+                          throw new SQLException("Failed to get generated product ID");
+                      }
+                  }
+              } else {
+                  throw new SQLException("Product insert failed, no rows affected");
+              }
           }
           
-          stmt.setDate(9, product.getExpirationDate());
-          stmt.setString(10, product.getAdditionalNotes());
-          stmt.setInt(11, createdBy);
+          // Insert initial stock record
+          try (PreparedStatement stockStmt = con.prepareStatement(stockSql)) {
+              stockStmt.setInt(1, productId);
+              
+              // Set initial stock quantity (default to 0 if not provided)
+              BigDecimal initialStock = product.getStockQuantity();
+              if (initialStock == null) {
+                  initialStock = BigDecimal.ZERO;
+              }
+              stockStmt.setBigDecimal(2, initialStock);
+              
+              System.out.println("DEBUG: Executing stock insert query for product ID: " + productId + " with quantity: " + initialStock);
+              int stockRowsAffected = stockStmt.executeUpdate();
+              
+              if (stockRowsAffected > 0) {
+                  System.out.println("DEBUG: Stock record inserted successfully");
+              } else {
+                  throw new SQLException("Stock insert failed, no rows affected");
+              }
+          }
           
-          System.out.println("DEBUG: All parameters set, executing query");
-          int rowsAffected = stmt.executeUpdate();
-          System.out.println("DEBUG: Query executed, rows affected: " + rowsAffected);
+          // Commit transaction
+          con.commit();
+          System.out.println("DEBUG: Transaction committed successfully");
           
-          return rowsAffected > 0;
+          return true;
           
       } catch (SQLException e) {
           System.err.println("ERROR: SQL Exception in addProduct: " + e.getMessage());
           System.err.println("ERROR: SQL State: " + e.getSQLState());
           System.err.println("ERROR: Error Code: " + e.getErrorCode());
           e.printStackTrace();
+          
+          // Rollback transaction on error
+          if (con != null) {
+              try {
+                  con.rollback();
+                  System.out.println("DEBUG: Transaction rolled back due to error");
+              } catch (SQLException rollbackEx) {
+                  System.err.println("ERROR: Failed to rollback transaction: " + rollbackEx.getMessage());
+              }
+          }
           return false;
       } catch (Exception e) {
           System.err.println("ERROR: General Exception in addProduct: " + e.getMessage());
           e.printStackTrace();
+          
+          // Rollback transaction on error
+          if (con != null) {
+              try {
+                  con.rollback();
+                  System.out.println("DEBUG: Transaction rolled back due to error");
+              } catch (SQLException rollbackEx) {
+                  System.err.println("ERROR: Failed to rollback transaction: " + rollbackEx.getMessage());
+              }
+          }
           return false;
+      } finally {
+          // Restore auto-commit and close connection
+          if (con != null) {
+              try {
+                  con.setAutoCommit(true);
+                  con.close();
+              } catch (SQLException e) {
+                  System.err.println("ERROR: Failed to restore auto-commit or close connection: " + e.getMessage());
+              }
+          }
       }
   }
   

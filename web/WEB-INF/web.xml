@@ -1,21 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
     <!-- ========== SERVLET DEFINITIONS ========== -->
-    <!-- Category Servlet -->
-    <servlet>
-    <servlet-name>TestPermissionServlet</servlet-name>
-    <servlet-class>controller.TestPermissionServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>TestPermissionServlet</servlet-name>
-    <url-pattern>/test-permission</url-pattern>
-</servlet-mapping>
-
-    
-    <servlet>
-        <servlet-name>CategoryServlet</servlet-name>
-        <servlet-class>controller.CategoryServlet</servlet-class>
-    </servlet>
     <!-- Authentication Servlets -->
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
@@ -60,11 +45,12 @@
         <servlet-name>RolePermissionServlet</servlet-name>
         <servlet-class>controller.RolePermissionServlet</servlet-class>
     </servlet>
+
+    <!--Authorization Filter -->
     <filter>
         <filter-name>AuthorizationFilter</filter-name>
         <filter-class>controller.AuthorizationFilter</filter-class>
     </filter>
-
     <!-- Profile Management Servlets -->
     <servlet>
         <servlet-name>ProfileServlet</servlet-name>
@@ -82,6 +68,10 @@
     <servlet>
         <servlet-name>PasswordRequestServlet</servlet-name>
         <servlet-class>controller.PasswordRequestServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ResetUserPasswordServlet</servlet-name>
+        <servlet-class>controller.ResetUserPasswordServlet</servlet-class>
     </servlet>
     <!-- Material Unit Management Servlets -->
     <servlet>
@@ -139,13 +129,29 @@
         <servlet-name>SubmitPurchaseOrderServlet</servlet-name>
         <servlet-class>controller.SubmitPurchaseOrderServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ApprovePurchaseQuotedServlet</servlet-name>
+        <servlet-class>controller.ApprovePurchaseQuotedServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RequoteFormServlet</servlet-name>
+        <servlet-class>controller.RequoteFormServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SubmitRequoteFormServlet</servlet-name>
+        <servlet-class>controller.SubmitRequoteFormServlet</servlet-class>
+    </servlet>
+    <!-- Category Parent Statistics Servlet -->
+    <servlet>
+        <servlet-name>CategoryParentStatisticsController</servlet-name>
+        <servlet-class>controller.CategoryParentStatisticsController</servlet-class>
+    </servlet>
+    <!-- Category Statistics Servlet -->
+    <servlet>
+        <servlet-name>CategoryStatisticsController</servlet-name>
+        <servlet-class>controller.CategoryStatisticsController</servlet-class>
+    </servlet>
     <!-- ========== SERVLET MAPPINGS ========== -->
-    <!-- Category Mapping -->
-    <servlet-mapping>
-        <servlet-name>CategoryServlet</servlet-name>
-        <url-pattern>/CategoryServlet</url-pattern>
-    </servlet-mapping>
-    <!-- Authentication Mappings -->
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -154,7 +160,6 @@
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
-    <!-- User Management Mappings -->
     <servlet-mapping>
         <servlet-name>AdduserServlet</servlet-name>
         <url-pattern>/adduser</url-pattern>
@@ -171,7 +176,6 @@
         <servlet-name>UserFilterServlet</servlet-name>
         <url-pattern>/userfilter</url-pattern>
     </servlet-mapping>
-    <!-- Request Management Mappings -->
     <servlet-mapping>
         <servlet-name>LoadingRequestServlet</servlet-name>
         <url-pattern>/loadingrequest</url-pattern>
@@ -184,50 +188,10 @@
         <servlet-name>ImportConfirmController</servlet-name>
         <url-pattern>/import-confirm</url-pattern>
     </servlet-mapping>
-    <!-- Role Management Mapping -->
     <servlet-mapping>
         <servlet-name>RolePermissionServlet</servlet-name>
         <url-pattern>/role-permission</url-pattern>
     </servlet-mapping>
-    <filter-mapping>
-        <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/usermanager</url-pattern>
-        <url-pattern>/adduser</url-pattern>
-        <url-pattern>/edituser</url-pattern>
-        <url-pattern>/userfilter</url-pattern>
-        <url-pattern>/role-permission</url-pattern>
-        <url-pattern>/CategoryServlet</url-pattern>
-        <url-pattern>/addcategory</url-pattern>
-        <url-pattern>/editcategory</url-pattern>
-        <url-pattern>/deletecategory</url-pattern>
-        <url-pattern>/loadingrequest</url-pattern>
-        <url-pattern>/import</url-pattern>
-        <url-pattern>/import-confirm</url-pattern>
-        <url-pattern>/exportRequest</url-pattern>
-        <url-pattern>/add-product</url-pattern>
-        <url-pattern>/update-product</url-pattern>
-        <url-pattern>/delete-product</url-pattern>
-        <url-pattern>/product-list</url-pattern>
-        <url-pattern>/material_unit/materialUnit</url-pattern>
-        <url-pattern>/material_unit/createMaterialUnit</url-pattern>
-        <url-pattern>/material_unit/editMaterialUnit</url-pattern>
-        <url-pattern>/material_unit/deleteMaterialUnit</url-pattern>
-        <url-pattern>/approvepurchaserequest</url-pattern>
-        <url-pattern>/listpurchaseorder</url-pattern>
-        <url-pattern>/purchaseorderform</url-pattern>
-        <url-pattern>/submitpurchaseorder</url-pattern>
-        <url-pattern>/approvepurchasequoted</url-pattern>
-        <url-pattern>/requoteform</url-pattern>
-        <url-pattern>/submitrequoteform</url-pattern>
-        <url-pattern>/suppliers</url-pattern>
-        <url-pattern>/addsupplier</url-pattern>
-        <url-pattern>/editsupplier</url-pattern>
-        <url-pattern>/evaluateSupplier</url-pattern>passwordrequest
-        <url-pattern>/passwordrequest</url-pattern>
-
-        <!-- ... Thêm các chức năng cần bảo vệ -->
-    </filter-mapping>
-    <!-- Profile Management Mappings -->
     <servlet-mapping>
         <servlet-name>ProfileServlet</servlet-name>
         <url-pattern>/profile</url-pattern>
@@ -236,7 +200,6 @@
         <servlet-name>EditProfileServlet</servlet-name>
         <url-pattern>/editprofile</url-pattern>
     </servlet-mapping>
-    <!-- Reset Password Mappings -->
     <servlet-mapping>
         <servlet-name>ForgotPasswordServlet</servlet-name>
         <url-pattern>/forgotpassword</url-pattern>
@@ -245,7 +208,10 @@
         <servlet-name>PasswordRequestServlet</servlet-name>
         <url-pattern>/passwordrequest</url-pattern>
     </servlet-mapping>
-    <!-- Material Unit Management Mappings -->
+    <servlet-mapping>
+        <servlet-name>ResetUserPasswordServlet</servlet-name>
+        <url-pattern>/reset-user-password</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>MaterialUnitServlet</servlet-name>
         <url-pattern>/material_unit/materialUnit</url-pattern>
@@ -262,12 +228,10 @@
         <servlet-name>DeleteMaterialUnitServlet</servlet-name>
         <url-pattern>/material_unit/deleteMaterialUnit</url-pattern>
     </servlet-mapping>
-    <!-- Export Request Mapping -->
     <servlet-mapping>
         <servlet-name>ExportRequestController</servlet-name>
         <url-pattern>/exportRequest</url-pattern>
     </servlet-mapping>
-    <!-- Product Management Mappings -->
     <servlet-mapping>
         <servlet-name>AddProductController</servlet-name>
         <url-pattern>/add-product</url-pattern>
@@ -284,7 +248,6 @@
         <servlet-name>ProductListController</servlet-name>
         <url-pattern>/product-list</url-pattern>
     </servlet-mapping>
-    <!-- Purchase Order Mappings -->
     <servlet-mapping>
         <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
         <url-pattern>/approvepurchaserequest</url-pattern>
@@ -301,32 +264,27 @@
         <servlet-name>SubmitPurchaseOrderServlet</servlet-name>
         <url-pattern>/submitpurchaseorder</url-pattern>
     </servlet-mapping>
-    <servlet>
-        <servlet-name>ApprovePurchaseQuotedServlet</servlet-name>
-        <servlet-class>controller.ApprovePurchaseQuotedServlet</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>ApprovePurchaseQuotedServlet</servlet-name>
         <url-pattern>/approvepurchasequoted</url-pattern>
     </servlet-mapping>
-    <servlet>
-        <servlet-name>RequoteFormServlet</servlet-name>
-        <servlet-class>controller.RequoteFormServlet</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>RequoteFormServlet</servlet-name>
         <url-pattern>/requoteform</url-pattern>
     </servlet-mapping>
-    <servlet>
-        <servlet-name>SubmitRequoteFormServlet</servlet-name>
-        <servlet-class>controller.SubmitRequoteFormServlet</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>SubmitRequoteFormServlet</servlet-name>
         <url-pattern>/submitrequoteform</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CategoryParentStatisticsController</servlet-name>
+        <url-pattern>/category-parent/statistics</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CategoryStatisticsController</servlet-name>
+        <url-pattern>/category/statistics</url-pattern>
+    </servlet-mapping>
     <!-- ========== FILTERS ========== -->
-    <!-- UTF-8 Encoding Filter -->
     <filter>
         <filter-name>encodingFilter</filter-name>
         <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
@@ -343,8 +301,81 @@
         <filter-name>encodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthorizationFilter</filter-name>
+        <url-pattern>/Admin.jsp</url-pattern>
+        <url-pattern>/usermanager</url-pattern>
+        <url-pattern>/UserManager.jsp</url-pattern>
+        <url-pattern>/adduser</url-pattern>
+        <url-pattern>/AddUser.jsp</url-pattern>
+        <url-pattern>/edituser</url-pattern>
+        <url-pattern>/EditUser.jsp</url-pattern>
+        <url-pattern>/role-permission</url-pattern>
+        <url-pattern>/permission.jsp</url-pattern>
+        <url-pattern>/profile</url-pattern>
+        <url-pattern>/Profile.jsp</url-pattern>
+        <url-pattern>/editprofile</url-pattern>
+        <url-pattern>/EditProfile.jsp</url-pattern>
+        <url-pattern>/categoriesforward.jsp</url-pattern>
+        <url-pattern>/category_product/list.jsp</url-pattern>
+        <url-pattern>/category/list</url-pattern>
+        <url-pattern>/category_product/create.jsp</url-pattern>
+        <url-pattern>/category/create</url-pattern>
+        <url-pattern>/category_product/edit.jsp</url-pattern>
+        <url-pattern>/category/edit</url-pattern>
+        <url-pattern>/LishSupplier.jsp</url-pattern>
+        <url-pattern>/LishSupplier</url-pattern>
+        <url-pattern>/AddNewSupplier.jsp</url-pattern>
+        <url-pattern>/AddNewSupplier</url-pattern>
+        <url-pattern>/UpdateSupplier.jsp</url-pattern>
+        <url-pattern>/UpdateSupplier</url-pattern>
+        <url-pattern>/DeleteSupplier.jsp</url-pattern>
+        <url-pattern>/DeleteSupplier</url-pattern>
+        <url-pattern>/SupplierEvaluation.jsp</url-pattern>
+        <url-pattern>/TableSupplierEvaluation</url-pattern>
+        <url-pattern>/ViewSupplierEvaluation.jsp</url-pattern>
+        <url-pattern>/ViewSupplierEvaluation</url-pattern>
+        <url-pattern>/StatisticSupplierEvaluation.jsp</url-pattern>
+        <url-pattern>/StatisticSupplierEvaluation</url-pattern>
+        <url-pattern>/Department_list.jsp</url-pattern>
+        <url-pattern>/department/list</url-pattern>
+        <url-pattern>/Department_create.jsp</url-pattern>
+        <url-pattern>/department/create</url-pattern>
+        <url-pattern>/Department_edit.jsp</url-pattern>
+        <url-pattern>/department/edit</url-pattern>
+        <url-pattern>/Department_detail.jsp</url-pattern>
+        <url-pattern>/department/detail</url-pattern>
+        <url-pattern>/Department_list.jsp</url-pattern>
+        <url-pattern>/department/statistics</url-pattern>
+        <url-pattern>/material_unit/materialUnit.jsp</url-pattern>
+        <url-pattern>/material_unit/materialUnit</url-pattern>
+        <url-pattern>/material_unit/createMaterialUnit.jsp</url-pattern>
+        <url-pattern>/material_unit/createMaterialUnit</url-pattern>
+        <url-pattern>/material_unit/editMaterialUnit.jsp</url-pattern>
+        <url-pattern>/material_unit/editMaterialUnit</url-pattern>
+        <url-pattern>/material_unit/deleteMaterialUnit</url-pattern>
+        <url-pattern>/product-list.jsp</url-pattern>
+        <url-pattern>/product-list</url-pattern>
+        <url-pattern>/add-product.jsp</url-pattern>
+        <url-pattern>/add-product</url-pattern>
+        <url-pattern>/update-product.jsp</url-pattern>
+        <url-pattern>/update-product</url-pattern>
+        <url-pattern>/deleted-products.jsp</url-pattern>
+        <url-pattern>/deleted-products</url-pattern>
+        <url-pattern>/recover-product</url-pattern>
+        <url-pattern>/ItemsSupplyRequestForm.jsp</url-pattern>
+        <url-pattern>/loadingrequest</url-pattern>
+        <url-pattern>/ListRequestImport.jsp</url-pattern>
+        <url-pattern>/import</url-pattern>
+        <url-pattern>/ExportRequest.jsp</url-pattern>
+        <url-pattern>/exportRequest</url-pattern>
+        <url-pattern>/ListPurchaseOrder.jsp</url-pattern>
+        <url-pattern>/listpurchaseorder</url-pattern>
+        <url-pattern>/password_request.jsp</url-pattern>
+        <url-pattern>/passwordrequest</url-pattern>
+        <!-- ... Thêm các chức năng cần bảo vệ -->
+    </filter-mapping>
     <!-- ========== SESSION CONFIGURATION ========== -->
-    <!-- Session Configuration -->
     <session-config>
         <session-timeout>15</session-timeout>
         <!-- 15 phút -->

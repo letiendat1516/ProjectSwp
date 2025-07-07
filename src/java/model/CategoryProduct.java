@@ -1,96 +1,105 @@
 package model;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class CategoryProduct {
-  private int id;
-  private String name;
-  private Integer parentId;
-  private boolean activeFlag;
-  private Timestamp createdAt;
-  private Timestamp updatedAt;
-  
-  // ✅ THÊM FIELD MỚI cho tên danh mục cha
-  private String parentName;
+    private int id;
+    private String name;
+    private Integer parentId;
+    private boolean activeFlag;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    
+    // Field cho tên danh mục cha
+    private String parentName;
 
-  // Constructors
-  public CategoryProduct() {}
+    // Constructors
+    public CategoryProduct() {}
 
-  public CategoryProduct(int id, String name, Integer parentId, boolean activeFlag) {
-      this.id = id;
-      this.name = name;
-      this.parentId = parentId;
-      this.activeFlag = activeFlag;
-  }
+    public CategoryProduct(int id, String name, Integer parentId, boolean activeFlag) {
+        this.id = id;
+        this.name = name;
+        this.parentId = parentId;
+        this.activeFlag = activeFlag;
+    }
 
-  // Getters and Setters
-  public int getId() {
-      return id;
-  }
+    public CategoryProduct(int id, String name, Integer parentId, boolean activeFlag, 
+                          LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.name = name;
+        this.parentId = parentId;
+        this.activeFlag = activeFlag;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 
-  public void setId(int id) {
-      this.id = id;
-  }
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
 
-  public String getName() {
-      return name;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public void setName(String name) {
-      this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public Integer getParentId() {
-      return parentId;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setParentId(Integer parentId) {
-      this.parentId = parentId;
-  }
+    public Integer getParentId() {
+        return parentId;
+    }
 
-  public boolean isActiveFlag() {
-      return activeFlag;
-  }
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
+    }
 
-  public void setActiveFlag(boolean activeFlag) {
-      this.activeFlag = activeFlag;
-  }
+    public boolean isActiveFlag() {
+        return activeFlag;
+    }
 
-  public Timestamp getCreatedAt() {
-      return createdAt;
-  }
+    public void setActiveFlag(boolean activeFlag) {
+        this.activeFlag = activeFlag;
+    }
 
-  public void setCreatedAt(Timestamp createdAt) {
-      this.createdAt = createdAt;
-  }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-  public Timestamp getUpdatedAt() {
-      return updatedAt;
-  }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
-  public void setUpdatedAt(Timestamp updatedAt) {
-      this.updatedAt = updatedAt;
-  }
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 
-  // ✅ GETTER/SETTER MỚI cho parentName
-  public String getParentName() {
-      return parentName;
-  }
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
-  public void setParentName(String parentName) {
-      this.parentName = parentName;
-  }
+    public String getParentName() {
+        return parentName;
+    }
 
-  @Override
-  public String toString() {
-      return "CategoryProduct{" +
-              "id=" + id +
-              ", name='" + name + '\'' +
-              ", parentId=" + parentId +
-              ", parentName='" + parentName + '\'' +
-              ", activeFlag=" + activeFlag +
-              ", createdAt=" + createdAt +
-              ", updatedAt=" + updatedAt +
-              '}';
-  }
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
+    }
+
+    @Override
+    public String toString() {
+        return "CategoryProduct{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", parentId=" + parentId +
+                ", parentName='" + parentName + '\'' +
+                ", activeFlag=" + activeFlag +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

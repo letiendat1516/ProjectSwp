@@ -189,7 +189,7 @@
         
         <div class="button-group">
             <a href="product-list" class="btn btn-success">
-                📋 Quay lại danh sách sản phẩ m
+                📋 Quay lại danh sách sản phẩm
             </a>
         </div>
     </div>

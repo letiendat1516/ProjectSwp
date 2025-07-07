@@ -10,7 +10,7 @@
 <%@page import="model.Users"%>
 <%
     Users user = (Users) session.getAttribute("user");
-    if (user == null || !"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName())) {
+    if (user == null) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -341,7 +341,7 @@
                     <h1 class="page-title">Quản lí đơn vị vật tư</h1>
                     <div class="header-user">
                         <label class="label"><%= user.getFullname()%></label>
-                        <a href="logout" class="logout-btn">Đăng xuất</a>
+                        <a href="../logout" class="logout-btn">Đăng xuất</a>
                     </div>
                 </div>
         

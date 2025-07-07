@@ -74,6 +74,28 @@
                 cursor: not-allowed;
             }
 
+            /* Validation styles */
+            .error {
+                border-color: #dc3545 !important;
+                background-color: #fff5f5;
+            }
+
+            .error-message {
+                color: #dc3545;
+                font-size: 12px;
+                margin-top: 5px;
+                display: none;
+            }
+
+            .error-message.show {
+                display: block;
+            }
+
+            .valid {
+                border-color: #28a745 !important;
+                background-color: #f8fff8;
+            }
+
             .information-user {
                 display: flex;
                 flex-wrap: wrap;
@@ -322,11 +344,13 @@
                             </div>
                             <div class="form-group">
                                 <label>Điện thoại người nhận</label>
-                                <textarea rows="1" name="recipient_phone" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                                <textarea rows="1" name="recipient_phone" id="recipient_phone" style="width: 100%; resize: none;overflow: hidden;" oninput="validatePhone(this)" required></textarea>
+                                <div class="error-message" id="phone_error">Số điện thoại phải có 10-11 chữ số</div>
                             </div>
                             <div class="form-group">
                                 <label>Email người nhận</label>
-                                <textarea rows="1" name="recipient_email" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
+                                <textarea rows="1" name="recipient_email" id="recipient_email" style="width: 100%; resize: none;overflow: hidden;" oninput="validateEmail(this)" required></textarea>
+                                <div class="error-message" id="email_error">Email không đúng định dạng</div>
                             </div>
                         </div>
                     </div>
@@ -409,6 +433,88 @@
                 }
 
                 input.value = value;
+            }
+
+            // Validate số điện thoại (10-11 số)
+            function validatePhone(input) {
+                autoResize(input);
+                const phoneValue = input.value.trim();
+                const phoneRegex = /^[0-9]{10,11}$/;
+                const errorElement = document.getElementById('phone_error');
+                
+                if (phoneValue === '') {
+                    input.classList.remove('error', 'valid');
+                    errorElement.classList.remove('show');
+                    return;
+                }
+                
+                if (phoneRegex.test(phoneValue)) {
+                    input.classList.remove('error');
+                    input.classList.add('valid');
+                    errorElement.classList.remove('show');
+                } else {
+                    input.classList.remove('valid');
+                    input.classList.add('error');
+                    errorElement.classList.add('show');
+                }
+            }
+
+            // Validate email
+            function validateEmail(input) {
+                autoResize(input);
+                const emailValue = input.value.trim();
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                const errorElement = document.getElementById('email_error');
+                
+                if (emailValue === '') {
+                    input.classList.remove('error', 'valid');
+                    errorElement.classList.remove('show');
+                    return;
+                }
+                
+                if (emailRegex.test(emailValue)) {
+                    input.classList.remove('error');
+                    input.classList.add('valid');
+                    errorElement.classList.remove('show');
+                } else {
+                    input.classList.remove('valid');
+                    input.classList.add('error');
+                    errorElement.classList.add('show');
+                }
+            }
+
+            // Validate form trước khi submit
+            function validateForm() {
+                const phoneInput = document.getElementById('recipient_phone');
+                const emailInput = document.getElementById('recipient_email');
+                
+                const phoneValue = phoneInput.value.trim();
+                const emailValue = emailInput.value.trim();
+                
+                const phoneRegex = /^[0-9]{10,11}$/;
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                
+                let isValid = true;
+                
+                // Validate phone
+                if (!phoneRegex.test(phoneValue)) {
+                    phoneInput.classList.add('error');
+                    document.getElementById('phone_error').classList.add('show');
+                    isValid = false;
+                }
+                
+                // Validate email
+                if (!emailRegex.test(emailValue)) {
+                    emailInput.classList.add('error');
+                    document.getElementById('email_error').classList.add('show');
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    alert('Vui lòng kiểm tra lại thông tin điện thoại và email!');
+                }
+                
+                return isValid;
             }
 
             function addRow() {
@@ -508,6 +614,13 @@
             // Khởi tạo khi trang load
             document.addEventListener('DOMContentLoaded', function () {
                 updateDeleteButtons(); // Ẩn nút xóa cho hàng đầu tiên nếu chỉ có 1 hàng
+                
+                // Thêm event listener cho form submit
+                document.getElementById('exportForm').addEventListener('submit', function(e) {
+                    if (!validateForm()) {
+                        e.preventDefault(); // Ngăn form submit nếu validation fail
+                    }
+                });
             });
         </script>
     </body>

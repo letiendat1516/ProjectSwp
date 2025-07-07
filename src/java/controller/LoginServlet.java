@@ -13,7 +13,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import model.Users;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
@@ -53,14 +55,6 @@ public class LoginServlet extends HttpServlet {
         request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -69,37 +63,63 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         UserDAO userDAO = new UserDAO();
-        Users user = userDAO.login(username, password);
+        Users user = userDAO.findByUsername(username);
+        if (user != null) {
+            String pwFromDB = user.getPassword();
+            // Nếu đã là hash BCrypt
+            if (pwFromDB != null && pwFromDB.startsWith("$2a$")) {
+                if (BCrypt.checkpw(password, pwFromDB)) {
+                    // Đăng nhập thành công
+                } else {
+                    // Sai mật khẩu
+                }
+            } else {
+                // So sánh trực tiếp mật khẩu plaintext
+                if (password.equals(pwFromDB)) {
+                    // Đăng nhập thành công và nâng cấp mật khẩu
+                    String newHash = BCrypt.hashpw(password, BCrypt.gensalt());
+                    userDAO.updatePasswordHash(user.getId(), newHash);
+                } else {
+                    // Sai mật khẩu
+                }
+            }
+        }
 
         if (user != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user);
+            String hashedPasswordFromDB = user.getPassword(); // password đã mã hóa trong DB
 
+            // So sánh password người dùng nhập với hash đã lưu
+            if (org.mindrot.jbcrypt.BCrypt.checkpw(password, hashedPasswordFromDB)) {
 
-            switch (user.getRoleName()) {
-            case "Admin":
-                response.sendRedirect("Admin.jsp");
-                break;
-            case "Nhân viên kho":
-                response.sendRedirect("categoriesforward.jsp");
-                break;
-            case "Nhân viên công ty":
-                response.sendRedirect("RequestForward.jsp");
-                break;
-            case "Giám đốc":
-                response.sendRedirect("ApproveListForward.jsp");
-                break;
-            
-            default:
-                response.sendRedirect("homepage.jsp");
+                HttpSession session = request.getSession();
+                session.setAttribute("user", user);
+
+                int userId = user.getId();
+                List<String> userPermissions = userDAO.getUserPermissions(userId);
+                session.setAttribute("userPermissions", userPermissions);
+
+                switch (user.getRoleName()) {
+                    case "Admin":
+                        response.sendRedirect("Admin.jsp");
+                        break;
+                    case "Nhân viên kho":
+                        response.sendRedirect("categoriesforward.jsp");
+                        break;
+                    case "Nhân viên công ty":
+                        response.sendRedirect("RequestForward.jsp");
+                        break;
+                    case "Giám đốc":
+                        response.sendRedirect("ApproveListForward.jsp");
+                        break;
+                    default:
+                        response.sendRedirect("homepage.jsp");
+                }
+                return; // Đăng nhập thành công!
+            }
         }
-
-            
-        } else {
-            request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng.");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
-        }
-
+        // Nếu không đúng, trả lại trang login + báo lỗi
+        request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng.");
+        request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 
     /**

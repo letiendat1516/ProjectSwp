@@ -31,38 +31,114 @@ public class AuthorizationFilter implements Filter {
 
     static {
         // USERS
+        urlPermissionMap.put("/Admin.jsp", "ADMIN");        
         urlPermissionMap.put("/usermanager", "USER_VIEW");
+        urlPermissionMap.put("/UserManager.jsp", "USER_VIEW");
         urlPermissionMap.put("/adduser", "USER_ADD");
+        urlPermissionMap.put("/AddUser.jsp", "USER_ADD");
         urlPermissionMap.put("/edituser", "USER_EDIT");
+        urlPermissionMap.put("/EditUser.jsp", "USER_EDIT");
         urlPermissionMap.put("/role-permission", "ROLE_ASSIGN");
+        urlPermissionMap.put("/permission.jsp", "ROLE_ASSIGN");
+        urlPermissionMap.put("/profile", "USER_PROFILE");
+        urlPermissionMap.put("/Profile.jsp", "USER_PROFILE");
+        urlPermissionMap.put("/editprofile", "USER_PROFILE_EDIT");
+        urlPermissionMap.put("/EditProfile.jsp", "USER_PROFILE_EDIT");
+           
+        
         // CATEGORY
-        urlPermissionMap.put("/categories", "CATEGORY_VIEW");
-        urlPermissionMap.put("/addcategory", "CATEGORY_ADD");
-        urlPermissionMap.put("/editcategory", "CATEGORY_EDIT");
-        urlPermissionMap.put("/deletecategory", "CATEGORY_DELETE");
+        urlPermissionMap.put("/categoriesforward.jsp", "CATEGORYFORWARD");
+        urlPermissionMap.put("/category_product/list.jsp", "CATEGORY_LIST");
+        urlPermissionMap.put("/category/list", "CATEGORY_LIST");
+        urlPermissionMap.put("/category_product/create.jsp", "CATEGORY_ADD");
+        urlPermissionMap.put("/category/create", "CATEGORY_ADD");
+        urlPermissionMap.put("/category_product/edit.jsp", "CATEGORY_EDIT");
+        urlPermissionMap.put("/category/edit", "CATEGORY_EDIT");
+
         // SUPPLIER
-        urlPermissionMap.put("/suppliers", "SUPPLIER_VIEW");
-        urlPermissionMap.put("/addsupplier", "SUPPLIER_ADD");
-        urlPermissionMap.put("/editsupplier", "SUPPLIER_EDIT");
-        urlPermissionMap.put("/evaluateSupplier", "SUPPLIER_EVALUATE");
+        urlPermissionMap.put("/LishSupplier.jsp", "SUPPLIER_VIEW");
+        urlPermissionMap.put("/LishSupplier", "SUPPLIER_VIEW");
+        urlPermissionMap.put("/AddNewSupplier.jsp", "SUPPLIER_ADD");
+        urlPermissionMap.put("/AddNewSupplier", "SUPPLIER_ADD");
+        urlPermissionMap.put("/UpdateSupplier.jsp", "SUPPLIER_EDIT");
+        urlPermissionMap.put("/UpdateSupplier", "SUPPLIER_EDIT");
+        urlPermissionMap.put("/DeleteSupplier", "SUPPLIER_DELETE");
+        
+        urlPermissionMap.put("/SupplierEvaluation.jsp", "SUPPLIER_EVALUATE");
+        urlPermissionMap.put("/TableSupplierEvaluation", "SUPPLIER_EVALUATE");
+        urlPermissionMap.put("/ViewSupplierEvaluation.jsp", "SUPPLIER_EVALUATE_VIEW");
+        urlPermissionMap.put("/ViewSupplierEvaluation", "SUPPLIER_EVALUATE_VIEW");
+        urlPermissionMap.put("/StatisticSupplierEvaluation.jsp", "SUPPLIER_EVALUATE_STATISTIC");
+        urlPermissionMap.put("/StatisticSupplierEvaluation", "SUPPLIER_EVALUATE_STATISTIC");
+        
+        // DEPARTMENT
+        urlPermissionMap.put("/Department_list.jsp", "DEPARTMENT_VIEW");
+        urlPermissionMap.put("/department/list", "DEPARTMENT_VIEW");
+        urlPermissionMap.put("/Department_create.jsp", "DEPARTMENT_ADD");
+        urlPermissionMap.put("/department/create", "DEPARTMENT_ADD");
+        urlPermissionMap.put("/Department_edit.jsp", "DEPARTMENT_EDIT");
+        urlPermissionMap.put("/department/edit", "DEPARTMENT_EDIT");
+        urlPermissionMap.put("/Department_detail.jsp", "DEPARTMENT_DETAIL");
+        urlPermissionMap.put("/department/detail", "DEPARTMENT_DETAIL");
+        urlPermissionMap.put("/Department_list.jsp", "DEPARTMENT_STATISTIC");
+        urlPermissionMap.put("/department/statistics", "DEPARTMENT_STATISTIC");
+        
+        
+        // MATERIAL_UNIT
+        urlPermissionMap.put("/material_unit/materialUnit.jsp", "UNIT_VIEW");
+        urlPermissionMap.put("/material_unit/materialUnit", "UNIT_VIEW");
+        urlPermissionMap.put("/material_unit/createMaterialUnit.jsp", "UNIT_ADD");
+        urlPermissionMap.put("/material_unit/createMaterialUnit", "UNIT_ADD");
+        urlPermissionMap.put("/material_unit/editMaterialUnit.jsp", "UNIT_EDIT");
+        urlPermissionMap.put("/material_unit/editMaterialUnit", "UNIT_EDIT");
+        urlPermissionMap.put("/material_unit/deleteMaterialUnit", "UNIT_DELETE");
+        
+        
         // PRODUCT
-        urlPermissionMap.put("/products", "PRODUCT_VIEW");
-        urlPermissionMap.put("/addproduct", "PRODUCT_ADD");
-        urlPermissionMap.put("/editproduct", "PRODUCT_EDIT");
-        // REQUESTS
-        urlPermissionMap.put("/createPurchaseRequest", "REQUEST_PURCHASE_CREATE");
-        urlPermissionMap.put("/approvePurchaseRequest", "REQUEST_PURCHASE_APPROVE");
+        urlPermissionMap.put("/product-list.jsp", "PRODUCT_VIEW");
+        urlPermissionMap.put("/product-list", "PRODUCT_VIEW");
+        urlPermissionMap.put("/add-product.jsp", "PRODUCT_ADD");
+        urlPermissionMap.put("/add-product", "PRODUCT_ADD");
+        urlPermissionMap.put("/update-product.jsp", "PRODUCT_EDIT");
+        urlPermissionMap.put("/update-product", "PRODUCT_EDIT");
+        urlPermissionMap.put("/deleted-products.jsp", "PRODUCT_DELETE");
+        urlPermissionMap.put("/deleted-products", "PRODUCT_DELETE");
+        urlPermissionMap.put("/recover-product", "PRODUCT_RECOVER");
+        
+        
+        //REQUEST
+        urlPermissionMap.put("/RequestForward.jsp", "REQUEST_PAGE");     
+        
+        //IMPORT
+        urlPermissionMap.put("/ListRequestImport.jsp", "REQUEST_PURCHASE_VIEW");        
+        urlPermissionMap.put("/import", "REQUEST_PURCHASE_VIEW");
+        urlPermissionMap.put("/ItemsSupplyRequestForm.jsp", "REQUEST_PURCHASE_CREATE");        
+        urlPermissionMap.put("/loadingrequest", "REQUEST_PURCHASE_CREATE");
+
+        
+//        urlPermissionMap.put("/.jsp", "IMPORT_CONFIRM");
+//        urlPermissionMap.put("/", "IMPORT_CONFIRM");
+        
+        //EXPORT
+        urlPermissionMap.put("/ExportRequest.jsp", "EXPORT_CREATE");
+        urlPermissionMap.put("/exportRequest", "EXPORT_CREATE");
+        
         // QUOTE
-        urlPermissionMap.put("/createQuote", "QUOTE_CREATE");
-        urlPermissionMap.put("/approveQuote", "QUOTE_APPROVE");
-        // IMPORT/EXPORT
-        urlPermissionMap.put("/confirmImport", "IMPORT_CONFIRM");
-        urlPermissionMap.put("/createExport", "EXPORT_CREATE");
-        // UNIT
-        urlPermissionMap.put("/units", "UNIT_VIEW");
-        urlPermissionMap.put("/addunit", "UNIT_ADD");
-        urlPermissionMap.put("/editunit", "UNIT_EDIT");
-        urlPermissionMap.put("/deleteunit", "UNIT_DELETE");
+        urlPermissionMap.put("/ListPurchaseOrder.jsp", "QUOTE_CREATE");
+        urlPermissionMap.put("/listpurchaseorder", "QUOTE_CREATE");
+
+
+        //APPROVE REQUEST
+        urlPermissionMap.put("/passwordrequest", "PASSWORD_RESPONSE");
+        urlPermissionMap.put("/password_request.jsp", "PASSWORD_RESPONSE");
+        urlPermissionMap.put("/reset_user_password", "PASSWORD_RESET");
+        urlPermissionMap.put("/reset_user_password.jsp", "PASSWORD_RESET");
+        urlPermissionMap.put("/ApproveListForward.jsp", "REQUEST_RESPONSE_PAGE"); 
+        urlPermissionMap.put("/ApprovePurchaseRequest.jsp", "REQUEST_PURCHASE_APPROVE");        
+        urlPermissionMap.put("/approvepurchaserequest", "REQUEST_PURCHASE_APPROVE");
+        urlPermissionMap.put("/ApprovePurchaseQuoted.jsp", "QUOTE_APPROVE");
+        urlPermissionMap.put("/approvepurchasequoted", "QUOTE_APPROVE");
+        
         // ... bạn có thể bổ sung các chức năng khác theo docx/database
     }
 
@@ -74,7 +150,6 @@ public class AuthorizationFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpSession session = request.getSession(false);
 
-        // Lấy danh sách quyền từ session (set sau khi login thành công)
         List<String> userPermissions = null;
         if (session != null) {
             Object permObj = session.getAttribute("userPermissions");
@@ -85,27 +160,27 @@ public class AuthorizationFilter implements Filter {
             }
         }
 
-        // Lấy servletPath, vd: /adduser, /editproduct, ...
         String path = request.getServletPath();
-
-        // Kiểm tra path này có yêu cầu phân quyền không
         String permissionRequired = urlPermissionMap.get(path);
 
         System.out.println("====== AUTH FILTER DEBUG ======");
+        System.out.println("Session ID: " + (session != null ? session.getId() : "null"));
         System.out.println("Filter path: " + path);
         System.out.println("permissionRequired: " + permissionRequired);
         System.out.println("userPermissions: " + userPermissions);
 
+        if (permissionRequired == null) {
+            System.out.println("WARNING: Chưa mapping quyền cho url: " + path);
+        }
+
         if (permissionRequired != null) {
-            // Nếu không login hoặc không đủ quyền
             if (userPermissions == null || !userPermissions.contains(permissionRequired)) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                        "Bạn không đủ quyền truy cập chức năng này!");
+                request.setAttribute("deniedFeature", path);
+                request.getRequestDispatcher("access-denied.jsp").forward(request, response);
                 return;
             }
         }
 
-        // Nếu pass, cho đi tiếp (gọi filter hoặc servlet tiếp theo)
         chain.doFilter(req, res);
     }
 

@@ -145,28 +145,40 @@ public class UserDAO extends Context {
     }
 
     public void addPermissionsToRole(int roleId, List<Integer> permissionIds) {
-        String sql = "INSERT INTO role_permission (role_id, permission_id) VALUES (?, ?)";
-        try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-            for (int permissionId : permissionIds) {
-                ps.setInt(1, roleId);
-                ps.setInt(2, permissionId);
-                ps.addBatch();
-            }
-            ps.executeBatch();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deletePermissionsByRoleId(int roleId) {
-        String sql = "DELETE FROM role_permission WHERE role_id = ?";
-        try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+    if (permissionIds == null || permissionIds.isEmpty()) return;
+    String sql = "INSERT INTO role_permission (role_id, permission_id) VALUES (?, ?)";
+    try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        for (Integer pid : permissionIds) {
             ps.setInt(1, roleId);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
+            ps.setInt(2, pid);
+            ps.addBatch();
         }
+        ps.executeBatch();
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+}
+
+    public void deletePermissionsOfRoleForPermissions(int roleId, List<Integer> permissionIds) {
+    if (permissionIds == null || permissionIds.isEmpty()) return;
+    StringBuilder sql = new StringBuilder("DELETE FROM role_permission WHERE role_id=? AND permission_id IN (");
+    for (int i = 0; i < permissionIds.size(); i++) {
+        sql.append("?");
+        if (i < permissionIds.size() - 1) sql.append(",");
+    }
+    sql.append(")");
+    try (Connection conn = Context.getJDBCConnection();
+         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        ps.setInt(1, roleId);
+        for (int i = 0; i < permissionIds.size(); i++) {
+            ps.setInt(i + 2, permissionIds.get(i));
+        }
+        ps.executeUpdate();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
 
     public void addUser(Users user, int roleId) throws SQLException {
         Connection connection = Context.getJDBCConnection();
@@ -448,6 +460,34 @@ public class UserDAO extends Context {
         }
         return false;
     }
+    
+public ForgotPasswordRequest getPasswordResetRequestById(int reqId) {
+    String sql = "SELECT prr.*, u.username, u.email "
+               + "FROM password_reset_requests prr "
+               + "LEFT JOIN users u ON prr.user_id = u.id "
+               + "WHERE prr.id = ?";
+    try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, reqId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                ForgotPasswordRequest req = new ForgotPasswordRequest();
+                req.setId(rs.getInt("id"));
+                req.setUserId(rs.getInt("user_id"));
+                req.setUsername(rs.getString("username"));
+                req.setEmail(rs.getString("email"));
+                req.setRequestTime(rs.getTimestamp("request_time"));
+                req.setNote(rs.getString("note"));
+                req.setResponseTime(rs.getTimestamp("response_time"));
+                req.setStatus(rs.getString("status"));
+                return req;
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+
 
     public List<ForgotPasswordRequest> getAllRequests() {
         List<ForgotPasswordRequest> requests = new ArrayList<>();
@@ -474,7 +514,73 @@ public class UserDAO extends Context {
         return requests;
     }
 
-    // Duyệt (approve) hoặc từ chối (reject) yêu cầu
+    public boolean approveAndUpdate(
+            int reqId, int userId, String newPassword, int adminId) {
+        Connection conn = null;
+        PreparedStatement psUpdateUser = null;
+        PreparedStatement psUpdateRequest = null;
+        try {
+            conn = Context.getJDBCConnection();
+            conn.setAutoCommit(false); // Đảm bảo atomicity
+
+            // 1. Cập nhật mật khẩu mới cho user
+            String sql1 = "UPDATE users SET password=? WHERE id=?";
+            psUpdateUser = conn.prepareStatement(sql1);
+            psUpdateUser.setString(1, newPassword);
+            psUpdateUser.setInt(2, userId);
+            int updatedRows = psUpdateUser.executeUpdate();
+
+            if (updatedRows == 0) {
+                conn.rollback();
+                return false;
+            }
+
+            // 2. Duyệt (approve) đơn yêu cầu đổi mật khẩu
+            String sql2 = "UPDATE password_reset_requests SET status='approved', admin_id=?, response_time=NOW() WHERE id=?";
+            psUpdateRequest = conn.prepareStatement(sql2);
+            psUpdateRequest.setInt(1, adminId);
+            psUpdateRequest.setInt(2, reqId);
+            int updatedReq = psUpdateRequest.executeUpdate();
+
+            if (updatedReq == 0) {
+                conn.rollback();
+                return false;
+            }
+
+            conn.commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (Exception ex) {
+            }
+        } finally {
+            try {
+                if (psUpdateUser != null) {
+                    psUpdateUser.close();
+                }
+            } catch (Exception e) {
+            }
+            try {
+                if (psUpdateRequest != null) {
+                    psUpdateRequest.close();
+                }
+            } catch (Exception e) {
+            }
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (Exception e) {
+            }
+        }
+        return false;
+    }
+
+    // Từ chối (reject) yêu cầu
     public boolean updateRequestStatus(int reqId, int adminId, String status) {
         String sql = "UPDATE password_reset_requests SET status=?, admin_id=?, response_time=NOW() WHERE id=?";
         try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -488,32 +594,30 @@ public class UserDAO extends Context {
         return false;
     }
 
-    public Users login(String username, String password) {
+    public Users findByUsername(String username) {
         String sql = "SELECT u.*, r.role_name "
                 + "FROM users u "
                 + "LEFT JOIN user_role ur ON u.id = ur.user_id "
                 + "LEFT JOIN role r ON ur.role_id = r.id "
-                + "WHERE u.username = ? AND u.password = ? AND u.active_flag = 1";
-
+                + "WHERE u.username = ? AND u.active_flag = 1";
         try {
             Connection connection = Context.getJDBCConnection();
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, username);
-            stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 Users user = new Users();
                 user.setId(rs.getInt("id"));
                 user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password"));
+                user.setPassword(rs.getString("password")); // Đây là chuỗi hash đã lưu trong DB
                 user.setEmail(rs.getString("email"));
                 user.setDob(rs.getDate("dob"));
                 user.setPhone(rs.getString("phone"));
                 user.setFullname(rs.getString("fullname"));
                 user.setActiveFlag(rs.getInt("active_flag"));
                 user.setCreateDate(rs.getTimestamp("create_date"));
-                user.setRoleName(rs.getString("role_name")); // Lấy role
+                user.setRoleName(rs.getString("role_name"));
                 return user;
             }
             rs.close();
@@ -522,6 +626,21 @@ public class UserDAO extends Context {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean updatePasswordHash(int userId, String hashedPassword) {
+        String sql = "UPDATE users SET password = ? WHERE id = ?";
+        try (
+                Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql);) {
+            stmt.setString(1, hashedPassword);
+            stmt.setInt(2, userId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public String getFullName(int userId) {
@@ -561,11 +680,5 @@ public class UserDAO extends Context {
         }
 
         return dob;
-    }
-
-    public static void main(String[] args) {
-        UserDAO ud = new UserDAO();
-        Users u = ud.login("admin", "123");
-        System.out.println(u.getId());
     }
 }
