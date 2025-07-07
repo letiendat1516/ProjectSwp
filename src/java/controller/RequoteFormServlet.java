@@ -4,6 +4,7 @@
  */
 package controller;
 
+import dao.PurchaseOrderDAO;
 import dao.SupplierDAO;
 import dao.UserDAO;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.PurchaseOrderInfo;
 import model.Supplier;
 
 import model.Users;
@@ -90,30 +92,63 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         List<Supplier> supplier_list = supplierDao.getLishSupplier();
         request.setAttribute("supplier_list", supplier_list);
 
-        // Các xử lý khác...
-        String requestId = request.getParameter("requestId");
-        String reason = request.getParameter("reason");
+        // ✅ 2. NHẬN purchaseOrderId TỪ FORM
+        String purchaseOrderId = request.getParameter("purchaseOrderId");
+        String action = request.getParameter("action");
+        
+        System.out.println("🔍 Received purchaseOrderId: " + purchaseOrderId);
+        System.out.println("🔍 Received action: " + action);
 
-        // Xử lý items...
-        List<Map<String, String>> items = new ArrayList<>();
-        int i = 0;
-        while (request.getParameter("items[" + i + "].productName") != null) {
-            Map<String, String> item = new HashMap<>();
-            item.put("productName", request.getParameter("items[" + i + "].productName"));
-            item.put("productCode", request.getParameter("items[" + i + "].productCode"));
-            item.put("unit", request.getParameter("items[" + i + "].unit"));
-            item.put("quantity", request.getParameter("items[" + i + "].quantity"));
-            item.put("note", request.getParameter("items[" + i + "].note"));
-            items.add(item);
-            i++;
+        if (purchaseOrderId != null && !purchaseOrderId.trim().isEmpty()) {
+            // ✅ 3. LOAD DỮ LIỆU TỪ DATABASE - SỬ DỤNG String thay vì int
+            PurchaseOrderDAO poDao = new PurchaseOrderDAO();
+            PurchaseOrderInfo poInfo = poDao.getPurchaseOrderById(purchaseOrderId); // ← String, không phải int
+            
+            if (poInfo != null) {
+                // ✅ 4. SET DỮ LIỆU VÀO REQUEST ATTRIBUTES
+                request.setAttribute("purchaseOrderId", purchaseOrderId);
+                request.setAttribute("requestId", poInfo.getId()); // Sử dụng ID của PO
+                request.setAttribute("reason", poInfo.getReason());
+                request.setAttribute("items", poInfo.getPurchaseItems());
+                request.setAttribute("action", action);
+                request.setAttribute("poInfo", poInfo); // Toàn bộ thông tin PO
+                
+                System.out.println("✅ Loaded data - ID: " + poInfo.getId());
+                System.out.println("✅ Loaded data - Reason: " + poInfo.getReason());
+                System.out.println("✅ Loaded data - Items count: " + 
+                    (poInfo.getPurchaseItems() != null ? poInfo.getPurchaseItems().size() : 0));
+                System.out.println("✅ Loaded data - Fullname: " + poInfo.getFullname());
+                System.out.println("✅ Loaded data - Status: " + poInfo.getStatus());
+            } else {
+                System.out.println("❌ No PO found with ID: " + purchaseOrderId);
+                request.setAttribute("errorMessage", "Không tìm thấy Purchase Order với ID: " + purchaseOrderId);
+            }
+        } else {
+            // ✅ 5. XỬ LÝ TRƯỜNG HỢP TẠO MỚI (từ form khác)
+            System.out.println("ℹ️ No purchaseOrderId provided - creating new");
+            String requestId = request.getParameter("requestId");
+            String reason = request.getParameter("reason");
+            
+            // Xử lý items từ form...
+            List<Map<String, String>> items = new ArrayList<>();
+            int i = 0;
+            while (request.getParameter("items[" + i + "].productName") != null) {
+                Map<String, String> item = new HashMap<>();
+                item.put("productName", request.getParameter("items[" + i + "].productName"));
+                item.put("productCode", request.getParameter("items[" + i + "].productCode"));
+                item.put("unit", request.getParameter("items[" + i + "].unit"));
+                item.put("quantity", request.getParameter("items[" + i + "].quantity"));
+                item.put("note", request.getParameter("items[" + i + "].note"));
+                items.add(item);
+                i++;
+            }
+
+            request.setAttribute("requestId", requestId);
+            request.setAttribute("reason", reason);
+            request.setAttribute("items", items);
         }
 
-        // Set attributes
-        request.setAttribute("requestId", requestId);
-        request.setAttribute("reason", reason);
-        request.setAttribute("items", items);
-
-        // User info
+        // ✅ 6. USER INFO (giữ nguyên)
         Users currentUser = (Users) session.getAttribute("user");
         UserDAO dao = new UserDAO();
         String fullname = dao.getFullName(currentUser.getId());
@@ -131,15 +166,17 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         session.setAttribute("currentUser", fullname);
         session.setAttribute("DoB", DoB);
         
-        // Forward to JSP
-        request.getRequestDispatcher("RequoteForm.jsp").forward(request, response);
+        // ✅ 7. FORWARD TO JSP
+        request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
 
     } catch (Exception e) {
         e.printStackTrace();
+        System.out.println("❌ Error in PurchaseOrderFormServlet: " + e.getMessage());
         request.setAttribute("errorMessage", "Lỗi: " + e.getMessage());
         request.getRequestDispatcher("error.jsp").forward(request, response);
     }
 }
+
     @Override
     public String getServletInfo() {
         return "Servlet hiển thị form tạo báo giá";

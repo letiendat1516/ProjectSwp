@@ -15,8 +15,8 @@ import java.util.List;
 public class PurchaseOrderInfo {
     private String id;
     private String fullname;
-    private Date doB;
     private Date dayPurchase;
+    private Date dayQuote;
     private String status;
     private String reason;
     private String supplier;
@@ -29,11 +29,11 @@ public class PurchaseOrderInfo {
     public PurchaseOrderInfo() {
     }
 
-    public PurchaseOrderInfo(String id, String fullname, Date doB, Date dayPurchase, String status, String reason, String supplier, String address, String phone, String email, String summary, List<PurchaseOrderItems> purchaseItems) {
+    public PurchaseOrderInfo(String id, String fullname, Date dayPurchase, Date dayQuote, String status, String reason, String supplier, String address, String phone, String email, String summary, List<PurchaseOrderItems> purchaseItems) {
         this.id = id;
         this.fullname = fullname;
-        this.doB = doB;
         this.dayPurchase = dayPurchase;
+        this.dayQuote = dayQuote;
         this.status = status;
         this.reason = reason;
         this.supplier = supplier;
@@ -60,20 +60,20 @@ public class PurchaseOrderInfo {
         this.fullname = fullname;
     }
 
-    public Date getDoB() {
-        return doB;
-    }
-
-    public void setDoB(Date doB) {
-        this.doB = doB;
-    }
-
     public Date getDayPurchase() {
         return dayPurchase;
     }
 
     public void setDayPurchase(Date dayPurchase) {
         this.dayPurchase = dayPurchase;
+    }
+
+    public Date getDayQuote() {
+        return dayQuote;
+    }
+
+    public void setDayQuote(Date dayQuote) {
+        this.dayQuote = dayQuote;
     }
 
     public String getStatus() {
@@ -139,4 +139,6 @@ public class PurchaseOrderInfo {
     public void setPurchaseItems(List<PurchaseOrderItems> purchaseItems) {
         this.purchaseItems = purchaseItems;
     }
+
+    
 }

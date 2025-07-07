@@ -66,9 +66,9 @@ public class LoginServlet extends HttpServlet {
         Users user = userDAO.findByUsername(username);
         if (user != null) {
             String pwFromDB = user.getPassword();
+                if (BCrypt.checkpw(password, pwFromDB)) {
             // Nếu đã là hash BCrypt
             if (pwFromDB != null && pwFromDB.startsWith("$2a$")) {
-                if (BCrypt.checkpw(password, pwFromDB)) {
                     // Đăng nhập thành công
                 } else {
                     // Sai mật khẩu

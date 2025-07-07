@@ -15,7 +15,6 @@ public class Context {
         String url = "jdbc:mysql://localhost:3306/warehouses";
         String user = "root";
         String password = "PhuC2004";
-
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             
