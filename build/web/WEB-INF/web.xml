@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
     <!-- ========== SERVLET DEFINITIONS ========== -->
-    <!-- Category Parent Controller (đã có @WebServlet annotation) -->
-    <!-- Không cần khai báo servlet cho CategoryParentController vì đã dùng annotation -->
     <!-- Category Servlet -->
     <servlet>
         <servlet-name>CategoryServlet</servlet-name>
@@ -30,10 +28,6 @@
         <servlet-name>EdituserServlet</servlet-name>
         <servlet-class>controller.EdituserServlet</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>UserFilterServlet</servlet-name>
-        <servlet-class>controller.UserFilterServlet</servlet-class>
-    </servlet>
     <!-- Request Management Servlets -->
     <servlet>
         <servlet-name>LoadingRequestServlet</servlet-name>
@@ -52,11 +46,6 @@
         <servlet-name>RolePermissionServlet</servlet-name>
         <servlet-class>controller.RolePermissionServlet</servlet-class>
     </servlet>
-    <filter>
-        <filter-name>AuthorizationFilter</filter-name>
-        <filter-class>controller.AuthorizationFilter</filter-class>
-    </filter>
-
     <!-- Profile Management Servlets -->
     <servlet>
         <servlet-name>ProfileServlet</servlet-name>
@@ -123,7 +112,7 @@
         <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
         <servlet-class>controller.ApprovePurchaseRequestServlet</servlet-class>
     </servlet>
-        <servlet>
+    <servlet>
         <servlet-name>ListPurchaseOrderServlet</servlet-name>
         <servlet-class>controller.ListPurchaseOrderServlet</servlet-class>
     </servlet>
@@ -152,15 +141,13 @@
         <servlet-name>CategoryParentStatisticsController</servlet-name>
         <servlet-class>controller.CategoryParentStatisticsController</servlet-class>
     </servlet>
-    
-    <!-- Category Statistics Servlet - THÊM MỚI -->
+    <!-- Category Statistics Servlet -->
     <servlet>
         <servlet-name>CategoryStatisticsController</servlet-name>
         <servlet-class>controller.CategoryStatisticsController</servlet-class>
     </servlet>
     <!-- ========== SERVLET MAPPINGS ========== -->
     <!-- Category Mapping -->
-
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
         <url-pattern>/CategoryServlet</url-pattern>
@@ -187,10 +174,6 @@
         <servlet-name>EdituserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>UserFilterServlet</servlet-name>
-        <url-pattern>/userfilter</url-pattern>
-    </servlet-mapping>
     <!-- Request Management Mappings -->
     <servlet-mapping>
         <servlet-name>LoadingRequestServlet</servlet-name>
@@ -209,6 +192,128 @@
         <servlet-name>RolePermissionServlet</servlet-name>
         <url-pattern>/role-permission</url-pattern>
     </servlet-mapping>
+    <!-- Profile Management Mappings -->
+    <servlet-mapping>
+        <servlet-name>ProfileServlet</servlet-name>
+        <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditProfileServlet</servlet-name>
+        <url-pattern>/editprofile</url-pattern>
+    </servlet-mapping>
+    <!-- Reset Password Mappings -->
+    <servlet-mapping>
+        <servlet-name>ForgotPasswordServlet</servlet-name>
+        <url-pattern>/forgotpassword</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PasswordRequestServlet</servlet-name>
+        <url-pattern>/passwordrequest</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ResetUserPasswordServlet</servlet-name>
+        <url-pattern>/reset-user-password</url-pattern>
+    </servlet-mapping>
+    <!-- Material Unit Management Mappings -->
+    <servlet-mapping>
+        <servlet-name>MaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/materialUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/createMaterialUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/editMaterialUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/deleteMaterialUnit</url-pattern>
+    </servlet-mapping>
+    <!-- Export Request Mapping -->
+    <servlet-mapping>
+        <servlet-name>ExportRequestController</servlet-name>
+        <url-pattern>/exportRequest</url-pattern>
+    </servlet-mapping>
+    <!-- Product Management Mappings -->
+    <servlet-mapping>
+        <servlet-name>AddProductController</servlet-name>
+        <url-pattern>/add-product</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateProductController</servlet-name>
+        <url-pattern>/update-product</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteProductController</servlet-name>
+        <url-pattern>/delete-product</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProductListController</servlet-name>
+        <url-pattern>/product-list</url-pattern>
+    </servlet-mapping>
+    <!-- Purchase Order Mappings -->
+    <servlet-mapping>
+        <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
+        <url-pattern>/approvepurchaserequest</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ListPurchaseOrderServlet</servlet-name>
+        <url-pattern>/listpurchaseorder</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PurchaseOrderFormServlet</servlet-name>
+        <url-pattern>/purchaseorderform</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SubmitPurchaseOrderServlet</servlet-name>
+        <url-pattern>/submitpurchaseorder</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ApprovePurchaseQuotedServlet</servlet-name>
+        <url-pattern>/approvepurchasequoted</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RequoteFormServlet</servlet-name>
+        <url-pattern>/requoteform</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SubmitRequoteFormServlet</servlet-name>
+        <url-pattern>/submitrequoteform</url-pattern>
+    </servlet-mapping>
+    <!-- Category Parent Statistics Mapping -->
+    <servlet-mapping>
+        <servlet-name>CategoryParentStatisticsController</servlet-name>
+        <url-pattern>/category-parent/statistics</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CategoryStatisticsController</servlet-name>
+        <url-pattern>/category/statistics</url-pattern>
+    </servlet-mapping>
+    <!-- ========== FILTERS ========== -->
+    <!-- UTF-8 Encoding Filter -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ignore</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!-- Authorization Filter -->
+    <filter>
+        <filter-name>AuthorizationFilter</filter-name>
+        <filter-class>controller.AuthorizationFilter</filter-class>
+    </filter>
     <filter-mapping>
         <filter-name>AuthorizationFilter</filter-name>
         <url-pattern>/Admin.jsp</url-pattern>
@@ -281,132 +386,8 @@
         <url-pattern>/listpurchaseorder</url-pattern>
         <url-pattern>/password_request.jsp</url-pattern>
         <url-pattern>/passwordrequest</url-pattern>
-        <!-- ... Thêm các chức năng cần bảo vệ -->
-    </filter-mapping>
-    
-    <!-- Profile Management Mappings -->
-    <servlet-mapping>
-        <servlet-name>ProfileServlet</servlet-name>
-        <url-pattern>/profile</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>EditProfileServlet</servlet-name>
-        <url-pattern>/editprofile</url-pattern>
-    </servlet-mapping>
-    <!-- Reset Password Mappings -->
-    <servlet-mapping>
-        <servlet-name>ForgotPasswordServlet</servlet-name>
-        <url-pattern>/forgotpassword</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>PasswordRequestServlet</servlet-name>
-        <url-pattern>/passwordrequest</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ResetUserPasswordServlet</servlet-name>
-        <url-pattern>/reset-user-password</url-pattern>
-    </servlet-mapping>
-    <!-- Material Unit Management Mappings -->
-    <servlet-mapping>
-        <servlet-name>MaterialUnitServlet</servlet-name>
-        <url-pattern>/material_unit/materialUnit</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateMaterialUnitServlet</servlet-name>
-        <url-pattern>/material_unit/createMaterialUnit</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>EditMaterialUnitServlet</servlet-name>
-        <url-pattern>/material_unit/editMaterialUnit</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DeleteMaterialUnitServlet</servlet-name>
-        <url-pattern>/material_unit/deleteMaterialUnit</url-pattern>
-    </servlet-mapping>
-    <!-- Export Request Mapping -->
-    <servlet-mapping>
-        <servlet-name>ExportRequestController</servlet-name>
-        <url-pattern>/exportRequest</url-pattern>
-    </servlet-mapping>
-    <!-- Product Management Mappings -->
-    <servlet-mapping>
-        <servlet-name>AddProductController</servlet-name>
-        <url-pattern>/add-product</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>UpdateProductController</servlet-name>
-        <url-pattern>/update-product</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DeleteProductController</servlet-name>
-        <url-pattern>/delete-product</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ProductListController</servlet-name>
-        <url-pattern>/product-list</url-pattern>
-    </servlet-mapping>
-    <!-- Purchase Order Mappings -->
-    <servlet-mapping>
-        <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
-        <url-pattern>/approvepurchaserequest</url-pattern>
-    </servlet-mapping>
-        <servlet-mapping>
-        <servlet-name>ListPurchaseOrderServlet</servlet-name>
-        <url-pattern>/listpurchaseorder</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>PurchaseOrderFormServlet</servlet-name>
-        <url-pattern>/purchaseorderform</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SubmitPurchaseOrderServlet</servlet-name>
-        <url-pattern>/submitpurchaseorder</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ApprovePurchaseQuotedServlet</servlet-name>
-        <url-pattern>/approvepurchasequoted</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RequoteFormServlet</servlet-name>
-        <url-pattern>/requoteform</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SubmitRequoteFormServlet</servlet-name>
-        <url-pattern>/submitrequoteform</url-pattern>
-    </servlet-mapping>
-    <!-- Category Parent Statistics Mapping - SỬA LẠI URL -->
-    <servlet-mapping>
-        <servlet-name>CategoryParentStatisticsController</servlet-name>
-        <url-pattern>/category-parent/statistics</url-pattern>
-    </servlet-mapping>
-    
-    <!-- Category Statistics Mapping - THÊM MỚI -->
-    <servlet-mapping>
-        <servlet-name>CategoryStatisticsController</servlet-name>
-        <url-pattern>/category/statistics</url-pattern>
-    </servlet-mapping>
-
-    <!-- ========== FILTERS ========== -->
-    <!-- UTF-8 Encoding Filter -->
-    <filter>
-        <filter-name>encodingFilter</filter-name>
-        <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
-        <init-param>
-            <param-name>encoding</param-name>
-            <param-value>UTF-8</param-value>
-        </init-param>
-        <init-param>
-            <param-name>ignore</param-name>
-            <param-value>false</param-value>
-        </init-param>
-    </filter>
-    <filter-mapping>
-        <filter-name>encodingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
     </filter-mapping>
     <!-- ========== SESSION CONFIGURATION ========== -->
-    <!-- Session Configuration -->
-
     <session-config>
         <session-timeout>15</session-timeout>
         <!-- 15 phút -->

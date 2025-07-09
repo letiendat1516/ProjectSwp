@@ -8,8 +8,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page import="model.Users" %>
 <%
-    Users currentUser = (Users) session.getAttribute("user");
-    if (currentUser == null) {
+    Users user = (Users) session.getAttribute("user");
+    if (user == null) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -17,23 +17,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit Profile</title>
+    <title>Chỉnh sửa thông tin cá nhân</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #f6f6f8;
             padding: 30px;
         }
-        .layout-container {
-            display: flex;
-            min-height: 100vh;
-        }
-        .main-content {
-            flex: 1;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        /* Header giống mẫu */
         .custom-header {
             display: flex;
             justify-content: space-between;
@@ -49,17 +39,12 @@
             align-items: center;
             gap: 32px;
         }
-        .logo-title {
-            font-size: 1.44rem;
-            font-weight: bold;
-            color: #206ed8;
-            margin-right: 34px;
-            letter-spacing: 0.5px;
-        }
-        .dashboard-title {
-            font-size: 2.1rem;
-            color: #206ed8;
-            font-weight: 700;
+        .header-title {
+            font-size: 1.8rem;
+            color: #1567c1;
+            margin: 0;
+            display: flex;
+            align-items: center;
         }
         .header-right {
             display: flex;
@@ -85,76 +70,97 @@
         .logout-btn:hover {
             background: #c70000;
         }
-
-        /* Container Edit Profile */
-        .edit-container {
+        .profile-container {
             background: #fff;
             border-radius: 8px;
-            max-width: 480px;
+            max-width: 460px;
             margin: 36px auto;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 32px 34px 24px 34px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 38px 34px 22px 34px;
         }
         h2 {
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
+        }
+        form {
+            width: 100%;
         }
         table {
             width: 100%;
         }
+        td {
+            padding: 10px 6px;
+            font-size: 1.06rem;
+        }
         td.label {
             font-weight: bold;
-            text-align: right;
-            padding-right: 20px;
             color: #3498db;
-            width: 32%;
+            width: 34%;
         }
-        td.input {
-            width: 68%;
-        }
-        input[type="text"], input[type="email"], input[type="date"] {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-            box-sizing: border-box;
-            margin-bottom: 6px;
-        }
-        .btn-submit {
-            margin-top: 18px;
-            width: 100%;
-            padding: 13px;
-            background-color: #3498db;
-            border: none;
+        input, select {
+            width: 98%;
+            padding: 8px 10px;
             border-radius: 5px;
-            color: white;
-            font-size: 1.15rem;
-            cursor: pointer;
-            font-weight: bold;
+            border: 1px solid #d4d8e2;
+            font-size: 1rem;
+            background: #f8fafd;
         }
-        .btn-submit:hover {
-            background-color: #217dbb;
-        }
-        .back-link {
-            display: block;
-            margin-top: 16px;
+        .btn-row {
             text-align: center;
-            color: #3498db;
-            text-decoration: none;
+            margin-top: 14px;
         }
-        .back-link:hover {
-            text-decoration: underline;
+        .save-btn {
+            display: inline-block;
+            background: #3498db;
+            color: #fff;
+            padding: 10px 34px;
+            border-radius: 5px;
+            font-weight: bold;
+            border: none;
+            font-size: 1rem;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background 0.18s;
+        }
+        .save-btn:hover {
+            background: #217dbb;
+        }
+        .cancel-link {
+            display: inline-block;
+            margin-left: 12px;
+            background: #e7e7e7;
+            color: #555;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background 0.18s;
+        }
+        .cancel-link:hover {
+            background: #d3d3d3;
+            color: #222;
+        }
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .form-error {
+            color: #e74c3c;
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 1rem;
         }
         .success-message {
-            color: green;
-            margin-bottom: 13px;
+            color: #27ae60;
             text-align: center;
-        }
-        .error-message {
-            color: red;
-            margin-bottom: 13px;
-            text-align: center;
+            margin-bottom: 8px;
+            font-size: 1rem;
         }
     </style>
 </head>
@@ -162,55 +168,58 @@
     <div class="layout-container">
         <jsp:include page="/include/sidebar.jsp" />
         <div class="main-content">
-            <!-- HEADER giống như dashboard -->
             <div class="custom-header">
                 <div class="header-left">
-                    <span class="logo-title">Warehouse Manager</span>
-                    <span class="dashboard-title">Admin Dashboard</span>
+                    <h1 class="header-title">Chỉnh sửa thông tin cá nhân</h1>
                 </div>
                 <div class="header-right">
-                    <span class="admin-name">Admin</span>
+                    <span class="admin-name">${user.fullname}</span>
                     <a href="logout" class="logout-btn">Đăng xuất</a>
                 </div>
             </div>
-            <!-- FORM SỬA PROFILE -->
-            <div class="edit-container">
+            <div class="profile-container">
                 <h2>Edit Profile</h2>
                 <c:if test="${not empty error}">
-                    <div class="error-message">${error}</div>
+                    <div class="form-error">${error}</div>
                 </c:if>
-                <c:if test="${not empty sessionScope.message}">
-                    <div class="success-message">${sessionScope.message}</div>
-                    <c:remove var="message" scope="session"/>
+                <c:if test="${not empty success}">
+                    <div class="success-message">${success}</div>
                 </c:if>
-
                 <form action="editprofile" method="post">
-                    <table>           
+                    <table>
                         <tr>
-                            <td class="label">Full Name:</td>
-                            <td class="input"><input type="text" name="fullname" value="${currentUser.fullname}" required></td>
+                            <td class="label">Username:</td>
+                            <td><input type="text" name="username" value="${user.username}" readonly /></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Họ và tên:</td>
+                            <td><input type="text" name="fullname" value="${user.fullname}" required /></td>
                         </tr>
                         <tr>
                             <td class="label">Email:</td>
-                            <td class="input"><input type="email" name="email" value="${currentUser.email}" required></td>
+                            <td><input type="email" name="email" value="${user.email}" required 
+                                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                title="Email phải đúng định dạng: example@domain.com"
+                            /></td>
                         </tr>
                         <tr>
-                            <td class="label">Phone:</td>
-                            <td class="input"><input type="text" name="phone" value="${currentUser.phone}" maxlength="20"></td>
+                            <td class="label">SĐT:</td>
+                            <td><input type="text" name="phone" value="${user.phone}" 
+                                pattern="^[0-9]{9,12}$" title="Số điện thoại không hợp lệ" /></td>
                         </tr>
                         <tr>
-                            <td class="label">Date of Birth:</td>
-                            <td class="input"><input type="date" name="dob" value="${currentUser.dob}"></td>
+                            <td class="label">Ngày sinh:</td>
+                            <td><input type="date" name="dob" value="${user.dob}" required /></td>
                         </tr>
                     </table>
-                    <button type="submit" class="btn-submit">Update</button>
+                    <div class="btn-row">
+                        <button type="submit" class="save-btn">Lưu thay đổi</button>
+                        <a href="profile" class="cancel-link">Huỷ</a>
+                    </div>
                 </form>
-                <!-- Back về trang profile -->
-                <a href="profile" class="back-link">Back to Profile</a>
-                <!-- Back về homepage -->
-                <a href="<%= homePage %>" class="back-link">Back</a>
             </div>
         </div>
     </div>
 </body>
 </html>
+

@@ -11,7 +11,7 @@
 <%@page import="model.Users"%>
 <%
     Users user = (Users) session.getAttribute("user");
-    if (user == null || (!"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName()))) {
+    if (user == null) {
         response.sendRedirect("login.jsp");
         return;
     }

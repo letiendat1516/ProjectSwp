@@ -329,12 +329,12 @@ response.setDateHeader("Expires", 0); // Proxies
                     <div class="page-header">
                         <div class="header-actions">
                             <a href="Admin.jsp" class="btn">Quay lại</a>
-                            <a href="AddUser.jsp" class="btn"> + Thêm người dùng</a>
+                            <a href="adduser" class="btn"> + Thêm người dùng</a>
                         </div>
                     </div>
                     <div class="filter-section">
                         <h3 class="filter-title">Tìm kiếm</h3>
-                        <form action="userfilter" method="get">
+                        <form action="usermanager" method="get">
                             <div class="filter-bar">
                                 <div class="filter-group">
                                     <label class="filter-label">Vai trò</label>
@@ -354,6 +354,18 @@ response.setDateHeader("Expires", 0); // Proxies
                                     </select>
                                 </div>
                                 <div class="filter-group">
+                                    <label class="filter-label">Phòng ban</label>
+                                    <select name="departmentId">
+                                        <option value="">Tất cả phòng ban</option>
+                                        <c:forEach var="dept" items="${departments}">
+                                            <option value="${dept.id}" <c:if test="${param.departmentId == dept.id}">selected</c:if>>
+                                                ${dept.deptName}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
                                     <label class="filter-label">Từ khóa</label>
                                     <input type="text" name="keyword" placeholder="Tìm theo tên đăng nhập, họ tên...">
                                 </div>
@@ -365,23 +377,7 @@ response.setDateHeader("Expires", 0); // Proxies
                         </form>
                     </div>
                     <div class="table-container">
-                        <div class="table-header">
-                            <h3 class="table-title">Danh sách người dùng</h3>
-                            <div class="table-count">
-                                <c:set var="userCount" value="0" />
-                                <c:forEach var="user" items="${userList}">
-                                    <c:set var="userCount" value="${userCount + 1}"/>
-                                </c:forEach>
-                                <c:choose>
-                                    <c:when test="${userCount > 0}">
-                                        Hiện có ${userCount} người dùng
-                                    </c:when>
-                                    <c:otherwise>
-                                        Không tìm thấy người dùng
-                                    </c:otherwise>
-                                </c:choose>
-                            </div>
-                        </div>
+
                         <c:choose>
                             <c:when test="${not empty userList}">
                                 <table>
@@ -390,6 +386,7 @@ response.setDateHeader("Expires", 0); // Proxies
                                             <th>ID</th>
                                             <th>Tên đăng nhập</th>
                                             <th>Họ và tên</th>
+                                            <th>Phòng ban</th>
                                             <th>Vai trò</th>
                                             <th>Trạng thái</th>
                                             <th>Ngày tạo</th>
@@ -402,6 +399,7 @@ response.setDateHeader("Expires", 0); // Proxies
                                                 <td><strong>#${user.id}</strong></td>
                                                 <td><strong>${user.username}</strong></td>
                                                 <td>${user.fullname}</td>
+                                                <td>${user.deptName}</td>
                                                 <td>
                                                     <c:choose>
                                                         <c:when test="${user.roleName == 'Warehouse Staff'}">
@@ -448,27 +446,26 @@ response.setDateHeader("Expires", 0); // Proxies
                         </c:choose>
                     </div>
                     <c:if test="${totalPages > 1}">
-                        <div class="pagination-container">
-                            <div class="pagination-info">Trang ${currentPage} / ${totalPages}</div>
-                            <div class="pagination">
-                                <c:if test="${currentPage > 1}">
-                                    <a href="usermanager?page=${currentPage - 1}">Trước</a>
-                                </c:if>
-                                <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <c:choose>
-                                        <c:when test="${i == currentPage}">
-                                            <button class="active">${i}</button>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <a href="usermanager?page=${i}">${i}</a>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </c:forEach>
-                                <c:if test="${currentPage < totalPages}">
-                                    <a href="usermanager?page=${currentPage + 1}">Sau</a>
-                                </c:if>
-                            </div>
+                        <center>
+                        <div class="pagination">
+                            <c:if test="${currentPage > 1}">
+                                <a href="usermanager?page=${currentPage - 1}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">Trước</a>
+                            </c:if>
+                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                <c:choose>
+                                    <c:when test="${i == currentPage}">
+                                        <button class="active">${i}</button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a href="usermanager?page=${i}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">${i}</a>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:forEach>
+                            <c:if test="${currentPage < totalPages}">
+                                <a href="usermanager?page=${currentPage + 1}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">Sau</a>
+                            </c:if>
                         </div>
+                        </center>
                     </c:if>
                 </div>
             </div>

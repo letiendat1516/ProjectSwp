@@ -18,7 +18,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>My Profile</title>
+        <title>Thông tin cá nhân</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -148,7 +148,7 @@
                         <h1 class="header-title">Thông tin cá nhân</h1>
                     </div>
                     <div class="header-right">
-                        <span class="admin-name">Admin</span>
+                        <span class="admin-name">${user.fullname}</span>
                         <a href="logout" class="logout-btn">Đăng xuất</a>
                     </div>
                 </div>
@@ -157,21 +157,22 @@
                     <h2>My Profile</h2>
                     <table>
                         <tr><td class="label">Username:</td><td>${user.username}</td></tr>
-                        <tr><td class="label">Full Name:</td><td>${user.fullname}</td></tr>
+                        <tr><td class="label">Họ và tên:</td><td>${user.fullname}</td></tr>
                         <tr><td class="label">Email:</td><td>${user.email}</td></tr>
-                        <tr><td class="label">Phone:</td><td>${user.phone}</td></tr>
-                        <tr><td class="label">Date of Birth:</td><td>
+                        <tr><td class="label">SĐT:</td><td>${user.phone}</td></tr>
+                        <tr><td class="label">Ngày sinh:</td><td>
                                 <c:choose>
                                     <c:when test="${not empty user.dob}">${user.dob}</c:when>
                                     <c:otherwise>-</c:otherwise>
                                 </c:choose>
                             </td></tr>
-                        <tr><td class="label">Role:</td><td>${user.roleName}</td></tr>
-                        <tr><td class="label">Status:</td>
+                        <tr><td class="label">Phòng ban:</td><td>${user.deptName != null ? user.deptName : 'Chưa có'}</td></tr>
+                        <tr><td class="label">Chức vụ:</td><td>${user.roleName}</td></tr>
+                        <tr><td class="label">Trạng thái:</td>
                             <td>
                                 <c:choose>
-                                    <c:when test="${user.activeFlag == 1}">Active</c:when>
-                                    <c:otherwise>Inactive</c:otherwise>
+                                    <c:when test="${user.activeFlag == 1}">Hoạt động</c:when>
+                                    <c:otherwise>Không hoạt động</c:otherwise>
                                 </c:choose>
                             </td>
                         </tr>

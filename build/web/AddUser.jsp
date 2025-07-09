@@ -7,6 +7,8 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@page import="model.Users"%>
+<%@page import="model.Department"%>
+
 <!DOCTYPE html>
 <%
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
@@ -266,6 +268,22 @@
                             <tr>
                                 <td class="label"><label for="dob">Sinh nhật:</label></td>
                                 <td class="input"><input type="date" id="dob" name="dob" required title="Điền ngày sinh"></td>
+                            </tr>
+                            <tr>
+                                <td class="label"><label for="department">Phòng ban:</label></td>
+                                <td class="input">
+                                    <div class="row-flex">
+                                        <select name="departmentId">
+                                            <option value="">-- Chọn phòng ban --</option>
+                                            <c:forEach var="dept" items="${departments}">
+                                                <option value="${dept.id}">
+                                                    ${dept.deptCode} - ${dept.deptName}
+                                                </option>
+                                            </c:forEach>
+                                        </select>
+
+
+                                    </div>
                             </tr>
                             <tr>
                                 <td class="label"><label for="role">Chức vụ:</label></td>

@@ -56,77 +56,68 @@ public class LoginServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+    String username = request.getParameter("username");
+    String password = request.getParameter("password");
 
-        UserDAO userDAO = new UserDAO();
-        Users user = userDAO.findByUsername(username);
-        if (user != null) {
-            String pwFromDB = user.getPassword();
-                if (BCrypt.checkpw(password, pwFromDB)) {
-            // Nếu đã là hash BCrypt
-            if (pwFromDB != null && pwFromDB.startsWith("$2a$")) {
-                    // Đăng nhập thành công
-                } else {
-                    // Sai mật khẩu
-                }
-            } else {
-                // So sánh trực tiếp mật khẩu plaintext
-                if (password.equals(pwFromDB)) {
-                    // Đăng nhập thành công và nâng cấp mật khẩu
-                    String newHash = BCrypt.hashpw(password, BCrypt.gensalt());
-                    userDAO.updatePasswordHash(user.getId(), newHash);
-                } else {
-                    // Sai mật khẩu
-                }
+    UserDAO userDAO = new UserDAO();
+    Users user = userDAO.findByUsername(username);
+
+    if (user != null) {
+        String pwFromDB = user.getPassword();
+        boolean loginSuccess = false;
+
+        if (pwFromDB != null && pwFromDB.startsWith("$2a$")) {
+            // Đã là BCrypt hash
+            if (BCrypt.checkpw(password, pwFromDB)) {
+                loginSuccess = true;
+            }
+        } else {
+            // Là plain text (tài khoản cũ)
+            if (password.equals(pwFromDB)) {
+                // Migrate mật khẩu sang BCrypt
+                String newHash = BCrypt.hashpw(password, BCrypt.gensalt());
+                userDAO.updatePasswordHash(user.getId(), newHash);
+                loginSuccess = true;
             }
         }
 
-        if (user != null) {
-            String hashedPasswordFromDB = user.getPassword(); // password đã mã hóa trong DB
+        if (loginSuccess) {
+            // Đăng nhập thành công: set session, phân quyền, chuyển trang
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
 
-            // So sánh password người dùng nhập với hash đã lưu
-            if (org.mindrot.jbcrypt.BCrypt.checkpw(password, hashedPasswordFromDB)) {
+            int userId = user.getId();
+            List<String> userPermissions = userDAO.getUserPermissions(userId);
+            session.setAttribute("userPermissions", userPermissions);
 
-                HttpSession session = request.getSession();
-                session.setAttribute("user", user);
-
-                int userId = user.getId();
-                List<String> userPermissions = userDAO.getUserPermissions(userId);
-                session.setAttribute("userPermissions", userPermissions);
-
-                switch (user.getRoleName()) {
-                    case "Admin":
-                        response.sendRedirect("Admin.jsp");
-                        break;
-                    case "Nhân viên kho":
-                        response.sendRedirect("categoriesforward.jsp");
-                        break;
-                    case "Nhân viên công ty":
-                        response.sendRedirect("RequestForward.jsp");
-                        break;
-                    case "Giám đốc":
-                        response.sendRedirect("ApproveListForward.jsp");
-                        break;
-                    default:
-                        response.sendRedirect("homepage.jsp");
-                }
-                return; // Đăng nhập thành công!
+            switch (user.getRoleName()) {
+                case "Admin":
+                    response.sendRedirect("Admin.jsp");
+                    break;
+                case "Nhân viên kho":
+                    response.sendRedirect("categoriesforward.jsp");
+                    break;
+                case "Nhân viên công ty":
+                    response.sendRedirect("RequestForward.jsp");
+                    break;
+                case "Giám đốc":
+                    response.sendRedirect("ApproveListForward.jsp");
+                    break;
+                default:
+                    response.sendRedirect("homepage.jsp");
             }
+            return;
         }
-        // Nếu không đúng, trả lại trang login + báo lỗi
-        request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng.");
-        request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
+    // Nếu không đúng, trả lại trang login + báo lỗi
+    request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng.");
+    request.getRequestDispatcher("login.jsp").forward(request, response);
+}
+
     @Override
     public String getServletInfo() {
         return "Short description";

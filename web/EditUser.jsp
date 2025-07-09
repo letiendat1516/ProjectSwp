@@ -230,7 +230,7 @@ if (user == null) {
                         <div class="success-message">${message}</div>
                         <c:remove var="message" scope="session"/>
                     </c:if>
-                        
+
                     <form action="edituser" method="post" class="form-simple">
                         <input type="hidden" name="id" value="${editUser.id}"/>
                         <div>
@@ -264,6 +264,18 @@ if (user == null) {
                             <label class="form-simple-label" for="dob">Ngày sinh:</label>
                             <input type="date" id="dob" name="dob" class="form-simple-input" value="${editUser.dob}" required>
                         </div>
+                        <div>
+                            <label class="form-simple-label" for="departmentId">Phòng ban:</label>
+                            <select id="departmentId" name="departmentId" class="form-simple-select" required>
+                                <c:forEach var="dept" items="${departments}">
+                                    <option value="${dept.id}" 
+                                            <c:if test="${editUser.departmentId == dept.id}">selected</c:if>>
+                                        ${dept.deptName}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+
                         <div>
                             <label class="form-simple-label" for="role">Vai trò:</label>
                             <select id="role" name="role" class="form-simple-select" required>

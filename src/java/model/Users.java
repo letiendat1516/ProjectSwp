@@ -12,6 +12,7 @@ import java.util.Date;
  * @author phucn
  */
 public class Users {
+
     private int id;
     private String username;
     private Date dob;
@@ -19,6 +20,8 @@ public class Users {
     private String email;
     private String fullname;
     private String phone;
+    private Integer departmentId;
+    private String deptName;
     private String roleName;
     private int activeFlag;
     private Timestamp createDate;
@@ -26,13 +29,15 @@ public class Users {
     public Users() {
     }
 
-    public Users(int id, String username, Date dob, String password, String email, String fullname, String phone, String roleName, int activeFlag, Timestamp createDate) {
+    public Users(int id, String username, Date dob, String password, String email, String fullname, String phone, Integer departmentId, String deptName, String roleName, int activeFlag, Timestamp createDate) {
         this.id = id;
         this.username = username;
         this.dob = dob;
         this.password = password;
         this.email = email;
         this.fullname = fullname;
+        this.departmentId = departmentId;
+        this.deptName = deptName;
         this.phone = phone;
         this.roleName = roleName;
         this.activeFlag = activeFlag;
@@ -95,6 +100,22 @@ public class Users {
         this.phone = phone;
     }
 
+    public Integer getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(Integer departmentId) {
+        this.departmentId = departmentId;
+    }
+    
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
+
     public String getRoleName() {
         return roleName;
     }
@@ -124,6 +145,4 @@ public class Users {
         return "Users{" + "id=" + id + ", username=" + username + ", dob=" + dob + ", password=" + password + ", email=" + email + ", fullname=" + fullname + ", phone=" + phone + ", roleName=" + roleName + ", activeFlag=" + activeFlag + ", createDate=" + createDate + '}';
     }
 
-
-    
 }
