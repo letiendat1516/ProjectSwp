@@ -132,17 +132,17 @@ public class GetStatusOfPurchaseRequestInformationDAO {
                             currentRequest = new Request();
                             currentRequest.setId(requestId);
                             currentRequest.setFullname(rs.getString("fullname"));
-                            currentRequest.setUser_id(rs.getInt("user_id"));
+//                            currentRequest.setUser_id(rs.getInt("user_id"));
                             currentRequest.setRole(rs.getString("role"));
                             currentRequest.setDay_request(rs.getDate("day_request"));
                             currentRequest.setStatus(rs.getString("status"));
                             currentRequest.setReason(rs.getString("reason"));
-                            currentRequest.setSupplier(rs.getString("supplier"));
-                            currentRequest.setAddress(rs.getString("address"));
-                            currentRequest.setPhone(rs.getString("phone"));
-                            currentRequest.setEmail(rs.getString("email"));
-                            currentRequest.setApprove_by(rs.getString("approve_by"));
-                            currentRequest.setWarehouse(rs.getString("warehouse"));
+//                            currentRequest.setSupplier(rs.getString("supplier"));
+//                            currentRequest.setAddress(rs.getString("address"));
+//                            currentRequest.setPhone(rs.getString("phone"));
+//                            currentRequest.setEmail(rs.getString("email"));
+//                            currentRequest.setApprove_by(rs.getString("approve_by"));
+//                            currentRequest.setWarehouse(rs.getString("warehouse"));
                             currentRequest.setItems(new ArrayList<>());
                             allRequests.add(currentRequest);
                         }
@@ -157,7 +157,7 @@ public class GetStatusOfPurchaseRequestInformationDAO {
                             item.setUnit(rs.getString("unit"));
                             item.setQuantity(rs.getDouble("quantity"));
                             item.setNote(rs.getString("note") != null ? rs.getString("note") : "");
-                            item.setReasonDetail(rs.getString("reason_detail") != null ? rs.getString("reason_detail") : "");
+//                            item.setReasonDetail(rs.getString("reason_detail") != null ? rs.getString("reason_detail") : "");
                             currentRequest.getItems().add(item);
                         }
                     }

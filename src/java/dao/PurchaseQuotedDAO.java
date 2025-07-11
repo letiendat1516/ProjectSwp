@@ -123,7 +123,7 @@ public class PurchaseQuotedDAO {
                                 currentOrder = new PurchaseOrderInfo();
                                 currentOrder.setId(orderId);
                                 currentOrder.setFullname(rs.getString("fullname"));
-                                currentOrder.setDoB(rs.getDate("DoB"));
+                        //        currentOrder.setDoB(rs.getDate("DoB"));
                                 currentOrder.setDayPurchase(rs.getDate("day_purchase"));
                                 currentOrder.setStatus(rs.getString("status"));
                                 currentOrder.setReason(rs.getString("reason"));
@@ -381,7 +381,7 @@ public class PurchaseQuotedDAO {
                 int orderUpdated = 0;
                 try (PreparedStatement stmt1 = con.prepareStatement(updateOrderSql)) {
                     stmt1.setString(1, purchaseOrder.getFullname());
-                    stmt1.setDate(2, purchaseOrder.getDoB() != null ? new java.sql.Date(purchaseOrder.getDoB().getTime()) : null);
+//                    stmt1.setDate(2, purchaseOrder.getDoB() != null ? new java.sql.Date(purchaseOrder.getDoB().getTime()) : null);
                     stmt1.setDate(3, purchaseOrder.getDayPurchase() != null ? new java.sql.Date(purchaseOrder.getDayPurchase().getTime()) : null);
                     stmt1.setString(4, purchaseOrder.getReason());
                     stmt1.setString(5, purchaseOrder.getSupplier());

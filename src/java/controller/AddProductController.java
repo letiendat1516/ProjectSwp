@@ -98,6 +98,22 @@ public class AddProductController extends HttpServlet {
           product.setStatus(status);
           product.setDescription(description != null ? description.trim() : "");
           
+          // Set initial stock quantity
+          if (stockQuantityStr != null && !stockQuantityStr.trim().isEmpty()) {
+              try {
+                  BigDecimal stockQuantity = new BigDecimal(stockQuantityStr.trim());
+                  if (stockQuantity.compareTo(BigDecimal.ZERO) >= 0) {
+                      product.setStockQuantity(stockQuantity);
+                  } else {
+                      product.setStockQuantity(BigDecimal.ZERO);
+                  }
+              } catch (NumberFormatException e) {
+                  product.setStockQuantity(BigDecimal.ZERO);
+              }
+          } else {
+              product.setStockQuantity(BigDecimal.ZERO);
+          }
+          
           // Set optional fields
           if (supplierIdStr != null && !supplierIdStr.isEmpty()) {
               product.setSupplierId(Integer.parseInt(supplierIdStr));

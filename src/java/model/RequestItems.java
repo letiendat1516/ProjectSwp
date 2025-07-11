@@ -16,12 +16,11 @@ public class RequestItems {
     private String[] unit;
     private int[] quantity;
     private String[] note;
-    private String reason_detail;
 
     public RequestItems() {
     }
 
-    public RequestItems(int id, Request request_id, String[] product_name, String[] product_code, String[] unit, int[] quantity, String[] note, String reason_detail) {
+    public RequestItems(int id, Request request_id, String[] product_name, String[] product_code, String[] unit, int[] quantity, String[] note) {
         this.id = id;
         this.request_id = request_id;
         this.product_name = product_name;
@@ -29,7 +28,6 @@ public class RequestItems {
         this.unit = unit;
         this.quantity = quantity;
         this.note = note;
-        this.reason_detail = reason_detail;
     }
 
     public int getId() {
@@ -87,14 +85,5 @@ public class RequestItems {
     public void setNote(String[] note) {
         this.note = note;
     }
-
-    public String getReason_detail() {
-        return reason_detail;
-    }
-
-    public void setReason_detail(String reason_detail) {
-        this.reason_detail = reason_detail;
-    }
-
 
 }
