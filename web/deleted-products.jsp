@@ -39,7 +39,7 @@
                             <th>Mã sản phẩm</th>
                             <th>Tên sản phẩm</th>
                             <th>Danh mục</th>
-                            <th>Giá</th>
+
                             <th>Trạng thái</th>
                             <th>Khôi phục</th>
                         </tr>
@@ -50,11 +50,7 @@
                                 <td>${product.code}</td>
                                 <td>${product.name}</td>
                                 <td>${product.cate_id}</td>
-                                <td>
-                                    <c:if test="${product.price != null}">
-                                        <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="₫" />
-                                    </c:if>
-                                </td>
+
                                 <td><span style="color: #dc3545; font-weight: bold;">Đã xóa</span></td>
                                 <td>
                                     <a href="recover-product?id=${product.id}" class="btn-recover">♻️ Khôi phục</a>

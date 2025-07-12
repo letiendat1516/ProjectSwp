@@ -124,7 +124,7 @@ ALTER TABLE request
 MODIFY status ENUM('pending', 'approved', 'rejected', 'completed');
 -- Enhanced PRODUCT INFO table with additional fields for comprehensive product management
 ALTER TABLE product_info
-ADD COLUMN supplier_id INT,
+	ADD COLUMN supplier_id INT,
     ADD COLUMN expiration_date DATE,
     ADD COLUMN image_url VARCHAR(255),
     ADD COLUMN additional_notes TEXT,
@@ -142,7 +142,7 @@ CREATE TABLE storage_location (
     description TEXT,
     active_flag TINYINT(1) DEFAULT 1
 );
-I -- INSERT SAMPLE DATA
+-- INSERT SAMPLE DATA
 -- Insert roles
 INSERT INTO role (role_name)
 VALUES ('Admin'),
@@ -365,3 +365,143 @@ VALUES (1, 5, 'available'),
     -- Normal stock - SSD
     (10, 50, 'available');
 -- Normal stock - pens
+
+CREATE TABLE department (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    dept_code VARCHAR(20) NOT NULL UNIQUE COMMENT 'Mã phòng ban',
+    dept_name VARCHAR(100) NOT NULL COMMENT 'Tên phòng ban',
+    description TEXT COMMENT 'Mô tả phòng ban',
+    manager_id INT COMMENT 'ID trưởng phòng',
+    active_flag TINYINT(1) DEFAULT 1 COMMENT 'Trạng thái hoạt động',
+    created_by INT COMMENT 'Người tạo phòng ban',
+    create_date DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Thời gian tạo phòng ban',
+    updated_by INT COMMENT 'Người cập nhật cuối',
+    update_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Thời gian cập nhật',
+    FOREIGN KEY (manager_id) REFERENCES users(id),
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (updated_by) REFERENCES users(id)
+);
+ALTER TABLE department 
+ADD COLUMN phone VARCHAR(20) NULL AFTER manager_id,
+ADD COLUMN email VARCHAR(100) NULL AFTER phone;
+
+CREATE TABLE `purchase_order_info` (
+  `id` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `fullname` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `day_purchase` date NOT NULL,
+  `day_quote` date DEFAULT NULL,
+  `status` enum('approved','rejected','re-quote','quoted','completed','pending_quote') DEFAULT 'pending_quote',
+  `reason` text,
+  `supplier` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `address` text,
+  `phone` varchar(15) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `email` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `summary` text, 
+  PRIMARY KEY (`id`));
+  
+  CREATE TABLE `purchase_order_items` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `purchase_id` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `product_name` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `product_code` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `unit` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `quantity` decimal(10,2) NOT NULL,
+  `price_per_unit` decimal(15,2) DEFAULT NULL,
+  `total_price` decimal(15,2) DEFAULT NULL,
+  `note` text,
+  PRIMARY KEY (`id`),
+  KEY `purchase_id` (`purchase_id`),
+  CONSTRAINT `purchase_order_items_ibfk_1` FOREIGN KEY (`purchase_id`) REFERENCES `purchase_order_info` (`id`));
+  
+  CREATE TABLE permission (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE role_permission (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    role_id INT NOT NULL,
+    permission_id INT NOT NULL,
+    FOREIGN KEY (role_id) REFERENCES role(id),
+    FOREIGN KEY (permission_id) REFERENCES permission(id)
+);
+
+INSERT INTO permission (code, name) VALUES ('ADMIN', 'Trang Admin');
+
+
+INSERT INTO permission (code, name) VALUES
+('ADMIN', 'Trang Admin'),
+('USER_VIEW', 'Xem danh sách người dùng'),
+('USER_ADD', 'Thêm người dùng'),
+('USER_EDIT', 'Sửa thông tin người dùng'),
+('ROLE_ASSIGN', 'Gán quyền cho người dùng'),
+('CATEGORY_VIEW', 'Xem danh mục sản phẩm'),
+('CATEGORY_ADD', 'Thêm danh mục sản phẩm'),
+('CATEGORY_EDIT', 'Sửa danh mục sản phẩm'),
+('CATEGORY_DELETE', 'Xóa danh mục sản phẩm'),
+('SUPPLIER_VIEW', 'Xem nhà cung cấp'),
+('SUPPLIER_ADD', 'Thêm nhà cung cấp'),
+('SUPPLIER_EDIT', 'Sửa nhà cung cấp'),
+('SUPPLIER_EVALUATE', 'Đánh giá nhà cung cấp'),
+('PRODUCT_VIEW', 'Xem sản phẩm'),
+('PRODUCT_ADD', 'Thêm sản phẩm'),
+('PRODUCT_EDIT', 'Sửa sản phẩm'),
+('REQUEST_PURCHASE_CREATE', 'Tạo yêu cầu mua hàng'),
+('REQUEST_PURCHASE_APPROVE', 'Duyệt yêu cầu mua hàng'),
+('QUOTE_CREATE', 'Tạo báo giá'),
+('QUOTE_APPROVE', 'Duyệt báo giá'),
+('IMPORT_CONFIRM', 'Xác nhận nhập kho'),
+('EXPORT_CREATE', 'Tạo phiếu xuất kho'),
+('UNIT_VIEW', 'Xem đơn vị tính'),
+('UNIT_ADD', 'Thêm đơn vị tính'),
+('UNIT_EDIT', 'Sửa đơn vị tính'),
+('UNIT_DELETE', 'Xóa đơn vị tính');
+
+-- cập nhật mấy cái này
+
+INSERT INTO role_permission (role_id, permission_id) 
+VALUES (
+    (SELECT id FROM role WHERE role_name = 'Admin'),
+    (SELECT id FROM permission WHERE code = 'ADMIN')
+);
+
+INSERT INTO permission (code, name) VALUES ('CATEGORYFORWARD', 'Trang Category');
+INSERT INTO permission (code, name) VALUES ('SUPPLIER_DELETE', 'Xóa nhà cung cấp');
+INSERT INTO permission (code, name) VALUES ('SUPPLIER_EVALUATE_VIEW', 'Xem đánh giá nhà cung cấp');
+INSERT INTO permission (code, name) VALUES ('SUPPLIER_EVALUATE_STATISTIC', 'Thống kê đánh giá nhà cung cấp');
+INSERT INTO permission (code, name) VALUES
+('DEPARTMENT_VIEW', 'Xem phòng ban'),
+('DEPARTMENT_ADD', 'Thêm phòng ban'),
+('DEPARTMENT_EDIT', 'Sửa phòng ban'),
+('DEPARTMENT_DETAIL', 'Chi tiết phòng ban'),
+('DEPARTMENT_STATISTIC', 'Thống kê phòng ban'),
+('PRODUCT_DELETE', 'Xóa sản phẩm'),
+('PRODUCT_RECOVER', 'Phục hồi sản phẩm'),
+('REQUEST_PAGE', 'Trang yêu cầu xuất/nhập kho'),
+('REQUEST_PURCHASE_VIEW', 'Xem yêu cầu mua hàng'),
+('REQUEST_RESPONSE_PAGE', 'Trang phê duyệt đơn'),
+('PASSWORD_RESPONSE', 'Phê duyệt yêu cầu mật khẩu'),
+('PASSWORD_RESET', 'Đổi mật khẩu'),
+('USER_PROFILE', 'Thông tin cá nhân'),
+('USER_PROFILE_EDIT', 'Cập nhật thông tin cá nhân');
+INSERT INTO role_permission (role_id, permission_id) 
+VALUES (
+    (SELECT id FROM role WHERE role_name = 'Admin'),
+    (SELECT id FROM permission WHERE code = 'ROLE_ASSIGN')
+);
+
+-- Add status column with default value
+ALTER TABLE `unit` ADD COLUMN `status` INT NOT NULL DEFAULT 1 COMMENT '1=Active, 0=Inactive';
+-- Set all existing units to active status
+UPDATE `unit` SET `status` = 1;
+-- ONLY run this after confirming the new system works perfectly
+ALTER TABLE `unit` DROP COLUMN `type`;
+-- Verify the relationship exists
+SELECT * FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+WHERE REFERENCED_TABLE_NAME = 'unit' AND TABLE_SCHEMA = 'warehouse_offical';
+-- Add index on status for better query performance
+ALTER TABLE `unit` ADD INDEX `idx_status` (`status`);
+
+
+

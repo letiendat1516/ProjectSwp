@@ -184,6 +184,32 @@
         .disabled-button {
             opacity: 0.5;
             cursor: not-allowed;
+            background: #bdbdbd !important;
+        }
+        .disabled-button:hover {
+            background: #bdbdbd !important;
+        }
+        .status-active {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .status-inactive {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .btn-activate {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-activate:hover {
+            background: #388e3c;
+        }
+        .btn-deactivate {
+            background: #ff9800;
+            color: white;
+        }
+        .btn-deactivate:hover {
+            background: #f57c00;
         }
         .search-container {
             margin-bottom: 24px;
@@ -363,29 +389,62 @@
                 <input type="text" id="searchInput" name="searchTerm" placeholder="Tên, kí hiệu,..." value="${searchTerm}" />
                 <button type="submit" class="btn-primary">Tìm kiếm</button>
             </form>
-            <select id="typeFilter" onchange="filterByType(this.value)">
-                <option value="all">Tất cả loại</option>
-                <option value="Khối lượng">Khối lượng</option>
-                <option value="Độ dài">Độ dài</option>
-                <option value="Số lượng">Số lượng</option>
+            <select id="statusFilter" onchange="filterByStatus(this.value)">
+                <option value="all">Tất cả trạng thái</option>
+                <option value="active">Hoạt động</option>
+                <option value="inactive">Ngừng hoạt động</option>
             </select>
             <a href="createMaterialUnit" class="btn-primary">Thêm đơn vị mới</a>
         </div>
 
         <script>
-        function filterByType(type) {
+        function filterByStatus(status) {
             var table = document.getElementById("materialUnitTable");
             var tr = table.getElementsByTagName("tr");
             for (var i = 1; i < tr.length; i++) {
-                var typeCell = tr[i].getElementsByTagName("td")[4];
-                if (typeCell) {
-                    var typeText = typeCell.textContent || typeCell.innerText;
-                    if (type === 'all' || typeText === type) {
+                var statusCell = tr[i].getElementsByTagName("td")[4];
+                if (statusCell) {
+                    var statusText = statusCell.textContent || statusCell.innerText;
+                    if (status === 'all' || 
+                        (status === 'active' && statusText === 'Hoạt động') ||
+                        (status === 'inactive' && statusText === 'Ngừng hoạt động')) {
                         tr[i].style.display = "";
                     } else {
                         tr[i].style.display = "none";
                     }
                 }
+            }
+        }
+        
+        function toggleUnitStatus(unitId, currentStatus) {
+            if (currentStatus == 1) {
+                // Deactivating - show options
+                if (confirm('Bạn có muốn ngừng hoạt động đơn vị này không?')) {
+                    // After deactivation, ask if user wants to delete
+                    if (confirm('Đơn vị đã được ngừng hoạt động. Bạn có muốn xóa đơn vị này luôn không?')) {
+                        // Redirect to deactivate and then delete
+                        window.location.href = 'deactivateMaterialUnit?id=' + unitId + '&deleteAfter=true';
+                    } else {
+                        // Just deactivate
+                        window.location.href = 'deactivateMaterialUnit?id=' + unitId;
+                    }
+                }
+            } else {
+                // Activating
+                if (confirm('Bạn có muốn kích hoạt đơn vị này không?')) {
+                    window.location.href = 'activateMaterialUnit?id=' + unitId;
+                }
+            }
+        }
+        
+        function deleteUnit(unitId, canDelete) {
+            if (!canDelete) {
+                alert('Không thể xóa đơn vị đang được sử dụng. Vui lòng ngừng hoạt động đơn vị trước, sau đó chọn xóa khi ngừng hoạt động.');
+                return;
+            }
+            
+            if (confirm('Bạn có muốn xóa đơn vị này không?')) {
+                window.location.href = 'deleteMaterialUnit?id=' + unitId;
             }
         }
         function sortTable(n) {
@@ -439,7 +498,7 @@
                     <th onclick="sortTable(1)">Tên ↕</th>
                     <th onclick="sortTable(2)">Kí hiệu ↕</th>
                     <th onclick="sortTable(3)">Mô tả ↕</th>
-                    <th onclick="sortTable(4)">Loại đơn vị ↕</th>
+                    <th onclick="sortTable(4)">Trạng thái ↕</th>
                     <th>Thao tác</th>
                 </tr>
             </thead>
@@ -457,10 +516,28 @@
                                 <td>${unit.name}</td>
                                 <td>${unit.symbol}</td>
                                 <td>${unit.description}</td>
-                                <td>${unit.type}</td>
                                 <td>
-                                    <a href="editMaterialUnit?id=${unit.id}" class="btn-edit">Thay đổi</a> 
-                                    <button onclick="if(confirm('Bạn có muốn xóa đơn vị này không?')) window.location.href='deleteMaterialUnit?id=${unit.id}'" class="btn-edit btn-delete">Xóa</button>
+                                    <c:choose>
+                                        <c:when test="${unit.status == 1}">
+                                            <span class="status-active">Hoạt động</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="status-inactive">Ngừng hoạt động</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <a href="editMaterialUnit?id=${unit.id}" class="btn-edit">Thay đổi</a>
+                                    <c:choose>
+                                        <c:when test="${unit.status == 1}">
+                                            <button onclick="toggleUnitStatus(${unit.id}, ${unit.status})" class="btn-edit btn-deactivate">Ngừng hoạt động</button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button onclick="toggleUnitStatus(${unit.id}, ${unit.status})" class="btn-edit btn-activate">Kích hoạt</button>
+                                            <!-- Show delete option for inactive units -->
+                                            <button onclick="deleteUnit(${unit.id}, true)" class="btn-edit btn-delete">Xóa</button>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
                             </tr>
                         </c:forEach>

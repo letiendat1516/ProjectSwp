@@ -184,11 +184,10 @@
                             <textarea id="description" name="description" rows="4">${unit.description}</textarea>
                         </div>
                         <div class="form-group">
-                            <label for="type">Loại đơn vị</label>
-                            <select id="type" name="type" required>
-                                <option value="Khối lượng" ${unit.type == 'Khối lượng' ? 'selected' : ''}>Khối lượng</option>
-                                <option value="Độ dài" ${unit.type == 'Độ dài' ? 'selected' : ''}>Độ dài</option>
-                                <option value="Số lượng" ${unit.type == 'Số lượng' ? 'selected' : ''}>Số lượng</option>
+                            <label for="status">Trạng thái</label>
+                            <select id="status" name="status" required>
+                                <option value="1" ${unit.status == 1 ? 'selected' : ''}>Hoạt động</option>
+                                <option value="0" ${unit.status == 0 ? 'selected' : ''}>Ngừng hoạt động</option>
                             </select>
                         </div>
                         <div class="form-buttons">

@@ -146,6 +146,14 @@
         <servlet-name>CategoryStatisticsController</servlet-name>
         <servlet-class>controller.CategoryStatisticsController</servlet-class>
     </servlet>
+    <servlet>
+    <servlet-name>ActivateMaterialUnitServlet</servlet-name>
+    <servlet-class>controller.ActivateMaterialUnitServlet</servlet-class>
+</servlet>
+<servlet>
+    <servlet-name>DeactivateMaterialUnitServlet</servlet-name>
+    <servlet-class>controller.DeactivateMaterialUnitServlet</servlet-class>
+</servlet>
     <!-- ========== SERVLET MAPPINGS ========== -->
     <!-- Category Mapping -->
     <servlet-mapping>
@@ -291,6 +299,14 @@
         <servlet-name>CategoryStatisticsController</servlet-name>
         <url-pattern>/category/statistics</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ActivateMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/activateMaterialUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeactivateMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/deactivateMaterialUnit</url-pattern>
+    </servlet-mapping>
     <!-- ========== FILTERS ========== -->
     <!-- UTF-8 Encoding Filter -->
     <filter>
@@ -367,6 +383,8 @@
         <url-pattern>/material_unit/editMaterialUnit.jsp</url-pattern>
         <url-pattern>/material_unit/editMaterialUnit</url-pattern>
         <url-pattern>/material_unit/deleteMaterialUnit</url-pattern>
+        <url-pattern>/material_unit/activateMaterialUnit</url-pattern>
+        <url-pattern>/material_unit/deactivateMaterialUnit</url-pattern>
         <url-pattern>/product-list.jsp</url-pattern>
         <url-pattern>/product-list</url-pattern>
         <url-pattern>/add-product.jsp</url-pattern>

@@ -92,6 +92,8 @@ public class AuthorizationFilter implements Filter {
         urlPermissionMap.put("/material_unit/editMaterialUnit.jsp", "UNIT_EDIT");
         urlPermissionMap.put("/material_unit/editMaterialUnit", "UNIT_EDIT");
         urlPermissionMap.put("/material_unit/deleteMaterialUnit", "UNIT_DELETE");
+        urlPermissionMap.put("/material_unit/activateMaterialUnit", "UNIT_EDIT");
+        urlPermissionMap.put("/material_unit/deactivateMaterialUnit", "UNIT_EDIT");
         
         
         // PRODUCT

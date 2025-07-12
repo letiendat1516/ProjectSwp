@@ -23,7 +23,6 @@ public class ProductInfoDAO {
   private static final String COL_CODE = "code";
   private static final String COL_CATE_ID = "cate_id";
   private static final String COL_UNIT_ID = "unit_id";
-  private static final String COL_PRICE = "price";
   private static final String COL_STATUS = "status";
   private static final String COL_DESCRIPTION = "description";
 
@@ -34,7 +33,7 @@ public class ProductInfoDAO {
   //Lấy tất cả product 
   public List<ProductInfo> getAllProducts() {
       List<ProductInfo> list = new ArrayList<>();
-      String sql = "SELECT id, name, code, cate_id, unit_id, price, status, description FROM product_info WHERE status != 'deleted'";
+      String sql = "SELECT id, name, code, cate_id, unit_id, status, description, min_stock_threshold FROM product_info WHERE status != 'deleted'";
 
       try (
               Connection con = Context.getJDBCConnection(); 
@@ -47,9 +46,9 @@ public class ProductInfoDAO {
               p.setCode(rs.getString(COL_CODE));
               p.setCate_id(rs.getInt(COL_CATE_ID));
               p.setUnit_id(rs.getInt(COL_UNIT_ID));
-              p.setPrice(rs.getBigDecimal(COL_PRICE));
               p.setStatus(rs.getString(COL_STATUS));
               p.setDescription(rs.getString(COL_DESCRIPTION));
+              p.setMinStockThreshold(rs.getBigDecimal("min_stock_threshold"));
               list.add(p);
           }
       } catch (SQLException e) {
@@ -95,7 +94,8 @@ public class ProductInfoDAO {
   public List<ProductStock> getProductsWithStock(int page, int pageSize, String search, String sortBy, String sortOrder) {
       List<ProductStock> list = new ArrayList<>();
       StringBuilder sql = new StringBuilder();
-      sql.append("SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.price, p.status, p.description, ");
+      sql.append("SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, ");
+      sql.append("p.min_stock_threshold, ");
       sql.append("COALESCE(s.qty, 0) as stock_qty, s.status as stock_status, ");
       sql.append("c.name as category_name, u.name as unit_name, u.symbol as unit_symbol ");
       sql.append("FROM product_info p ");
@@ -112,7 +112,6 @@ public class ProductInfoDAO {
           switch (sortBy) {
               case COL_NAME -> sql.append("p.name ");
               case COL_CODE -> sql.append("p.code ");
-              case COL_PRICE -> sql.append("p.price ");
               case "stock" -> sql.append("stock_qty ");
               case "category" -> sql.append("c.name ");
               default -> sql.append("p.id ");
@@ -146,7 +145,6 @@ public class ProductInfoDAO {
               product.setCode(rs.getString(COL_CODE));
               product.setCateId(rs.getInt(COL_CATE_ID));
               product.setUnitId(rs.getInt(COL_UNIT_ID));
-              product.setPrice(rs.getBigDecimal(COL_PRICE));
               product.setStatus(rs.getString(COL_STATUS));
               product.setDescription(rs.getString(COL_DESCRIPTION));
               product.setStockQuantity(rs.getBigDecimal("stock_qty"));
@@ -154,6 +152,7 @@ public class ProductInfoDAO {
               product.setCategoryName(rs.getString("category_name"));
               product.setUnitName(rs.getString("unit_name"));
               product.setUnitSymbol(rs.getString("unit_symbol"));
+              product.setMinStockThreshold(rs.getBigDecimal("min_stock_threshold"));
               
               // Check for low stock and near expiration
               product.checkLowStock();
@@ -214,8 +213,8 @@ public class ProductInfoDAO {
    */
   //Thêm product mới
   public boolean addProduct(ProductInfo product, int createdBy) {
-      String productSql = "INSERT INTO product_info (name, code, cate_id, unit_id, price, status, description, " +
-                         "supplier_id, expiration_date, additional_notes, created_by) " +
+      String productSql = "INSERT INTO product_info (name, code, cate_id, unit_id, status, description, " +
+                         "supplier_id, expiration_date, additional_notes, min_stock_threshold, created_by) " +
                          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       
       String stockSql = "INSERT INTO product_in_stock (product_id, qty, status) VALUES (?, ?, 'active')";
@@ -223,7 +222,7 @@ public class ProductInfoDAO {
       System.out.println("DEBUG: Starting addProduct method");
       System.out.println("DEBUG: Product data - Name: " + product.getName() + ", Code: " + product.getCode());
       System.out.println("DEBUG: Category ID: " + product.getCate_id() + ", Unit ID: " + product.getUnit_id());
-      System.out.println("DEBUG: Price: " + product.getPrice() + ", Status: " + product.getStatus());
+      System.out.println("DEBUG: Status: " + product.getStatus());
       System.out.println("DEBUG: Initial Stock Quantity: " + (product.getStockQuantity() != null ? product.getStockQuantity() : "0"));
       
       Connection con = null;
@@ -246,19 +245,19 @@ public class ProductInfoDAO {
               productStmt.setString(2, product.getCode());
               productStmt.setInt(3, product.getCate_id());
               productStmt.setInt(4, product.getUnit_id());
-              productStmt.setBigDecimal(5, product.getPrice());
-              productStmt.setString(6, product.getStatus());
-              productStmt.setString(7, product.getDescription());
+              productStmt.setString(5, product.getStatus());
+              productStmt.setString(6, product.getDescription());
               
               // Handle supplier_id - set to null if 0 or not provided
               if (product.getSupplierId() > 0) {
-                  productStmt.setInt(8, product.getSupplierId());
+                  productStmt.setInt(7, product.getSupplierId());
               } else {
-                  productStmt.setNull(8, java.sql.Types.INTEGER);
+                  productStmt.setNull(7, java.sql.Types.INTEGER);
               }
               
-              productStmt.setDate(9, product.getExpirationDate());
-              productStmt.setString(10, product.getAdditionalNotes());
+              productStmt.setDate(8, product.getExpirationDate());
+              productStmt.setString(9, product.getAdditionalNotes());
+              productStmt.setBigDecimal(10, product.getMinStockThreshold());
               productStmt.setInt(11, createdBy);
               
               System.out.println("DEBUG: Executing product insert query");
@@ -453,15 +452,28 @@ public class ProductInfoDAO {
    */
   //Lấy dữ liệu từ product dựa trên id 
   public ProductInfo getProductById(int productId) {
-      String sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.price, p.status, p.description, " +
-                   "p.supplier_id, p.expiration_date, p.additional_notes, " +
-                   "p.created_by, p.created_date, p.updated_by, p.updated_date, " +
-                   "COALESCE(s.qty, 0) as stock_qty " +
-                   "FROM product_info p " +
-                   "LEFT JOIN product_in_stock s ON p.id = s.product_id " +
-                   "WHERE p.id = ? AND p.active_flag = 1";
+      // First check if min_stock_threshold column exists
+      boolean hasMinStockThreshold = checkColumnExists("product_info", "min_stock_threshold");
+      
+      String sql;
+      if (hasMinStockThreshold) {
+          sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, " +
+                "p.expiration_date, p.min_stock_threshold, " +
+                "COALESCE(s.qty, 0) as stock_qty " +
+                "FROM product_info p " +
+                "LEFT JOIN product_in_stock s ON p.id = s.product_id " +
+                "WHERE p.id = ?";
+      } else {
+          sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, " +
+                "p.expiration_date, " +
+                "COALESCE(s.qty, 0) as stock_qty " +
+                "FROM product_info p " +
+                "LEFT JOIN product_in_stock s ON p.id = s.product_id " +
+                "WHERE p.id = ?";
+      }
       
       System.out.println("DEBUG: getProductById called with ID: " + productId);
+      System.out.println("DEBUG: Using SQL: " + sql);
       
       try (Connection con = Context.getJDBCConnection(); 
            PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -482,29 +494,36 @@ public class ProductInfoDAO {
                   product.setCode(rs.getString("code"));
                   product.setCate_id(rs.getInt("cate_id"));
                   product.setUnit_id(rs.getInt("unit_id"));
-                  product.setPrice(rs.getBigDecimal("price"));
                   product.setStatus(rs.getString("status"));
                   product.setDescription(rs.getString("description"));
-                  product.setSupplierId(rs.getInt("supplier_id"));
+                  
+                  // Set default values for fields that might not exist
+                  product.setSupplierId(0);
+                  product.setAdditionalNotes("");
+                  product.setCreatedBy(0);
+                  product.setUpdatedBy(0);
+                  
                   product.setExpirationDate(rs.getDate("expiration_date"));
-                  product.setAdditionalNotes(rs.getString("additional_notes"));
-                  product.setCreatedBy(rs.getInt("created_by"));
                   
-                  // Convert Timestamp to Date for compatibility
-                  java.sql.Timestamp createdTimestamp = rs.getTimestamp("created_date");
-                  if (createdTimestamp != null) {
-                      product.setCreatedDate(new java.sql.Date(createdTimestamp.getTime()));
-                  }
-                  
-                  product.setUpdatedBy(rs.getInt("updated_by"));
-                  java.sql.Timestamp updatedTimestamp = rs.getTimestamp("updated_date");
-                  if (updatedTimestamp != null) {
-                      product.setUpdatedDate(new java.sql.Date(updatedTimestamp.getTime()));
+                  // Handle min_stock_threshold
+                  if (hasMinStockThreshold) {
+                      BigDecimal minStockThreshold = rs.getBigDecimal("min_stock_threshold");
+                      if (minStockThreshold != null) {
+                          product.setMinStockThreshold(minStockThreshold);
+                      } else {
+                          product.setMinStockThreshold(BigDecimal.ZERO);
+                      }
+                  } else {
+                      product.setMinStockThreshold(BigDecimal.ZERO);
                   }
                   
                   // Set stock quantity
                   BigDecimal stockQty = rs.getBigDecimal("stock_qty");
-                  product.setStockQuantity(stockQty);
+                  if (stockQty != null) {
+                      product.setStockQuantity(stockQty.doubleValue());
+                  } else {
+                      product.setStockQuantity(0.0);
+                  }
                   
                   // Debug log
                   System.out.println("DEBUG: Product loaded successfully from DB: " + product.getName());
@@ -524,18 +543,53 @@ public class ProductInfoDAO {
       }
       return null;
   }
+  
+  /**
+   * Check if a column exists in a table
+   */
+  private boolean checkColumnExists(String tableName, String columnName) {
+      String sql = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS " +
+                   "WHERE TABLE_SCHEMA = DATABASE() " +
+                   "AND TABLE_NAME = ? AND COLUMN_NAME = ?";
+      
+      try (Connection con = Context.getJDBCConnection();
+           PreparedStatement stmt = con.prepareStatement(sql)) {
+          
+          stmt.setString(1, tableName);
+          stmt.setString(2, columnName);
+          
+          try (ResultSet rs = stmt.executeQuery()) {
+              if (rs.next()) {
+                  return rs.getInt(1) > 0;
+              }
+          }
+      } catch (SQLException e) {
+          System.err.println("ERROR checking column existence: " + e.getMessage());
+      }
+      return false;
+  }
 
   /**
    * Update product information
    */
   //Update dữ liệu của product
   public boolean updateProduct(ProductInfo product) {
-      String sql = "UPDATE product_info SET " +
-                   "name = ?, code = ?, cate_id = ?, unit_id = ?, price = ?, " +
-                   "status = ?, description = ?, supplier_id = ?, expiration_date = ?, " +
-                   "additional_notes = ?, " +
-                   "updated_by = ?, updated_date = CURRENT_TIMESTAMP " +
-                   "WHERE id = ?";
+      // Check if min_stock_threshold column exists
+      boolean hasMinStockThreshold = checkColumnExists("product_info", "min_stock_threshold");
+      
+      String sql;
+      if (hasMinStockThreshold) {
+          sql = "UPDATE product_info SET " +
+                "name = ?, code = ?, cate_id = ?, unit_id = ?, " +
+                "status = ?, description = ?, expiration_date = ?, " +
+                "min_stock_threshold = ? " +
+                "WHERE id = ?";
+      } else {
+          sql = "UPDATE product_info SET " +
+                "name = ?, code = ?, cate_id = ?, unit_id = ?, " +
+                "status = ?, description = ?, expiration_date = ? " +
+                "WHERE id = ?";
+      }
       
       try (Connection con = Context.getJDBCConnection(); 
            PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -544,21 +598,16 @@ public class ProductInfoDAO {
           stmt.setString(2, product.getCode());
           stmt.setInt(3, product.getCate_id());
           stmt.setInt(4, product.getUnit_id());
-          stmt.setBigDecimal(5, product.getPrice());
-          stmt.setString(6, product.getStatus());
-          stmt.setString(7, product.getDescription());
+          stmt.setString(5, product.getStatus());
+          stmt.setString(6, product.getDescription());
+          stmt.setDate(7, product.getExpirationDate());
           
-          // Handle supplier_id - set to null if 0 or not provided
-          if (product.getSupplierId() > 0) {
-              stmt.setInt(8, product.getSupplierId());
+          if (hasMinStockThreshold) {
+              stmt.setBigDecimal(8, product.getMinStockThreshold());
+              stmt.setInt(9, product.getId());
           } else {
-              stmt.setNull(8, java.sql.Types.INTEGER);
+              stmt.setInt(8, product.getId());
           }
-          
-          stmt.setDate(9, product.getExpirationDate());
-          stmt.setString(10, product.getAdditionalNotes());
-          stmt.setInt(11, product.getUpdatedBy());
-          stmt.setInt(12, product.getId());
           
           int rowsAffected = stmt.executeUpdate();
           return rowsAffected > 0;
@@ -711,7 +760,7 @@ public class ProductInfoDAO {
    */
   public List<ProductInfo> getDeletedProducts() {
       List<ProductInfo> list = new ArrayList<>();
-      String sql = "SELECT id, name, code, cate_id, unit_id, price, status, description FROM product_info WHERE status = 'deleted'";
+      String sql = "SELECT id, name, code, cate_id, unit_id, status, description, min_stock_threshold FROM product_info WHERE status = 'deleted'";
       try (
               Connection con = Context.getJDBCConnection();
               PreparedStatement stmt = con.prepareStatement(sql);
@@ -723,9 +772,9 @@ public class ProductInfoDAO {
               p.setCode(rs.getString(COL_CODE));
               p.setCate_id(rs.getInt(COL_CATE_ID));
               p.setUnit_id(rs.getInt(COL_UNIT_ID));
-              p.setPrice(rs.getBigDecimal(COL_PRICE));
               p.setStatus(rs.getString(COL_STATUS));
               p.setDescription(rs.getString(COL_DESCRIPTION));
+              p.setMinStockThreshold(rs.getBigDecimal("min_stock_threshold"));
               list.add(p);
           }
       } catch (SQLException e) {
