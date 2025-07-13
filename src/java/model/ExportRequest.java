@@ -1,49 +1,34 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
+
 import java.util.ArrayList;
 import java.util.Date;
-/**
- *
- * @author Dell
- */
+
 public class ExportRequest {
 
     private String id;
-    private int user_id;
+    private int userId;
     private String role;
-    private Date day_request;
+    private Date dayRequest;
     private String status;
-    private String reason;
-    private String department;
-    private String recipient_name;
-    private String recipient_phone;
-    private String recipient_email;
-    private String approve_by;
-    private String warehouse;
+    private String approveBy;
+    private Date createdAt;
     private ArrayList<ExportRequestItem> items;
 
+    // Constructors
     public ExportRequest() {
+        this.items = new ArrayList<>();
     }
 
-    public ExportRequest(String id, int user_id, String role, Date day_request, String status, String reason, String department, String recipient_name, String recipient_phone, String recipient_email, String approve_by, String warehouse, ArrayList<ExportRequestItem> items) {
+    public ExportRequest(String id, int userId, String role, Date dayRequest, String status) {
         this.id = id;
-        this.user_id = user_id;
+        this.userId = userId;
         this.role = role;
-        this.day_request = day_request;
+        this.dayRequest = dayRequest;
         this.status = status;
-        this.reason = reason;
-        this.department = department;
-        this.recipient_name = recipient_name;
-        this.recipient_phone = recipient_phone;
-        this.recipient_email = recipient_email;
-        this.approve_by = approve_by;
-        this.warehouse = warehouse;
-        this.items = items;
+        this.items = new ArrayList<>();
     }
 
+    // Getters and Setters
     public String getId() {
         return id;
     }
@@ -52,12 +37,12 @@ public class ExportRequest {
         this.id = id;
     }
 
-    public int getUser_id() {
-        return user_id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getRole() {
@@ -68,12 +53,12 @@ public class ExportRequest {
         this.role = role;
     }
 
-    public Date getDay_request() {
-        return day_request;
+    public Date getDayRequest() {
+        return dayRequest;
     }
 
-    public void setDay_request(Date day_request) {
-        this.day_request = day_request;
+    public void setDayRequest(Date dayRequest) {
+        this.dayRequest = dayRequest;
     }
 
     public String getStatus() {
@@ -84,60 +69,20 @@ public class ExportRequest {
         this.status = status;
     }
 
-    public String getReason() {
-        return reason;
+    public String getApproveBy() {
+        return approveBy;
     }
 
-    public void setReason(String reason) {
-        this.reason = reason;
+    public void setApproveBy(String approveBy) {
+        this.approveBy = approveBy;
     }
 
-    public String getDepartment() {
-        return department;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
-    }
-
-    public String getRecipient_name() {
-        return recipient_name;
-    }
-
-    public void setRecipient_name(String recipient_name) {
-        this.recipient_name = recipient_name;
-    }
-
-    public String getRecipient_phone() {
-        return recipient_phone;
-    }
-
-    public void setRecipient_phone(String recipient_phone) {
-        this.recipient_phone = recipient_phone;
-    }
-
-    public String getRecipient_email() {
-        return recipient_email;
-    }
-
-    public void setRecipient_email(String recipient_email) {
-        this.recipient_email = recipient_email;
-    }
-
-    public String getApprove_by() {
-        return approve_by;
-    }
-
-    public void setApprove_by(String approve_by) {
-        this.approve_by = approve_by;
-    }
-
-    public String getWarehouse() {
-        return warehouse;
-    }
-
-    public void setWarehouse(String warehouse) {
-        this.warehouse = warehouse;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     public ArrayList<ExportRequestItem> getItems() {
@@ -147,5 +92,4 @@ public class ExportRequest {
     public void setItems(ArrayList<ExportRequestItem> items) {
         this.items = items;
     }
-    
 }

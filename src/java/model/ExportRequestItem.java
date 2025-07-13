@@ -1,42 +1,32 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-/**
- *
- * @author Dell
- */
 public class ExportRequestItem {
 
     private int id;
-    private String export_request_id;
-    private String product_name;
-    private String product_code;
+    private String exportRequestId;
+    private String productName;
+    private String productCode;
     private String unit;
     private double quantity;
     private String note;
-    private String reason_detail;
-    private int product_id;
-    private double exported_qty;
+    private int productId;
+    private double exportedQty;
 
+    // Constructors
     public ExportRequestItem() {
     }
 
-    public ExportRequestItem(int id, String export_request_id, String product_name,
-            String product_code, String unit, double quantity, String note,
-            String reason_detail, int product_id, double exported_qty) {
-        this.id = id;
-        this.export_request_id = export_request_id;
-        this.product_name = product_name;
-        this.product_code = product_code;
+    public ExportRequestItem(String exportRequestId, String productName,
+            String productCode, String unit, double quantity,
+            String note, int productId) {
+        this.exportRequestId = exportRequestId;
+        this.productName = productName;
+        this.productCode = productCode;
         this.unit = unit;
         this.quantity = quantity;
         this.note = note;
-        this.reason_detail = reason_detail;
-        this.product_id = product_id;
-        this.exported_qty = exported_qty;
+        this.productId = productId;
+        this.exportedQty = 0.0;
     }
 
     // Getters and Setters
@@ -48,28 +38,28 @@ public class ExportRequestItem {
         this.id = id;
     }
 
-    public String getExport_request_id() {
-        return export_request_id;
+    public String getExportRequestId() {
+        return exportRequestId;
     }
 
-    public void setExport_request_id(String export_request_id) {
-        this.export_request_id = export_request_id;
+    public void setExportRequestId(String exportRequestId) {
+        this.exportRequestId = exportRequestId;
     }
 
-    public String getProduct_name() {
-        return product_name;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setProduct_name(String product_name) {
-        this.product_name = product_name;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
-    public String getProduct_code() {
-        return product_code;
+    public String getProductCode() {
+        return productCode;
     }
 
-    public void setProduct_code(String product_code) {
-        this.product_code = product_code;
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
     }
 
     public String getUnit() {
@@ -96,27 +86,19 @@ public class ExportRequestItem {
         this.note = note;
     }
 
-    public String getReason_detail() {
-        return reason_detail;
+    public int getProductId() {
+        return productId;
     }
 
-    public void setReason_detail(String reason_detail) {
-        this.reason_detail = reason_detail;
+    public void setProductId(int productId) {
+        this.productId = productId;
     }
 
-    public int getProduct_id() {
-        return product_id;
+    public double getExportedQty() {
+        return exportedQty;
     }
 
-    public void setProduct_id(int product_id) {
-        this.product_id = product_id;
-    }
-
-    public double getExported_qty() {
-        return exported_qty;
-    }
-
-    public void setExported_qty(double exported_qty) {
-        this.exported_qty = exported_qty;
+    public void setExportedQty(double exportedQty) {
+        this.exportedQty = exportedQty;
     }
 }

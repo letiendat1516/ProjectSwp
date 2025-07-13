@@ -93,7 +93,7 @@ public class SubmitRequoteFormServlet extends HttpServlet {
           PurchaseOrderInfo purchaseOrder = new PurchaseOrderInfo();
           purchaseOrder.setId(originalRequestId);
           purchaseOrder.setFullname(fullname);
-          purchaseOrder.setDoB(dob);
+  //        purchaseOrder.setDoB(dob);
           purchaseOrder.setDayPurchase(purchaseDate);
           // Status sẽ được set thành "pending" trong DAO
 

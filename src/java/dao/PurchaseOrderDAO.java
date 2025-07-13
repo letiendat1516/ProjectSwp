@@ -32,12 +32,11 @@ public class PurchaseOrderDAO {
                 pstmtOrder.setString(2, purchaseOrderInfo.getFullname());
 
                 // Chuyển đổi java.util.Date sang java.sql.Date
-                if (purchaseOrderInfo.getDoB() != null) {
-                    pstmtOrder.setDate(3, new java.sql.Date(purchaseOrderInfo.getDoB().getTime()));
-                } else {
-                    pstmtOrder.setNull(3, Types.DATE);
-                }
-
+//                if (purchaseOrderInfo.getDoB() != null) {
+//                    pstmtOrder.setDate(3, new java.sql.Date(purchaseOrderInfo.getDoB().getTime()));
+//                } else {
+//                    pstmtOrder.setNull(3, Types.DATE);
+//                }
                 if (purchaseOrderInfo.getDayPurchase() != null) {
                     pstmtOrder.setDate(4, new java.sql.Date(purchaseOrderInfo.getDayPurchase().getTime()));
                 } else {
@@ -203,17 +202,17 @@ public class PurchaseOrderDAO {
                                 currentRequest = new Request();
                                 currentRequest.setId(requestId);
                                 currentRequest.setFullname(rs.getString("fullname"));
-                                currentRequest.setUser_id(rs.getInt("user_id"));
+                                //  currentRequest.setUser_id(rs.getInt("user_id"));
                                 currentRequest.setRole(rs.getString("role"));
                                 currentRequest.setDay_request(rs.getDate("day_request"));
                                 currentRequest.setStatus(rs.getString("status"));
                                 currentRequest.setReason(rs.getString("reason"));
-                                currentRequest.setSupplier(rs.getString("supplier"));
-                                currentRequest.setAddress(rs.getString("address"));
-                                currentRequest.setPhone(rs.getString("phone"));
-                                currentRequest.setEmail(rs.getString("email"));
-                                currentRequest.setApprove_by(rs.getString("approve_by"));
-                                currentRequest.setWarehouse(rs.getString("warehouse"));
+//                                currentRequest.setSupplier(rs.getString("supplier"));
+//                                currentRequest.setAddress(rs.getString("address"));
+//                                currentRequest.setPhone(rs.getString("phone"));
+//                                currentRequest.setEmail(rs.getString("email"));
+//                                currentRequest.setApprove_by(rs.getString("approve_by"));
+//                                currentRequest.setWarehouse(rs.getString("warehouse"));
                                 currentRequest.setItems(new ArrayList<>());
                                 allRequests.add(currentRequest);
                             }
@@ -228,7 +227,7 @@ public class PurchaseOrderDAO {
                                 item.setUnit(rs.getString("unit"));
                                 item.setQuantity(rs.getDouble("quantity"));
                                 item.setNote(rs.getString("note") != null ? rs.getString("note") : "");
-                                item.setReasonDetail(rs.getString("reason_detail") != null ? rs.getString("reason_detail") : "");
+//                                item.setReasonDetail(rs.getString("reason_detail") != null ? rs.getString("reason_detail") : "");
                                 currentRequest.getItems().add(item);
                             }
                         }
@@ -432,7 +431,7 @@ public class PurchaseOrderDAO {
                         order = new PurchaseOrderInfo();
                         order.setId(rs.getString("order_id"));
                         order.setFullname(rs.getString("fullname"));
-                        order.setDoB(rs.getDate("DoB"));
+//                        order.setDoB(rs.getDate("DoB"));
                         order.setDayPurchase(rs.getDate("day_purchase"));
                         order.setStatus(rs.getString("status"));
                         order.setReason(rs.getString("reason"));

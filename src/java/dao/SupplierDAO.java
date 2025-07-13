@@ -171,6 +171,7 @@ public class SupplierDAO {
         List<Supplier> list = new ArrayList<>();
         String sql = "SELECT * FROM supplier ORDER BY id LIMIT ?, ?";
         try {
+            System.out.println(sql);
             conn = new Context().getJDBCConnection();
             ps = conn.prepareStatement(sql);
             ps.setInt(1, (pageIndex - 1) * pageSize);
@@ -304,15 +305,6 @@ public class SupplierDAO {
         } catch (SQLException e) {
         }
         return null;
-    }
-
-    public static void main(String[] args) {
-        SupplierDAO sd = new SupplierDAO();
-        Supplier s = sd.getSupplierByID(1);
-        System.out.println(s.getSupplierID());
-        // limit (offset),(limit)
-//        List<Supplier> l = sd.getSuppliersByPageFilter(2, 10, "all", "");
-//        System.out.println(Math.ceil((double)l.size()/5));
     }
 
 }

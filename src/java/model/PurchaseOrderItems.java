@@ -1,41 +1,64 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import java.math.BigDecimal;
 
-/**
- *
- * @author Admin
- */
 public class PurchaseOrderItems {
+
     private int id;
     private String purchaseId;
     private String productName;
     private String productCode;
     private String unit;
-    private BigDecimal quantity;
+    private BigDecimal quantity; // Số lượng gốc từ đơn hàng
+    private BigDecimal quantityOrdered; // Số lượng đặt hàng
+    private BigDecimal quantityImported; // Số lượng đã nhập
+    private BigDecimal quantityPending; // Số lượng còn lại
     private BigDecimal pricePerUnit;
     private BigDecimal totalPrice;
     private String note;
 
+    // Constructor
     public PurchaseOrderItems() {
+        this.quantityImported = BigDecimal.ZERO;
+        this.quantityPending = BigDecimal.ZERO;
     }
 
-    public PurchaseOrderItems(int id, String purchaseId, String productName, String productCode, String unit, BigDecimal quantity, BigDecimal pricePerUnit, BigDecimal totalPrice, String note) {
-        this.id = id;
-        this.purchaseId = purchaseId;
-        this.productName = productName;
-        this.productCode = productCode;
-        this.unit = unit;
-        this.quantity = quantity;
-        this.pricePerUnit = pricePerUnit;
-        this.totalPrice = totalPrice;
-        this.note = note;
+    // Getters và Setters
+    public BigDecimal getQuantityOrdered() {
+        return quantityOrdered;
     }
 
+    public void setQuantityOrdered(BigDecimal quantityOrdered) {
+        this.quantityOrdered = quantityOrdered;
+        // Tự động tính số lượng còn lại
+        if (this.quantityImported != null) {
+            this.quantityPending = quantityOrdered.subtract(this.quantityImported);
+        } else {
+            this.quantityPending = quantityOrdered;
+        }
+    }
+
+    public BigDecimal getQuantityImported() {
+        return quantityImported != null ? quantityImported : BigDecimal.ZERO;
+    }
+
+    public void setQuantityImported(BigDecimal quantityImported) {
+        this.quantityImported = quantityImported != null ? quantityImported : BigDecimal.ZERO;
+        // Tự động tính số lượng còn lại
+        if (this.quantityOrdered != null) {
+            this.quantityPending = this.quantityOrdered.subtract(this.quantityImported);
+        }
+    }
+
+    public BigDecimal getQuantityPending() {
+        return quantityPending != null ? quantityPending : BigDecimal.ZERO;
+    }
+
+    public void setQuantityPending(BigDecimal quantityPending) {
+        this.quantityPending = quantityPending;
+    }
+
+    // Các getter/setter khác giữ nguyên...
     public int getId() {
         return id;
     }
@@ -107,5 +130,4 @@ public class PurchaseOrderItems {
     public void setNote(String note) {
         this.note = note;
     }
-    
 }

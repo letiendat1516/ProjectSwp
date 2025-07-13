@@ -1,14 +1,10 @@
 package controller;
 
-import dao.ExportRequestDAO;
-import dao.ExportRequestItemsDAO;
-import dao.ProductInfoDAO;
-import dao.UnitDAO;
-import dao.UserDAO;
+import dao.*;
+import model.*;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -16,250 +12,295 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import model.ProductInfo;
-import model.Unit;
-import model.Users;
 
 public class ExportRequestController extends HttpServlet {
 
-  @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
+    private ExportRequestDAO exportRequestDAO;
+    private ExportRequestItemsDAO exportRequestItemsDAO;
+    private ProductInfoDAO productInfoDAO;
+    private UnitDAO unitDAO;
+    private UserDAO userDAO;
 
-      // Kiểm tra session trước khi sử dụng
-      HttpSession session = request.getSession(false);
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        exportRequestDAO = new ExportRequestDAO();
+        exportRequestItemsDAO = new ExportRequestItemsDAO();
+        productInfoDAO = new ProductInfoDAO();
+        unitDAO = new UnitDAO();
+        userDAO = new UserDAO();
+    }
 
-      if (session == null) {
-          System.out.println("Session is null - redirecting to login");
-          response.sendRedirect("login.jsp");
-          return;
-      }
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-      Users currentUser = (Users) session.getAttribute("user");
+        System.out.println("=== ExportRequestController doGet() ===");
 
-      if (currentUser == null) {
-          System.out.println("Current user is null - redirecting to login");
-          response.sendRedirect("login.jsp");
-          return;
-      }
+        // Kiểm tra session
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            System.out.println("Session không hợp lệ, redirect về login");
+            response.sendRedirect("login.jsp");
+            return;
+        }
 
-      try {
-          // Khởi tạo các DAO
-          UserDAO dao = new UserDAO();
-          ExportRequestDAO exportRequestDAO = new ExportRequestDAO();
-          ProductInfoDAO product = new ProductInfoDAO();
-          UnitDAO unitDAO = new UnitDAO();
+        Users currentUser = (Users) session.getAttribute("user");
+        System.out.println("Current user ID: " + currentUser.getId());
 
-          // Lấy thông tin user
-          String fullname = dao.getFullName(currentUser.getId());
-          Date DoB = dao.getDoB(currentUser.getId());
-          
-          // Lấy ID preview cho form
-          String nextExportID = exportRequestDAO.getNextExportRequestId();
+        try {
+            // Lấy thông tin user
+            String fullname = userDAO.getFullName(currentUser.getId());
+            Date dob = userDAO.getDoB(currentUser.getId());
 
-          // Tính tuổi
-          if (DoB != null) {
-              java.util.Calendar cal = java.util.Calendar.getInstance();
-              cal.setTime(DoB);
-              int yearOfBirth = cal.get(java.util.Calendar.YEAR);
-              int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-              int age = currentYear - yearOfBirth;
-              request.setAttribute("age", age);
-          } else {
-              System.out.println("DOB is null for user: " + currentUser.getId());
-              request.setAttribute("age", "N/A");
-          }
+            // Tính tuổi
+            int age = calculateAge(dob);
 
-          // Lấy dữ liệu cho form
-          List<ProductInfo> products_list = product.getAllProducts();
-          List<Unit> units_list = unitDAO.getAllUnits();
+            // Lấy ID preview cho form
+            String nextExportID = exportRequestDAO.generateNextExportRequestId();
 
-          // Set attributes
-          request.setAttribute("nextExportID", nextExportID);
-          request.setAttribute("products_list", products_list);
-          request.setAttribute("units_list", units_list);
-          session.setAttribute("currentUser", fullname);
-          session.setAttribute("DoB", DoB);
+            // Lấy danh sách sản phẩm và đơn vị
+            List<ProductInfo> productsList = productInfoDAO.getAllProducts();
+            List<Unit> unitsList = unitDAO.getAllUnits();
 
-          request.getRequestDispatcher("ExportRequest.jsp").forward(request, response);
-          
-      } catch (Exception e) {
-          System.out.println("Error in doGet: " + e.getMessage());
-          e.printStackTrace();
-          request.setAttribute("error", "Có lỗi xảy ra khi tải trang: " + e.getMessage());
-          request.getRequestDispatcher("error.jsp").forward(request, response);
-      }
-  }
+            System.out.println("Next Export ID: " + nextExportID);
+            System.out.println("Products count: " + (productsList != null ? productsList.size() : 0));
+            System.out.println("Units count: " + (unitsList != null ? unitsList.size() : 0));
 
-  @Override
-  protected void doPost(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
-      response.setContentType("text/html;charset=UTF-8");
-      request.setCharacterEncoding("UTF-8");
+            // Set attributes
+            request.setAttribute("nextExportID", nextExportID);
+            request.setAttribute("productsList", productsList);
+            request.setAttribute("unitsList", unitsList);
+            request.setAttribute("currentUser", fullname);
+            request.setAttribute("age", age);
+            request.setAttribute("dob", dob);
 
-      try {
-          // Lấy dữ liệu từ form
-          String role = request.getParameter("role");
-          String dayRequestStr = request.getParameter("day_request");
-          String reason = request.getParameter("reason");
-          String department = request.getParameter("department");
-          String recipientName = request.getParameter("recipient_name");
-          String recipientPhone = request.getParameter("recipient_phone");
-          String recipientEmail = request.getParameter("recipient_email");
+            // Forward đến JSP
+            System.out.println("Forward to ExportRequest.jsp");
+            request.getRequestDispatcher("ExportRequest.jsp").forward(request, response);
 
-          // Debug log
-          System.out.println("=== DEBUG EXPORT REQUEST ===");
-          System.out.println("Role: " + role);
-          System.out.println("Day request: " + dayRequestStr);
-          System.out.println("Department: " + department);
-          System.out.println("Recipient: " + recipientName);
+        } catch (Exception e) {
+            System.out.println("Lỗi trong doGet: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "Có lỗi xảy ra khi tải trang: " + e.getMessage());
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+        }
+    }
 
-          // Parse ngày
-          Date dayRequest = null;
-          try {
-              java.util.Date utilDate = new SimpleDateFormat("yyyy-MM-dd").parse(dayRequestStr);
-              dayRequest = new java.sql.Date(utilDate.getTime());
-          } catch (ParseException e) {
-              e.printStackTrace();
-              request.setAttribute("error", "Ngày không hợp lệ");
-              doGet(request, response); // Reload form với error
-              return;
-          }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-          // Lấy thông tin items
-          String[] sttArr = request.getParameterValues("stt");
-          String[] productNameArr = request.getParameterValues("product_name");
-          String[] productCodeArr = request.getParameterValues("product_code");
-          String[] unitArr = request.getParameterValues("unit");
-          String[] quantityArr = request.getParameterValues("quantity");
-          String[] noteArr = request.getParameterValues("note");
-          String reasonDetail = request.getParameter("reason_detail");
+        System.out.println("=== ExportRequestController doPost() BẮT ĐẦU ===");
 
-          // Debug items
-          System.out.println("Product names: " + java.util.Arrays.toString(productNameArr));
-          System.out.println("Product codes: " + java.util.Arrays.toString(productCodeArr));
-          System.out.println("Original units: " + java.util.Arrays.toString(unitArr));
-          System.out.println("Quantities: " + java.util.Arrays.toString(quantityArr));
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
 
-          // Validate dữ liệu
-          if (productNameArr == null || productCodeArr == null || quantityArr == null) {
-              request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin sản phẩm");
-              doGet(request, response);
-              return;
-          }
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            System.out.println("Session không hợp lệ, redirect về login");
+            response.sendRedirect("login.jsp");
+            return;
+        }
 
-          // Convert quantity sang int
-          int[] quantityIntArr = new int[quantityArr.length];
-          for (int i = 0; i < quantityArr.length; i++) {
-              try {
-                  quantityIntArr[i] = Integer.parseInt(quantityArr[i]);
-              } catch (NumberFormatException e) {
-                  quantityIntArr[i] = 0;
-              }
-          }
+        Users currentUser = (Users) session.getAttribute("user");
+        System.out.println("Current user ID: " + currentUser.getId());
 
-          // Lấy user từ session
-          HttpSession session = request.getSession(false);
-          Users currentUser = (Users) session.getAttribute("user");
-          int user_id = currentUser.getId();
+        try {
+            // Lấy dữ liệu từ form
+            String role = request.getParameter("role");
+            System.out.println("Role nhận được: " + role);
 
-          // Convert product IDs thành tên sản phẩm
-          ProductInfoDAO productDAO = new ProductInfoDAO();
-          String[] actualProductNames = new String[productNameArr.length];
-          for (int i = 0; i < productNameArr.length; i++) {
-              if (productNameArr[i] != null && !productNameArr[i].trim().isEmpty()) {
-                  try {
-                      int productId = Integer.parseInt(productNameArr[i]);
-                      actualProductNames[i] = productDAO.getProductNameById(productId);
-                  } catch (NumberFormatException e) {
-                      actualProductNames[i] = productNameArr[i];
-                  }
-              } else {
-                  actualProductNames[i] = "";
-              }
-          }
+            // Ngày yêu cầu là ngày hiện tại
+            Date dayRequest = new Date();
+            System.out.println("Day request: " + dayRequest);
 
-          // Convert unit IDs thành tên đơn vị
-          UnitDAO unitDAO = new UnitDAO();
-          String[] actualUnitNames = convertUnitsToNames(unitArr, unitDAO);
-          
-          System.out.println("Converted units: " + java.util.Arrays.toString(actualUnitNames));
+            // Validate dữ liệu cơ bản
+            if (role == null || role.trim().isEmpty()) {
+                System.out.println("Role trống, trả về form với lỗi");
+                request.setAttribute("error", "Vui lòng chọn vai trò");
+                doGet(request, response);
+                return;
+            }
 
-          // Khởi tạo DAO
-          ExportRequestDAO exportRequestDAO = new ExportRequestDAO();
-          ExportRequestItemsDAO exportRequestItemsDAO = new ExportRequestItemsDAO();
+            // Tạo đối tượng ExportRequest
+            ExportRequest exportRequest = new ExportRequest();
+            exportRequest.setUserId(currentUser.getId());
+            exportRequest.setRole(role);
+            exportRequest.setDayRequest(dayRequest);
+            exportRequest.setStatus("pending");
 
-          // Thêm export request - ID sẽ được tạo trong method này
-          String export_request_id = exportRequestDAO.addExportRequestIntoDB(
-                  user_id, role, dayRequest, "pending", reason, department,
-                  recipientName, recipientPhone, recipientEmail);
+            // Lấy dữ liệu items từ form
+            String[] productIds = request.getParameterValues("product_id");
+            String[] productNames = request.getParameterValues("product_name");
+            String[] productCodes = request.getParameterValues("product_code");
+            String[] units = request.getParameterValues("unit");
+            String[] quantities = request.getParameterValues("quantity");
+            String[] notes = request.getParameterValues("note");
 
-          if (export_request_id != null && !export_request_id.trim().isEmpty()) {
-              // Thêm items
-              exportRequestItemsDAO.addExportItemsIntoDB(
-                      export_request_id, actualProductNames, productCodeArr,
-                      actualUnitNames, quantityIntArr, noteArr, reasonDetail);
+            // Debug log chi tiết
+            System.out.println("=== DEBUG FORM DATA ===");
+            System.out.println("Product IDs: " + java.util.Arrays.toString(productIds));
+            System.out.println("Product Names: " + java.util.Arrays.toString(productNames));
+            System.out.println("Product Codes: " + java.util.Arrays.toString(productCodes));
+            System.out.println("Units: " + java.util.Arrays.toString(units));
+            System.out.println("Quantities: " + java.util.Arrays.toString(quantities));
+            System.out.println("Notes: " + java.util.Arrays.toString(notes));
 
-              // Set thông tin cho success page
-              request.setAttribute("exportRequestId", export_request_id);
-              request.setAttribute("requestDate", new SimpleDateFormat("dd/MM/yyyy").format(dayRequest));
-              request.setAttribute("department", department);
-              request.setAttribute("recipientName", recipientName);
+            // Validate items
+            if (productIds == null || productIds.length == 0) {
+                System.out.println("Không có sản phẩm nào được chọn");
+                request.setAttribute("error", "Vui lòng thêm ít nhất một sản phẩm");
+                doGet(request, response);
+                return;
+            }
 
-              // Forward đến success page
-              request.getRequestDispatcher("ExportRequestSuccessNotification.jsp").forward(request, response);
-          } else {
-              request.setAttribute("error", "Không thể tạo đơn xuất kho. Vui lòng thử lại.");
-              doGet(request, response);
-          }
+            // Kiểm tra có ít nhất 1 item hợp lệ
+            boolean hasValidItem = false;
+            int validItemCount = 0;
+            for (int i = 0; i < productIds.length; i++) {
+                System.out.println("Checking item " + i + ": productId=" + productIds[i] + ", quantity=" + quantities[i]);
+                if (productIds[i] != null && !productIds[i].trim().isEmpty()
+                        && quantities[i] != null && !quantities[i].trim().isEmpty()) {
+                    try {
+                        double qty = Double.parseDouble(quantities[i]);
+                        if (qty > 0) {
+                            hasValidItem = true;
+                            validItemCount++;
+                            System.out.println("Item " + i + " hợp lệ với quantity: " + qty);
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Lỗi parse quantity tại item " + i + ": " + quantities[i]);
+                    }
+                }
+            }
 
-      } catch (Exception e) {
-          e.printStackTrace();
-          request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
-          doGet(request, response);
-      }
-  }
+            System.out.println("Số item hợp lệ: " + validItemCount);
 
-  /**
-   * Convert unit IDs thành tên đơn vị
-   */
-  private String[] convertUnitsToNames(String[] unitArr, UnitDAO unitDAO) {
-      if (unitArr == null) return new String[0];
-      
-      String[] actualUnitNames = new String[unitArr.length];
-      
-      for (int i = 0; i < unitArr.length; i++) {
-          if (unitArr[i] != null && !unitArr[i].trim().isEmpty()) {
-              try {
-                  int unitId = Integer.parseInt(unitArr[i]);
-                  Unit unit = unitDAO.getUnitById(unitId);
-                  if (unit != null) {
-                      String unitDisplay = (unit.getSymbol() != null && !unit.getSymbol().trim().isEmpty()) 
-                                         ? unit.getSymbol() 
-                                         : unit.getName();
-                      actualUnitNames[i] = unitDisplay;
-                      System.out.println("Converted unit ID " + unitId + " to: " + unitDisplay);
-                  } else {
-                      actualUnitNames[i] = unitArr[i];
-                      System.out.println("Warning: Không tìm thấy unit với ID: " + unitId);
-                  }
-              } catch (NumberFormatException e) {
-                  actualUnitNames[i] = unitArr[i];
-                  System.out.println("Unit is already a name: " + unitArr[i]);
-              } catch (Exception e) {
-                  actualUnitNames[i] = unitArr[i];
-                  System.out.println("Database error when getting unit: " + e.getMessage());
-              }
-          } else {
-              actualUnitNames[i] = "";
-          }
-      }
-      
-      return actualUnitNames;
-  }
+            if (!hasValidItem) {
+                System.out.println("Không có item hợp lệ nào");
+                request.setAttribute("error", "Vui lòng nhập ít nhất một sản phẩm với số lượng hợp lệ");
+                doGet(request, response);
+                return;
+            }
 
-  @Override
-  public String getServletInfo() {
-      return "Export Request Servlet";
-  }
+            System.out.println("Bắt đầu thêm export request vào database...");
+
+            // Thêm đơn xuất kho
+            String exportRequestId = exportRequestDAO.addExportRequest(exportRequest);
+            System.out.println("Export Request ID được tạo: " + exportRequestId);
+
+            if (exportRequestId != null && !exportRequestId.trim().isEmpty()) {
+                System.out.println("Export request được tạo thành công với ID: " + exportRequestId);
+
+                // Tạo danh sách items
+                List<ExportRequestItem> items = new ArrayList<>();
+
+                for (int i = 0; i < productIds.length; i++) {
+                    if (productIds[i] != null && !productIds[i].trim().isEmpty()
+                            && quantities[i] != null && !quantities[i].trim().isEmpty()) {
+
+                        try {
+                            double quantity = Double.parseDouble(quantities[i]);
+                            if (quantity > 0) {
+                                ExportRequestItem item = new ExportRequestItem();
+                                item.setExportRequestId(exportRequestId);
+                                item.setProductId(Integer.parseInt(productIds[i]));
+                                item.setProductName(productNames[i] != null ? productNames[i] : "");
+                                item.setProductCode(productCodes[i] != null ? productCodes[i] : "");
+                                item.setUnit(units[i] != null ? units[i] : "");
+                                item.setQuantity(quantity);
+                                item.setNote(notes[i] != null ? notes[i] : "");
+
+                                items.add(item);
+                                System.out.println("Đã thêm item: " + item.getProductName() + " - Qty: " + quantity);
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Lỗi parse số lượng tại index " + i + ": " + quantities[i]);
+                        }
+                    }
+                }
+
+                System.out.println("Tổng số items chuẩn bị thêm: " + items.size());
+
+                // Thêm items vào database
+                if (!items.isEmpty()) {
+                    boolean itemsAdded = exportRequestItemsDAO.addExportRequestItems(items);
+                    System.out.println("Kết quả thêm items: " + itemsAdded);
+
+                    if (itemsAdded) {
+                        System.out.println("THÀNH CÔNG! Chuẩn bị chuyển đến trang success...");
+
+                        // Lấy tên user để hiển thị
+                        String fullname = userDAO.getFullName(currentUser.getId());
+                        System.out.println("Fullname: " + fullname);
+
+                        // Set attributes cho success page
+                        request.setAttribute("exportRequestId", exportRequestId);
+                        request.setAttribute("currentUser", fullname);
+                        request.setAttribute("requestDate", new SimpleDateFormat("dd/MM/yyyy").format(dayRequest));
+                        request.setAttribute("role", role);
+                        request.setAttribute("itemCount", items.size());
+
+                        System.out.println("Attributes đã set:");
+                        System.out.println("- exportRequestId: " + exportRequestId);
+                        System.out.println("- currentUser: " + fullname);
+                        System.out.println("- requestDate: " + new SimpleDateFormat("dd/MM/yyyy").format(dayRequest));
+                        System.out.println("- role: " + role);
+                        System.out.println("- itemCount: " + items.size());
+
+                        System.out.println("Forward đến ExportRequestSuccess.jsp...");
+                        request.getRequestDispatcher("ExportRequestSuccess.jsp").forward(request, response);
+                        System.out.println("Forward hoàn thành!");
+                        return;
+
+                    } else {
+                        System.out.println("LỖI: Không thể thêm items vào database");
+                        request.setAttribute("error", "Không thể thêm chi tiết sản phẩm vào hệ thống");
+                        doGet(request, response);
+                        return;
+                    }
+                } else {
+                    System.out.println("LỖI: Danh sách items trống");
+                    request.setAttribute("error", "Không có sản phẩm hợp lệ để thêm");
+                    doGet(request, response);
+                    return;
+                }
+            } else {
+                System.out.println("LỖI: Không thể tạo export request (ID null hoặc empty)");
+                request.setAttribute("error", "Không thể tạo đơn xuất kho trong hệ thống");
+                doGet(request, response);
+                return;
+            }
+
+        } catch (Exception e) {
+            System.out.println("EXCEPTION trong doPost: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "Có lỗi hệ thống xảy ra: " + e.getMessage());
+            doGet(request, response);
+        }
+
+        System.out.println("=== ExportRequestController doPost() KẾT THÚC ===");
+    }
+
+    /**
+     * Tính tuổi từ ngày sinh
+     */
+    private int calculateAge(Date birthDate) {
+        if (birthDate == null) {
+            return 0;
+        }
+
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.setTime(birthDate);
+        int yearOfBirth = cal.get(java.util.Calendar.YEAR);
+        int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+
+        return currentYear - yearOfBirth;
+    }
+
+    @Override
+    public String getServletInfo() {
+        return "Export Request Controller - Debug Version";
+    }
 }

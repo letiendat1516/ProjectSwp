@@ -70,7 +70,7 @@ public class SubmitPurchaseOrderServlet extends HttpServlet {
             PurchaseOrderInfo purchaseOrder = new PurchaseOrderInfo();
             purchaseOrder.setId(originalRequestId);
             purchaseOrder.setFullname(fullname);
-            purchaseOrder.setDoB(dob);
+ //           purchaseOrder.setDoB(dob);
             purchaseOrder.setDayPurchase(purchaseDate);
             purchaseOrder.setStatus("pending"); // Mặc định là pending
 

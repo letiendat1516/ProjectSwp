@@ -10,12 +10,11 @@ public class RequestItem {
     private double quantity; // Sửa từ int thành double
     private double importedQty; // mới
     private String note;
-    private String reasonDetail;
 
     public RequestItem() {
     }
 
-    public RequestItem(int id, String requestId, String productName, String productCode, String unit, double quantity, double importedQty, String note, String reasonDetail) {
+    public RequestItem(int id, String requestId, String productName, String productCode, String unit, double quantity, double importedQty, String note) {
         this.id = id;
         this.requestId = requestId;
         this.productName = productName;
@@ -24,7 +23,6 @@ public class RequestItem {
         this.quantity = quantity;
         this.importedQty = importedQty;
         this.note = note;
-        this.reasonDetail = reasonDetail;
     }
 
     public int getId() {
@@ -90,13 +88,4 @@ public class RequestItem {
     public void setNote(String note) {
         this.note = note;
     }
-
-    public String getReasonDetail() {
-        return reasonDetail;
-    }
-
-    public void setReasonDetail(String reasonDetail) {
-        this.reasonDetail = reasonDetail;
-    }
-
 }
