@@ -182,11 +182,10 @@
                         <textarea id="description" name="description" rows="4"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="type">Loại đơn vị</label>
-                        <select id="type" name="type" required>
-                            <option value="Khối lượng">Khối lượng</option>
-                            <option value="Độ dài">Độ dài</option>
-                            <option value="Số lượng">Số lượng</option>
+                        <label for="status">Trạng thái</label>
+                        <select id="status" name="status" required>
+                            <option value="1" selected>Hoạt động</option>
+                            <option value="0">Ngừng hoạt động</option>
                         </select>
                     </div>
                     <div class="form-buttons">

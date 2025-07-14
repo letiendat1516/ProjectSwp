@@ -3,30 +3,48 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category_product/list.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/UserDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/include/sidebar.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/categoriesforward.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/CategoryProductController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/Department_list.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/ImportDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/GetStatusOfPurchaseRequestInformationDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/PurchaseQuotedDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/CategoryStatisticsController.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/CategoryStatisticsDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ImportConfirmController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ListRequestImportController.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category-statistics.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/StatisticSupplierEvaluation.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ExportRequestController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/model/PurchaseOrderInfo.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category_product/edit.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/SubmitPurchaseOrderServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/META-INF/context.xml</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/CategoryProductDAO.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ApprovePurchaseRequestServlet.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ApprovePurchaseQuotedServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/model/RequestItem.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/model/CategoryProduct.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category_product/create.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/DepartmentController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/PurchaseOrderDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/AdduserServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/DBContext/Context.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/SubmitRequoteFormServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category_product/list.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/EditProfile.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/CategoryStatisticsDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/ApprovePurchaseQuoted.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/StatisticSupplierEvaluation.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/ApprovePurchaseRequest.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/ListRequestImportDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ApprovePurchaseRequestServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/WEB-INF/web.xml</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/StatisticSupplierEvaluation.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/SupplierDAO.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/DBContext/Context.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/AuthorizationFilter.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/AddProductController.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/SupplierEvaluationDAO.java</file>
-=======
-            <file>file:/D:/Project%20SWP/ProjectSwp/web/ExportRequest.jsp</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ExportRequestDAO.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ExportRequestController.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ExportRequestItemsDAO.java</file>
->>>>>>> 116d4a4dba7add75d65b7714f789fbabaf6c8dd3
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/ProductInfoDAO.java</file>
         </group>
     </open-files>
 </project-private>

@@ -2,8 +2,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
-<%@page import="model.Request"%>
-<%@page import="model.RequestItem"%>
+<%@page import="model.PurchaseOrderInfo"%>
+<%@page import="model.PurchaseOrderItems"%>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -166,7 +166,7 @@
                 color: #856404 !important;
                 font-weight: bold !important;
             }
-            .status-pending_re-quote {
+            .status-re-quote {
                 background-color: #f8d7da !important;
                 border-left: 4px solid #dc3545 !important;
                 color: #721c24 !important;
@@ -192,10 +192,10 @@
                 background-color: #28a745;
                 color: #fff;
             }
-            .detail-table th:nth-child(1), .detail-table td:nth-child(1) {
+            .detail-table th:nth-child(2), .detail-table td:nth-child(2) {
                 width: 10cm;
             }
-            .detail-table th:nth-child(2), .detail-table td:nth-child(2) {
+            .detail-table th:nth-child(1), .detail-table td:nth-child(1) {
                 width: 1.5cm;
             }
             .detail-table th:nth-child(3), .detail-table td:nth-child(3) {
@@ -205,7 +205,13 @@
                 width: 1.5cm;
             }
             .detail-table th:nth-child(5), .detail-table td:nth-child(5) {
-                width: 8cm;
+                width: 2cm;
+            }
+            .detail-table th:nth-child(6), .detail-table td:nth-child(6) {
+                width: 2cm;
+            }
+            .detail-table th:nth-child(7), .detail-table td:nth-child(7) {
+                width: 6cm;
             }
             .pagination {
                 display: flex;
@@ -327,313 +333,350 @@
         <div class="layout-container">
             <jsp:include page="/include/sidebar.jsp" />
             <div class="main-content">
-            <h1>DANH SÁCH CẦN BÁO GIÁ</h1>
+                <h1>DANH SÁCH CẦN BÁO GIÁ</h1>
 
-            <!-- Hiển thị thông báo -->
-            <c:if test="${not empty param.message}">
-                <div class="message success">
-                    ${param.message}
-                </div>
-            </c:if>
+                <!-- Hiển thị thông báo -->
+                <c:if test="${not empty param.message}">
+                    <div class="message success">
+                        ${param.message}
+                    </div>
+                </c:if>
 
-            <!-- Form lọc -->
-            <form action="listpurchaseorder" method="post" class="filter-section" id="filterForm">
-                <div class="filter-item">
-                    <label for="startDate">Từ ngày:</label>
-                    <input type="date" id="startDate" name="startDate" value="${param.startDate}">
-                </div>
-                <div class="filter-item">
-                    <label for="endDate">Đến ngày:</label>
-                    <input type="date" id="endDate" name="endDate" value="${param.endDate}">
-                </div>
-                <div class="filter-item">
-                    <label for="statusFilter">Trạng thái:</label>
-                    <select id="statusFilter" name="statusFilter">
-                        <option value="" ${empty param.statusFilter ? 'selected' : ''}>Tất cả</option>
-                        <option value="approved" ${param.statusFilter == 'approved' ? 'selected' : ''}>Chưa báo giá</option>
-                        <option value="quoted" ${param.statusFilter == 'quoted' ? 'selected' : ''}>Đã báo giá</option>                    
-                        <option value="pending re-quote" ${param.statusFilter == 'pending re-quote' ? 'selected' : ''}>Báo giá lại</option>
-                        <option value="completed" ${param.statusFilter == 'completed' ? 'selected' : ''}>Đã hoàn thành</option>
-                    </select>
-                </div>
-                <div class="filter-item">
-                    <label for="requestIdFilter">ID:</label>
-                    <input type="text" id="requestIdFilter" name="requestIdFilter" value="${param.requestIdFilter}" placeholder="Nhập ID">
-                </div>
-                <button type="submit" class="filter-button">
-                    <span class="material-icons">filter_alt</span> Lọc
-                </button>
-                <button type="button" class="clear-filter-button" onclick="clearFilters()">
-                    <span class="material-icons">clear</span> Xóa lọc
-                </button>
-            </form>
+                <!-- Hiển thị thông báo lỗi -->
+                <c:if test="${not empty errorMessage}">
+                    <div class="message error">
+                        ${errorMessage}
+                    </div>
+                </c:if>
 
-            <table class="requests-table">
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>ID</th>
-                        <th>Người yêu cầu</th>
-                        <th>Ngày Yêu Cầu</th>
-                        <th>Trạng thái</th>
-                        <th>Mục Đích Yêu Cầu</th>
-                        <th>Hành Động</th>
-                    </tr>
-                </thead>
-                <tbody id="requestsTableBody">
-                    <c:choose>
-                        <c:when test="${not empty purchaseOrders}">
-                            <c:forEach var="req" items="${purchaseOrders}" varStatus="loop">
-                                <c:set var="status" value="" />
-                                <c:set var="rowClass" value="" />
-                                <c:choose>
-                                    <c:when test="${req.status == 'approved'}">
-                                        <c:set var="status" value="Chưa báo giá" />
-                                        <c:set var="rowClass" value="status-approved" />
-                                    </c:when>
-                                    <c:when test="${req.status == 'quoted'}">
-                                        <c:set var="status" value="Đã báo giá" />
-                                        <c:set var="rowClass" value="status-quoted" />
-                                    </c:when>
-                                    <c:when test="${req.status == 'pending re-quote'}">
-                                        <c:set var="status" value="Báo giá lại" />
-                                        <c:set var="rowClass" value="status-pending_re-quote" />
-                                    </c:when>
-                                    <c:when test="${req.status == 'completed'}">
-                                        <c:set var="status" value="Đã hoàn thành" />
-                                        <c:set var="rowClass" value="status-completed" />
-                                    </c:when>
-                                </c:choose>
-                                <tr class="${rowClass}">
-                                    <td>${loop.count}</td>
-                                    <td>${req.id}</td>
-                                    <td>${req.fullname}</td>
-                                    <td>
-                                        <c:if test="${not empty req.day_request}">
-                                            <fmt:formatDate value="${req.day_request}" pattern="dd/MM/yyyy" />
-                                        </c:if>
-                                    </td>
-                                    <td>${status}</td>
-                                    <td>${req.reason}</td>
-                                    <td>
-                                        <div class="action-buttons-cell">
-                                            <!-- Nút xem chi tiết -->
-                                            <button onclick="toggleDetails(this)" class="action-btn view-btn">
-                                                <span class="material-icons">visibility</span>
-                                                <span>Chi tiết</span>
-                                            </button>
+                <!-- Form lọc -->
+                <form action="listpurchaseorder" method="post" class="filter-section" id="filterForm">
+                    <div class="filter-item">
+                        <label for="startDate">Từ ngày:</label>
+                        <input type="date" id="startDate" name="startDate" value="${param.startDate}">
+                    </div>
+                    <div class="filter-item">
+                        <label for="endDate">Đến ngày:</label>
+                        <input type="date" id="endDate" name="endDate" value="${param.endDate}">
+                    </div>
+                    <div class="filter-item">
+                        <label for="statusFilter">Trạng thái:</label>
+                        <select id="statusFilter" name="statusFilter">
+                            <option value="" ${empty param.statusFilter ? 'selected' : ''}>Tất cả</option>
+                            <option value="pending_quote" ${param.statusFilter == 'pending_quote' ? 'selected' : ''}>Chờ báo giá</option>
+                            <option value="quoted" ${param.statusFilter == 'quoted' ? 'selected' : ''}>Đã báo giá</option>                    
+                            <option value="re-quote" ${param.statusFilter == 're-quote' ? 'selected' : ''}>Báo giá lại</option>
+                            <option value="approved" ${param.statusFilter == 'approved' || param.statusFilter == 'rejected' || param.statusFilter == 'completed' ? 'selected' : ''}>Đã hoàn thành</option>
 
-                                            <!-- ✅ LOGIC HIỂN THỊ NÚT BÁO GIÁ THEO STATUS -->
-                                            <c:choose>
-                                                <c:when test="${req.status == 'completed'}">
-                                                    <!-- Đã hoàn thành: Không hiển thị nút báo giá -->
-                                                </c:when>
-                                                <c:when test="${req.status == 'quoted'}">
-                                                    <!-- Đã báo giá: Không hiển thị nút báo giá -->
-                                                </c:when>
-                                                <c:when test="${req.status == 'pending re-quote'}">
-                                                    <!-- Báo giá lại: Form với action=update -->
-                                                    <form action="requoteform" method="post" class="quote-form">
-                                                        <!-- Thông tin request -->
-                                                        <input type="hidden" name="requestId" value="${req.id}">
-                                                        <input type="hidden" name="fullname" value="${req.fullname}">
-                                                        <input type="hidden" name="dayRequest" value="<fmt:formatDate value='${req.day_request}' pattern='yyyy-MM-dd' />">
-                                                        <input type="hidden" name="reason" value="${req.reason}">
-                                                        <input type="hidden" name="status" value="${req.status}">
-                                                        <input type="hidden" name="action" value="update">
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="requestIdFilter">ID:</label>
+                        <input type="text" id="requestIdFilter" name="requestIdFilter" value="${param.requestIdFilter}" placeholder="Nhập ID">
+                    </div>
+                    <button type="submit" class="filter-button">
+                        <span class="material-icons">filter_alt</span> Lọc
+                    </button>
+                    <button type="button" class="clear-filter-button" onclick="clearFilters()">
+                        <span class="material-icons">clear</span> Xóa lọc
+                    </button>
+                </form>
 
-                                                        <!-- Thông tin items -->
-                                                        <c:if test="${not empty req.items}">
-                                                            <c:forEach var="item" items="${req.items}" varStatus="itemLoop">
-                                                                <input type="hidden" name="items[${itemLoop.index}].productName" value="${item.productName}">
-                                                                <input type="hidden" name="items[${itemLoop.index}].productCode" value="${item.productCode}">
-                                                                <input type="hidden" name="items[${itemLoop.index}].unit" value="${item.unit}">
-                                                                <input type="hidden" name="items[${itemLoop.index}].quantity" value="${item.quantity}">
-                                                            </c:forEach>
-                                                        </c:if>
+                <table class="requests-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>ID</th>
+                            <th>Người yêu cầu</th>
+                            <th>Ngày tạo PO</th>
+                            <th>Trạng thái</th>
+                            <th>Mục đích</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestsTableBody">
+                        <c:choose>
+                            <c:when test="${not empty purchaseOrders}">
+                                <c:forEach var="po" items="${purchaseOrders}" varStatus="loop">
+                                    <c:set var="status" value="" />
+                                    <c:set var="rowClass" value="" />
+                                    <c:choose>
+                                        <c:when test="${po.status == 'pending_quote'}">
+                                            <c:set var="status" value="Chờ báo giá" />
+                                            <c:set var="rowClass" value="status-pending_quote" />
+                                        </c:when>
+                                        <c:when test="${po.status == 'quoted'}">
+                                            <c:set var="status" value="Đã báo giá" />
+                                            <c:set var="rowClass" value="status-quoted" />
+                                        </c:when>
+                                        <c:when test="${po.status == 're-quote'}">
+                                            <c:set var="status" value="Báo giá lại" />
+                                            <c:set var="rowClass" value="status-re-quote" />
+                                        </c:when>
+                                        <c:when test="${po.status == 'approved' || po.status == 'completed' || po.status == 'rejected'}">
+                                            <c:set var="status" value="Đã hoàn thành" />
+                                            <c:set var="rowClass" value="status-completed" />
+                                        </c:when>
+                                    </c:choose>
+                                    <tr class="${rowClass}">
+                                        <td>${(currentPage - 1) * 11 + loop.count}</td>
+                                        <td>${po.id}</td>
+                                        <td>${po.fullname}</td>
+                                        <td>
+                                            <c:if test="${not empty po.dayPurchase}">
+                                                <fmt:formatDate value="${po.dayPurchase}" pattern="dd/MM/yyyy" />
+                                            </c:if>
+                                        </td>
+                                        <td>${status}</td>
+                                        <td>${po.reason}</td>
+                                        <td>
+                                            <div class="action-buttons-cell">
+                                                <!-- Nút xem chi tiết -->
+                                                <button onclick="toggleDetails(this)" class="action-btn view-btn">
+                                                    <span class="material-icons">visibility</span>
+                                                    <span>Chi tiết</span>
+                                                </button>
 
-                                                        <button type="submit" class="action-btn requote-btn">
-                                                            <span class="material-icons">refresh</span>
-                                                            <span>Báo giá lại</span>
-                                                        </button>
-                                                    </form>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <!-- Chưa báo giá (approved): Form tạo báo giá mới -->
-                                                    <form action="purchaseorderform" method="post" class="quote-form">
-                                                        <!-- Thông tin request -->
-                                                        <input type="hidden" name="requestId" value="${req.id}">
-                                                        <input type="hidden" name="fullname" value="${req.fullname}">
-                                                        <input type="hidden" name="dayRequest" value="<fmt:formatDate value='${req.day_request}' pattern='yyyy-MM-dd' />">
-                                                        <input type="hidden" name="reason" value="${req.reason}">
-                                                        <input type="hidden" name="status" value="${req.status}">
-                                                        <input type="hidden" name="action" value="create">
-
-                                                        <!-- Thông tin items -->
-                                                        <c:if test="${not empty req.items}">
-                                                            <c:forEach var="item" items="${req.items}" varStatus="itemLoop">
-                                                                <input type="hidden" name="items[${itemLoop.index}].productName" value="${item.productName}">
-                                                                <input type="hidden" name="items[${itemLoop.index}].productCode" value="${item.productCode}">
-                                                                <input type="hidden" name="items[${itemLoop.index}].unit" value="${item.unit}">
-                                                                <input type="hidden" name="items[${itemLoop.index}].quantity" value="${item.quantity}">
-                                                            </c:forEach>
-                                                        </c:if>
-
-                                                        <button type="submit" class="action-btn quote-btn">
-                                                            <span class="material-icons">description</span>
-                                                            <span>Tạo báo giá</span>
-                                                        </button>
-                                                    </form>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class="detail-row">
-                                    <td colspan="7">
-                                        <div style="margin-bottom: 10px;">
-                                            <strong>Gợi ý nhà cung cấp:</strong> ${empty req.supplier or req.supplier == 'null' ? 'Chưa có' : req.supplier}<br>
-                                            <strong>Địa chỉ:</strong> ${empty req.address or req.address == 'null' ? 'Chưa có' : req.address}<br>
-                                            <strong>SĐT:</strong> ${empty req.phone or req.phone == 'null' ? 'Chưa có' : req.phone}<br>
-                                            <strong>Email:</strong> ${empty req.email or req.email == 'null' ? 'Chưa có' : req.email}F
-                                        </div>
-
-                                        <table class="detail-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Tên Hàng</th>
-                                                    <th>ID</th>
-                                                    <th>Đơn Vị</th>
-                                                    <th>Số Lượng</th>
-                                                    <th>Ghi Chú</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                                <!-- ✅ LOGIC HIỂN THỊ NÚT BÁO GIÁ THEO STATUS -->
                                                 <c:choose>
-                                                    <c:when test="${not empty req.items}">
-                                                        <c:forEach var="item" items="${req.items}">
-                                                            <tr>
-                                                                <td>${item.productName}</td>
-                                                                <td>${item.productCode}</td>
-                                                                <td>${item.unit}</td>
-                                                                <td>${item.quantity}</td>
-                                                                <td>${item.note}</td>
-                                                            </tr>
-                                                        </c:forEach>
+                                                    <c:when test="${po.status == 'completed' || po.status == 'quoted' || po.status == 'approved'|| po.status == 'rejected'}">
+                                                        <!-- Đã hoàn thành/Đã báo giá/Đã duyệt: Không hiển thị nút báo giá -->
+                                                    </c:when>
+                                                    <c:when test="${po.status == 're-quote'}">
+                                                        <!-- Báo giá lại: Form với action=update -->
+                                                        <form action="requoteform" method="post" class="quote-form">
+                                                            <input type="hidden" name="purchaseOrderId" value="${po.id}">
+                                                            <input type="hidden" name="action" value="update">
+
+                                                            <button type="submit" class="action-btn requote-btn">
+                                                                <span class="material-icons">refresh</span>
+                                                                <span>Báo giá lại</span>
+                                                            </button>
+                                                        </form>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <!-- Chờ báo giá (pending quote): Form tạo báo giá mới -->
+                                                        <form action="purchaseorderform" method="post" class="quote-form">
+                                                            <input type="hidden" name="purchaseOrderId" value="${po.id}">
+                                                            <input type="hidden" name="action" value="create">
+
+                                                            <button type="submit" class="action-btn quote-btn">
+                                                                <span class="material-icons">description</span>
+                                                                <span>Tạo báo giá</span>
+                                                            </button>
+                                                        </form>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="detail-row">
+                                        <td colspan="8">
+                                            <div style="margin-bottom: 10px;">
+                                                <strong>Nhà cung cấp:</strong> ${empty po.supplier ? 'Chưa có' : po.supplier}<br>
+                                                <strong>Địa chỉ:</strong> ${empty po.address ? 'Chưa có' : po.address}<br>
+                                                <strong>SĐT:</strong> ${empty po.phone ? 'Chưa có' : po.phone}<br>
+                                                <strong>Email:</strong> ${empty po.email ? 'Chưa có' : po.email}
+                                            </div>
+
+                                            <table class="detail-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Mã SP</th>
+                                                        <th>Tên Hàng</th>
+
+                                                        <th>Đơn Vị</th>
+                                                        <th>Số Lượng</th>
+                                                        <th>Đơn giá</th>
+                                                        <th>Thành tiền</th>
+                                                        <th>Ghi Chú</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <c:choose>
+                                                        <c:when test="${not empty po.purchaseItems}">
+                                                            <c:forEach var="item" items="${po.purchaseItems}">
+                                                                <tr>
+                                                                    <td>${item.productCode}</td>
+                                                                    <td>${item.productName}</td>
+
+                                                                    <td>${item.unit}</td>
+                                                                    <td>
+                                                                        <fmt:formatNumber value="${item.quantity}" pattern="#,##0.##" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <c:choose>
+                                                                            <c:when test="${not empty item.pricePerUnit}">
+                                                                                <fmt:formatNumber value="${item.pricePerUnit}" pattern="#,##0" /> VNĐ
+                                                                            </c:when>
+                                                                            <c:otherwise>Chưa có giá</c:otherwise>
+                                                                        </c:choose>
+                                                                    </td>
+                                                                    <td>
+                                                                        <c:choose>
+                                                                            <c:when test="${not empty item.totalPrice}">
+                                                                                <fmt:formatNumber value="${item.totalPrice}" pattern="#,##0" /> VNĐ
+                                                                            </c:when>
+                                                                            <c:otherwise>Chưa có giá</c:otherwise>
+                                                                        </c:choose>
+                                                                    </td>
+                                                                    <td>${item.note}</td>
+                                                                </tr>
+
+                                                            </c:forEach>
+                                                        <div style="margin-bottom: 10px;">
+                                                            <strong>Tổng kết báo giá:</strong> ${empty po.summary ? 'Chưa có' : po.summary}<br>
+                                                        </div>
                                                     </c:when>
                                                     <c:otherwise>
                                                         <tr>
-                                                            <td colspan="5">Không có dữ liệu chi tiết</td>
+                                                            <td colspan="7">Không có dữ liệu chi tiết</td>
                                                         </tr>
                                                     </c:otherwise>
                                                 </c:choose>
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </c:when>
-                        <c:otherwise>
-                            <tr>
-                                <td colspan="7">Không có đơn cần báo giá nào trong khoảng thời gian hoặc trạng thái này.</td>
+                                </tbody>
+                            </table>
+                            </td>
                             </tr>
-                        </c:otherwise>
-                    </c:choose>
-                </tbody>
-            </table>
-
-            <!-- Phân trang -->
-            <div class="pagination">
-                <c:set var="currentPage" value="${empty param.index ? 1 : param.index}" />
-                <c:set var="endPage" value="${requestScope.endPage}" />
-                <c:set var="filterParams" value="" />
-                <c:if test="${not empty param.startDate}">
-                    <c:set var="filterParams" value="${filterParams}&startDate=${param.startDate}" />
-                </c:if>
-                <c:if test="${not empty param.endDate}">
-                    <c:set var="filterParams" value="${filterParams}&endDate=${param.endDate}" />
-                </c:if>
-                <c:if test="${not empty param.statusFilter}">
-                    <c:set var="filterParams" value="${filterParams}&statusFilter=${param.statusFilter}" />
-                </c:if>
-                <c:if test="${not empty param.requestIdFilter}">
-                    <c:set var="filterParams" value="${filterParams}&requestIdFilter=${param.requestIdFilter}" />
-                </c:if>
-
-                <c:choose>
-                    <c:when test="${currentPage <= 1}">
-                        <button disabled>
-                            <span class="material-icons">chevron_left</span>
-                        </button>
+                        </c:forEach>
                     </c:when>
                     <c:otherwise>
-                        <a href="listpurchaseorder?index=${currentPage - 1}${filterParams}" class="pagination-button">
-                            <button>
-                                <span class="material-icons">chevron_left</span>
-                            </button>
-                        </a>
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 20px; color: #666;">
+                                <span class="material-icons" style="font-size: 48px; color: #ccc;">inbox</span><br>
+                                Không có dữ liệu để hiển thị
+                            </td>
+                        </tr>
                     </c:otherwise>
                 </c:choose>
+                </tbody>
+                </table>
 
-                <span class="current-page">${currentPage}</span>
+                <!-- Phân trang -->
 
-                <c:choose>
-                    <c:when test="${currentPage >= endPage}">
-                        <button disabled>
-                            <span class="material-icons">chevron_right</span>
-                        </button>
-                    </c:when>
-                    <c:otherwise>
-                        <a href="listpurchaseorder?index=${currentPage + 1}${filterParams}" class="pagination-button">
-                            <button>
+                <c:if test="${totalPages > 1}">
+                    <div class="pagination">
+                        <!-- Nút Previous -->
+                        <c:if test="${currentPage > 1}">
+                            <button type="button" onclick="goToPage(${currentPage - 1})">
+                                <span class="material-icons">chevron_left</span>
+                                Trước
+                            </button>
+                        </c:if>
+                        <c:if test="${currentPage <= 1}">
+                            <button type="button" disabled>
+                                <span class="material-icons">chevron_left</span>
+                                Trước
+                            </button>
+                        </c:if>
+
+                        <!-- Hiển thị trang hiện tại -->
+                        <span class="current-page">Trang ${currentPage}</span>
+
+                        <!-- Nút Next -->
+                        <c:if test="${currentPage < totalPages}">
+                            <button type="button" onclick="goToPage(${currentPage + 1})">
+                                Sau
                                 <span class="material-icons">chevron_right</span>
                             </button>
-                        </a>
-                    </c:otherwise>
-                </c:choose>
+                        </c:if>
+                        <c:if test="${currentPage >= totalPages}">
+                            <button type="button" disabled>
+                                Sau
+                                <span class="material-icons">chevron_right</span>
+                            </button>
+                        </c:if>
 
-                <div class="total-pages">Tổng ${endPage} trang</div>
-            </div>
+                        <!-- Thông tin tổng số trang -->
+                        <div class="total-pages">
+                            Tổng số: ${totalRecords} mục | ${totalPages} trang
+                        </div>
+                    </div>
+                </c:if>
 
-            <div class="footer">
-                <a href="Admin.jsp" class="btn-secondary">
-                    <span class="material-icons back-btn-icon">arrow_back</span> Quay Lại Trang Chủ
-                </a>
+                <!-- Footer -->
+                <div class="footer">
+                    <a href="Admin.jsp" class="btn-secondary">
+                        <span class="material-icons back-btn-icon">arrow_back</span>
+                        Quay về Dashboard
+                    </a>
+                </div>
             </div>
         </div>
-            </div>
-            
 
         <script>
+            // Hàm toggle chi tiết
             function toggleDetails(button) {
-                const row = button.closest('tr').nextElementSibling;
-                if (row.classList.contains('detail-row')) {
-                    const isVisible = row.style.display === 'table-row';
-                    row.style.display = isVisible ? 'none' : 'table-row';
+                const currentRow = button.closest('tr');
+                const detailRow = currentRow.nextElementSibling;
 
-                    // Cập nhật icon và text
-                    const icon = button.querySelector('.material-icons');
-                    const text = button.querySelector('span:last-child');
-                    if (isVisible) {
-                        icon.textContent = 'visibility';
-                        text.textContent = 'Chi tiết';
+                if (detailRow && detailRow.classList.contains('detail-row')) {
+                    if (detailRow.style.display === 'none' || detailRow.style.display === '') {
+                        detailRow.style.display = 'table-row';
+                        button.innerHTML = '<span class="material-icons">visibility_off</span><span>Ẩn chi tiết</span>';
                     } else {
-                        icon.textContent = 'visibility_off';
-                        text.textContent = 'Ẩn';
+                        detailRow.style.display = 'none';
+                        button.innerHTML = '<span class="material-icons">visibility</span><span>Chi tiết</span>';
                     }
                 }
             }
 
+            // Hàm xóa bộ lọc
             function clearFilters() {
-                // Xóa tất cả giá trị trong form
                 document.getElementById('startDate').value = '';
                 document.getElementById('endDate').value = '';
                 document.getElementById('statusFilter').value = '';
                 document.getElementById('requestIdFilter').value = '';
-
-                // Gửi request để hiển thị tất cả purchase order
-                window.location.href = 'listpurchaseorder';
+                document.getElementById('filterForm').submit();
             }
+
+            // Hàm chuyển trang
+            function goToPage(page) {
+                const form = document.getElementById('filterForm');
+
+                // ✅ SỬA: Dùng 'page' thay vì 'index'
+                let pageInput = document.querySelector('input[name="page"]');
+                if (!pageInput) {
+                    pageInput = document.createElement('input');
+                    pageInput.type = 'hidden';
+                    pageInput.name = 'page';
+                    form.appendChild(pageInput);
+                }
+                pageInput.value = page;
+
+                form.submit();
+            }
+
+            // Validation form
+            document.getElementById('filterForm').addEventListener('submit', function (e) {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                if (startDate && endDate && startDate > endDate) {
+                    e.preventDefault();
+                    alert('Ngày bắt đầu không thể lớn hơn ngày kết thúc!');
+                    return false;
+                }
+            });
+            function changePageSize(size) {
+                const form = document.getElementById('filterForm');
+
+                let sizeInput = document.querySelector('input[name="size"]');
+                if (!sizeInput) {
+                    sizeInput = document.createElement('input');
+                    sizeInput.type = 'hidden';
+                    sizeInput.name = 'size';
+                    form.appendChild(sizeInput);
+                }
+                sizeInput.value = size;
+                form.submit();
+            }
+
+            // Auto-submit form khi thay đổi filter (optional)
+            document.getElementById('statusFilter').addEventListener('change', function () {
+                // Uncomment dòng dưới nếu muốn tự động submit khi thay đổi status
+                // document.getElementById('filterForm').submit();
+            });
         </script>
     </body>
 </html>

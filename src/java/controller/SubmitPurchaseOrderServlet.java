@@ -1,10 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
-import dao.GetStatusOfPurchaseRequestInformationDAO;
 import dao.PurchaseOrderDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -15,214 +10,176 @@ import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
-import model.PurchaseOrderInfo;
-import model.PurchaseOrderItems;
-
 /**
- *
- * @author Admin
+ * Servlet xử lý submit đơn báo giá - CẬP NHẬT thông tin thay vì tạo mới
  */
 public class SubmitPurchaseOrderServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
+  @Override
+  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+          throws ServletException, IOException {
+      // Redirect về danh sách nếu truy cập trực tiếp
+      response.sendRedirect("listpurchaseorder");
+  }
 
-        try {
-            // Lấy thông tin cơ bản từ form
-            String originalRequestId = request.getParameter("originalRequestId");
-            String quoteDate = request.getParameter("quote_date");
-            String supplier = request.getParameter("supplier_name");
-            String address = request.getParameter("supplier_address");
-            String phone = request.getParameter("supplier_phone");
-            String email = request.getParameter("supplier_email");
-            String quoteSummary = request.getParameter("quote_summary");
+  @Override
+  protected void doPost(HttpServletRequest request, HttpServletResponse response)
+          throws ServletException, IOException {
+      response.setContentType("text/html;charset=UTF-8");
+      request.setCharacterEncoding("UTF-8");
 
-            // Lấy thông tin từ session
-            String fullname = (String) session.getAttribute("currentUser");
-            Date dob = (Date) session.getAttribute("DoB");
+      HttpSession session = request.getSession(false);
+      if (session == null || session.getAttribute("user") == null) {
+          response.sendRedirect("login.jsp");
+          return;
+      }
 
-            // Chuyển đổi ngày tạo báo giá
-            Date purchaseDate = null;
-            if (quoteDate != null && !quoteDate.isEmpty()) {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                purchaseDate = sdf.parse(quoteDate);
-            }
+      try {
+          // ✅ 1. LẤY THÔNG TIN CƠ BẢN TỪ FORM
+          String originalRequestId = request.getParameter("originalRequestId");
+          String quoteDate = request.getParameter("quote_date");
+          String supplier = request.getParameter("supplier_name");
+          String address = request.getParameter("supplier_address");
+          String phone = request.getParameter("supplier_phone");
+          String email = request.getParameter("supplier_email");
+          String quoteSummary = request.getParameter("quote_summary");
 
-            // Tạo đối tượng PurchaseOrderInfo
-            PurchaseOrderInfo purchaseOrder = new PurchaseOrderInfo();
-            purchaseOrder.setId(originalRequestId);
-            purchaseOrder.setFullname(fullname);
- //           purchaseOrder.setDoB(dob);
-            purchaseOrder.setDayPurchase(purchaseDate);
-            purchaseOrder.setStatus("pending"); // Mặc định là pending
+          System.out.println("🔍 Processing quote for ID: " + originalRequestId);
+          System.out.println("🔍 Quote date: " + quoteDate);
+          System.out.println("🔍 Supplier: " + supplier);
 
-            // Lấy reason từ form trước đó (có thể cần lưu trong session hoặc hidden field)
-            String reason = request.getParameter("quote_note");
-            purchaseOrder.setReason(reason);
+          // ✅ 2. CHUYỂN ĐỔI NGÀY BÁO GIÁ AN TOÀN
+          java.sql.Date sqlQuoteDate = null;
+          if (quoteDate != null && !quoteDate.isEmpty()) {
+              SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+              Date quoteDateParsed = sdf.parse(quoteDate);
+              sqlQuoteDate = new java.sql.Date(quoteDateParsed.getTime());
+              System.out.println("✅ Converted date successfully: " + sqlQuoteDate);
+          }
 
-            purchaseOrder.setSupplier(supplier);
-            purchaseOrder.setAddress(address);
-            purchaseOrder.setPhone(phone);
-            purchaseOrder.setEmail(email);
-            purchaseOrder.setSummary(quoteSummary);
+          // ✅ 3. CẬP NHẬT THÔNG TIN PURCHASE_ORDER_INFO
+          PurchaseOrderDAO dao = new PurchaseOrderDAO();
+          boolean updateInfoSuccess = dao.updatePurchaseOrderInfo(
+              originalRequestId, 
+              sqlQuoteDate,  // ✅ Sử dụng java.sql.Date
+              supplier, 
+              address, 
+              phone, 
+              email, 
+              quoteSummary
+          );
 
-            // Lấy danh sách items từ form
-            ArrayList<PurchaseOrderItems> items = new ArrayList<>();
+          if (!updateInfoSuccess) {
+              System.out.println("❌ Failed to update purchase order info");
+              request.setAttribute("errorMessage", "Không thể cập nhật thông tin báo giá. Vui lòng thử lại.");
+              request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
+              return;
+          }
+          
+          System.out.println("✅ Updated purchase order info successfully");
 
-            // Lấy tất cả các parameter name để tìm items
-            String[] productNames = request.getParameterValues("product_name");
-            String[] productCodes = request.getParameterValues("product_code");
-            String[] units = request.getParameterValues("unit");
-            String[] quantities = request.getParameterValues("quantity");
-            String[] pricesPerUnit = request.getParameterValues("pricePerUnit");
-            String[] totalPrices = request.getParameterValues("totalPrice");
-            String[] itemNotes = request.getParameterValues("quote_item_note");
+          // ✅ 4. CẬP NHẬT GIÁ CHO TỪNG ITEM
+          String[] productCodes = request.getParameterValues("product_code");
+          String[] pricesPerUnit = request.getParameterValues("pricePerUnit");
+          String[] totalPrices = request.getParameterValues("totalPrice");
+          String[] itemNotes = request.getParameterValues("quote_item_note");
 
-            if (productNames != null && productNames.length > 0) {
-                for (int i = 0; i < productNames.length; i++) {
-                    if (productNames[i] != null && !productNames[i].trim().isEmpty()) {
-                        PurchaseOrderItems item = new PurchaseOrderItems();
-                        item.setPurchaseId(originalRequestId);
-                        item.setProductName(productNames[i]);
-                        item.setProductCode(productCodes != null && i < productCodes.length ? productCodes[i] : "");
-                        item.setUnit(units != null && i < units.length ? units[i] : "");
+          if (productCodes != null && pricesPerUnit != null) {
+              boolean updateItemsSuccess = true;
+              
+              System.out.println("🔍 Updating " + productCodes.length + " items");
+              
+              for (int i = 0; i < productCodes.length; i++) {
+                  if (productCodes[i] != null && !productCodes[i].trim().isEmpty()) {
+                      
+                      // Parse price per unit
+                      BigDecimal pricePerUnit = BigDecimal.ZERO;
+                      if (pricesPerUnit != null && i < pricesPerUnit.length && pricesPerUnit[i] != null) {
+                          try {
+                              String priceStr = pricesPerUnit[i].replaceAll("[^0-9,.]", "").replace(",", ".");
+                              pricePerUnit = new BigDecimal(priceStr);
+                          } catch (NumberFormatException e) {
+                              System.out.println("❌ Error parsing price for item " + i + ": " + pricesPerUnit[i]);
+                              pricePerUnit = BigDecimal.ZERO;
+                          }
+                      }
 
-                        // Xử lý quantity
-                        if (quantities != null && i < quantities.length && quantities[i] != null) {
-                            try {
-                                String quantityStr = quantities[i].replace(",", ".");
-                                item.setQuantity(new BigDecimal(quantityStr));
-                            } catch (NumberFormatException e) {
-                                item.setQuantity(BigDecimal.ZERO);
-                            }
-                        } else {
-                            item.setQuantity(BigDecimal.ZERO);
-                        }
+                      // Parse total price
+                      BigDecimal totalPrice = BigDecimal.ZERO;
+                      if (totalPrices != null && i < totalPrices.length && totalPrices[i] != null) {
+                          try {
+                              String totalStr = totalPrices[i].replaceAll("[^0-9,.]", "").replace(",", ".");
+                              totalPrice = new BigDecimal(totalStr);
+                          } catch (NumberFormatException e) {
+                              System.out.println("❌ Error parsing total price for item " + i + ": " + totalPrices[i]);
+                              totalPrice = BigDecimal.ZERO;
+                          }
+                      }
 
-                        // Xử lý price per unit
-                        if (pricesPerUnit != null && i < pricesPerUnit.length && pricesPerUnit[i] != null) {
-                            try {
-                                String priceStr = pricesPerUnit[i].replaceAll("[^0-9,.]", "").replace(",", ".");
-                                item.setPricePerUnit(new BigDecimal(priceStr));
-                            } catch (NumberFormatException e) {
-                                item.setPricePerUnit(BigDecimal.ZERO);
-                            }
-                        } else {
-                            item.setPricePerUnit(BigDecimal.ZERO);
-                        }
+                      // Get note
+                      String note = (itemNotes != null && i < itemNotes.length) ? itemNotes[i] : "";
 
-                        // Xử lý total price
-                        if (totalPrices != null && i < totalPrices.length && totalPrices[i] != null) {
-                            try {
-                                String totalStr = totalPrices[i].replaceAll("[^0-9,.]", "").replace(",", ".");
-                                item.setTotalPrice(new BigDecimal(totalStr));
-                            } catch (NumberFormatException e) {
-                                // Tính lại total price nếu parse lỗi
-                                item.setTotalPrice(item.getQuantity().multiply(item.getPricePerUnit()));
-                            }
-                        } else {
-                            // Tính total price nếu không có
-                            item.setTotalPrice(item.getQuantity().multiply(item.getPricePerUnit()));
-                        }
+                      // Update item
+                      boolean itemUpdateSuccess = dao.updatePurchaseOrderItem(
+                          originalRequestId, 
+                          productCodes[i], 
+                          pricePerUnit, 
+                          totalPrice, 
+                          note
+                      );
 
-                        // Xử lý note
-                        item.setNote(itemNotes != null && i < itemNotes.length ? itemNotes[i] : "");
+                      if (!itemUpdateSuccess) {
+                          System.out.println("❌ Failed to update item: " + productCodes[i]);
+                          updateItemsSuccess = false;
+                      } else {
+                          System.out.println("✅ Updated item: " + productCodes[i] + " - Price: " + pricePerUnit);
+                      }
+                  }
+              }
 
-                        items.add(item);
-                    }
-                }
-            }
+              if (!updateItemsSuccess) {
+                  request.setAttribute("errorMessage", "Có lỗi khi cập nhật giá sản phẩm. Vui lòng kiểm tra lại.");
+                  request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
+                  return;
+              }
+          }
 
-            purchaseOrder.setPurchaseItems(items);
+          // ✅ 5. CẬP NHẬT STATUS THÀNH 'QUOTED'
+          boolean updateStatusSuccess = dao.updatePurchaseOrderStatus(originalRequestId, "quoted");
+          
+          if (!updateStatusSuccess) {
+              System.out.println("❌ Failed to update status to 'quoted'");
+              request.setAttribute("errorMessage", "Không thể cập nhật trạng thái báo giá.");
+              request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
+              return;
+          }
 
-            // Insert vào database
-            PurchaseOrderDAO dao = new PurchaseOrderDAO();
-            boolean success = dao.insertPurchaseOrder(purchaseOrder);
+          // ✅ 6. THÀNH CÔNG - REDIRECT VỀ DANH SÁCH
+          System.out.println("✅ Successfully completed quote for: " + originalRequestId);
+          response.sendRedirect("QuoteSuccessNotification.jsp");
 
-            if (success) {
-                // Cập nhật status của Purchase Request gốc
-                GetStatusOfPurchaseRequestInformationDAO requestDAO = new GetStatusOfPurchaseRequestInformationDAO();
-                boolean updateSuccess = requestDAO.updateQuotedStatus(originalRequestId);
+      } catch (ParseException e) {
+          e.printStackTrace();
+          System.out.println("❌ Date parsing error: " + e.getMessage());
+          request.setAttribute("errorMessage", "Định dạng ngày không hợp lệ. Vui lòng kiểm tra lại.");
+          request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
+      } catch (NumberFormatException e) {
+          e.printStackTrace();
+          System.out.println("❌ Number format error: " + e.getMessage());
+          request.setAttribute("errorMessage", "Định dạng số không hợp lệ. Vui lòng kiểm tra lại giá và số lượng.");
+          request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
+      } catch (Exception e) {
+          e.printStackTrace();
+          System.out.println("❌ Unexpected error: " + e.getMessage());
+          request.setAttribute("errorMessage", "Có lỗi không mong muốn xảy ra: " + e.getMessage());
+          request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
+      }
+  }
 
-                if (updateSuccess) {
-                    // ✅ Cả 2 thao tác đều thành công
-                    session.setAttribute("successMessage", "Đơn báo giá đã được tạo thành công với ID: " + originalRequestId);
-                    response.sendRedirect("QuoteSuccessNotification.jsp");
-                } else {
-                    // ✅ Tạo báo giá thành công nhưng không cập nhật được status
-                    request.setAttribute("errorMessage", "Tạo báo giá thành công nhưng không thể cập nhật trạng thái request.");
-                    request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
-                }
-            } else {
-                // ✅ Tạo báo giá thất bại
-                request.setAttribute("errorMessage", "Không thể tạo đơn báo giá. Vui lòng thử lại.");
-                request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
-            }
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "Định dạng ngày không hợp lệ. Vui lòng kiểm tra lại.");
-            request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "Định dạng số không hợp lệ. Vui lòng kiểm tra lại giá và số lượng.");
-            request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "Có lỗi không mong muốn xảy ra: " + e.getMessage());
-            request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
-        }
-    }
-
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-    }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-
-    }
-
-    @Override
-    public String getServletInfo() {
-        return "Servlet xử lý submit đơn báo giá";
-    }
+  @Override
+  public String getServletInfo() {
+      return "Servlet xử lý submit đơn báo giá - cập nhật thông tin";
+  }
 }

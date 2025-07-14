@@ -216,40 +216,6 @@ public class CategoryStatisticsDAO {
     /**
      * Get category distribution for chart (by parent category)
      */
-    public List<Map<String, Object>> getCategoryDistribution() {
-        List<Map<String, Object>> distribution = new ArrayList<>();
-
-        String sql = "SELECT "
-                + "CASE WHEN parent_c.name IS NOT NULL THEN parent_c.name ELSE 'Danh mục gốc' END as root_name, "
-                + "COUNT(DISTINCT c.id) as category_count, "
-                + "COUNT(DISTINCT p.id) as product_count "
-                + "FROM category c "
-                + "LEFT JOIN category parent_c ON c.parent_id = parent_c.id "
-                + "LEFT JOIN product_info p ON c.id = p.cate_id "
-                + "WHERE c.active_flag = 1 "
-                + "GROUP BY parent_c.id, parent_c.name "
-                + "ORDER BY product_count DESC";
-
-        try (Connection conn = new Context().getJDBCConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql); 
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                Map<String, Object> item = new HashMap<>();
-                item.put("name", rs.getString("root_name"));
-                item.put("categoryCount", rs.getInt("category_count"));
-                item.put("productCount", rs.getInt("product_count"));
-
-                distribution.add(item);
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error in getCategoryDistribution: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return distribution;
-    }
 
     /**
      * Get monthly growth statistics
@@ -373,116 +339,14 @@ public class CategoryStatisticsDAO {
     /**
      * Get statistics grouped by parent category
      */
-    public List<Map<String, Object>> getStatisticsByParentCategory() {
-        List<Map<String, Object>> statsList = new ArrayList<>();
-
-        String sql = "SELECT "
-                + "parent_c.id as parent_id, "
-                + "parent_c.name as parent_name, "
-                + "COUNT(c.id) as category_count, "
-                + "SUM(CASE WHEN c.active_flag = 1 THEN 1 ELSE 0 END) as active_count, "
-                + "SUM(CASE WHEN c.active_flag = 0 THEN 1 ELSE 0 END) as inactive_count, "
-                + "COUNT(DISTINCT p.id) as product_count "
-                + "FROM category parent_c "
-                + "LEFT JOIN category c ON parent_c.id = c.parent_id "
-                + "LEFT JOIN product_info p ON c.id = p.cate_id "
-                + "GROUP BY parent_c.id, parent_c.name "
-                + "ORDER BY parent_c.name";
-
-        try (Connection conn = new Context().getJDBCConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql); 
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                Map<String, Object> stat = new HashMap<>();
-                stat.put("parentId", rs.getInt("parent_id"));
-                stat.put("parentName", rs.getString("parent_name"));
-                stat.put("categoryCount", rs.getInt("category_count"));
-                stat.put("activeCount", rs.getInt("active_count"));
-                stat.put("inactiveCount", rs.getInt("inactive_count"));
-                stat.put("productCount", rs.getInt("product_count"));
-
-                statsList.add(stat);
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error in getStatisticsByParentCategory: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return statsList;
-    }
 
     /**
      * Get monthly trend data for the current year
      */
-    public List<Map<String, Object>> getMonthlyTrend() {
-        List<Map<String, Object>> trend = new ArrayList<>();
-        int currentYear = LocalDate.now().getYear();
-
-        String sql = "SELECT MONTH(create_date) as month, COUNT(*) as count "
-                + "FROM category "
-                + "WHERE YEAR(create_date) = ? "
-                + "GROUP BY MONTH(create_date) "
-                + "ORDER BY month";
-
-        try (Connection conn = new Context().getJDBCConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, currentYear);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Map<String, Object> monthData = new HashMap<>();
-                    monthData.put("month", rs.getInt("month"));
-                    monthData.put("count", rs.getInt("count"));
-                    trend.add(monthData);
-                }
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error in getMonthlyTrend: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return trend;
-    }
 
     /**
      * Get product distribution by category (top N)
      */
-    public List<Map<String, Object>> getProductDistributionByCategory(int limit) {
-        List<Map<String, Object>> distribution = new ArrayList<>();
-
-        String sql = "SELECT c.name, COUNT(p.id) as product_count "
-                + "FROM category c "
-                + "LEFT JOIN product_info p ON c.id = p.cate_id "
-                + "GROUP BY c.id, c.name "
-                + "HAVING product_count > 0 "
-                + "ORDER BY product_count DESC "
-                + "LIMIT ?";
-
-        try (Connection conn = new Context().getJDBCConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, limit);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Map<String, Object> item = new HashMap<>();
-                    item.put("name", rs.getString("name"));
-                    item.put("productCount", rs.getInt("product_count"));
-                    distribution.add(item);
-                }
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error in getProductDistributionByCategory: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return distribution;
-    }
 
     /**
      * Get category with most products (FIXED VERSION)
@@ -535,54 +399,6 @@ public class CategoryStatisticsDAO {
      * Get most recently added category (FIXED VERSION)
      * Lấy loại sản phẩm được thêm gần đây nhất
      */
-    public Map<String, Object> getMostRecentlyAddedCategory() {
-        Map<String, Object> result = new HashMap<>();
-        
-        String sql = "SELECT c.id, c.name, parent_c.name as parent_name, " +
-                    "c.create_date, c.active_flag, " +
-                    "COUNT(p.id) as product_count " +
-                    "FROM category c " +
-                    "LEFT JOIN category parent_c ON c.parent_id = parent_c.id " +
-                    "LEFT JOIN product_info p ON c.id = p.cate_id " +
-                    "GROUP BY c.id, c.name, parent_c.name, c.create_date, c.active_flag " +
-                    "ORDER BY c.create_date DESC " +
-                    "LIMIT 1";
-        
-        try (Connection conn = new Context().getJDBCConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            
-            if (rs.next()) {
-                result.put("id", rs.getInt("id"));
-                result.put("name", rs.getString("name"));
-                result.put("parentName", rs.getString("parent_name"));
-                result.put("productCount", rs.getInt("product_count"));
-                result.put("activeFlag", rs.getBoolean("active_flag"));
-                
-                if (rs.getTimestamp("create_date") != null) {
-                    LocalDateTime createDate = rs.getTimestamp("create_date").toLocalDateTime();
-                    result.put("createDate", createDate);
-                    
-                    // Tính số ngày đã tạo
-                    long daysSinceCreated = java.time.temporal.ChronoUnit.DAYS.between(
-                        createDate.toLocalDate(), 
-                        LocalDate.now()
-                    );
-                    result.put("daysSinceCreated", daysSinceCreated);
-                    
-                    // Format ngày để hiển thị
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                    result.put("createDateFormatted", createDate.format(formatter));
-                }
-            }
-            
-        } catch (SQLException e) {
-            System.out.println("Error in getMostRecentlyAddedCategory: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        return result;
-    }
 
     /**
      * Get top N recently added categories with statistics (FIXED VERSION)
@@ -658,9 +474,6 @@ public class CategoryStatisticsDAO {
         Map<String, Object> topCategory = getCategoryWithMostProducts();
         summary.put("categoryWithMostProducts", topCategory);
         
-        // Lấy loại SP được thêm gần đây nhất
-        Map<String, Object> recentCategory = getMostRecentlyAddedCategory();
-        summary.put("mostRecentCategory", recentCategory);
         
         // Lấy thống kê cơ bản
         Map<String, Object> basicStats = getBasicStatistics();

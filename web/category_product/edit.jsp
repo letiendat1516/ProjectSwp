@@ -241,7 +241,7 @@
                 cursor: pointer;
                 font-weight: 500;
             }
-            
+
             /* Info Section */
             .info-section {
                 background: #f8f9fa;
@@ -397,26 +397,51 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="parentId" class="form-label">Danh mục cha</label>
-                                <select class="form-select" id="parentId" name="parentId">
-                                    <option value="">-- Không có danh mục cha --</option>
-                                    <c:forEach items="${allCategories}" var="cat">
-                                        <option value="${cat.id}" 
-                                                ${category.parentId == cat.id ? 'selected' : ''}
-                                                class="${empty cat.parentId ? 'category-level-0' : 'category-level-1'}">
-                                            <c:choose>
-                                                <c:when test="${empty cat.parentId}">
-                                                    ${cat.name}
-                                                </c:when>
-                                                <c:otherwise>
-                                                    └─ ${cat.name}
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </option>
-                                    </c:forEach>
-                                </select>
-                                <div class="text-muted">Chọn danh mục cha để tạo cấu trúc phân cấp</div>
-                            </div>
+    <label for="parentId" class="form-label">Danh mục cha</label>
+    <c:choose>
+        <c:when test="${canSelectParent}">
+            <!-- Cho phép chọn danh mục cha -->
+            <select class="form-select" id="parentId" name="parentId">
+                <option value="">-- Không có danh mục cha --</option>
+                <c:forEach items="${parentCategories}" var="cat">
+                    <option value="${cat.id}" 
+                            ${category.parentId == cat.id ? 'selected' : ''}
+                            class="${empty cat.parentId ? 'category-level-0' : 'category-level-1'}">
+                        <c:choose>
+                            <c:when test="${empty cat.parentId}">
+                                ${cat.name}
+                            </c:when>
+                            <c:otherwise>
+                                └─ ${cat.name}
+                            </c:otherwise>
+                        </c:choose>
+                    </option>
+                </c:forEach>
+            </select>
+            <div class="text-muted">Chọn danh mục cha để tạo cấu trúc phân cấp</div>
+        </c:when>
+        <c:otherwise>
+            <!-- Không cho phép chọn vì đã có danh mục con -->
+            <input type="hidden" name="parentId" value="${category.parentId}">
+            <select class="form-select" disabled>
+                <option>
+                    <c:choose>
+                        <c:when test="${empty category.parentId}">
+                            -- Không có danh mục cha --
+                        </c:when>
+                        <c:otherwise>
+                            ${category.parentName}
+                        </c:otherwise>
+                    </c:choose>
+                </option>
+            </select>
+            <div class="text-danger">
+                <i class="fas fa-info-circle"></i>
+                Không thể thay đổi danh mục cha vì danh mục này đã có danh mục con
+            </div>
+        </c:otherwise>
+    </c:choose>
+</div>
 
                             <div class="form-group">
                                 <label class="form-label">Trạng thái</label>

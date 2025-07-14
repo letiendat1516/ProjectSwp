@@ -24,69 +24,74 @@ public class UpdateProductController extends HttpServlet {
     
     private final ProductInfoDAO productDAO = new ProductInfoDAO();
     
-@Override
-protected void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    
-    System.out.println("DEBUG: UpdateProductController doGet method called");
-    
-    // Check user authentication and authorization
-    HttpSession session = request.getSession();
-    Users user = (Users) session.getAttribute("user");
-    if (user == null) {
-        System.out.println("DEBUG: User not authenticated, redirecting to login");
-        response.sendRedirect("login.jsp");
-        return;
-    }
-    
-    String productIdStr = request.getParameter("id");
-    System.out.println("DEBUG: Product ID parameter: " + productIdStr);
-    
-    if (productIdStr == null || productIdStr.trim().isEmpty()) {
-        System.out.println("DEBUG: Product ID is null or empty");
-        response.sendRedirect("product-list?error=Không tìm thấy sản phẩm!");
-        return;
-    }
-    
-    try {
-        int productId = Integer.parseInt(productIdStr);
-        System.out.println("DEBUG: Parsed product ID: " + productId);
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         
-        // Get product details
-        ProductInfo product = productDAO.getProductById(productId);
-        System.out.println("DEBUG: Product from DAO: " + (product != null ? product.getName() : "null"));
+        System.out.println("DEBUG: UpdateProductController doGet method called");
+        System.out.println("DEBUG: Request URI: " + request.getRequestURI());
+        System.out.println("DEBUG: Query String: " + request.getQueryString());
         
-        if (product == null) {
-            System.out.println("DEBUG: Product is null, redirecting with error");
-            response.sendRedirect("product-list?error=Sản phẩm không tồn tại!");
+        // Check user authentication and authorization
+        HttpSession session = request.getSession();
+        Users user = (Users) session.getAttribute("user");
+        if (user == null) {
+            System.out.println("DEBUG: User not authenticated, redirecting to login");
+            response.sendRedirect("login.jsp");
             return;
         }
         
-        // Load dropdown data FIRST
-        System.out.println("DEBUG: Loading dropdown data");
-        loadDropdownData(request);
+        System.out.println("DEBUG: User authenticated: " + user.getFullname() + " (Role: " + user.getRoleName() + ")");
         
-        // Set product data for form - Make sure this is set
-        request.setAttribute("product", product);
-        request.setAttribute("mode", "edit");
+        String productIdStr = request.getParameter("id");
+        System.out.println("DEBUG: Product ID parameter: " + productIdStr);
         
-        // Debug log
-        System.out.println("DEBUG: Product set in request: " + product.getName() + " (ID: " + product.getId() + ")");
-        System.out.println("DEBUG: Request attributes set, forwarding to JSP");
+        if (productIdStr == null || productIdStr.trim().isEmpty()) {
+            System.out.println("DEBUG: Product ID is null or empty");
+            response.sendRedirect("product-list?error=Không tìm thấy sản phẩm!");
+            return;
+        }
         
-        // Forward to update product page
-        request.getRequestDispatcher("update-product.jsp").forward(request, response);
-        
-    } catch (NumberFormatException e) {
-        System.out.println("DEBUG: NumberFormatException for product ID: " + e.getMessage());
-        response.sendRedirect("product-list?error=ID sản phẩm không hợp lệ!");
-    } catch (Exception e) {
-        System.out.println("DEBUG: Exception in doGet: " + e.getMessage());
-        e.printStackTrace();
-        response.sendRedirect("product-list?error=Có lỗi xảy ra khi tải thông tin sản phẩm!");
+        try {
+            int productId = Integer.parseInt(productIdStr);
+            System.out.println("DEBUG: Parsed product ID: " + productId);
+            
+            // Get product details
+            System.out.println("DEBUG: Calling productDAO.getProductById(" + productId + ")");
+            ProductInfo product = productDAO.getProductById(productId);
+            System.out.println("DEBUG: Product from DAO: " + (product != null ? product.getName() : "null"));
+            
+            if (product == null) {
+                System.out.println("DEBUG: Product is null, redirecting with error");
+                response.sendRedirect("product-list?error=Sản phẩm không tồn tại!");
+                return;
+            }
+            
+            // Load dropdown data FIRST
+            System.out.println("DEBUG: Loading dropdown data");
+            loadDropdownData(request);
+            
+            // Set product data for form - Make sure this is set
+            request.setAttribute("product", product);
+            request.setAttribute("mode", "edit");
+            
+            // Debug log
+            System.out.println("DEBUG: Product set in request: " + product.getName() + " (ID: " + product.getId() + ")");
+            System.out.println("DEBUG: Request attributes set, forwarding to JSP");
+            System.out.println("DEBUG: About to forward to: update-product.jsp");
+            
+            // Forward to update product page
+            request.getRequestDispatcher("update-product.jsp").forward(request, response);
+            
+        } catch (NumberFormatException e) {
+            System.out.println("DEBUG: NumberFormatException for product ID: " + e.getMessage());
+            response.sendRedirect("product-list?error=ID sản phẩm không hợp lệ!");
+        } catch (Exception e) {
+            System.out.println("DEBUG: Exception in doGet: " + e.getMessage());
+            e.printStackTrace();
+            response.sendRedirect("product-list?error=Có lỗi xảy ra khi tải thông tin sản phẩm!");
+        }
     }
-}
-
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -122,13 +127,16 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 loadDropdownData(request);
                 request.getRequestDispatcher("update-product.jsp").forward(request, response);
                 return;
-            }            // Update product in database
+            }
+            
+            // Update product in database
             boolean success = productDAO.updateProduct(existingProduct);
             
             System.out.println("DEBUG: Update product result: " + success);
             System.out.println("DEBUG: Product ID: " + productId);
             System.out.println("DEBUG: Product name: " + existingProduct.getName());
-              if (success) {
+            
+            if (success) {
                 // Update stock quantity if provided
                 String stockQuantityStr = request.getParameter("stockQuantity");
                 if (stockQuantityStr != null && !stockQuantityStr.trim().isEmpty()) {
@@ -175,12 +183,13 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         String categoryIdStr = request.getParameter("categoryId");
         String unitIdStr = request.getParameter("unitId");
         String supplierIdStr = request.getParameter("supplierId");
-        String priceStr = request.getParameter("price");
         String status = request.getParameter("status");
         String description = request.getParameter("description");
         String expirationDateStr = request.getParameter("expirationDate");
         String additionalNotes = request.getParameter("additionalNotes");
-          // Basic validation
+        String minStockThresholdStr = request.getParameter("minStockThreshold");
+        
+        // Basic validation
         if (name == null || name.trim().isEmpty()) {
             return "Tên sản phẩm không được để trống!";
         }
@@ -217,36 +226,50 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 product.setSupplierId(Integer.parseInt(supplierIdStr));
             }
             
-            if (priceStr != null && !priceStr.trim().isEmpty()) {
-                BigDecimal price = new BigDecimal(priceStr);
-                if (price.compareTo(BigDecimal.ZERO) < 0) {
-                    return "Giá sản phẩm không được âm!";
-                }
-                product.setPrice(price);
-            }
-            
             if (expirationDateStr != null && !expirationDateStr.trim().isEmpty()) {
                 Date expirationDate = Date.valueOf(expirationDateStr);
                 product.setExpirationDate(expirationDate);
+            }
+            
+            if (minStockThresholdStr != null && !minStockThresholdStr.trim().isEmpty()) {
+                BigDecimal minStockThreshold = new BigDecimal(minStockThresholdStr);
+                if (minStockThreshold.compareTo(BigDecimal.ZERO) >= 0) {
+                    product.setMinStockThreshold(minStockThreshold);
+                } else {
+                    product.setMinStockThreshold(BigDecimal.ZERO);
+                }
+            } else {
+                product.setMinStockThreshold(BigDecimal.ZERO);
             }
             
         } catch (NumberFormatException e) {
             return "Dữ liệu số không hợp lệ! Vui lòng kiểm tra lại.";
         } catch (IllegalArgumentException e) {
             return "Ngày hết hạn không hợp lệ! Vui lòng sử dụng định dạng YYYY-MM-DD.";
-        }        
+        }
+        
         return null; // No validation errors
     }
     
     private void loadDropdownData(HttpServletRequest request) {
         try {
+            System.out.println("DEBUG: Loading categories...");
             List<CategoryProduct> categories = productDAO.getAllActiveCategories();
+            System.out.println("DEBUG: Categories loaded: " + (categories != null ? categories.size() : "null"));
+            
+            System.out.println("DEBUG: Loading units...");
             List<Unit> units = productDAO.getAllActiveUnits();
+            System.out.println("DEBUG: Units loaded: " + (units != null ? units.size() : "null"));
+            
+            System.out.println("DEBUG: Loading suppliers...");
             List<Supplier> suppliers = productDAO.getAllActiveSuppliers();
+            System.out.println("DEBUG: Suppliers loaded: " + (suppliers != null ? suppliers.size() : "null"));
             
             request.setAttribute("categories", categories != null ? categories : List.of());
             request.setAttribute("units", units != null ? units : List.of());
             request.setAttribute("suppliers", suppliers != null ? suppliers : List.of());
+            
+            System.out.println("DEBUG: All dropdown data loaded and set in request");
             
         } catch (Exception e) {
             e.printStackTrace();

@@ -477,7 +477,6 @@
                             <option value="">Sắp xếp theo</option>
                             <option value="name" ${sortBy == 'name' ? 'selected' : ''}>Tên sản phẩm</option>
                             <option value="code" ${sortBy == 'code' ? 'selected' : ''}>Mã sản phẩm</option>
-                            <option value="price" ${sortBy == 'price' ? 'selected' : ''}>Giá</option>
                             <option value="stock" ${sortBy == 'stock' ? 'selected' : ''}>Số lượng tồn</option>
                             <option value="category" ${sortBy == 'category' ? 'selected' : ''}>Danh mục</option>
                         </select>
@@ -540,10 +539,7 @@
                                     Danh mục
                                     <span class="sort-icon ${sortBy == 'category' ? (sortOrder == 'asc' ? 'sort-asc' : 'sort-desc') : ''}"></span>
                                 </th>
-                                <th class="sortable" onclick="sortTable('price')">
-                                    Giá
-                                    <span class="sort-icon ${sortBy == 'price' ? (sortOrder == 'asc' ? 'sort-asc' : 'sort-desc') : ''}"></span>
-                                </th>
+
                                 <th class="sortable" onclick="sortTable('stock')">
                                     Số lượng tồn
                                     <span class="sort-icon ${sortBy == 'stock' ? (sortOrder == 'asc' ? 'sort-asc' : 'sort-desc') : ''}"></span>
@@ -559,15 +555,14 @@
                                     <td><strong>${product.code}</strong></td>
                                     <td>${product.name}</td>
                                     <td>${product.categoryName != null ? product.categoryName : 'Chưa phân loại'}</td>
-                                    <td>
-                                        <c:if test="${product.price != null}">
-                                            <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="₫" />
-                                        </c:if>
-                                    </td>
+
                                     <td>
                                         <strong>
                                             <fmt:formatNumber value="${product.stockQuantity}" type="number" maxFractionDigits="2" />
                                         </strong>
+                                        <c:if test="${product.minStockThreshold != null && product.minStockThreshold > 0}">
+                                            <br><small style="color: #666;">Ngưỡng: <fmt:formatNumber value="${product.minStockThreshold}" type="number" maxFractionDigits="2" /></small>
+                                        </c:if>
                                     </td>
                                     <td>${product.unitSymbol != null ? product.unitSymbol : product.unitName}</td>
                                     <td>
@@ -587,7 +582,12 @@
                                         </c:choose>
                                     </td>                                    <td>
                                         <c:if test="${product.lowStock}">
-                                            <span class="badge badge-danger">Sắp hết hàng</span>
+                                            <span class="badge badge-danger">
+                                                Sắp hết hàng
+                                                <c:if test="${product.minStockThreshold != null && product.minStockThreshold > 0}">
+                                                    (≤${product.minStockThreshold})
+                                                </c:if>
+                                            </span>
                                         </c:if>
                                         <c:if test="${product.nearExpiration}">
                                             <span class="badge badge-warning">Sắp hết hạn</span>
