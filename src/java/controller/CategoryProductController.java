@@ -13,19 +13,20 @@ import dao.CategoryProductDAO;
 import model.CategoryProduct;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import java.util.ArrayList;
 
 @WebServlet(name = "CategoryController", urlPatterns = {"/category/*"})
 public class CategoryProductController extends HttpServlet {
 
     private CategoryProductDAO categoryDAO;
-    
+
     // Constants for sorting
     private static final String DEFAULT_SORT_FIELD = "id";
     private static final String DEFAULT_SORT_DIR = "asc";
     private static final String SORT_ASC = "asc";
     private static final String SORT_DESC = "desc";
     private static final String[] ALLOWED_SORT_FIELDS = {"id", "name", "parent_name", "active_flag", "create_date", "update_date"};
-    
+
     // Constants for pagination
     private static final int DEFAULT_PAGE_SIZE = 10;
 
@@ -39,11 +40,11 @@ public class CategoryProductController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // Set UTF-8 encoding for Vietnamese display
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-        
+
         // Get path to determine what user wants to do
         String pathInfo = request.getPathInfo();
 
@@ -67,7 +68,7 @@ public class CategoryProductController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // Set UTF-8 encoding
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
@@ -85,7 +86,9 @@ public class CategoryProductController extends HttpServlet {
 
     // Validate sortField
     private boolean isValidSortField(String sortField) {
-        if (sortField == null) return false;
+        if (sortField == null) {
+            return false;
+        }
         for (String field : ALLOWED_SORT_FIELDS) {
             if (field.equalsIgnoreCase(sortField)) {
                 return true;
@@ -98,10 +101,24 @@ public class CategoryProductController extends HttpServlet {
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Get list of all active categories for parent dropdown
+        // Lấy tất cả danh mục đang hoạt động
         List<CategoryProduct> allCategories = categoryDAO.getAllCategoriesForDropdown();
-        
-        request.setAttribute("allCategories", allCategories);
+
+        // Lọc danh mục: 
+        // - Giữ lại TẤT CẢ danh mục gốc (parentId = null)
+        // - Chỉ giữ lại danh mục con nếu nó KHÔNG có con
+        List<CategoryProduct> availableParents = new ArrayList<>();
+        for (CategoryProduct cat : allCategories) {
+            if (cat.getParentId() == null) {
+                // Luôn giữ lại danh mục gốc
+                availableParents.add(cat);
+            } else if (!categoryDAO.hasChildCategories(cat.getId())) {
+                // Chỉ giữ lại danh mục con nếu nó không có con
+                availableParents.add(cat);
+            }
+        }
+
+        request.setAttribute("allCategories", availableParents);
 
         request.getRequestDispatcher("/category_product/create.jsp").forward(request, response);
     }
@@ -136,19 +153,24 @@ public class CategoryProductController extends HttpServlet {
         category.setName(name);
 
         // 5. Handle parent ID
-        if (parentIdStr != null && !parentIdStr.trim().isEmpty() && !parentIdStr.equals("0")) {
-            try {
-                int parentId = Integer.parseInt(parentIdStr);
-                // Check if parent is active
-                CategoryProduct parent = categoryDAO.getCategoryById(parentId);
-                if (parent != null && !parent.isActiveFlag() && "1".equals(activeFlagStr)) {
-                    request.setAttribute("error", "Không thể tạo danh mục hoạt động với danh mục cha đang bị vô hiệu hóa");
-                    showCreateForm(request, response);
-                    return;
-                }
-                category.setParentId(parentId);
-            } catch (NumberFormatException e) {
+        if (parentIdStr != null && !parentIdStr.trim().isEmpty()) {
+            if (parentIdStr.equals("-1") || parentIdStr.equals("0")) {
+                // -1 hoặc 0 nghĩa là danh mục gốc
                 category.setParentId(null);
+            } else {
+                try {
+                    int parentId = Integer.parseInt(parentIdStr);
+                    // Check if parent is active
+                    CategoryProduct parent = categoryDAO.getCategoryById(parentId);
+                    if (parent != null && !parent.isActiveFlag() && "1".equals(activeFlagStr)) {
+                        request.setAttribute("error", "Không thể tạo danh mục hoạt động với danh mục cha đang bị vô hiệu hóa");
+                        showCreateForm(request, response);
+                        return;
+                    }
+                    category.setParentId(parentId);
+                } catch (NumberFormatException e) {
+                    category.setParentId(null);
+                }
             }
         } else {
             category.setParentId(null);
@@ -168,7 +190,7 @@ public class CategoryProductController extends HttpServlet {
         }
     }
 
-    // Display edit form
+// Display edit form
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -189,21 +211,33 @@ public class CategoryProductController extends HttpServlet {
                 return;
             }
 
-            // 3. Get list of all categories for parent dropdown (excluding current category)
-            List<CategoryProduct> allCategories = categoryDAO.getAllCategoriesForDropdown();
-            // Remove current category and its children from list to prevent circular reference
-            allCategories.removeIf(cat -> cat.getId() == id);
-            
-            // Also remove all children of current category
-            List<Integer> childIds = categoryDAO.getAllChildCategoryIds(id);
-            allCategories.removeIf(cat -> childIds.contains(cat.getId()));
-            
-            // 4. DateTimeFormatter
+            // 3. Kiểm tra xem danh mục này có con hay không
+            boolean hasChildren = categoryDAO.hasChildCategories(id);
+
+            // 4. Nếu có con rồi thì không cho phép chọn danh mục cha
+            List<CategoryProduct> parentCategories = new ArrayList<>();
+            boolean canSelectParent = !hasChildren;
+
+            if (canSelectParent) {
+                // Lấy tất cả danh mục để làm cha
+                parentCategories = categoryDAO.getAllCategoriesForDropdown();
+
+                // Loại bỏ chính nó
+                parentCategories.removeIf(cat -> cat.getId() == id);
+
+                // Loại bỏ các danh mục con của nó (tránh vòng lặp)
+                List<Integer> childIds = categoryDAO.getAllChildCategoryIds(id);
+                parentCategories.removeIf(cat -> childIds.contains(cat.getId()));
+            }
+
+            // 5. DateTimeFormatter
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-            
-            // 5. Send data to JSP
+
+            // 6. Send data to JSP
             request.setAttribute("category", category);
-            request.setAttribute("allCategories", allCategories);
+            request.setAttribute("parentCategories", parentCategories);
+            request.setAttribute("canSelectParent", canSelectParent);
+            request.setAttribute("hasChildren", hasChildren);
             request.setAttribute("dateTimeFormatter", dateTimeFormatter);
 
             request.getRequestDispatcher("/category_product/edit.jsp").forward(request, response);
@@ -249,40 +283,47 @@ public class CategoryProductController extends HttpServlet {
 
             // 4. Handle parent ID and validate
             Integer newParentId = null;
-            if (parentIdStr != null && !parentIdStr.trim().isEmpty() && !parentIdStr.equals("0")) {
-                try {
-                    newParentId = Integer.parseInt(parentIdStr);
-                    
-                    // Prevent self-referencing
-                    if (newParentId == id) {
-                        request.setAttribute("error", "Danh mục không thể là cha của chính nó");
-                        request.setAttribute("id", idStr);
-                        showEditForm(request, response);
-                        return;
-                    }
-                    
-                    // Prevent circular reference (category cannot be parent of its own parent)
-                    List<Integer> childIds = categoryDAO.getAllChildCategoryIds(id);
-                    if (childIds.contains(newParentId)) {
-                        request.setAttribute("error", "Không thể chọn danh mục con làm danh mục cha");
-                        request.setAttribute("id", idStr);
-                        showEditForm(request, response);
-                        return;
-                    }
-                    
-                    // Check if parent is active when trying to activate this category
-                    if ("1".equals(activeFlagStr) && !currentCategory.isActiveFlag()) {
-                        CategoryProduct parent = categoryDAO.getCategoryById(newParentId);
-                        if (parent != null && !parent.isActiveFlag()) {
-                            request.setAttribute("error", "Không thể kích hoạt danh mục khi danh mục cha đang bị vô hiệu hóa");
+            if (parentIdStr != null && !parentIdStr.trim().isEmpty()) {
+                if (parentIdStr.equals("-1") || parentIdStr.equals("0")) {
+                    // -1 hoặc 0 nghĩa là danh mục gốc
+                    newParentId = null;
+                } else {
+                    try {
+                        newParentId = Integer.parseInt(parentIdStr);
+
+                        // Prevent self-referencing
+                        if (newParentId == id) {
+                            request.setAttribute("error", "Danh mục không thể là cha của chính nó");
                             request.setAttribute("id", idStr);
                             showEditForm(request, response);
                             return;
                         }
+
+                        // Prevent circular reference (category cannot be parent of its own parent)
+                        List<Integer> childIds = categoryDAO.getAllChildCategoryIds(id);
+                        if (childIds.contains(newParentId)) {
+                            request.setAttribute("error", "Không thể chọn danh mục con làm danh mục cha");
+                            request.setAttribute("id", idStr);
+                            showEditForm(request, response);
+                            return;
+                        }
+
+                        // Check if parent is active when trying to activate this category
+                        if ("1".equals(activeFlagStr) && !currentCategory.isActiveFlag()) {
+                            CategoryProduct parent = categoryDAO.getCategoryById(newParentId);
+                            if (parent != null && !parent.isActiveFlag()) {
+                                request.setAttribute("error", "Không thể kích hoạt danh mục khi danh mục cha đang bị vô hiệu hóa");
+                                request.setAttribute("id", idStr);
+                                showEditForm(request, response);
+                                return;
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        newParentId = null;
                     }
-                } catch (NumberFormatException e) {
-                    newParentId = null;
                 }
+            } else {
+                newParentId = null;
             }
 
             // 5. Create CategoryProduct object
@@ -290,12 +331,12 @@ public class CategoryProductController extends HttpServlet {
             category.setId(id);
             category.setName(name);
             category.setParentId(newParentId);
-            
+
             // 6. Handle active status change
             boolean newActiveStatus = "1".equals(activeFlagStr);
             boolean oldActiveStatus = currentCategory.isActiveFlag();
             category.setActiveFlag(newActiveStatus);
-            
+
             // 7. If deactivating and has children, warn user (but still allow in backend)
             if (oldActiveStatus && !newActiveStatus && categoryDAO.hasChildCategories(id)) {
                 // This will be handled by the DAO's toggleCategoryStatus method
@@ -421,7 +462,9 @@ public class CategoryProductController extends HttpServlet {
 
         // 1. Get pagination parameters
         int page = getIntParameter(request, "page", 1);
-        if (page < 1) page = 1;
+        if (page < 1) {
+            page = 1;
+        }
 
         // 2. Get filter parameters
         String searchKeyword = getStringParameter(request, "search");
@@ -462,7 +505,7 @@ public class CategoryProductController extends HttpServlet {
 
         // 6. Get filtered data
         List<CategoryProduct> categories = categoryDAO.searchCategoriesWithFilters(
-            searchKeyword, status, parentId, sortField, sortDir, offset, DEFAULT_PAGE_SIZE);
+                searchKeyword, status, parentId, sortField, sortDir, offset, DEFAULT_PAGE_SIZE);
 
         // 7. Get total count for pagination
         int totalCategories = categoryDAO.countCategoriesWithFilters(searchKeyword, status, parentId);
@@ -470,6 +513,7 @@ public class CategoryProductController extends HttpServlet {
 
         // 8. Get root categories for dropdown filter
         List<CategoryProduct> rootCategories = categoryDAO.getRootCategories();
+        request.setAttribute("rootCategories", rootCategories);
 
         // 9. Calculate pagination display
         calculatePaginationDisplay(request, page, totalPages);
@@ -513,8 +557,8 @@ public class CategoryProductController extends HttpServlet {
     }
 
     /**
-     * Toggle trạng thái active/inactive của danh mục
-     * Khi vô hiệu hóa danh mục cha, tất cả danh mục con cũng bị vô hiệu hóa
+     * Toggle trạng thái active/inactive của danh mục Khi vô hiệu hóa danh mục
+     * cha, tất cả danh mục con cũng bị vô hiệu hóa
      */
     private void toggleCategoryStatus(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -566,16 +610,16 @@ public class CategoryProductController extends HttpServlet {
                 jsonResponse.addProperty("success", true);
                 jsonResponse.addProperty("newStatus", newStatus ? "Hoạt động" : "Không hoạt động");
                 jsonResponse.addProperty("statusClass", newStatus ? "badge-success" : "badge-secondary");
-                jsonResponse.addProperty("buttonText", newStatus ? "vô hiệu hóa" : "kích hoạt");
+                jsonResponse.addProperty("buttonText", newStatus ? "vô hiệu hóa" : "kích hoạt");
                 jsonResponse.addProperty("buttonClass", newStatus ? "btn-danger" : "btn-success");
-                
+
                 // Add message about children being deactivated
                 if (!newStatus && categoryDAO.hasChildCategories(categoryId)) {
                     jsonResponse.addProperty("message", "Đã vô hiệu hóa danh mục và tất cả danh mục con");
                     jsonResponse.addProperty("childrenDeactivated", true);
                 } else {
-                    jsonResponse.addProperty("message", newStatus ? 
-                        "Đã kích hoạt danh mục thành công" : "Đã vô hiệu hóa danh mục thành công");
+                    jsonResponse.addProperty("message", newStatus
+                            ? "Đã kích hoạt danh mục thành công" : "Đã vô hiệu hóa danh mục thành công");
                     jsonResponse.addProperty("childrenDeactivated", false);
                 }
             } else {
@@ -596,7 +640,6 @@ public class CategoryProductController extends HttpServlet {
     }
 
     // ===================== HELPER METHODS =====================
-
     /**
      * Get integer parameter with default value
      */
@@ -632,12 +675,12 @@ public class CategoryProductController extends HttpServlet {
     private void calculatePaginationDisplay(HttpServletRequest request, int currentPage, int totalPages) {
         int startPage = Math.max(1, currentPage - 2);
         int endPage = Math.min(totalPages, startPage + 4);
-        
+
         // Adjust start page if we don't have enough pages at the end
         if (endPage - startPage < 4 && totalPages > 5) {
             startPage = Math.max(1, endPage - 4);
         }
-        
+
         request.setAttribute("startPage", startPage);
         request.setAttribute("endPage", endPage);
     }
@@ -656,7 +699,7 @@ public class CategoryProductController extends HttpServlet {
         int totalCategories = categoryDAO.getTotalCategoriesCount();
         int activeCategories = categoryDAO.getCategoriesCountByStatus(true);
         int inactiveCategories = categoryDAO.getCategoriesCountByStatus(false);
-        
+
         request.setAttribute("totalCategoriesCount", totalCategories);
         request.setAttribute("activeCategoriesCount", activeCategories);
         request.setAttribute("inactiveCategoriesCount", inactiveCategories);

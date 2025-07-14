@@ -311,27 +311,54 @@ public class CategoryProductDAO {
     }
 
     // Get active categories for dropdown
-    public List<CategoryProduct> getAllCategoriesForDropdown() {
-        List<CategoryProduct> categories = new ArrayList<>();
-        String sql = "SELECT id, name, parent_id, active_flag, create_date, update_date FROM category WHERE active_flag = 1 ORDER BY name";
-
-        try (Connection conn = new Context().getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                categories.add(mapResultSetToCategory(rs, false));
+public List<CategoryProduct> getAllCategoriesForDropdown() {
+    List<CategoryProduct> result = new ArrayList<>();
+    
+    // Bước 1: Lấy tất cả danh mục gốc (parent_id = NULL)
+    String sqlRoot = "SELECT id, name, parent_id, active_flag, create_date, update_date " +
+                     "FROM category WHERE parent_id IS NULL AND active_flag = 1 ORDER BY name";
+    
+    try (Connection conn = new Context().getJDBCConnection();
+         PreparedStatement psRoot = conn.prepareStatement(sqlRoot);
+         ResultSet rsRoot = psRoot.executeQuery()) {
+        
+        while (rsRoot.next()) {
+            // Thêm danh mục gốc
+            CategoryProduct root = mapResultSetToCategory(rsRoot, false);
+            result.add(root);
+            
+            // Bước 2: Lấy tất cả danh mục con của danh mục gốc này
+            String sqlChildren = "SELECT id, name, parent_id, active_flag, create_date, update_date " +
+                               "FROM category WHERE parent_id = ? AND active_flag = 1 ORDER BY name";
+            
+            try (PreparedStatement psChild = conn.prepareStatement(sqlChildren)) {
+                psChild.setInt(1, root.getId());
+                
+                try (ResultSet rsChild = psChild.executeQuery()) {
+                    while (rsChild.next()) {
+                        CategoryProduct child = mapResultSetToCategory(rsChild, false);
+                        result.add(child);
+                    }
+                }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-
-        return categories;
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    
+    return result;
+}
 
     // Get root categories (parent_id is NULL)
     public List<CategoryProduct> getRootCategories() {
         List<CategoryProduct> categories = new ArrayList<>();
-        String sql = "SELECT id, name, parent_id, active_flag, create_date, update_date "
-                + "FROM category WHERE parent_id IS NULL AND active_flag = 1 ORDER BY name";
+        // Thay đổi SQL để chỉ lấy những danh mục có danh mục con
+        String sql = "SELECT DISTINCT p.id, p.name, p.parent_id, p.active_flag, p.create_date, p.update_date "
+                + "FROM category p "
+                + "INNER JOIN category c ON p.id = c.parent_id "
+                + "WHERE p.active_flag = 1 "
+                + "ORDER BY p.name";
 
         try (Connection conn = new Context().getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 

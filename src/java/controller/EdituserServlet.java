@@ -4,6 +4,7 @@
  */
 package controller;
 
+import dao.DepartmentDAO;
 import dao.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,7 +13,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import model.Department;
 import model.Users;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
@@ -49,28 +53,22 @@ public class EdituserServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String idStr = request.getParameter("id");
-        if (idStr == null || idStr.isEmpty()) {
-            response.sendRedirect("admin");
+        String userIdStr = request.getParameter("id");
+        int userId = 0;
+        try {
+            userId = Integer.parseInt(userIdStr);
+        } catch (Exception e) {
+            response.sendRedirect("usermanager");
             return;
         }
+        UserDAO userDAO = new UserDAO();
+        DepartmentDAO deptDAO = new DepartmentDAO();
+        Users user = userDAO.getUserById(userId);
+        List<Department> departments = deptDAO.getAllDepartments();
 
-        try {
-            int id = Integer.parseInt(idStr);
-            UserDAO userDAO = new UserDAO();
-            Users user = userDAO.getUserById(id);
-
-            if (user == null) {
-                response.sendRedirect("admin");
-                return;
-            }
-
-            request.setAttribute("editUser", user);
-            request.getRequestDispatcher("EditUser.jsp").forward(request, response);
-
-        } catch (NumberFormatException e) {
-            response.sendRedirect("usermanager");
-        }
+        request.setAttribute("editUser", user);
+        request.setAttribute("departments", departments);
+        request.getRequestDispatcher("EditUser.jsp").forward(request, response);
     }
 
     @Override
@@ -79,71 +77,86 @@ public class EdituserServlet extends HttpServlet {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             String username = request.getParameter("username");
+            String password = request.getParameter("password");
             String fullname = request.getParameter("fullname");
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
             String dobStr = request.getParameter("dob");
             int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
             int roleId = Integer.parseInt(request.getParameter("role"));
+            String departmentIdStr = request.getParameter("departmentId");
+            Integer departmentId = (departmentIdStr != null && !departmentIdStr.isEmpty())
+                    ? Integer.parseInt(departmentIdStr) : null;
 
+            UserDAO userDAO = new UserDAO();
+
+            // Xử lý mật khẩu: nếu không đổi thì lấy lại mật khẩu cũ
+            String hashedPassword;
+            if (password != null && !password.trim().isEmpty()) {
+                hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+            } else {
+                hashedPassword = userDAO.getUserById(id).getPassword();
+            }
+
+            // Build user object
             Users user = new Users();
             user.setId(id);
             user.setUsername(username);
+            user.setPassword(hashedPassword);
             user.setFullname(fullname);
             user.setEmail(email);
             user.setPhone(phone);
+            user.setDepartmentId(departmentId);
 
-            // Xử lý ngày sinh
+            // Xử lý ngày sinh và validate tuổi
             java.sql.Date dob = null;
-            try {
-                if (dobStr != null && !dobStr.trim().isEmpty()) {
+            if (dobStr != null && !dobStr.trim().isEmpty()) {
+                try {
                     dob = java.sql.Date.valueOf(dobStr);
-                }
-            } catch (IllegalArgumentException e) {
-                request.setAttribute("error", "Date of Birth is invalid!");
-
-                UserDAO userDAO = new UserDAO();
-                user = userDAO.getUserById(id);
-                request.setAttribute("editUser", user);
-                request.getRequestDispatcher("EditUser.jsp").forward(request, response);
-                return;
-            }
-            user.setDob(dob);
-
-            if (dob != null) {
-                // Tính tuổi
-                java.time.LocalDate birth = dob.toLocalDate();
-                java.time.LocalDate now = java.time.LocalDate.now();
-                int age = java.time.Period.between(birth, now).getYears();
-
-                if (age < 18 || age > 60) {
-                    request.setAttribute("error", "Tuổi người dùng phải từ 18 đến 60!");
-                    UserDAO userDAO = new UserDAO();
-                    Users userOld = userDAO.getUserById(id);
-                    request.setAttribute("editUser", userOld);
-                    request.getRequestDispatcher("EditUser.jsp").forward(request, response);
+                } catch (IllegalArgumentException e) {
+                    returnEditWithError(request, response, id, "Ngày sinh không hợp lệ!");
                     return;
                 }
             }
+            user.setDob(dob);
+            if (dob != null) {
+                int age = java.time.Period.between(dob.toLocalDate(), java.time.LocalDate.now()).getYears();
+                if (age < 18 || age > 60) {
+                    returnEditWithError(request, response, id, "Tuổi người dùng phải từ 18 đến 60!");
+                    return;
+                }
+            }
+
             user.setActiveFlag(activeFlag);
 
-            UserDAO userDAO = new UserDAO();
             userDAO.updateUser(user, roleId);
 
+            // Thành công
             HttpSession session = request.getSession();
-            session.setAttribute("message", "User updated successfully!");
+            session.setAttribute("message", "Cập nhật người dùng thành công!");
             response.sendRedirect("usermanager");
         } catch (Exception e) {
-            request.setAttribute("error", "Error updating user: " + e.getMessage());
+            // Gặp lỗi thì lấy lại dữ liệu, forward về form và báo lỗi
             try {
                 int id = Integer.parseInt(request.getParameter("id"));
-                UserDAO userDAO = new UserDAO();
-                Users user = userDAO.getUserById(id);
-                request.setAttribute("editUser", user);
+                returnEditWithError(request, response, id, "Không thể cập nhật người dùng!");
             } catch (Exception ex) {
+                response.sendRedirect("usermanager");
             }
-            request.getRequestDispatcher("EditUser.jsp").forward(request, response);
         }
+    }
+
+// Hàm phụ: forward về EditUser.jsp với dữ liệu và lỗi
+    private void returnEditWithError(HttpServletRequest request, HttpServletResponse response, int userId, String errorMsg)
+            throws ServletException, IOException {
+        UserDAO userDAO = new UserDAO();
+        DepartmentDAO deptDAO = new DepartmentDAO();
+        Users user = userDAO.getUserById(userId);
+        List<Department> departments = deptDAO.getAllDepartments();
+        request.setAttribute("editUser", user);
+        request.setAttribute("departments", departments);
+        request.setAttribute("error", errorMsg);
+        request.getRequestDispatcher("EditUser.jsp").forward(request, response);
     }
 
     @Override

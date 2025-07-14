@@ -474,76 +474,72 @@
             </div>
 
             <div class="items-section">
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    Vui lòng chọn sản phẩm và nhập đầy đủ thông tin cho từng mặt hàng
-                </div>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                Vui lòng chọn sản phẩm và nhập đầy đủ thông tin cho từng mặt hàng
+            </div>
 
-                <!-- Buttons thêm/xóa hàng - nhỏ và sát nhau -->
-                <div class="table-buttons">
-                    <button type="button" class="btn btn-success btn-sm" onclick="addRow()">
-                        <i class="fas fa-plus"></i> Thêm
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="removeLastRow()">
-                        <i class="fas fa-minus"></i> Xóa
-                    </button>
-                </div>
+            <!-- Buttons thêm/xóa hàng - nhỏ và sát nhau -->
+            <div class="table-buttons">
+                <button type="button" class="btn btn-success btn-sm" onclick="addRow()">
+                    <i class="fas fa-plus"></i> Thêm
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeLastRow()">
+                    <i class="fas fa-minus"></i> Xóa
+                </button>
+            </div>
 
-                <div class="items-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>STT</th>
-                                <th>Mã SP</th>
-                                <th>Tên mặt hàng</th>
-                                <th>Đơn vị</th>
-                                <th>Số lượng</th>
-                                <th>Ghi chú</th>
-                            </tr>
-                        </thead>
-                        <tbody id="itemsTableBody">
-                            <tr>
-                                <td><textarea name="stt" rows="1" style="resize: none; text-align: center;" oninput="autoResize(this)">1</textarea></td>
-                                
-                                <td><input type="text" name="product_code" readonly style="width: 100%; text-align: center;" /></td>
+            <div class="items-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Mã SP</th>
+                            <th>Tên mặt hàng</th>
+                            <th>Đơn vị</th>
+                            <th>Số lượng</th>
+                            <th>Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                        <tr>
+                            <td><textarea name="stt" rows="1" style="resize: none; text-align: center;" oninput="autoResize(this)">1</textarea></td>
+                            
+                            <td><input type="text" name="product_code" readonly style="width: 100%; text-align: center;" /></td>
 
-                                <td>
-                                    <select name="product_name" onchange="updateProductInfo(this)" style="width: 100%;">
-                                        <option value="" disabled selected>-- Chọn sản phẩm --</option>
-                                        <c:forEach var="p" items="${products_list}">
-                                            <option value="${p.name}" data-code="${p.code}">
-                                                ${p.name}
-                                            </option>
-                                        </c:forEach>
-                                    </select>
-                                </td>
+                            <td>
+                                <select name="product_name" onchange="updateProductInfo(this)" style="width: 100%;">
+                                    <option value="" disabled selected>-- Chọn sản phẩm --</option>
+                                    <c:forEach var="p" items="${products_list}">
+                                        <option value="${p.name}" data-code="${p.code}" data-unit-symbol="${p.unitSymbol}">
+                                            ${p.name}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </td>
 
-                                <td>
-                                    <select name="unit" style="width: 100%;">
-                                        <option value="" disabled selected>-- Chọn --</option>
-                                        <c:forEach var="u" items="${unit_list}">
-                                            <option value="${u.name}" data-symbol="${u.symbol}">
-                                                ${u.symbol}
-                                            </option>
-                                        </c:forEach>
-                                    </select>
-                                </td>
+                            <td>
+                                <!-- Thay select bằng input readonly -->
+                                <input type="text" name="unit" readonly style="width: 100%; text-align: center;" />
+                                <!-- Thêm input hidden để lưu giá trị thực sự gửi đi -->
+                                <input type="hidden" name="unit_value" />
+                            </td>
 
-                                <td>
-                                    <textarea name="quantity" rows="1" 
-                                              class="quantity-input"
-                                              style="resize: none; text-align: center;" 
-                                              oninput="validateQuantity(this); autoResize(this)"
-                                              onblur="formatQuantity(this)"
-                                              onkeypress="return isNumberKey(event)"
-                                              placeholder="0"></textarea>
-                                </td>
-                                
-                                <td><textarea name="note" rows="1" style="resize: none;" oninput="autoResize(this)" placeholder="Ghi chú..."></textarea></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                            <td>
+                                <textarea name="quantity" rows="1" 
+                                          class="quantity-input"
+                                          style="resize: none; text-align: center;" 
+                                          oninput="validateQuantity(this); autoResize(this)"
+                                          onblur="formatQuantity(this)"
+                                          onkeypress="return isNumberKey(event)"
+                                          placeholder="0"></textarea>
+                            </td>
+                            
+                            <td><textarea name="note" rows="1" style="resize: none;" oninput="autoResize(this)" placeholder="Ghi chú..."></textarea></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
                 <!-- Nút bổ sung sản phẩm - ở dưới bảng trong container -->
                 <div class="supplement-button">
@@ -667,14 +663,35 @@
             const productSelect = newRow.querySelector('select[name="product_name"]');
             productSelect.selectedIndex = 0;
 
-            const unitSelect = newRow.querySelector('select[name="unit"]');
-            unitSelect.selectedIndex = 0;
+            const unitInput = newRow.querySelector('input[name="unit"]');
+            unitInput.value = '';
+            
+            const unitValueInput = newRow.querySelector('input[name="unit_value"]');
+            unitValueInput.value = '';
 
             const quantityTextarea = newRow.querySelector('textarea[name="quantity"]');
             quantityTextarea.value = '';
 
             const noteTextarea = newRow.querySelector('textarea[name="note"]');
             noteTextarea.value = '';
+
+            // Đảm bảo các event handlers vẫn hoạt động
+            const newProductSelect = newRow.querySelector('select[name="product_name"]');
+            newProductSelect.onchange = function() { updateProductInfo(this); };
+
+            const newQuantityTextarea = newRow.querySelector('textarea[name="quantity"]');
+            newQuantityTextarea.oninput = function() { 
+                validateQuantity(this); 
+                autoResize(this); 
+            };
+            newQuantityTextarea.onblur = function() { formatQuantity(this); };
+            newQuantityTextarea.onkeypress = function(event) { return isNumberKey(event); };
+
+            const newSttTextarea = newRow.querySelector('textarea[name="stt"]');
+            newSttTextarea.oninput = function() { autoResize(this); };
+
+            const newNoteTextarea = newRow.querySelector('textarea[name="note"]');
+            newNoteTextarea.oninput = function() { autoResize(this); };
 
             tbody.appendChild(newRow);
         }
@@ -698,14 +715,34 @@
             // window.location.href = 'supplement-products.jsp';
         }
 
-        // Tự động fill code sản phẩm
+        // Tự động fill code sản phẩm và unit
         function updateProductInfo(selectElement) {
             const selectedOption = selectElement.options[selectElement.selectedIndex];
             const code = selectedOption.getAttribute("data-code");
+            const unitSymbol = selectedOption.getAttribute("data-unit-symbol");
 
             const row = selectElement.closest("tr");
+            
+            // Điền mã sản phẩm
             const codeInput = row.querySelector("input[name='product_code']");
             codeInput.value = code || '';
+            
+            // Điền đơn vị hiển thị và giá trị
+            const unitInput = row.querySelector("input[name='unit']");
+            const unitValueInput = row.querySelector("input[name='unit_value']");
+            
+            if (unitSymbol) {
+                unitInput.value = unitSymbol;
+                // Tìm đơn vị tương ứng từ danh sách đơn vị
+                <c:forEach var="u" items="${unit_list}">
+                    if ("${u.symbol}" === unitSymbol) {
+                        unitValueInput.value = "${u.name}";
+                    }
+                </c:forEach>
+            } else {
+                unitInput.value = '';
+                unitValueInput.value = '';
+            }
         }
 
         // Form validation

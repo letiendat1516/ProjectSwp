@@ -62,6 +62,20 @@
                 font-size: 1.18rem;
                 cursor: pointer;
             }
+            .pw-link {
+                display: inline-block;
+                margin: 22px 7px 0 0;
+                text-decoration: none;
+                color: #fff;
+                background: #3498db;
+                padding: 9px 22px;
+                border-radius: 5px;
+                font-weight: bold;
+                transition: background 0.18s;
+            }
+            .pw-link {
+                background: #e74c3c;
+            }
             
             back {
                 margin-top: 15px;
@@ -97,7 +111,8 @@
                 <textarea id="note" name="note" placeholder="Nhập lý do đổi mật khẩu..."></textarea>
                 <button type="submit">Gửi yêu cầu</button>
                 <div class="back" style="text-align: center;">
-                    <a href="login.jsp">Quay lại</a>
+                    <a href="javascript:window.history.back()" class="pw-link">Quay lại</a>
+
                 </div>
             </form>
             <div class="msg<%= (msg != null && msg.contains("không")) ? " err" : "" %>">

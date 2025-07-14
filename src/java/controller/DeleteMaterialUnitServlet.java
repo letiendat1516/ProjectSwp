@@ -26,6 +26,14 @@ public class DeleteMaterialUnitServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
+            
+            // Check if the unit can be deleted
+            if (!materialUnitDAO.checkIfUnitCanBeDeleted(id)) {
+                request.getSession().setAttribute("errorMessage", "Không thể xóa đơn vị đang được sử dụng bởi sản phẩm. Vui lòng ngừng hoạt động đơn vị này trước.");
+                response.sendRedirect("materialUnit");
+                return;
+            }
+            
             boolean success = materialUnitDAO.deleteMaterialUnit(id);
             
             if (success) {

@@ -13,7 +13,6 @@ public class ProductInfo {
     private String code;
     private int cate_id;
     private int unit_id;
-    private BigDecimal price;
     private String status;
     private String description;
     private int supplierId;
@@ -24,20 +23,22 @@ public class ProductInfo {
     private int updatedBy;
     private Date updatedDate;
     private BigDecimal stockQuantity;
+    private BigDecimal minStockThreshold;
+    private String unitSymbol;
 
     // Default constructor
     public ProductInfo() {
     }
 
     // Constructor with basic fields
-    public ProductInfo(String name, String code, int cate_id, int unit_id, BigDecimal price, String status, String description) {
+    public ProductInfo(String name, String code, int cate_id, int unit_id, String status, String description,String unitSymbol) {
         this.name = name;
         this.code = code;
         this.cate_id = cate_id;
         this.unit_id = unit_id;
-        this.price = price;
         this.status = status;
         this.description = description;
+        this.unitSymbol = unitSymbol;
     }
 
     // Getters and Setters
@@ -48,6 +49,13 @@ public class ProductInfo {
     public void setId(int id) {
         this.id = id;
     }
+    public String getUnitSymbol() {
+    return unitSymbol;
+}
+
+public void setUnitSymbol(String unitSymbol) {
+    this.unitSymbol = unitSymbol;
+}
 
     public String getName() {
         return name;
@@ -79,14 +87,6 @@ public class ProductInfo {
 
     public void setUnit_id(int unit_id) {
         this.unit_id = unit_id;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
     }
 
     public String getStatus() {
@@ -168,6 +168,18 @@ public class ProductInfo {
     public void setStockQuantity(BigDecimal stockQuantity) {
         this.stockQuantity = stockQuantity;
     }
+    
+    public void setStockQuantity(double stockQuantity) {
+        this.stockQuantity = BigDecimal.valueOf(stockQuantity);
+    }
+
+    public BigDecimal getMinStockThreshold() {
+        return minStockThreshold;
+    }
+
+    public void setMinStockThreshold(BigDecimal minStockThreshold) {
+        this.minStockThreshold = minStockThreshold;
+    }
 
     @Override
     public String toString() {
@@ -177,12 +189,12 @@ public class ProductInfo {
                 ", code='" + code + '\'' +
                 ", cate_id=" + cate_id +
                 ", unit_id=" + unit_id +
-                ", price=" + price +
                 ", status='" + status + '\'' +
                 ", description='" + description + '\'' +
                 ", supplierId=" + supplierId +
                 ", expirationDate=" + expirationDate +
                 ", additionalNotes='" + additionalNotes + '\'' +
+                ", minStockThreshold=" + minStockThreshold +
                 '}';
     }
 }

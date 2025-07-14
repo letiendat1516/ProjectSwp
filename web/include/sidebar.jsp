@@ -114,7 +114,7 @@ Description: Reusable sidebar component - extracted from Dashboard.jsp
     <h2>Warehouse Manager</h2>
     <a href="${pageContext.request.contextPath}/categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
     <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="nav-item">Giao dịch</a>
-    <a href="Profile.jsp" class="nav-item">Thông tin cá nhân</a>
-    <a href="Admin.jsp" class="nav-item">Trang chủ (Chỉ Admin)</a>
-    <a href="StatisticSupplierEvaluation.jsp" class="nav-item">Thống kê</a>
+    <a href="${pageContext.request.contextPath}/profile" class="nav-item">Thông tin cá nhân</a>
+    <a href="${pageContext.request.contextPath}/Admin.jsp" class="nav-item">Trang chủ (Chỉ Admin)</a>
+    <a href="${pageContext.request.contextPath}/StatisticSupplierEvaluation.jsp" class="nav-item">Thống kê</a>
 </div>
