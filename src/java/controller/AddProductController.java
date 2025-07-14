@@ -61,16 +61,16 @@ public class AddProductController extends HttpServlet {
           String code = request.getParameter("code");
           String categoryIdStr = request.getParameter("categoryId");
           String unitIdStr = request.getParameter("unitId");
-          String priceStr = request.getParameter("price");
           String status = request.getParameter("status");
           String description = request.getParameter("description");
           String supplierIdStr = request.getParameter("supplierId");
           String expirationDateStr = request.getParameter("expirationDate");
           String additionalNotes = request.getParameter("additionalNotes");
           String stockQuantityStr = request.getParameter("stockQuantity");
+          String minStockThresholdStr = request.getParameter("minStockThreshold");
           
           // Validate required fields
-          String validationError = validateInput(name, code, categoryIdStr, unitIdStr, priceStr, status);
+          String validationError = validateInput(name, code, categoryIdStr, unitIdStr, status);
           if (validationError != null) {
               loadDropdownData(request);
               request.setAttribute("error", validationError);
@@ -94,7 +94,6 @@ public class AddProductController extends HttpServlet {
           product.setCode(code.trim().toUpperCase());
           product.setCate_id(Integer.parseInt(categoryIdStr));
           product.setUnit_id(Integer.parseInt(unitIdStr));
-          product.setPrice(new BigDecimal(priceStr));
           product.setStatus(status);
           product.setDescription(description != null ? description.trim() : "");
           
@@ -127,6 +126,22 @@ public class AddProductController extends HttpServlet {
           
           if (additionalNotes != null && !additionalNotes.isEmpty()) {
               product.setAdditionalNotes(additionalNotes.trim());
+          }
+          
+          // Set minimum stock threshold
+          if (minStockThresholdStr != null && !minStockThresholdStr.trim().isEmpty()) {
+              try {
+                  BigDecimal minStockThreshold = new BigDecimal(minStockThresholdStr.trim());
+                  if (minStockThreshold.compareTo(BigDecimal.ZERO) >= 0) {
+                      product.setMinStockThreshold(minStockThreshold);
+                  } else {
+                      product.setMinStockThreshold(BigDecimal.ZERO);
+                  }
+              } catch (NumberFormatException e) {
+                  product.setMinStockThreshold(BigDecimal.ZERO);
+              }
+          } else {
+              product.setMinStockThreshold(BigDecimal.ZERO);
           }
           
           // Add product to database
@@ -183,7 +198,7 @@ public class AddProductController extends HttpServlet {
   }
   
   private String validateInput(String name, String code, String categoryId, String unitId, 
-                              String price, String status) {
+                              String status) {
       if (name == null || name.trim().isEmpty()) {
           return "Tên sản phẩm không được để trống.";
       }
@@ -204,19 +219,6 @@ public class AddProductController extends HttpServlet {
       
       if (unitId == null || unitId.isEmpty()) {
           return "Vui lòng chọn đơn vị tính.";
-      }
-      
-      if (price == null || price.trim().isEmpty()) {
-          return "Giá sản phẩm không được để trống.";
-      }
-      
-      try {
-          BigDecimal priceValue = new BigDecimal(price);
-          if (priceValue.compareTo(BigDecimal.ZERO) < 0) {
-              return "Giá sản phẩm phải lớn hơn hoặc bằng 0.";
-          }
-      } catch (NumberFormatException e) {
-          return "Giá sản phẩm không hợp lệ.";
       }
       
       if (status == null || status.isEmpty()) {

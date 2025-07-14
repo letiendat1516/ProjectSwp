@@ -37,7 +37,8 @@ public class CreateMaterialUnitServlet extends HttpServlet {
             String name = request.getParameter("name");
             String symbol = request.getParameter("symbol");
             String description = request.getParameter("description");
-            String type = request.getParameter("type");
+            String statusParam = request.getParameter("status");
+            int status = Integer.parseInt(statusParam != null ? statusParam : "1"); // Default to active
 
             // Kiểm tra dữ liệu không được để trống
             if (name == null || name.trim().isEmpty()) {
@@ -46,7 +47,7 @@ public class CreateMaterialUnitServlet extends HttpServlet {
                 unit.setName(name);
                 unit.setSymbol(symbol);
                 unit.setDescription(description);
-                unit.setType(type);
+                unit.setStatus(status);
                 request.setAttribute("unit", unit);
                 request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
                 return;
@@ -58,7 +59,7 @@ public class CreateMaterialUnitServlet extends HttpServlet {
                 unit.setName(name);
                 unit.setSymbol(symbol);
                 unit.setDescription(description);
-                unit.setType(type);
+                unit.setStatus(status);
                 request.setAttribute("unit", unit);
                 request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
                 return;
@@ -71,7 +72,7 @@ public class CreateMaterialUnitServlet extends HttpServlet {
                 unit.setName(name);
                 unit.setSymbol(symbol);
                 unit.setDescription(description);
-                unit.setType(type);
+                unit.setStatus(status);
                 request.setAttribute("unit", unit);
                 request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
                 return;
@@ -83,7 +84,7 @@ public class CreateMaterialUnitServlet extends HttpServlet {
                 unit.setName(name);
                 unit.setSymbol(symbol);
                 unit.setDescription(description);
-                unit.setType(type);
+                unit.setStatus(status);
                 request.setAttribute("unit", unit);
                 request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
                 return;
@@ -97,7 +98,7 @@ public class CreateMaterialUnitServlet extends HttpServlet {
                 unit.setName(name);
                 unit.setSymbol(symbol);
                 unit.setDescription(description);
-                unit.setType(type);
+                unit.setStatus(status);
                 request.setAttribute("unit", unit);
                 request.getRequestDispatcher("/material_unit/createMaterialUnit.jsp").forward(request, response);
                 return;
@@ -108,7 +109,7 @@ public class CreateMaterialUnitServlet extends HttpServlet {
             unit.setName(name);
             unit.setSymbol(symbol);
             unit.setDescription(description);
-            unit.setType(type);            // Lưu vào database
+            unit.setStatus(status);            // Lưu vào database
             boolean success = materialUnitDAO.addMaterialUnit(unit);
 
             if (success) {

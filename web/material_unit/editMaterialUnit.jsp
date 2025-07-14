@@ -1,7 +1,22 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!-- Edit Material Unit Page: Edit details of a material unit -->
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
+
+<%@page import="model.Users"%>
+<%
+    Users user = (Users) session.getAttribute("user");
+    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
+
 <html>
 <head>
     <meta charset="UTF-8">
@@ -169,11 +184,10 @@
                             <textarea id="description" name="description" rows="4">${unit.description}</textarea>
                         </div>
                         <div class="form-group">
-                            <label for="type">Loại đơn vị</label>
-                            <select id="type" name="type" required>
-                                <option value="Khối lượng" ${unit.type == 'Khối lượng' ? 'selected' : ''}>Khối lượng</option>
-                                <option value="Độ dài" ${unit.type == 'Độ dài' ? 'selected' : ''}>Độ dài</option>
-                                <option value="Số lượng" ${unit.type == 'Số lượng' ? 'selected' : ''}>Số lượng</option>
+                            <label for="status">Trạng thái</label>
+                            <select id="status" name="status" required>
+                                <option value="1" ${unit.status == 1 ? 'selected' : ''}>Hoạt động</option>
+                                <option value="0" ${unit.status == 0 ? 'selected' : ''}>Ngừng hoạt động</option>
                             </select>
                         </div>
                         <div class="form-buttons">

@@ -64,7 +64,8 @@ public class EditMaterialUnitServlet extends HttpServlet {
             String name = request.getParameter("name");
             String symbol = request.getParameter("symbol");
             String description = request.getParameter("description");
-            String type = request.getParameter("type");
+            String statusParam = request.getParameter("status");
+            int status = Integer.parseInt(statusParam != null ? statusParam : "1"); // Default to active
 
             // Kiểm tra dữ liệu không được để trống
             if (name == null || name.trim().isEmpty()) {
@@ -73,7 +74,7 @@ public class EditMaterialUnitServlet extends HttpServlet {
                 unit.setName(name);
                 unit.setSymbol(symbol);
                 unit.setDescription(description);
-                unit.setType(type);
+                unit.setStatus(status);
                 request.setAttribute("unit", unit);
                 request.setAttribute("errorMessage", "Tên đơn vị không được để trống.");
                 request.getRequestDispatcher("/material_unit/editMaterialUnit.jsp").forward(request, response);
@@ -86,7 +87,7 @@ public class EditMaterialUnitServlet extends HttpServlet {
                 unit.setName(name);
                 unit.setSymbol(symbol);
                 unit.setDescription(description);
-                unit.setType(type);
+                unit.setStatus(status);
                 request.setAttribute("unit", unit);
                 request.setAttribute("errorMessage", "Ký hiệu đơn vị không được để trống.");
                 request.getRequestDispatcher("/material_unit/editMaterialUnit.jsp").forward(request, response);
@@ -100,7 +101,7 @@ public class EditMaterialUnitServlet extends HttpServlet {
                 unit.setName(name);
                 unit.setSymbol(symbol);
                 unit.setDescription(description);
-                unit.setType(type);
+                unit.setStatus(status);
                 request.setAttribute("unit", unit);
                 request.setAttribute("errorMessage", "Tên đơn vị không được vượt quá 50 ký tự.");
                 request.getRequestDispatcher("/material_unit/editMaterialUnit.jsp").forward(request, response);
@@ -113,7 +114,7 @@ public class EditMaterialUnitServlet extends HttpServlet {
                 unit.setName(name);
                 unit.setSymbol(symbol);
                 unit.setDescription(description);
-                unit.setType(type);
+                unit.setStatus(status);
                 request.setAttribute("unit", unit);
                 request.setAttribute("errorMessage", "Ký hiệu đơn vị không được vượt quá 10 ký tự.");
                 request.getRequestDispatcher("/material_unit/editMaterialUnit.jsp").forward(request, response);
@@ -127,7 +128,7 @@ public class EditMaterialUnitServlet extends HttpServlet {
                 unit.setName(name);
                 unit.setSymbol(symbol);
                 unit.setDescription(description);
-                unit.setType(type);
+                unit.setStatus(status);
                 request.setAttribute("unit", unit);
                 request.setAttribute("errorMessage", "Tên hoặc ký hiệu đã tồn tại. Vui lòng nhập giá trị khác.");
                 request.getRequestDispatcher("/material_unit/editMaterialUnit.jsp").forward(request, response);
@@ -143,7 +144,7 @@ public class EditMaterialUnitServlet extends HttpServlet {
             unit.setName(name);
             unit.setSymbol(symbol);
             unit.setDescription(description);
-            unit.setType(type);
+            unit.setStatus(status);
 
             // Cập nhật vào database
             boolean updated = materialUnitDAO.updateMaterialUnit(unit);            if (updated) {

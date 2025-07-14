@@ -12,6 +12,7 @@ import java.sql.Timestamp;
  */
 public class ForgotPasswordRequest {
     private int id;
+    private int userId;
     private String username;
     private String email;
     private Timestamp requestTime;
@@ -22,8 +23,9 @@ public class ForgotPasswordRequest {
     public ForgotPasswordRequest() {
     }
 
-    public ForgotPasswordRequest(int id, String username, String email, Timestamp requestTime, String note, Timestamp responseTime, String status) {
+    public ForgotPasswordRequest(int id, int userId, String username, String email, Timestamp requestTime, String note, Timestamp responseTime, String status) {
         this.id = id;
+        this.userId = userId;
         this.username = username;
         this.email = email;
         this.requestTime = requestTime;
@@ -38,6 +40,14 @@ public class ForgotPasswordRequest {
 
     public void setId(int id) {
         this.id = id;
+    }
+    
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {
