@@ -61,6 +61,7 @@
         .header p {
             font-size: 1.1rem;
             opacity: 0.9;
+            color: black;
         }
 
         .back-btn {
@@ -256,6 +257,30 @@
             background: #f8f9fa;
         }
 
+        /* Product Detail Links */
+        .table td a {
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin: -4px -8px;
+        }
+
+        .table td a:hover {
+            background: rgba(102, 126, 234, 0.1);
+            text-decoration: none !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .table td a[href*="product-detail"] {
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .table td a[href*="product-detail"]:hover {
+            color: #5a6fd8 !important;
+        }
+
         .badge {
             padding: 4px 8px;
             border-radius: 12px;
@@ -400,7 +425,7 @@
                 align-items: center;
             }
             .label {
-                color: #888;
+                color: black;
                 width: 120px;
             }
             .logout-btn {
@@ -441,6 +466,7 @@
             <a href="categoriesforward.jsp" class="back-btn">← Quay lại Trang trước</a>
             <a href="add-product" class="add-product-btn">➕ Thêm Sản Phẩm Mới</a>
             <a href="deleted-products" class="add-product-btn" style="background: #ffc107; color: #333;">🗑️ Sản Phẩm Đã Xóa</a>
+            <a href="inventory-statistics" class="add-product-btn" style="background: #17a2b8; color: white;">📊 Thống Kê Kho Hàng</a>
         </div>        <!-- Success Message -->
         <c:if test="${not empty param.success}">
             <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #c3e6cb;">
@@ -472,45 +498,12 @@
                         </select>
                     </div>
                     
-                    <div class="sort-box">
-                        <select name="sortBy" onchange="this.form.submit()">
-                            <option value="">Sắp xếp theo</option>
-                            <option value="name" ${sortBy == 'name' ? 'selected' : ''}>Tên sản phẩm</option>
-                            <option value="code" ${sortBy == 'code' ? 'selected' : ''}>Mã sản phẩm</option>
-                            <option value="stock" ${sortBy == 'stock' ? 'selected' : ''}>Số lượng tồn</option>
-                            <option value="category" ${sortBy == 'category' ? 'selected' : ''}>Danh mục</option>
-                        </select>
-                    </div>
-                    
-                    <div class="sort-box">
-                        <select name="sortOrder" onchange="this.form.submit()">
-                            <option value="asc" ${sortOrder == 'asc' ? 'selected' : ''}>Tăng dần</option>
-                            <option value="desc" ${sortOrder == 'desc' ? 'selected' : ''}>Giảm dần</option>
-                        </select>
-                    </div>
-                    
                     <button type="submit" class="btn btn-primary">Tìm kiếm</button>
                 </div>
                 
                 <!-- Hidden fields to maintain current page -->
                 <input type="hidden" name="page" value="${currentPage}">
             </form>
-        </div>
-
-        <!-- Statistics -->
-        <div class="stats">
-            <div class="stat-card stat-total">
-                <div class="stat-number">${totalProducts}</div>
-                <div class="stat-label">Tổng sản phẩm</div>
-            </div>
-            <div class="stat-card stat-low">
-                <div class="stat-number">${lowStockCount}</div>
-                <div class="stat-label">Sắp hết hàng</div>
-            </div>
-            <div class="stat-card stat-expiring">
-                <div class="stat-number">${nearExpirationCount}</div>
-                <div class="stat-label">Sắp hết hạn</div>
-            </div>
         </div>
 
         <!-- Products Table -->
@@ -552,8 +545,18 @@
                         <tbody>
                             <c:forEach var="product" items="${products}">
                                 <tr class="${product.lowStock ? 'highlight-low-stock' : ''} ${product.nearExpiration ? 'highlight-expiring' : ''}">
-                                    <td><strong>${product.code}</strong></td>
-                                    <td>${product.name}</td>
+                                    <td>
+                                        <strong>
+                                            <a href="product-detail?id=${product.id}" style="color: #667eea; text-decoration: none; font-weight: bold;">
+                                                ${product.code}
+                                            </a>
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <a href="product-detail?id=${product.id}" style="color: #333; text-decoration: none; font-weight: 500;">
+                                            ${product.name}
+                                        </a>
+                                    </td>
                                     <td>${product.categoryName != null ? product.categoryName : 'Chưa phân loại'}</td>
 
                                     <td>

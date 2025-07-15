@@ -46,7 +46,7 @@
         }
 
         .success-title {
-            color: #2c3e50;
+            color: black;
             font-size: 28px;
             font-weight: bold;
             margin-bottom: 15px;
@@ -175,7 +175,7 @@
         
         <% if(request.getAttribute("productName") != null && request.getAttribute("productCode") != null) { %>
         <div class="product-details">
-            <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">Chi tiết sản phẩm</h3>
+            <h3 style="color: black; margin-bottom: 15px; font-size: 18px;">Chi tiết sản phẩm</h3>
             <div class="product-detail-item">
                 <span class="product-detail-label">Tên sản phẩm:</span>
                 <span class="product-detail-value"><%= request.getAttribute("productName") %></span>

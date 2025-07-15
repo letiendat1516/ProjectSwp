@@ -458,14 +458,13 @@ public class ProductInfoDAO {
       String sql;
       if (hasMinStockThreshold) {
           sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, " +
-                "p.expiration_date, p.min_stock_threshold, " +
+                "p.min_stock_threshold, " +
                 "COALESCE(s.qty, 0) as stock_qty " +
                 "FROM product_info p " +
                 "LEFT JOIN product_in_stock s ON p.id = s.product_id " +
                 "WHERE p.id = ?";
       } else {
           sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, " +
-                "p.expiration_date, " +
                 "COALESCE(s.qty, 0) as stock_qty " +
                 "FROM product_info p " +
                 "LEFT JOIN product_in_stock s ON p.id = s.product_id " +
@@ -503,7 +502,8 @@ public class ProductInfoDAO {
                   product.setCreatedBy(0);
                   product.setUpdatedBy(0);
                   
-                  product.setExpirationDate(rs.getDate("expiration_date"));
+                  // Set expiration date to null since it's not in the database
+                  product.setExpirationDate(null);
                   
                   // Handle min_stock_threshold
                   if (hasMinStockThreshold) {

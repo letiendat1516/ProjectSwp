@@ -41,12 +41,13 @@
                 font-size: 2.5rem;
                 margin-bottom: 10px;
                 font-weight: 300;
-                color: white;
+                color: black;
             }
 
             .header p {
                 font-size: 1.1rem;
                 opacity: 0.9;
+                color: black;
             }
 
             .nav-buttons {

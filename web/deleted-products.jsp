@@ -10,7 +10,7 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
         .container { display: flex; min-height: 100vh; }
         .main-content { flex: 1; padding: 30px; background: #f5f7fa; }
-        h1 { color: #dc3545; margin-bottom: 20px; }
+        h1 { color: black; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px 10px; border-bottom: 1px solid #eee; text-align: left; }
         th { background: #f8d7da; color: #721c24; }

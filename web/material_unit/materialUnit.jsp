@@ -395,6 +395,7 @@
                 <option value="inactive">Ngừng hoạt động</option>
             </select>
             <a href="createMaterialUnit" class="btn-primary">Thêm đơn vị mới</a>
+            <a href="../unit-statistics" class="btn-primary" style="background: #17a2b8; margin-left: 10px;">📊 Thống Kê Đơn Vị</a>
         </div>
 
         <script>
