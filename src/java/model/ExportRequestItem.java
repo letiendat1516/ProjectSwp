@@ -1,5 +1,8 @@
 package model;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+
 public class ExportRequestItem {
 
     private int id;
@@ -7,26 +10,23 @@ public class ExportRequestItem {
     private String productName;
     private String productCode;
     private String unit;
-    private double quantity;
+    private int unitId;
+    private double quantity; // Số lượng yêu cầu ban đầu
+    private double quantityRequested; // Alias cho quantity
+    private double quantityExported; // Số lượng đã xuất tích lũy
+    private double quantityPending; // Số lượng còn lại (calculated)
     private String note;
     private int productId;
-    private double exportedQty;
+    private String dayRequest;
+    private String status;
+    private String rejectReason;
+    private String reasonDetail;
+    private double exportedQty; // Alias cho quantityExported
+    private String lastExportDate;
+    private String lastExportedBy;
 
     // Constructors
     public ExportRequestItem() {
-    }
-
-    public ExportRequestItem(String exportRequestId, String productName,
-            String productCode, String unit, double quantity,
-            String note, int productId) {
-        this.exportRequestId = exportRequestId;
-        this.productName = productName;
-        this.productCode = productCode;
-        this.unit = unit;
-        this.quantity = quantity;
-        this.note = note;
-        this.productId = productId;
-        this.exportedQty = 0.0;
     }
 
     // Getters and Setters
@@ -70,12 +70,46 @@ public class ExportRequestItem {
         this.unit = unit;
     }
 
+    public int getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(int unitId) {
+        this.unitId = unitId;
+    }
+
     public double getQuantity() {
         return quantity;
     }
 
     public void setQuantity(double quantity) {
         this.quantity = quantity;
+    }
+
+    public double getQuantityRequested() {
+        return quantityRequested;
+    }
+
+    public void setQuantityRequested(double quantityRequested) {
+        this.quantityRequested = quantityRequested;
+        this.quantity = quantityRequested; // Keep sync
+    }
+
+    public double getQuantityExported() {
+        return quantityExported;
+    }
+
+    public void setQuantityExported(double quantityExported) {
+        this.quantityExported = quantityExported;
+        this.exportedQty = quantityExported; // Keep sync
+    }
+
+    public double getQuantityPending() {
+        return quantityPending;
+    }
+
+    public void setQuantityPending(double quantityPending) {
+        this.quantityPending = quantityPending;
     }
 
     public String getNote() {
@@ -94,11 +128,86 @@ public class ExportRequestItem {
         this.productId = productId;
     }
 
+    public String getDayRequest() {
+        return dayRequest;
+    }
+
+    public void setDayRequest(String dayRequest) {
+        this.dayRequest = dayRequest;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
+
+    public String getReasonDetail() {
+        return reasonDetail;
+    }
+
+    public void setReasonDetail(String reasonDetail) {
+        this.reasonDetail = reasonDetail;
+    }
+
     public double getExportedQty() {
         return exportedQty;
     }
 
     public void setExportedQty(double exportedQty) {
         this.exportedQty = exportedQty;
+        this.quantityExported = exportedQty; // Keep sync
+    }
+
+    public String getLastExportDate() {
+        return lastExportDate;
+    }
+
+    public void setLastExportDate(String lastExportDate) {
+        this.lastExportDate = lastExportDate;
+    }
+
+    public String getLastExportedBy() {
+        return lastExportedBy;
+    }
+
+    public void setLastExportedBy(String lastExportedBy) {
+        this.lastExportedBy = lastExportedBy;
+    }
+
+    // Utility methods
+    public boolean isFullyExported() {
+        return quantityExported >= quantity;
+    }
+
+    public boolean hasRemainingQuantity() {
+        return quantityExported < quantity;
+    }
+
+    public double getRemainingQuantity() {
+        return Math.max(0, quantity - quantityExported);
+    }
+
+    @Override
+    public String toString() {
+        return "ExportRequestItem{"
+                + "id=" + id
+                + ", exportRequestId='" + exportRequestId + '\''
+                + ", productName='" + productName + '\''
+                + ", productCode='" + productCode + '\''
+                + ", quantity=" + quantity
+                + ", quantityExported=" + quantityExported
+                + ", quantityPending=" + quantityPending
+                + '}';
     }
 }

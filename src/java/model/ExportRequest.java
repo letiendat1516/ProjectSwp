@@ -1,34 +1,39 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
+import java.sql.Timestamp;
 
 public class ExportRequest {
-
     private String id;
     private int userId;
-    private String role;
     private Date dayRequest;
     private String status;
     private String approveBy;
-    private Date createdAt;
-    private ArrayList<ExportRequestItem> items;
+    private String role;
+    private String reason;        // Thêm field này
+    private String rejectReason;  // Thêm field này
+    private Timestamp createdAt;
 
-    // Constructors
+    // Constructor mặc định
     public ExportRequest() {
-        this.items = new ArrayList<>();
     }
 
-    public ExportRequest(String id, int userId, String role, Date dayRequest, String status) {
+    // Constructor đầy đủ
+    public ExportRequest(String id, int userId, Date dayRequest, String status, 
+                        String approveBy, String role, String reason, 
+                        String rejectReason, Timestamp createdAt) {
         this.id = id;
         this.userId = userId;
-        this.role = role;
         this.dayRequest = dayRequest;
         this.status = status;
-        this.items = new ArrayList<>();
+        this.approveBy = approveBy;
+        this.role = role;
+        this.reason = reason;
+        this.rejectReason = rejectReason;
+        this.createdAt = createdAt;
     }
 
-    // Getters and Setters
+    // Getters và Setters
     public String getId() {
         return id;
     }
@@ -43,14 +48,6 @@ public class ExportRequest {
 
     public void setUserId(int userId) {
         this.userId = userId;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public Date getDayRequest() {
@@ -77,19 +74,75 @@ public class ExportRequest {
         this.approveBy = approveBy;
     }
 
-    public Date getCreatedAt() {
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public String getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
+
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public ArrayList<ExportRequestItem> getItems() {
-        return items;
+    // Utility methods
+    public boolean isPending() {
+        return "pending".equals(this.status);
     }
 
-    public void setItems(ArrayList<ExportRequestItem> items) {
-        this.items = items;
+    public boolean isApproved() {
+        return "approved".equals(this.status);
+    }
+
+    public boolean isRejected() {
+        return "rejected".equals(this.status);
+    }
+
+    public boolean isCompleted() {
+        return "completed".equals(this.status);
+    }
+
+    public boolean isPartialExported() {
+        return "partial_exported".equals(this.status);
+    }
+
+    public boolean canBeProcessed() {
+        return isApproved() || isPartialExported();
+    }
+
+    @Override
+    public String toString() {
+        return "ExportRequest{" +
+                "id='" + id + '\'' +
+                ", userId=" + userId +
+                ", dayRequest=" + dayRequest +
+                ", status='" + status + '\'' +
+                ", approveBy='" + approveBy + '\'' +
+                ", role='" + role + '\'' +
+                ", reason='" + reason + '\'' +
+                ", rejectReason='" + rejectReason + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }
