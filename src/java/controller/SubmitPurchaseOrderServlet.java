@@ -46,19 +46,9 @@ public class SubmitPurchaseOrderServlet extends HttpServlet {
           String email = request.getParameter("supplier_email");
           String quoteSummary = request.getParameter("quote_summary");
 
-<<<<<<< HEAD
-            // Tạo đối tượng PurchaseOrderInfo
-            PurchaseOrderInfo purchaseOrder = new PurchaseOrderInfo();
-            purchaseOrder.setId(originalRequestId);
-            purchaseOrder.setFullname(fullname);
- //           purchaseOrder.setDoB(dob);
-            purchaseOrder.setDayPurchase(purchaseDate);
-            purchaseOrder.setStatus("pending"); // Mặc định là pending
-=======
           System.out.println("🔍 Processing quote for ID: " + originalRequestId);
           System.out.println("🔍 Quote date: " + quoteDate);
           System.out.println("🔍 Supplier: " + supplier);
->>>>>>> 31e5107d6d34587f671590d0382a74961088ae84
 
           // ✅ 2. CHUYỂN ĐỔI NGÀY BÁO GIÁ AN TOÀN
           java.sql.Date sqlQuoteDate = null;

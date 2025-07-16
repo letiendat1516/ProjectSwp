@@ -202,11 +202,6 @@ public class CategoryStatisticsController extends HttpServlet {
             request.setAttribute("topCategory", topCategory);
             
             // 4. Get most recently added category (THÊM MỚI)
-<<<<<<< HEAD
-            Map<String, Object> mostRecentCategory = statisticsDAO.getMostRecentlyAddedCategory();
-            request.setAttribute("mostRecentCategory", mostRecentCategory);
-=======
->>>>>>> 31e5107d6d34587f671590d0382a74961088ae84
             
             // 5. Get monthly growth
             Map<String, Integer> monthlyGrowth = statisticsDAO.getMonthlyGrowth();
@@ -241,18 +236,6 @@ public class CategoryStatisticsController extends HttpServlet {
             if (topCategoriesByProducts == null) topCategoriesByProducts = new ArrayList<>();
             request.setAttribute("topCategoriesByProducts", topCategoriesByProducts);
             
-<<<<<<< HEAD
-            // 9. Get category distribution for chart
-            List<Map<String, Object>> categoryDistribution = statisticsDAO.getCategoryDistribution();
-            if (categoryDistribution == null) categoryDistribution = new ArrayList<>();
-            request.setAttribute("categoryDistribution", categoryDistribution);
-            
-            // 10. Get statistics by parent category (for table)
-            List<Map<String, Object>> categoryStatsByParent = statisticsDAO.getStatisticsByParentCategory();
-            if (categoryStatsByParent == null) categoryStatsByParent = new ArrayList<>();
-            request.setAttribute("categoryStatsByParent", categoryStatsByParent);
-=======
->>>>>>> 31e5107d6d34587f671590d0382a74961088ae84
             
             // Calculate totals for summary row
             int totalCategoryCount = 0;
@@ -260,36 +243,12 @@ public class CategoryStatisticsController extends HttpServlet {
             int totalInactiveCount = 0;
             int totalProductCount = 0;
             
-<<<<<<< HEAD
-            for (Map<String, Object> stat : categoryStatsByParent) {
-                totalCategoryCount += (Integer) stat.getOrDefault("categoryCount", 0);
-                totalActiveCount += (Integer) stat.getOrDefault("activeCount", 0);
-                totalInactiveCount += (Integer) stat.getOrDefault("inactiveCount", 0);
-                totalProductCount += (Integer) stat.getOrDefault("productCount", 0);
-            }
-=======
->>>>>>> 31e5107d6d34587f671590d0382a74961088ae84
             
             request.setAttribute("totalCategoryCount", totalCategoryCount);
             request.setAttribute("totalActiveCount", totalActiveCount);
             request.setAttribute("totalInactiveCount", totalInactiveCount);
             request.setAttribute("totalProductCount", totalProductCount);
             
-<<<<<<< HEAD
-            // 11. Get monthly trend data (for line chart)
-            List<Map<String, Object>> monthlyTrend = statisticsDAO.getMonthlyTrend();
-            if (monthlyTrend == null) monthlyTrend = new ArrayList<>();
-            String monthlyTrendJson = gson.toJson(monthlyTrend);
-            request.setAttribute("monthlyTrendJson", monthlyTrendJson);
-            
-            // 12. Get product distribution by category (for bar chart)
-            List<Map<String, Object>> productDistribution = statisticsDAO.getProductDistributionByCategory(10);
-            if (productDistribution == null) productDistribution = new ArrayList<>();
-            String productDistributionJson = gson.toJson(productDistribution);
-            request.setAttribute("productDistributionJson", productDistributionJson);
-            
-=======
->>>>>>> 31e5107d6d34587f671590d0382a74961088ae84
             // 13. Get category statistics summary (THÊM MỚI - Tổng hợp tất cả)
             Map<String, Object> categoryStatsSummary = statisticsDAO.getCategoryStatisticsSummary();
             request.setAttribute("categoryStatsSummary", categoryStatsSummary);
@@ -304,10 +263,6 @@ public class CategoryStatisticsController extends HttpServlet {
             System.out.println("Active categories: " + activeCategories);
             System.out.println("Inactive categories: " + inactiveCategories);
             System.out.println("Top category: " + topCategory);
-<<<<<<< HEAD
-            System.out.println("Most recent category: " + mostRecentCategory);
-=======
->>>>>>> 31e5107d6d34587f671590d0382a74961088ae84
             System.out.println("Time stats loaded: " + timeStats);
             
         } catch (Exception e) {

@@ -59,15 +59,6 @@ public class SubmitRequoteFormServlet extends HttpServlet {
               System.out.println("✅ Converted date successfully: " + sqlQuoteDate);
           }
 
-<<<<<<< HEAD
-          // Tạo đối tượng PurchaseOrderInfo để cập nhật
-          PurchaseOrderInfo purchaseOrder = new PurchaseOrderInfo();
-          purchaseOrder.setId(originalRequestId);
-          purchaseOrder.setFullname(fullname);
-  //        purchaseOrder.setDoB(dob);
-          purchaseOrder.setDayPurchase(purchaseDate);
-          // Status sẽ được set thành "pending" trong DAO
-=======
           // ✅ 3. CẬP NHẬT THÔNG TIN PURCHASE_ORDER_INFO
           PurchaseOrderDAO dao = new PurchaseOrderDAO();
           boolean updateInfoSuccess = dao.updatePurchaseOrderInfo(
@@ -79,7 +70,6 @@ public class SubmitRequoteFormServlet extends HttpServlet {
               email, 
               quoteSummary
           );
->>>>>>> 31e5107d6d34587f671590d0382a74961088ae84
 
           if (!updateInfoSuccess) {
               System.out.println("❌ Failed to update purchase order info");
