@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
     <!-- ========== SERVLET DEFINITIONS ========== -->
+
+    <!-- Category Parent Controller (đã có @WebServlet annotation) -->
+    <!-- Không cần khai báo servlet cho CategoryParentController vì đã dùng annotation -->
+
     <!-- Category Servlet -->
     <servlet>
         <servlet-name>CategoryServlet</servlet-name>
@@ -27,6 +31,10 @@
     <servlet>
         <servlet-name>EdituserServlet</servlet-name>
         <servlet-class>controller.EdituserServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserFilterServlet</servlet-name>
+        <servlet-class>controller.UserFilterServlet</servlet-class>
     </servlet>
     <!-- Request Management Servlets -->
     <servlet>
@@ -141,13 +149,20 @@
         <servlet-name>CategoryParentStatisticsController</servlet-name>
         <servlet-class>controller.CategoryParentStatisticsController</servlet-class>
     </servlet>
-    <!-- Category Statistics Servlet -->
     <servlet>
         <servlet-name>CategoryStatisticsController</servlet-name>
         <servlet-class>controller.CategoryStatisticsController</servlet-class>
     </servlet>
     <!-- ========== SERVLET MAPPINGS ========== -->
     <!-- Category Mapping -->
+    <servlet>
+        <servlet-name>ListRequestExportController</servlet-name>
+        <servlet-class>controller.ListRequestExportController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExportConfirmController</servlet-name>
+        <servlet-class>controller.ExportConfirmController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
         <url-pattern>/CategoryServlet</url-pattern>
@@ -173,6 +188,10 @@
     <servlet-mapping>
         <servlet-name>EdituserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserFilterServlet</servlet-name>
+        <url-pattern>/userfilter</url-pattern>
     </servlet-mapping>
     <!-- Request Management Mappings -->
     <servlet-mapping>
@@ -388,6 +407,15 @@
         <url-pattern>/passwordrequest</url-pattern>
     </filter-mapping>
     <!-- ========== SESSION CONFIGURATION ========== -->
+    <!-- Session Configuration -->
+    <servlet-mapping>
+        <servlet-name>ListRequestExportController</servlet-name>
+        <url-pattern>/exportList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExportConfirmController</servlet-name>
+        <url-pattern>/export</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>15</session-timeout>
         <!-- 15 phút -->
