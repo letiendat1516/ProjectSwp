@@ -355,27 +355,27 @@
                                 <div class="text-muted">Tên danh mục phải duy nhất và không được trùng lặp</div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="parentId" class="form-label">Danh mục cha</label>
-                                <select class="form-select" id="parentId" name="parentId">
-                                    <option value="">-- Chọn danh mục (không bắt buộc) --</option>
-                                    <c:forEach var="category" items="${allCategories}">
-                                        <option value="${category.id}" 
-                                                ${param.parentId eq category.id ? 'selected' : ''}
-                                                class="${empty category.parentId ? 'category-level-0' : 'category-level-1'}">
-                                            <c:choose>
-                                                <c:when test="${empty category.parentId}">
-                                                    ${category.name}
-                                                </c:when>
-                                                <c:otherwise>
-                                                    └─ ${category.name}
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </option>
-                                    </c:forEach>
-                                </select>
-                                <div class="text-muted">Chọn danh mục cha để tạo cấu trúc phân cấp</div>
-                            </div>
+<div class="form-group">
+    <label for="parentId" class="form-label">Danh mục cha</label>
+    <select class="form-select" id="parentId" name="parentId">
+        <option value="">-- Chọn danh mục (không bắt buộc) --</option>
+        <c:forEach var="category" items="${allCategories}">
+            <option value="${category.id}" 
+                    ${param.parentId eq category.id ? 'selected' : ''}
+                    class="${empty category.parentId ? 'category-level-0' : 'category-level-1'}">
+                <c:choose>
+                    <c:when test="${empty category.parentId}">
+                        ${category.name}
+                    </c:when>
+                    <c:otherwise>
+                        └─ ${category.name}  <!-- Thêm khoảng trắng sau └─ -->
+                    </c:otherwise>
+                </c:choose>
+            </option>
+        </c:forEach>
+    </select>
+    <div class="text-muted">Chọn danh mục cha để tạo cấu trúc phân cấp</div>
+</div>
 
                             <div class="form-group">
                                 <div class="form-check">
@@ -407,7 +407,7 @@
                         this.parentElement.style.display = 'none';
                     });
                 });
-                
+
                 // Auto hide alerts after 5 seconds
                 const alerts = document.querySelectorAll('.alert');
                 alerts.forEach(function (alert) {

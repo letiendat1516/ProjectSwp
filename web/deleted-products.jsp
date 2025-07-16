@@ -10,7 +10,7 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
         .container { display: flex; min-height: 100vh; }
         .main-content { flex: 1; padding: 30px; background: #f5f7fa; }
-        h1 { color: #dc3545; margin-bottom: 20px; }
+        h1 { color: black; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px 10px; border-bottom: 1px solid #eee; text-align: left; }
         th { background: #f8d7da; color: #721c24; }
@@ -39,7 +39,7 @@
                             <th>Mã sản phẩm</th>
                             <th>Tên sản phẩm</th>
                             <th>Danh mục</th>
-                            <th>Giá</th>
+
                             <th>Trạng thái</th>
                             <th>Khôi phục</th>
                         </tr>
@@ -50,11 +50,7 @@
                                 <td>${product.code}</td>
                                 <td>${product.name}</td>
                                 <td>${product.cate_id}</td>
-                                <td>
-                                    <c:if test="${product.price != null}">
-                                        <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="₫" />
-                                    </c:if>
-                                </td>
+
                                 <td><span style="color: #dc3545; font-weight: bold;">Đã xóa</span></td>
                                 <td>
                                     <a href="recover-product?id=${product.id}" class="btn-recover">♻️ Khôi phục</a>

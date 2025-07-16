@@ -15,15 +15,15 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.jakarta.servlet.jsp.jstl-2.0.0.jar-6}</file>
+                    <file>${file.reference.jakarta.servlet.jsp.jstl-2.0.0.jar-7}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0.jar-7}</file>
+                    <file>${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0.jar-8}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.jaxb-api-2.1.jar-4}</file>
+                    <file>${file.reference.jaxb-api-2.1.jar-5}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
@@ -31,7 +31,7 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.mysql-connector-j-8.3.0.jar-6}</file>
+                    <file>${file.reference.mysql-connector-j-8.3.0.jar-7}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">

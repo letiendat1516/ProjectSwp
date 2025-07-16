@@ -41,12 +41,13 @@
                 font-size: 2.5rem;
                 margin-bottom: 10px;
                 font-weight: 300;
-                color: white;
+                color: black;
             }
 
             .header p {
                 font-size: 1.1rem;
                 opacity: 0.9;
+                color: black;
             }
 
             .nav-buttons {
@@ -432,13 +433,6 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="form-label required" for="price">Giá (VNĐ)</label>
-                                        <input type="number" id="price" name="price" class="form-control" 
-                                               value="${product.price}" min="0" step="0.01" required>
-                                        <div class="form-help">Nhập giá bằng VNĐ</div>
-                                    </div>
-
-                                    <div class="form-group">
                                         <label class="form-label required" for="status">Trạng Thái</label>
                                         <select id="status" name="status" class="form-control" required>
                                             <option value="">-- Chọn trạng thái --</option>
@@ -453,6 +447,14 @@
                                                value="${product.stockQuantity != null ? product.stockQuantity : ''}" 
                                                min="0" step="0.01" placeholder="0">
                                         <div class="form-help">Cập nhật số lượng hiện có trong kho</div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="minStockThreshold">Ngưỡng Cảnh Báo Tồn Kho</label>
+                                        <input type="number" id="minStockThreshold" name="minStockThreshold" class="form-control" 
+                                               value="${product.minStockThreshold != null ? product.minStockThreshold : ''}" 
+                                               min="0" step="0.01" placeholder="10">
+                                        <div class="form-help">Số lượng tối thiểu để cảnh báo sắp hết hàng (mặc định: 10)</div>
                                     </div>
                                 </div>
 

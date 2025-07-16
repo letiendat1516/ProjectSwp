@@ -1,9 +1,10 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+     * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+     * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 package controller;
 
+import dao.DepartmentDAO;
 import dao.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,6 +13,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.mindrot.jbcrypt.BCrypt;
+import java.util.List;
+import model.Department;
 import model.Users;
 
 /**
@@ -20,15 +24,6 @@ import model.Users;
  */
 public class AdduserServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -46,44 +41,49 @@ public class AdduserServlet extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        DepartmentDAO deptDAO = new DepartmentDAO();
+        List<Department> departments = deptDAO.getAllDepartments();
+        request.setAttribute("departments", departments);
+        request.getRequestDispatcher("AddUser.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        DepartmentDAO deptDAO = new DepartmentDAO();
+        List<Department> departments = deptDAO.getAllDepartments();
+        request.setAttribute("departments", departments);
+
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
         String fullname = request.getParameter("fullname");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
         String dobStr = request.getParameter("dob");
         int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
         int roleId = Integer.parseInt(request.getParameter("role"));
+        String departmentIdStr = request.getParameter("departmentId");
+        Integer departmentId = null;
+        if (departmentIdStr != null && !departmentIdStr.isEmpty()) {
+            try {
+                departmentId = Integer.parseInt(departmentIdStr);
+            } catch (NumberFormatException e) {
+                request.setAttribute("error", "Phòng ban không hợp lệ!");
+                request.getRequestDispatcher("AddUser.jsp").forward(request, response);
+                return;
+            }
+        }
 
         Users user = new Users();
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(hashedPassword);
+
         user.setFullname(fullname);
         user.setEmail(email);
         user.setPhone(phone);
@@ -95,15 +95,15 @@ public class AdduserServlet extends HttpServlet {
                 dob = java.sql.Date.valueOf(dobStr); // Format: yyyy-MM-dd
             }
         } catch (IllegalArgumentException e) {
-            request.setAttribute("error", "Date of Birth is invalid!");
+            request.setAttribute("error", "Ngày sinh không hợp lệ!");
             request.getRequestDispatcher("AddUser.jsp").forward(request, response);
             return;
         }
         user.setDob(dob); // Đặt giá trị ngày sinh
         if (dob != null) {
-        java.time.LocalDate birthDate = dob.toLocalDate();
-        java.time.LocalDate today = java.time.LocalDate.now();
-        int age = java.time.Period.between(birthDate, today).getYears();
+            java.time.LocalDate birthDate = dob.toLocalDate();
+            java.time.LocalDate today = java.time.LocalDate.now();
+            int age = java.time.Period.between(birthDate, today).getYears();
 
             if (age < 18 || age > 60) {
                 request.setAttribute("error", "Tuổi người dùng phải từ 18 đến 60!");
@@ -112,17 +112,17 @@ public class AdduserServlet extends HttpServlet {
             }
         }
 
+        user.setDepartmentId(departmentId);
         user.setActiveFlag(activeFlag);
 
         try {
             UserDAO userDAO = new UserDAO();
             userDAO.addUser(user, roleId);
-
             HttpSession session = request.getSession();
-            session.setAttribute("message", "User added successfully!");
-            response.sendRedirect("AddUser.jsp");
+            session.setAttribute("message", "Thêm người dùng thành công!");
+            response.sendRedirect("adduser");
         } catch (Exception e) {
-            request.setAttribute("error", "Failed to add user: " + e.getMessage());
+            request.setAttribute("error", "Không thể thêm người dùng");
             request.getRequestDispatcher("AddUser.jsp").forward(request, response);
         }
     }

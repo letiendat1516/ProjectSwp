@@ -13,10 +13,10 @@ public class RequestItemsDAO {
      * Thêm danh sách items (sản phẩm) vào request đã tạo
      */
     public void addItemsIntoDB(String request_id, String[] product_name, String[] product_code,
-                           String[] unit, int[] quantity, String[] note, String reason_detail) {
+                           String[] unit, int[] quantity, String[] note) {
         
         // SQL insert một item vào bảng request_items
-        String sql = "INSERT INTO request_items (request_id, product_name, product_code, unit, quantity, note, reason_detail) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO request_items (request_id, product_name, product_code, unit, quantity, note) VALUES (?, ?, ?, ?, ?, ?)";
         
         try {
             Connection con = Context.getJDBCConnection();
@@ -33,7 +33,6 @@ public class RequestItemsDAO {
                 System.out.println("unit: " + unit[i]);
                 System.out.println("quantity: " + quantity[i]);
                 System.out.println("note: " + note[i]);
-                System.out.println("reason_detail: " + reason_detail);
 
                 // Gán giá trị vào prepared statement
                 stmt.setString(1, request_id);           // FK tới bảng request
@@ -42,7 +41,6 @@ public class RequestItemsDAO {
                 stmt.setString(4, unit[i]);              // Đơn vị tính
                 stmt.setInt(5, quantity[i]);             // Số lượng yêu cầu
                 stmt.setString(6, note[i]);              // Ghi chú riêng cho item này
-                stmt.setString(7, reason_detail);        // Lý do chi tiết (chung)
 
                 // Thực hiện insert item này
                 int rowsAffected = stmt.executeUpdate();
