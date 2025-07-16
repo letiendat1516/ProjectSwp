@@ -652,7 +652,7 @@ public class UserDAO extends Context {
         String sql = "SELECT prr.id, u.username, u.email, prr.request_time, prr.note, prr.response_time, prr.status "
                 + "FROM password_reset_requests prr "
                 + "LEFT JOIN users u ON prr.user_id = u.id "
-                //+ "WHERE prr.status = 'pending' "
+                + "WHERE prr.status = 'pending' "
                 + "ORDER BY prr.request_time DESC";
         try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
