@@ -92,6 +92,10 @@
     </servlet>
     <!-- Product Management -->
     <servlet>
+        <servlet-name>AddProductFromRequestServlet</servlet-name>
+        <servlet-class>controller.AddProductFromRequestServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>AddProductController</servlet-name>
         <servlet-class>controller.AddProductController</servlet-class>
     </servlet>
@@ -147,15 +151,19 @@
         <servlet-class>controller.CategoryStatisticsController</servlet-class>
     </servlet>
     <servlet>
-    <servlet-name>ActivateMaterialUnitServlet</servlet-name>
-    <servlet-class>controller.ActivateMaterialUnitServlet</servlet-class>
-</servlet>
-<servlet>
-    <servlet-name>DeactivateMaterialUnitServlet</servlet-name>
-    <servlet-class>controller.DeactivateMaterialUnitServlet</servlet-class>
-</servlet>
+        <servlet-name>ActivateMaterialUnitServlet</servlet-name>
+        <servlet-class>controller.ActivateMaterialUnitServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeactivateMaterialUnitServlet</servlet-name>
+        <servlet-class>controller.DeactivateMaterialUnitServlet</servlet-class>
+    </servlet>
     <!-- ========== SERVLET MAPPINGS ========== -->
     <!-- Category Mapping -->
+    <servlet>
+        <servlet-name>ApproveExportRequestServlet</servlet-name>
+        <servlet-class>controller.ApproveExportRequestServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
         <url-pattern>/CategoryServlet</url-pattern>
@@ -246,6 +254,10 @@
     </servlet-mapping>
     <!-- Product Management Mappings -->
     <servlet-mapping>
+        <servlet-name>AddProductFromRequestServlet</servlet-name>
+        <url-pattern>/add-product-request</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>AddProductController</servlet-name>
         <url-pattern>/add-product</url-pattern>
     </servlet-mapping>
@@ -291,17 +303,14 @@
         <url-pattern>/submitrequoteform</url-pattern>
     </servlet-mapping>
     <!-- Category Parent Statistics Mapping -->
-
     <servlet-mapping>
         <servlet-name>CategoryParentStatisticsController</servlet-name>
         <url-pattern>/category-parent/statistics</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>CategoryStatisticsController</servlet-name>
         <url-pattern>/category/statistics</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>ActivateMaterialUnitServlet</servlet-name>
         <url-pattern>/material_unit/activateMaterialUnit</url-pattern>
@@ -310,7 +319,6 @@
         <servlet-name>DeactivateMaterialUnitServlet</servlet-name>
         <url-pattern>/material_unit/deactivateMaterialUnit</url-pattern>
     </servlet-mapping>
-
     <!-- ========== FILTERS ========== -->
     <!-- UTF-8 Encoding Filter -->
     <filter>
@@ -410,6 +418,10 @@
         <url-pattern>/passwordrequest</url-pattern>
     </filter-mapping>
     <!-- ========== SESSION CONFIGURATION ========== -->
+    <servlet-mapping>
+        <servlet-name>ApproveExportRequestServlet</servlet-name>
+        <url-pattern>/approveexportrequest</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>15</session-timeout>
         <!-- 15 phút -->

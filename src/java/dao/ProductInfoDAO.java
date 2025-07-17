@@ -458,14 +458,13 @@ public class ProductInfoDAO {
       String sql;
       if (hasMinStockThreshold) {
           sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, " +
-                "p.expiration_date, p.min_stock_threshold, " +
+                "p.min_stock_threshold, " +
                 "COALESCE(s.qty, 0) as stock_qty " +
                 "FROM product_info p " +
                 "LEFT JOIN product_in_stock s ON p.id = s.product_id " +
                 "WHERE p.id = ?";
       } else {
           sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, " +
-                "p.expiration_date, " +
                 "COALESCE(s.qty, 0) as stock_qty " +
                 "FROM product_info p " +
                 "LEFT JOIN product_in_stock s ON p.id = s.product_id " +
@@ -503,7 +502,8 @@ public class ProductInfoDAO {
                   product.setCreatedBy(0);
                   product.setUpdatedBy(0);
                   
-                  product.setExpirationDate(rs.getDate("expiration_date"));
+                  // Set expiration date to null since it's not in the database
+                  product.setExpirationDate(null);
                   
                   // Handle min_stock_threshold
                   if (hasMinStockThreshold) {
@@ -783,48 +783,95 @@ public class ProductInfoDAO {
       return list;
   }
   /**
-   * Get all products with their unit symbols
-   * @return List of ProductInfo objects with unit symbols
-   */
-  public List<ProductInfo> getAllProductsWithUnitSymbols() {
-      List<ProductInfo> products = new ArrayList<>();
-      String sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.active_flag, p.status, p.description, " +
-                  "p.min_stock_threshold, u.symbol as unit_symbol " +
-                  "FROM product_info p " +
-                  "LEFT JOIN unit u ON p.unit_id = u.id " +
-                  "WHERE p.status != 'deleted' " +
-                  "ORDER BY p.name";
-      
-      try (Connection con = Context.getJDBCConnection(); 
-           PreparedStatement stmt = con.prepareStatement(sql);
-           ResultSet rs = stmt.executeQuery()) {
-          
-          while (rs.next()) {
-              ProductInfo product = new ProductInfo();
-              product.setId(rs.getInt("id"));
-              product.setName(rs.getString("name"));
-              product.setCode(rs.getString("code"));
-              product.setCate_id(rs.getInt("cate_id"));
-              product.setUnit_id(rs.getInt("unit_id"));
-              product.setActive_flag(rs.getInt("active_flag"));
-              product.setStatus(rs.getString("status"));
-              product.setDescription(rs.getString("description"));
-              product.setUnitSymbol(rs.getString("unit_symbol"));
-              
-              // Handle min_stock_threshold
-              BigDecimal minStockThreshold = rs.getBigDecimal("min_stock_threshold");
-              if (minStockThreshold != null) {
-                  product.setMinStockThreshold(minStockThreshold);
-              } else {
-                  product.setMinStockThreshold(BigDecimal.ZERO);
-              }
-              
-              products.add(product);
-          }
-      } catch (SQLException e) {
-          System.err.println("ERROR: SQL Exception in getAllProductsWithUnitSymbols: " + e.getMessage());
-          e.printStackTrace();
-      }
-      return products;
-  }
+ * Get product information with unit symbol by product ID
+ * @param productId The ID of the product
+ * @return ProductInfo object with unit symbol
+ */
+public ProductInfo getProductWithUnitSymbol(int productId) {
+    String sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, " +
+                "p.min_stock_threshold, u.symbol as unit_symbol " +
+                "FROM product_info p " +
+                "LEFT JOIN unit u ON p.unit_id = u.id " +
+                "WHERE p.id = ? AND p.status != 'deleted'";
+    
+    try (Connection con = Context.getJDBCConnection(); 
+         PreparedStatement stmt = con.prepareStatement(sql)) {
+        
+        stmt.setInt(1, productId);
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                ProductInfo product = new ProductInfo();
+                product.setId(rs.getInt("id"));
+                product.setName(rs.getString("name"));
+                product.setCode(rs.getString("code"));
+                product.setCate_id(rs.getInt("cate_id"));
+                product.setUnit_id(rs.getInt("unit_id"));
+                product.setStatus(rs.getString("status"));
+                product.setDescription(rs.getString("description"));
+                product.setUnitSymbol(rs.getString("unit_symbol"));
+                
+                // Xử lý min_stock_threshold
+                BigDecimal minStockThreshold = rs.getBigDecimal("min_stock_threshold");
+                if (minStockThreshold != null) {
+                    product.setMinStockThreshold(minStockThreshold);
+                } else {
+                    product.setMinStockThreshold(BigDecimal.ZERO);
+                }
+                
+                return product;
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("ERROR: SQL Exception in getProductWithUnitSymbol: " + e.getMessage());
+        e.printStackTrace();
+    }
+    return null;
+}
+
+/**
+ * Get all products with their unit symbols
+ * @return List of ProductInfo objects with unit symbols
+ */
+public List<ProductInfo> getAllProductsWithUnitSymbols() {
+    List<ProductInfo> products = new ArrayList<>();
+    String sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, " +
+                "p.min_stock_threshold, u.symbol as unit_symbol " +
+                "FROM product_info p " +
+                "LEFT JOIN unit u ON p.unit_id = u.id " +
+                "WHERE p.status != 'deleted' " +
+                "ORDER BY p.name";
+    
+    try (Connection con = Context.getJDBCConnection(); 
+         PreparedStatement stmt = con.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+        
+        while (rs.next()) {
+            ProductInfo product = new ProductInfo();
+            product.setId(rs.getInt("id"));
+            product.setName(rs.getString("name"));
+            product.setCode(rs.getString("code"));
+            product.setCate_id(rs.getInt("cate_id"));
+            product.setUnit_id(rs.getInt("unit_id"));
+            product.setStatus(rs.getString("status"));
+            product.setDescription(rs.getString("description"));
+            product.setUnitSymbol(rs.getString("unit_symbol"));
+            
+            // Xử lý min_stock_threshold
+            BigDecimal minStockThreshold = rs.getBigDecimal("min_stock_threshold");
+            if (minStockThreshold != null) {
+                product.setMinStockThreshold(minStockThreshold);
+            } else {
+                product.setMinStockThreshold(BigDecimal.ZERO);
+            }
+            
+            products.add(product);
+        }
+    } catch (SQLException e) {
+        System.err.println("ERROR: SQL Exception in getAllProductsWithUnitSymbols: " + e.getMessage());
+        e.printStackTrace();
+    }
+    return products;
+}
+
 }
