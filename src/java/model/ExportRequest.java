@@ -3,8 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
+
 import java.util.ArrayList;
 import java.util.Date;
+
 /**
  *
  * @author Dell
@@ -24,11 +26,12 @@ public class ExportRequest {
     private String approve_by;
     private String warehouse;
     private ArrayList<ExportRequestItem> items;
+    private String requester_name;
 
     public ExportRequest() {
     }
 
-    public ExportRequest(String id, int user_id, String role, Date day_request, String status, String reason, String department, String recipient_name, String recipient_phone, String recipient_email, String approve_by, String warehouse, ArrayList<ExportRequestItem> items) {
+    public ExportRequest(String id, int user_id, String role, Date day_request, String status, String reason, String department, String recipient_name, String recipient_phone, String recipient_email, String approve_by, String warehouse, ArrayList<ExportRequestItem> items, String requester_name) {
         this.id = id;
         this.user_id = user_id;
         this.role = role;
@@ -42,6 +45,7 @@ public class ExportRequest {
         this.approve_by = approve_by;
         this.warehouse = warehouse;
         this.items = items;
+        this.requester_name = requester_name;
     }
 
     public String getId() {
@@ -147,5 +151,12 @@ public class ExportRequest {
     public void setItems(ArrayList<ExportRequestItem> items) {
         this.items = items;
     }
-    
+
+    public String getRequester_name() {
+        return requester_name;
+    }
+
+    public void setRequester_name(String requester_name) {
+        this.requester_name = requester_name;
+    }
 }

@@ -280,6 +280,23 @@
                             </a>
                         </div>
                     </div>
+                    
+                    <!-- Export Request -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Đơn Xuất Kho</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-container">
+                                <span class="material-icons">request_quote</span>
+                            </div>
+                            <h4 class="card-title">Phê Duyệt Đơn Xuất Kho</h4>
+                            <p class="card-text">Kiểm tra và phê duyệt các đơn xin xuất kho các sản phẩm được đề xuất.</p>
+                            <a href="approveexportrequest" class="btn btn-primary">
+                                Truy Cập <span class="material-icons btn-icon">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="footer">

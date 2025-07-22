@@ -91,6 +91,7 @@ public class UpdateProductController extends HttpServlet {
             e.printStackTrace();
             response.sendRedirect("product-list?error=Có lỗi xảy ra khi tải thông tin sản phẩm!");
         }
+        
     }
     
     @Override
