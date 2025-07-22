@@ -26,15 +26,12 @@ CREATE TABLE `export_request` (
   `id` varchar(10) NOT NULL,
   `user_id` int DEFAULT NULL,
   `day_request` date DEFAULT NULL,
-  `status` enum('pending','approved','rejected','completed') DEFAULT NULL,
-  `reason` text,
-  `department` varchar(100) DEFAULT NULL,
-  `recipient_name` varchar(100) DEFAULT NULL,
-  `recipient_phone` varchar(20) DEFAULT NULL,
-  `recipient_email` varchar(100) DEFAULT NULL,
+  `status` enum('pending','approved','rejected','completed','partial_exported') DEFAULT 'pending',
   `approve_by` varchar(100) DEFAULT NULL,
-  `warehouse` varchar(100) DEFAULT NULL,
   `role` varchar(50) DEFAULT NULL,
+  `reason` varchar(500) DEFAULT NULL,
+  `reject_reason` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `export_request_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
@@ -50,4 +47,4 @@ CREATE TABLE `export_request` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-23 22:51:53
+-- Dump completed on 2025-07-22 13:38:32

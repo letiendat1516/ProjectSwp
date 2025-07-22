@@ -16,18 +16,34 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `role`
+-- Table structure for table `department`
 --
 
-DROP TABLE IF EXISTS `role`;
+DROP TABLE IF EXISTS `department`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `role` (
+CREATE TABLE `department` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `role_name` varchar(50) NOT NULL,
+  `dept_code` varchar(20) NOT NULL COMMENT 'Mã phòng ban',
+  `dept_name` varchar(100) NOT NULL COMMENT 'Tên phòng ban',
+  `description` text COMMENT 'Mô tả phòng ban',
+  `manager_id` int DEFAULT NULL COMMENT 'ID trưởng phòng',
+  `phone` varchar(20) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `active_flag` tinyint(1) DEFAULT '1' COMMENT 'Trạng thái hoạt động',
+  `created_by` int DEFAULT NULL COMMENT 'Người tạo phòng ban',
+  `create_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Thời gian tạo phòng ban',
+  `updated_by` int DEFAULT NULL COMMENT 'Người cập nhật cuối',
+  `update_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Thời gian cập nhật',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `role_name` (`role_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `dept_code` (`dept_code`),
+  KEY `manager_id` (`manager_id`),
+  KEY `created_by` (`created_by`),
+  KEY `updated_by` (`updated_by`),
+  CONSTRAINT `department_ibfk_1` FOREIGN KEY (`manager_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `department_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `department_ibfk_3` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -39,4 +55,4 @@ CREATE TABLE `role` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-22 13:38:33
+-- Dump completed on 2025-07-22 13:38:32

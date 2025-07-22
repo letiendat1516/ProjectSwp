@@ -16,18 +16,27 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `role`
+-- Table structure for table `warehouse_export_history`
 --
 
-DROP TABLE IF EXISTS `role`;
+DROP TABLE IF EXISTS `warehouse_export_history`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `role` (
+CREATE TABLE `warehouse_export_history` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `role_name` varchar(50) NOT NULL,
+  `export_request_id` varchar(10) NOT NULL,
+  `product_name` varchar(255) DEFAULT NULL,
+  `product_code` varchar(50) NOT NULL,
+  `quantity_exported` decimal(10,2) DEFAULT NULL,
+  `export_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `note` varchar(255) DEFAULT NULL,
+  `exported_by` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `role_name` (`role_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `fk_export_history_request_id` (`export_request_id`),
+  KEY `fk_export_history_product_code` (`product_code`),
+  CONSTRAINT `fk_export_history_product_code` FOREIGN KEY (`product_code`) REFERENCES `product_info` (`code`),
+  CONSTRAINT `fk_export_history_request_id` FOREIGN KEY (`export_request_id`) REFERENCES `export_request` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
