@@ -88,12 +88,21 @@ public class AddProductController extends HttpServlet {
               return;
           }
           
+          // Validate unit is active before setting
+          int unitId = Integer.parseInt(unitIdStr);
+          if (!productDAO.isUnitActive(unitId)) {
+              request.setAttribute("error", "Đơn vị tính đã chọn hiện đang ngừng hoạt động! Vui lòng chọn đơn vị khác.");
+              loadDropdownData(request);
+              request.getRequestDispatcher("add-product.jsp").forward(request, response);
+              return;
+          }
+          
           // Create ProductInfo object
           ProductInfo product = new ProductInfo();
           product.setName(name.trim());
           product.setCode(code.trim().toUpperCase());
           product.setCate_id(Integer.parseInt(categoryIdStr));
-          product.setUnit_id(Integer.parseInt(unitIdStr));
+          product.setUnit_id(unitId);
           product.setStatus(status);
           product.setDescription(description != null ? description.trim() : "");
           

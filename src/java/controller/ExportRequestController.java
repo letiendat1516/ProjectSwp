@@ -72,7 +72,7 @@ public class ExportRequestController extends HttpServlet {
 
           // Lấy dữ liệu cho form
           List<ProductInfo> products_list = product.getAllProducts();
-          List<Unit> units_list = unitDAO.getAllUnits();
+          List<Unit> units_list = unitDAO.getAllUnits(); // Now only returns active units
 
           // Set attributes
           request.setAttribute("nextExportID", nextExportID);

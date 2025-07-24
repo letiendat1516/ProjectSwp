@@ -399,7 +399,7 @@
         
         <div class="main-content">
             <div class="header">
-                <h1 class="page-title">📊 Thống Kê Kho Hàng</h1>
+                <h1 class="page-title">Thống Kê Kho Hàng</h1>
                 <p>Tổng quan và phân tích chi tiết về tình trạng kho hàng</p>
                 <div class="header-user">
                     <label class="label">Chào mừng, <%= user.getFullname()%></label>
@@ -415,7 +415,7 @@
             <!-- Low Stock Alert -->
             <c:if test="${lowStockCount > 0}">
                 <div class="low-stock-alert">
-                    <span class="alert-icon">⚠️</span>
+                    <span class="alert-icon"></span>
                     <div>
                         <strong>Cảnh báo hàng tồn kho thấp!</strong><br>
                         Có ${lowStockCount} sản phẩm đang có số lượng tồn kho thấp và cần được bổ sung.
@@ -426,16 +426,16 @@
             <!-- Quick Actions -->
             <div class="quick-actions">
                 <a href="product-list" class="action-btn">
-                    📦 Xem danh sách sản phẩm
+                    Xem danh sách sản phẩm
                 </a>
                 <a href="add-product" class="action-btn">
-                    ➕ Thêm sản phẩm mới
+                    Thêm sản phẩm mới
                 </a>
                 <a href="ExportRequest.jsp" class="action-btn">
-                    📤 Tạo yêu cầu xuất kho
+                    Tạo yêu cầu xuất kho
                 </a>
                 <a href="ListRequestImport.jsp" class="action-btn">
-                    📥 Yêu cầu nhập kho
+                    Yêu cầu nhập kho
                 </a>
             </div>
 
@@ -473,7 +473,7 @@
                 <div class="stat-card">
                     <div class="stat-header">
                         <span class="stat-title">Tổng Số Sản Phẩm</span>
-                        <span class="stat-icon">📦</span>
+                        <span class="stat-icon"></span>
                     </div>
                     <div class="stat-number">${totalProducts}</div>
                     <div class="stat-description">
@@ -488,7 +488,7 @@
                 <div class="stat-card danger">
                     <div class="stat-header">
                         <span class="stat-title">Sắp Hết Hàng</span>
-                        <span class="stat-icon">⚠️</span>
+                        <span class="stat-icon"></span>
                     </div>
                     <div class="stat-number">${lowStockCount}</div>
                     <div class="stat-description">
@@ -503,7 +503,6 @@
                 <div class="stat-card warning">
                     <div class="stat-header">
                         <span class="stat-title">Sắp Hết Hạn</span>
-                        <span class="stat-icon">⏰</span>
                     </div>
                     <div class="stat-number">${nearExpirationCount}</div>
                     <div class="stat-description">
@@ -518,7 +517,6 @@
                 <div class="stat-card success">
                     <div class="stat-header">
                         <span class="stat-title">Sản Phẩm Hoạt Động</span>
-                        <span class="stat-icon">✅</span>
                     </div>
                     <div class="stat-number">${activeProductsCount}</div>
                     <div class="stat-description">
@@ -533,7 +531,6 @@
                 <div class="stat-card warning">
                     <div class="stat-header">
                         <span class="stat-title">Sản Phẩm Ngưng Bán</span>
-                        <span class="stat-icon">⏸️</span>
                     </div>
                     <div class="stat-number">${inactiveProductsCount}</div>
                     <div class="stat-description">
@@ -548,7 +545,6 @@
                 <div class="stat-card info">
                     <div class="stat-header">
                         <span class="stat-title">Giao Dịch Gần Đây</span>
-                        <span class="stat-icon">📈</span>
                     </div>
                     <div class="stat-number">${recentTransactionsCount}</div>
                     <div class="stat-description">
@@ -563,7 +559,6 @@
                 <div class="stat-card info">
                     <div class="stat-header">
                         <span class="stat-title">Danh Mục Sản Phẩm</span>
-                        <span class="stat-icon">🏷️</span>
                     </div>
                     <div class="stat-number">${totalCategories}</div>
                     <div class="stat-description">
@@ -575,12 +570,12 @@
             <!-- Top Low Stock Products -->
             <div class="table-container">
                 <div class="chart-title">
-                    ⚠️ Top Sản Phẩm Sắp Hết Hàng
+                    Top Sản Phẩm Sắp Hết Hàng
                 </div>
                 <c:choose>
                     <c:when test="${empty lowStockProducts}">
                         <div style="text-align: center; padding: 40px; color: #6c757d;">
-                            <div style="font-size: 3rem; margin-bottom: 15px;">✅</div>
+                            <div style="font-size: 3rem; margin-bottom: 15px;"></div>
                             <h4>Tuyệt vời! Không có sản phẩm nào sắp hết hàng</h4>
                             <p>Tất cả sản phẩm đều có lượng tồn kho đầy đủ.</p>
                         </div>
@@ -627,12 +622,12 @@
             <!-- Category Statistics -->
             <div class="table-container">
                 <div class="chart-title">
-                    📊 Thống Kê Theo Danh Mục
+                    Thống Kê Theo Danh Mục
                 </div>
                 <c:choose>
                     <c:when test="${empty categoryStats}">
                         <div style="text-align: center; padding: 40px; color: #6c757d;">
-                            <div style="font-size: 3rem; margin-bottom: 15px;">📊</div>
+                            <div style="font-size: 3rem; margin-bottom: 15px;"></div>
                             <h4>Chưa có dữ liệu thống kê</h4>
                             <p>Dữ liệu thống kê theo danh mục sẽ xuất hiện khi có sản phẩm.</p>
                         </div>
@@ -676,12 +671,12 @@
             <!-- Recent Activity -->
             <div class="table-container">
                 <div class="chart-title">
-                    📈 Hoạt Động Gần Đây
+                    Hoạt Động Gần Đây
                 </div>
                 <c:choose>
                     <c:when test="${empty recentActivities}">
                         <div style="text-align: center; padding: 40px; color: #6c757d;">
-                            <div style="font-size: 3rem; margin-bottom: 15px;">📈</div>
+                            <div style="font-size: 3rem; margin-bottom: 15px;"></div>
                             <h4>Chưa có hoạt động nào</h4>
                             <p>Các hoạt động nhập/xuất kho gần đây sẽ hiển thị ở đây.</p>
                         </div>

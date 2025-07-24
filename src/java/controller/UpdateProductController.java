@@ -69,7 +69,7 @@ public class UpdateProductController extends HttpServlet {
             
             // Load dropdown data FIRST
             System.out.println("DEBUG: Loading dropdown data");
-            loadDropdownData(request);
+            loadDropdownData(request, product);
             
             // Set product data for form - Make sure this is set
             request.setAttribute("product", product);
@@ -114,7 +114,7 @@ public class UpdateProductController extends HttpServlet {
             ProductInfo existingProduct = productDAO.getProductById(productId);
             if (existingProduct == null) {
                 request.setAttribute("error", "Sản phẩm không tồn tại!");
-                loadDropdownData(request);
+                loadDropdownData(request, null);
                 request.getRequestDispatcher("update-product.jsp").forward(request, response);
                 return;
             }
@@ -125,7 +125,7 @@ public class UpdateProductController extends HttpServlet {
             if (validationError != null) {
                 request.setAttribute("error", validationError);
                 request.setAttribute("product", existingProduct);
-                loadDropdownData(request);
+                loadDropdownData(request, existingProduct);
                 request.getRequestDispatcher("update-product.jsp").forward(request, response);
                 return;
             }
@@ -163,7 +163,7 @@ public class UpdateProductController extends HttpServlet {
             } else {
                 request.setAttribute("error", "Có lỗi xảy ra khi cập nhật sản phẩm. Vui lòng thử lại!");
                 request.setAttribute("product", existingProduct);
-                loadDropdownData(request);
+                loadDropdownData(request, existingProduct);
                 request.getRequestDispatcher("update-product.jsp").forward(request, response);
             }
             
@@ -172,7 +172,7 @@ public class UpdateProductController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Có lỗi hệ thống xảy ra. Vui lòng thử lại sau!");
-            loadDropdownData(request);
+            loadDropdownData(request, null);
             request.getRequestDispatcher("update-product.jsp").forward(request, response);
         }
     }
@@ -220,7 +220,14 @@ public class UpdateProductController extends HttpServlet {
             }
             
             if (unitIdStr != null && !unitIdStr.trim().isEmpty()) {
-                product.setUnit_id(Integer.parseInt(unitIdStr));
+                int newUnitId = Integer.parseInt(unitIdStr);
+                
+                // Check if the unit is active (only if it's different from current unit)
+                if (product.getUnit_id() != newUnitId && !productDAO.isUnitActive(newUnitId)) {
+                    return "Đơn vị tính đã chọn hiện đang ngừng hoạt động! Vui lòng chọn đơn vị khác.";
+                }
+                
+                product.setUnit_id(newUnitId);
             }
             
             if (supplierIdStr != null && !supplierIdStr.trim().isEmpty()) {
@@ -252,15 +259,23 @@ public class UpdateProductController extends HttpServlet {
         return null; // No validation errors
     }
     
-    private void loadDropdownData(HttpServletRequest request) {
+    private void loadDropdownData(HttpServletRequest request, ProductInfo product) {
         try {
             System.out.println("DEBUG: Loading categories...");
             List<CategoryProduct> categories = productDAO.getAllActiveCategories();
             System.out.println("DEBUG: Categories loaded: " + (categories != null ? categories.size() : "null"));
             
             System.out.println("DEBUG: Loading units...");
-            List<Unit> units = productDAO.getAllActiveUnits();
-            System.out.println("DEBUG: Units loaded: " + (units != null ? units.size() : "null"));
+            List<Unit> units;
+            if (product != null && product.getUnit_id() > 0) {
+                // For existing products, include their current unit even if inactive
+                units = productDAO.getUnitsForProductEdit(product.getUnit_id());
+                System.out.println("DEBUG: Units loaded for product edit (including current unit): " + (units != null ? units.size() : "null"));
+            } else {
+                // For new products or when no current unit, only show active units
+                units = productDAO.getAllActiveUnits();
+                System.out.println("DEBUG: Active units loaded: " + (units != null ? units.size() : "null"));
+            }
             
             System.out.println("DEBUG: Loading suppliers...");
             List<Supplier> suppliers = productDAO.getAllActiveSuppliers();

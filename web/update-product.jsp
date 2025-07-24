@@ -299,7 +299,7 @@
             <jsp:include page="/include/sidebar.jsp" />
             <div class="main-content">
                 <div class="header">
-                    <h1>📝 Cập Nhật Sản Phẩm</h1>
+                    <h1>Cập Nhật Sản Phẩm</h1>
                     <p>Chỉnh sửa thông tin sản phẩm trong hệ thống kho</p>
                 </div>
                 
@@ -310,13 +310,13 @@
                 <!-- Error/Success Messages -->
                 <c:if test="${not empty error}">
                     <div class="error-message">
-                        <strong>❌ Lỗi:</strong> ${error}
+                        <strong>Lỗi:</strong> ${error}
                     </div>
                 </c:if>
 
                 <c:if test="${not empty success}">
                     <div class="success-message">
-                        <strong>✅ Thành công:</strong> ${success}
+                        <strong>Thành công:</strong> ${success}
                     </div>
                 </c:if>
                 
@@ -324,7 +324,7 @@
                 <c:choose>
                     <c:when test="${empty product}">
                         <div class="error-message">
-                            <strong>❌ Lỗi:</strong> Không tìm thấy sản phẩm. Vui lòng kiểm tra lại đường dẫn hoặc quay lại danh sách sản phẩm.
+                            <strong>Lỗi:</strong> Không tìm thấy sản phẩm. Vui lòng kiểm tra lại đường dẫn hoặc quay lại danh sách sản phẩm.
                             <br><br>
                             <strong>Debug Info:</strong><br>
                             - Product object: ${product}<br>
@@ -336,7 +336,7 @@
                     <c:otherwise>
                         <!-- Current Product Information -->
                         <div class="product-info-card">
-                            <h3 style="margin-bottom: 15px; color: #495057;">📦 Thông Tin Hiện Tại</h3>
+                            <h3 style="margin-bottom: 15px; color: #495057;">Thông Tin Hiện Tại</h3>
                             <div class="product-info-grid">
                                 <div class="info-item">
                                     <span class="info-label">Mã Sản Phẩm</span>
@@ -361,8 +361,8 @@
                                     <span class="info-label">Trạng Thái</span>
                                     <span class="info-value">
                                         <c:choose>
-                                            <c:when test="${product.status == 'active'}">🟢 Hoạt động</c:when>
-                                            <c:otherwise>🔴 Ngưng hoạt động</c:otherwise>
+                                            <c:when test="${product.status == 'active'}">Hoạt động</c:when>
+                                            <c:otherwise>Ngưng hoạt động</c:otherwise>
                                         </c:choose>
                                     </span>
                                 </div>
@@ -390,7 +390,7 @@
                                 </div>
 
                                 <!-- Basic Information -->
-                                <div class="section-title">📝 Thông Tin Cơ Bản</div>
+                                <div class="section-title">Thông Tin Cơ Bản</div>
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label class="form-label required" for="name">Tên Sản Phẩm</label>
@@ -425,11 +425,19 @@
                                             <option value="">-- Chọn đơn vị --</option>
                                             <c:forEach var="unit" items="${units}">
                                                 <option value="${unit.id}" 
-                                                        ${product.unit_id == unit.id ? 'selected' : ''}>
-                                                    ${unit.name} (${unit.symbol})
+                                                        ${product.unit_id == unit.id ? 'selected' : ''}
+                                                        ${unit.status != 1 ? 'style="color: #999; font-style: italic;"' : ''}>
+                                                    ${unit.name} (${unit.symbol})${unit.status != 1 ? ' [Ngừng hoạt động]' : ''}
                                                 </option>
                                             </c:forEach>
                                         </select>
+                                        <c:if test="${not empty units}">
+                                            <c:forEach var="unit" items="${units}">
+                                                <c:if test="${product.unit_id == unit.id && unit.status != 1}">
+                                                    <small class="text-warning">Đơn vị hiện tại đã ngừng hoạt động. Bạn có thể giữ nguyên hoặc thay đổi sang đơn vị khác.</small>
+                                                </c:if>
+                                            </c:forEach>
+                                        </c:if>
                                     </div>
 
                                     <div class="form-group">
@@ -459,7 +467,7 @@
                                 </div>
 
                                 <!-- Additional Information -->
-                                <div class="section-title">📦 Thông Tin Bổ Sung</div>
+                                <div class="section-title">Thông Tin Bổ Sung</div>
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label class="form-label" for="supplierId">Nhà Cung Cấp</label>
@@ -498,14 +506,14 @@
                                 <!-- Submit Buttons -->
                                 <div style="text-align: center; margin-top: 30px;">
                                     <button type="submit" class="btn btn-warning" style="padding: 15px 30px; font-size: 16px;">
-                                        💾 Cập Nhật Sản Phẩm
+                                        Cập Nhật Sản Phẩm
                                     </button>
                                     <a href="product-list" class="btn btn-secondary" style="padding: 15px 30px; font-size: 16px; margin-left: 15px;">
-                                        ❌ Hủy Bỏ
+                                        Hủy Bỏ
                                     </a>
                                     <button type="button" onclick="confirmDelete()" class="btn btn-danger" 
                                             style="padding: 15px 30px; font-size: 16px; margin-left: 15px;">
-                                        🗑️ Xóa Sản Phẩm
+                                        Xóa Sản Phẩm
                                     </button>
                                 </div>
                             </form>

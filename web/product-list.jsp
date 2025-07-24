@@ -454,7 +454,7 @@
             <div class="main-content">
         
                 <div class="header">
-                    <h1 class="page-title">📦 Danh Sách Sản Phẩm</h1>
+                    <h1 class="page-title">Danh Sách Sản Phẩm</h1>
                     <p>Quản lý và theo dõi tồn kho sản phẩm</p>
                     <div class="header-user">
                         <label class="label"><%= user.getFullname()%></label>
@@ -464,20 +464,20 @@
 
         <div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
             <a href="categoriesforward.jsp" class="back-btn">← Quay lại Trang trước</a>
-            <a href="add-product" class="add-product-btn">➕ Thêm Sản Phẩm Mới</a>
-            <a href="deleted-products" class="add-product-btn" style="background: #ffc107; color: #333;">🗑️ Sản Phẩm Đã Xóa</a>
-            <a href="inventory-statistics" class="add-product-btn" style="background: #17a2b8; color: white;">📊 Thống Kê Kho Hàng</a>
+            <a href="add-product" class="add-product-btn">Thêm Sản Phẩm Mới</a>
+            <a href="deleted-products" class="add-product-btn" style="background: #ffc107; color: #333;">Sản Phẩm Đã Xóa</a>
+            <a href="inventory-statistics" class="add-product-btn" style="background: #17a2b8; color: white;">Thống Kê Kho Hàng</a>
         </div>        <!-- Success Message -->
         <c:if test="${not empty param.success}">
             <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #c3e6cb;">
-                <strong>✅ Thành công:</strong> ${param.success}
+                <strong>Thành công:</strong> ${param.success}
             </div>
         </c:if>
         
         <!-- Error Message -->
         <c:if test="${not empty param.error}">
             <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #f5c6cb;">
-                <strong>❌ Lỗi:</strong> ${param.error}
+                <strong>Lỗi:</strong> ${param.error}
             </div>
         </c:if>
 
@@ -511,7 +511,7 @@
             <c:choose>
                 <c:when test="${empty products}">
                     <div class="no-data">
-                        <i>📦</i>
+                        <i></i>
                         <h3>Không tìm thấy sản phẩm nào</h3>
                         <p>Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc</p>
                     </div>
@@ -600,7 +600,7 @@
                                         <c:choose>
                                             <c:when test="${product.status == 'deleted'}">
                                                 <a href="recover-product?id=${product.id}" class="btn-edit" style="background: #ffc107; color: #333;" title="Khôi phục sản phẩm">
-                                                    ♻️ Khôi phục
+                                                    Khôi phục
                                                 </a>
                                             </c:when>
                                             <c:otherwise>

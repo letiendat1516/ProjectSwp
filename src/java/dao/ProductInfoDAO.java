@@ -403,7 +403,7 @@ public class ProductInfoDAO {
   //Lấy dữ liệu từ Unit 
   public List<Unit> getAllActiveUnits() {
       List<Unit> units = new ArrayList<>();
-      String sql = "SELECT id, name, symbol FROM unit ORDER BY name";
+      String sql = "SELECT id, name, symbol, status FROM unit WHERE status = 1 ORDER BY name";
       
       try (Connection con = Context.getJDBCConnection(); 
            PreparedStatement stmt = con.prepareStatement(sql); 
@@ -414,12 +414,66 @@ public class ProductInfoDAO {
               unit.setId(rs.getInt("id"));
               unit.setName(rs.getString("name"));
               unit.setSymbol(rs.getString("symbol"));
+              unit.setStatus(rs.getInt("status"));
               units.add(unit);
           }
       } catch (SQLException e) {
           e.printStackTrace();
       }
       return units;
+  }
+  
+  /**
+   * Get all active units plus a specific unit (for editing existing products)
+   * This ensures that existing products can still see their current unit even if it's inactive
+   * @param includeUnitId The specific unit ID to include even if inactive
+   * @return List of Unit objects
+   */
+  public List<Unit> getUnitsForProductEdit(int includeUnitId) {
+      List<Unit> units = new ArrayList<>();
+      String sql = "SELECT id, name, symbol, status FROM unit WHERE status = 1 OR id = ? ORDER BY name";
+      
+      try (Connection con = Context.getJDBCConnection(); 
+           PreparedStatement stmt = con.prepareStatement(sql)) {
+          
+          stmt.setInt(1, includeUnitId);
+          ResultSet rs = stmt.executeQuery();
+          
+          while (rs.next()) {
+              Unit unit = new Unit();
+              unit.setId(rs.getInt("id"));
+              unit.setName(rs.getString("name"));
+              unit.setSymbol(rs.getString("symbol"));
+              unit.setStatus(rs.getInt("status"));
+              units.add(unit);
+          }
+      } catch (SQLException e) {
+          e.printStackTrace();
+      }
+      return units;
+  }
+  
+  /**
+   * Check if a unit is active
+   * @param unitId The unit ID to check
+   * @return true if unit is active, false if inactive or doesn't exist
+   */
+  public boolean isUnitActive(int unitId) {
+      String sql = "SELECT status FROM unit WHERE id = ?";
+      
+      try (Connection con = Context.getJDBCConnection(); 
+           PreparedStatement stmt = con.prepareStatement(sql)) {
+          
+          stmt.setInt(1, unitId);
+          ResultSet rs = stmt.executeQuery();
+          
+          if (rs.next()) {
+              return rs.getInt("status") == 1;
+          }
+      } catch (SQLException e) {
+          e.printStackTrace();
+      }
+      return false;
   }
   
   /**

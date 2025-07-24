@@ -2,15 +2,13 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-<<<<<<< HEAD
         <group>
+            <file>file:/D:/School/Project/Java/SWP/ProjectSwp/src/java/controller/ActivateMaterialUnitServlet.java</file>
+            <file>file:/D:/School/Project/Java/SWP/ProjectSwp/src/java/dao/CategoryProductDAO.java</file>
             <file>file:/D:/School/Project/Java/SWP/ProjectSwp/src/java/DBContext/Context.java</file>
-            <file>file:/D:/School/Project/Java/SWP/ProjectSwp/src/java/controller/InventoryStatisticsController.java</file>
+            <file>file:/D:/School/Project/Java/SWP/ProjectSwp/src/java/controller/AddNewSupplier.java</file>
+            <file>file:/D:/School/Project/Java/SWP/ProjectSwp/web/material_unit/materialUnit.jsp</file>
             <file>file:/D:/School/Project/Java/SWP/ProjectSwp/web/inventory-statistics.jsp</file>
-            <file>file:/D:/School/Project/Java/SWP/ProjectSwp/web/unit-statistics.jsp</file>
         </group>
-=======
-        <group/>
->>>>>>> quoc
     </open-files>
 </project-private>

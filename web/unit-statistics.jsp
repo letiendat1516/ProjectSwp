@@ -520,7 +520,7 @@
             </a>
 
             <div class="header">
-                <h1>📊 Thống Kê Đơn Vị Tính</h1>
+                <h1>Thống Kê Đơn Vị Tính</h1>
                 <p>Tổng quan về các đơn vị tính trong hệ thống và mức độ sử dụng</p>
             </div>
 
@@ -627,7 +627,7 @@
             <div class="details-section">
                 <!-- Top Used Units -->
                 <div class="detail-panel">
-                    <div class="panel-header">🔥 Đơn vị được sử dụng nhiều nhất</div>
+                    <div class="panel-header">Đơn vị được sử dụng nhiều nhất</div>
                     <div class="panel-content">
                         <div class="unit-list">
                             <c:forEach var="unit" items="${topUsedUnits}">
@@ -651,7 +651,7 @@
 
                 <!-- Least Used Units -->
                 <div class="detail-panel">
-                    <div class="panel-header">📉 Đơn vị ít được sử dụng</div>
+                    <div class="panel-header">Đơn vị ít được sử dụng</div>
                     <div class="panel-content">
                         <div class="unit-list">
                             <c:forEach var="unit" items="${leastUsedUnits}">
@@ -676,11 +676,11 @@
 
             <!-- Recent Activities -->
             <div class="recent-activities">
-                <div class="panel-header">📅 Hoạt động gần đây</div>
+                <div class="panel-header">Hoạt động gần đây</div>
                 <div class="panel-content">
                     <c:forEach var="activity" items="${recentUnitActivities}">
                         <div class="activity-item">
-                            <div class="activity-icon">📦</div>
+                            <div class="activity-icon"></div>
                             <div class="activity-content">
                                 <div class="activity-description">${activity.description}</div>
                                 <div class="activity-meta">
