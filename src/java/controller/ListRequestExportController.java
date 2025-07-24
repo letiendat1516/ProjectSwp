@@ -3,14 +3,14 @@ package controller;
 import dao.ListRequestExportDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.ArrayList;
 import model.ExportRequestItem;
-
+import model.Users;
 
 public class ListRequestExportController extends HttpServlet {
 
@@ -62,7 +62,7 @@ public class ListRequestExportController extends HttpServlet {
             int historyPages = 0;
 
             // Lấy tổng số để hiển thị thống kê
-                        int totalApproved = dao.countApprovedExportItems(null, null);
+            int totalApproved = dao.countApprovedExportItems(null, null);
             int totalHistory = dao.countCompletedExportItems(null, null);
 
             if ("approved".equals(tab)) {
@@ -126,7 +126,159 @@ public class ListRequestExportController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
+        String action = request.getParameter("action");
+
+        if ("updatePartialExport".equals(action)) {
+            handlePartialExportUpdate(request, response);
+        } else if ("completeExport".equals(action)) {
+            handleCompleteExport(request, response);
+        } else if ("rejectExport".equals(action)) {
+            handleRejectExport(request, response);
+        } else {
+            // Nếu không có action cụ thể, redirect về GET
+            doGet(request, response);
+        }
+    }
+
+    /**
+     * Xử lý cập nhật xuất kho từng phần
+     */
+    private void handlePartialExportUpdate(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+        Users user = (Users) session.getAttribute("user");
+
+        if (user == null) {
+            response.sendRedirect("login.jsp?error=session_expired");
+            return;
+        }
+
+        try {
+            ListRequestExportDAO dao = new ListRequestExportDAO();
+
+            String requestId = request.getParameter("requestId");
+            String productName = request.getParameter("productName");
+            String quantityStr = request.getParameter("quantity");
+            String note = request.getParameter("note");
+
+            // Validate input
+            if (requestId == null || productName == null || quantityStr == null) {
+                response.sendRedirect("exportRequest?action=list&error=missing_parameters");
+                return;
+            }
+
+            double quantity;
+            try {
+                quantity = Double.parseDouble(quantityStr);
+                if (quantity <= 0) {
+                    response.sendRedirect("exportRequest?action=list&error=invalid_quantity");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                response.sendRedirect("exportRequest?action=list&error=invalid_quantity_format");
+                return;
+            }
+
+            // Thực hiện cập nhật
+            boolean success = dao.updatePartialExportStatus(requestId, productName, quantity, note);
+
+            if (success) {
+                response.sendRedirect("exportRequest?action=list&message=partial_export_success");
+            } else {
+                response.sendRedirect("exportRequest?action=list&error=update_failed");
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error handling partial export update: " + e.getMessage());
+            e.printStackTrace();
+            response.sendRedirect("exportRequest?action=list&error=processing_error");
+        }
+    }
+
+    /**
+     * Xử lý hoàn thành xuất kho
+     */
+    private void handleCompleteExport(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+        Users user = (Users) session.getAttribute("user");
+
+        if (user == null) {
+            response.sendRedirect("login.jsp?error=session_expired");
+            return;
+        }
+
+        try {
+            ListRequestExportDAO dao = new ListRequestExportDAO();
+
+            String requestId = request.getParameter("requestId");
+            String note = request.getParameter("note");
+
+            if (requestId == null) {
+                response.sendRedirect("exportRequest?action=list&error=missing_request_id");
+                return;
+            }
+
+            // Thực hiện hoàn thành xuất kho
+            boolean success = dao.completeExportRequest(requestId, note, user.getUsername());
+
+            if (success) {
+                response.sendRedirect("exportRequest?action=list&message=export_completed");
+            } else {
+                response.sendRedirect("exportRequest?action=list&error=complete_failed");
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error handling complete export: " + e.getMessage());
+            e.printStackTrace();
+            response.sendRedirect("exportRequest?action=list&error=processing_error");
+        }
+    }
+
+    /**
+     * Xử lý từ chối xuất kho
+     */
+    private void handleRejectExport(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+        Users user = (Users) session.getAttribute("user");
+
+        if (user == null) {
+            response.sendRedirect("login.jsp?error=session_expired");
+            return;
+        }
+
+        try {
+            ListRequestExportDAO dao = new ListRequestExportDAO();
+
+            String requestId = request.getParameter("requestId");
+            String rejectReason = request.getParameter("rejectReason");
+
+            if (requestId == null || rejectReason == null || rejectReason.trim().isEmpty()) {
+                response.sendRedirect("exportRequest?action=list&error=missing_reject_reason");
+                return;
+            }
+
+            // Thực hiện từ chối
+            boolean success = dao.rejectExportRequest(requestId, rejectReason, user.getUsername());
+
+            if (success) {
+                response.sendRedirect("exportRequest?action=list&message=reject_success");
+            } else {
+                response.sendRedirect("exportRequest?action=list&error=reject_failed");
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error handling reject export: " + e.getMessage());
+            e.printStackTrace();
+            response.sendRedirect("exportRequest?action=list&error=processing_error");
+        }
     }
 }
-

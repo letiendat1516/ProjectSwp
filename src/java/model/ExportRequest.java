@@ -10,18 +10,15 @@ public class ExportRequest {
     private String status;
     private String approveBy;
     private String role;
-    private String reason;        // Thêm field này
-    private String rejectReason;  // Thêm field này
+    private String reason;
+    private String rejectReason;
     private Timestamp createdAt;
 
-    // Constructor mặc định
-    public ExportRequest() {
-    }
+    // Constructors
+    public ExportRequest() {}
 
-    // Constructor đầy đủ
     public ExportRequest(String id, int userId, Date dayRequest, String status, 
-                        String approveBy, String role, String reason, 
-                        String rejectReason, Timestamp createdAt) {
+                        String approveBy, String role, String reason) {
         this.id = id;
         this.userId = userId;
         this.dayRequest = dayRequest;
@@ -29,11 +26,9 @@ public class ExportRequest {
         this.approveBy = approveBy;
         this.role = role;
         this.reason = reason;
-        this.rejectReason = rejectReason;
-        this.createdAt = createdAt;
     }
 
-    // Getters và Setters
+    // Getters and Setters
     public String getId() {
         return id;
     }
@@ -104,31 +99,6 @@ public class ExportRequest {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
-    }
-
-    // Utility methods
-    public boolean isPending() {
-        return "pending".equals(this.status);
-    }
-
-    public boolean isApproved() {
-        return "approved".equals(this.status);
-    }
-
-    public boolean isRejected() {
-        return "rejected".equals(this.status);
-    }
-
-    public boolean isCompleted() {
-        return "completed".equals(this.status);
-    }
-
-    public boolean isPartialExported() {
-        return "partial_exported".equals(this.status);
-    }
-
-    public boolean canBeProcessed() {
-        return isApproved() || isPartialExported();
     }
 
     @Override

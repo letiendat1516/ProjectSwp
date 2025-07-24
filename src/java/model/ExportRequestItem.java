@@ -1,7 +1,6 @@
 package model;
 
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.util.Date;
 
 public class ExportRequestItem {
 
@@ -11,19 +10,19 @@ public class ExportRequestItem {
     private String productCode;
     private String unit;
     private int unitId;
-    private double quantity; // Số lượng yêu cầu ban đầu
-    private double quantityRequested; // Alias cho quantity
-    private double quantityExported; // Số lượng đã xuất tích lũy
-    private double quantityPending; // Số lượng còn lại (calculated)
+    private double quantity;
+    private double quantityRequested;
+    private double quantityExported;
+    private double quantityPending;
+    private double exportQuantity;
     private String note;
     private int productId;
+
     private String dayRequest;
     private String status;
-    private String rejectReason;
+    private double exportedQty;
     private String reasonDetail;
-    private double exportedQty; // Alias cho quantityExported
-    private String lastExportDate;
-    private String lastExportedBy;
+    private String rejectReason;
 
     // Constructors
     public ExportRequestItem() {
@@ -92,7 +91,6 @@ public class ExportRequestItem {
 
     public void setQuantityRequested(double quantityRequested) {
         this.quantityRequested = quantityRequested;
-        this.quantity = quantityRequested; // Keep sync
     }
 
     public double getQuantityExported() {
@@ -101,7 +99,6 @@ public class ExportRequestItem {
 
     public void setQuantityExported(double quantityExported) {
         this.quantityExported = quantityExported;
-        this.exportedQty = quantityExported; // Keep sync
     }
 
     public double getQuantityPending() {
@@ -110,6 +107,15 @@ public class ExportRequestItem {
 
     public void setQuantityPending(double quantityPending) {
         this.quantityPending = quantityPending;
+    }
+
+    // *** THÊM MỚI ***
+    public double getExportQuantity() {
+        return exportQuantity;
+    }
+
+    public void setExportQuantity(double exportQuantity) {
+        this.exportQuantity = exportQuantity;
     }
 
     public String getNote() {
@@ -128,6 +134,7 @@ public class ExportRequestItem {
         this.productId = productId;
     }
 
+    // Compatibility getters/setters
     public String getDayRequest() {
         return dayRequest;
     }
@@ -144,12 +151,12 @@ public class ExportRequestItem {
         this.status = status;
     }
 
-    public String getRejectReason() {
-        return rejectReason;
+    public double getExportedQty() {
+        return exportedQty;
     }
 
-    public void setRejectReason(String rejectReason) {
-        this.rejectReason = rejectReason;
+    public void setExportedQty(double exportedQty) {
+        this.exportedQty = exportedQty;
     }
 
     public String getReasonDetail() {
@@ -160,42 +167,12 @@ public class ExportRequestItem {
         this.reasonDetail = reasonDetail;
     }
 
-    public double getExportedQty() {
-        return exportedQty;
+    public String getRejectReason() {
+        return rejectReason;
     }
 
-    public void setExportedQty(double exportedQty) {
-        this.exportedQty = exportedQty;
-        this.quantityExported = exportedQty; // Keep sync
-    }
-
-    public String getLastExportDate() {
-        return lastExportDate;
-    }
-
-    public void setLastExportDate(String lastExportDate) {
-        this.lastExportDate = lastExportDate;
-    }
-
-    public String getLastExportedBy() {
-        return lastExportedBy;
-    }
-
-    public void setLastExportedBy(String lastExportedBy) {
-        this.lastExportedBy = lastExportedBy;
-    }
-
-    // Utility methods
-    public boolean isFullyExported() {
-        return quantityExported >= quantity;
-    }
-
-    public boolean hasRemainingQuantity() {
-        return quantityExported < quantity;
-    }
-
-    public double getRemainingQuantity() {
-        return Math.max(0, quantity - quantityExported);
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
     }
 
     @Override
@@ -205,9 +182,10 @@ public class ExportRequestItem {
                 + ", exportRequestId='" + exportRequestId + '\''
                 + ", productName='" + productName + '\''
                 + ", productCode='" + productCode + '\''
-                + ", quantity=" + quantity
+                + ", quantityRequested=" + quantityRequested
                 + ", quantityExported=" + quantityExported
                 + ", quantityPending=" + quantityPending
+                + ", exportQuantity=" + exportQuantity
                 + '}';
     }
 }

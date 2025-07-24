@@ -17,295 +17,206 @@ import model.Users;
 
 public class ExportConfirmController extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+  @Override
+  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+          throws ServletException, IOException {
 
-        ExportDAO dao = new ExportDAO();
+      ExportDAO dao = new ExportDAO();
 
-        String requestId = request.getParameter("id");
-        if (requestId == null || requestId.trim().isEmpty()) {
-            response.sendRedirect("exportList?error=missing_id");
-            return;
-        }
+      String requestId = request.getParameter("id");
+      if (requestId == null || requestId.trim().isEmpty()) {
+          response.sendRedirect("exportRequest?action=list&error=missing_id");
+          return;
+      }
 
-        // Kiểm tra đơn xuất có thể xử lý không
-        if (!dao.isExportRequestProcessable(requestId)) {
-            response.sendRedirect("exportList?error=request_not_processable");
-            return;
-        }
+      // Kiểm tra đơn hàng có thể xử lý không
+      if (!dao.isOrderProcessable(requestId)) {
+          response.sendRedirect("exportRequest?action=list&error=order_not_processable");
+          return;
+      }
 
-        // Lấy thông tin đơn xuất kho
-        ExportRequest exportRequest = dao.getExportRequestById(requestId);
-        if (exportRequest == null) {
-            response.sendRedirect("exportList?error=request_not_found");
-            return;
-        }
+      // Khởi tạo pending items nếu chưa có
+      System.out.println("Initializing pending items for request: " + requestId);
+      boolean initialized = dao.initializeExportPendingItems(requestId);
+      System.out.println("Pending items initialization result: " + initialized);
 
-        // Lấy danh sách items với thông tin xuất kho
-        List<ExportRequestItem> itemList = dao.getExportRequestItemsByRequestId(requestId);
+      // Lấy thông tin đơn hàng
+      ExportRequest exportRequest = dao.getExportRequestById(requestId);
+      if (exportRequest == null) {
+          response.sendRedirect("exportRequest?action=list&error=order_not_found");
+          return;
+      }
 
-        // Lấy lịch sử xuất kho (nếu có)
-        List<Object[]> exportHistory = dao.getExportHistory(requestId);
+      // Lấy danh sách items với thông tin xuất kho
+      List<ExportRequestItem> itemList = dao.getExportRequestItemsByOrderId(requestId);
+      System.out.println("Loaded items count: " + itemList.size());
 
-        // Set attributes
-        request.setAttribute("exportRequest", exportRequest);
-        request.setAttribute("itemList", itemList);
-        request.setAttribute("exportHistory", exportHistory);
-        request.setAttribute("currentDate", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+      // Debug: In ra thông tin các items
+      for (ExportRequestItem item : itemList) {
+          System.out.println("Item: " + item.getProductName() + 
+                           " - Requested: " + item.getQuantityRequested() + 
+                           " - Exported: " + item.getQuantityExported() + 
+                           " - Pending: " + item.getQuantityPending());
+      }
 
-        // Forward to JSP
-        request.getRequestDispatcher("ExportManagement.jsp").forward(request, response);
-    }
+      // Lấy lịch sử xuất kho (nếu có)
+      List<Object[]> exportHistory = dao.getExportHistory(requestId);
+      
+      // Set attributes
+      request.setAttribute("exportRequest", exportRequest);
+      request.setAttribute("itemList", itemList);
+      request.setAttribute("exportHistory", exportHistory);
+      request.setAttribute("currentDate", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 
-// Sửa lại method doPost trong ExportConfirmController
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+      // Forward to JSP
+      request.getRequestDispatcher("/ExportManagement.jsp").forward(request, response);
+  }
 
-        // Set encoding để xử lý tiếng Việt
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
+  @Override
+  protected void doPost(HttpServletRequest request, HttpServletResponse response)
+          throws ServletException, IOException {
 
-        ExportDAO dao = new ExportDAO();
-        HttpSession session = request.getSession();
+      ExportDAO dao = new ExportDAO();
+      HttpSession session = request.getSession();
 
-        String requestId = request.getParameter("id");
-        String action = request.getParameter("action");
+      String requestId = request.getParameter("id");
+      String action = request.getParameter("action");
 
-        System.out.println("=== DEBUG POST REQUEST ===");
-        System.out.println("Request ID: " + requestId);
-        System.out.println("Action: " + action);
+      // Validate basic parameters
+      if (requestId == null || requestId.trim().isEmpty() || action == null) {
+          response.sendRedirect("exportRequest?action=list&error=invalid_data");
+          return;
+      }
 
-        // Validate basic parameters
-        if (requestId == null || requestId.trim().isEmpty() || action == null) {
-            System.out.println("ERROR: Missing basic parameters");
-            response.sendRedirect("exportList?error=invalid_data");
-            return;
-        }
+      // Kiểm tra đơn hàng có thể xử lý không
+      if (!dao.isOrderProcessable(requestId)) {
+          response.sendRedirect("exportRequest?action=list&error=order_not_processable");
+          return;
+      }
 
-        // Kiểm tra đơn xuất có thể xử lý không
-        if (!dao.isExportRequestProcessable(requestId)) {
-            System.out.println("ERROR: Request not processable");
-            response.sendRedirect("exportList?error=request_not_processable");
-            return;
-        }
+      try {
+          if ("confirm".equalsIgnoreCase(action)) {
+              // Xử lý xác nhận xuất kho từng phần
+              String exportDate = request.getParameter("exportDate");
+              String additionalNote = request.getParameter("additionalNote");
 
-        try {
-            if ("confirm".equalsIgnoreCase(action)) {
-                System.out.println("Processing CONFIRM action");
+              // Validate required fields
+              if (exportDate == null || exportDate.trim().isEmpty()) {
+                  response.sendRedirect("export?id=" + requestId + "&error=missing_required_fields");
+                  return;
+              }
 
-                // Xử lý xác nhận xuất kho từng phần
-                String exportDate = request.getParameter("exportDate");
-                String additionalNote = request.getParameter("additionalNote");
+              // Lấy thông tin người xử lý từ session
+              String processor = "Unknown";
+              Users user = (Users) session.getAttribute("user");
+              if (user != null) {
+                  processor = user.getFullname() != null ? user.getFullname() : user.getUsername();
+              }
 
-                System.out.println("Export Date: " + exportDate);
-                System.out.println("Additional Note: " + additionalNote);
+              // Lấy danh sách items để xuất kho
+              List<ExportRequestItem> exportItems = new ArrayList<>();
 
-                // Validate required fields
-                if (exportDate == null || exportDate.trim().isEmpty()) {
-                    System.out.println("ERROR: Missing export date");
-                    response.sendRedirect("export?id=" + requestId + "&error=missing_required_fields");
-                    return;
-                }
+              // Lấy danh sách items gốc
+              List<ExportRequestItem> originalItems = dao.getExportRequestItemsByOrderId(requestId);
 
-                // FIX: Validate date format
-                try {
-                    java.sql.Date.valueOf(exportDate.trim());
-                } catch (IllegalArgumentException e) {
-                    System.out.println("ERROR: Invalid date format: " + exportDate);
-                    response.sendRedirect("export?id=" + requestId + "&error=invalid_date_format");
-                    return;
-                }
+              for (ExportRequestItem originalItem : originalItems) {
+                  String quantityParam = request.getParameter("export_quantity_" + originalItem.getId());
 
-                // Lấy thông tin người xử lý từ session
-                String processor = "Unknown";
-                Users user = (Users) session.getAttribute("user");
-                if (user != null) {
-                    processor = user.getFullname() != null ? user.getFullname() : user.getUsername();
-                }
-                System.out.println("Processor: " + processor);
+                  if (quantityParam != null && !quantityParam.trim().isEmpty()) {
+                      try {
+                          // Chỉ chấp nhận số nguyên
+                          int exportQuantityInt = Integer.parseInt(quantityParam.trim());
 
-                // Lấy danh sách items để xuất kho
-                List<ExportRequestItem> exportItems = new ArrayList<>();
+                          // Kiểm tra số nguyên dương
+                          if (exportQuantityInt <= 0) {
+                              System.err.println("Invalid quantity (not positive integer) for item " + originalItem.getId());
+                              continue;
+                          }
 
-                // Lấy danh sách items gốc
-                List<ExportRequestItem> originalItems = dao.getExportRequestItemsByRequestId(requestId);
-                System.out.println("Original items count: " + originalItems.size());
+                          double exportQuantity = exportQuantityInt;
 
-                boolean hasValidItems = false;
-                List<String> validationErrors = new ArrayList<>();
+                          // Kiểm tra số lượng hợp lệ
+                          if (exportQuantity > 0 && exportQuantity <= originalItem.getQuantityPending()) {
 
-                // Debug: In ra tất cả parameters
-                System.out.println("=== ALL PARAMETERS ===");
-                request.getParameterMap().forEach((key, values) -> {
-                    System.out.println(key + " = " + String.join(", ", values));
-                });
+                              // Kiểm tra tồn kho
+                              if (!dao.checkInventoryAvailability(originalItem.getProductCode(), exportQuantity)) {
+                                  response.sendRedirect("export?id=" + requestId + "&error=insufficient_inventory&product=" + originalItem.getProductCode());
+                                  return;
+                              }
 
-                for (ExportRequestItem originalItem : originalItems) {
-                    String quantityParam = request.getParameter("export_quantity_" + originalItem.getId());
-                    System.out.println("Processing item ID: " + originalItem.getId()
-                            + ", Product: " + originalItem.getProductName()
-                            + ", Quantity param: " + quantityParam
-                            + ", Available: " + originalItem.getQuantityPending());
+                              // Tạo item để xuất kho với exportQuantity
+                              ExportRequestItem exportItem = new ExportRequestItem();
+                              exportItem.setId(originalItem.getId());
+                              exportItem.setExportRequestId(originalItem.getExportRequestId());
+                              exportItem.setProductName(originalItem.getProductName());
+                              exportItem.setProductCode(originalItem.getProductCode());
+                              exportItem.setUnit(originalItem.getUnit());
+                              exportItem.setQuantityRequested(originalItem.getQuantityRequested());
+                              exportItem.setNote(originalItem.getNote());
+                              exportItem.setProductId(originalItem.getProductId());
+                              exportItem.setUnitId(originalItem.getUnitId());
+                              
+                              // QUAN TRỌNG: Set exportQuantity thay vì quantity
+                              exportItem.setExportQuantity(exportQuantity); // Số lượng xuất lần này
+                              exportItem.setQuantity(originalItem.getQuantityRequested()); // Giữ nguyên số lượng yêu cầu
 
-                    if (quantityParam != null && !quantityParam.trim().isEmpty()) {
-                        try {
-                            String trimmedValue = quantityParam.trim();
+                              exportItems.add(exportItem);
+                              
+                              System.out.println("Added export item: " + exportItem.getProductName() + 
+                                               " - Export quantity: " + exportItem.getExportQuantity());
+                          } else {
+                              System.err.println("Quantity exceeds pending amount for item " + originalItem.getId() + 
+                                               " - Export: " + exportQuantity + ", Pending: " + originalItem.getQuantityPending());
+                          }
+                      } catch (NumberFormatException e) {
+                          System.err.println("Invalid integer quantity format for item " + originalItem.getId() + ": " + quantityParam);
+                      }
+                  }
+              }
 
-                            // Kiểm tra chặt chẽ chỉ chứa số nguyên dương
-                            if (!trimmedValue.matches("^\\d+$")) {
-                                validationErrors.add("Số lượng xuất cho " + originalItem.getProductName() + " phải là số nguyên dương (1, 2, 3...)");
-                                continue;
-                            }
+              // Kiểm tra có item nào để xuất không
+              if (exportItems.isEmpty()) {
+                  response.sendRedirect("export?id=" + requestId + "&error=no_valid_items_to_export");
+                  return;
+              }
 
-                            // Parse thành integer
-                            int exportQuantityInt = Integer.parseInt(trimmedValue);
+              System.out.println("Total export items to process: " + exportItems.size());
 
-                            // Kiểm tra số nguyên dương (phải lớn hơn 0)
-                            if (exportQuantityInt <= 0) {
-                                validationErrors.add("Số lượng xuất cho " + originalItem.getProductName() + " phải lớn hơn 0");
-                                continue;
-                            }
+              // Xử lý xuất kho từng phần
+              boolean success = dao.processPartialExport(requestId, exportDate.trim(), processor,
+                      additionalNote, exportItems);
 
-                            double exportQuantity = exportQuantityInt;
+              if (success) {
+                  response.sendRedirect("exportRequest?action=list&message=export_success");
+              } else {
+                  response.sendRedirect("export?id=" + requestId + "&error=export_failed");
+              }
 
-                            // Kiểm tra số lượng không vượt quá số lượng còn lại
-                            if (exportQuantity > originalItem.getQuantityPending()) {
-                                validationErrors.add("Số lượng xuất cho " + originalItem.getProductName()
-                                        + " (" + (int) exportQuantity + ") vượt quá số lượng còn lại (" + (int) originalItem.getQuantityPending() + ")");
-                                continue;
-                            }
+          } else if ("reject".equalsIgnoreCase(action)) {
+              // Xử lý từ chối
+              String rejectReason = request.getParameter("rejectReason");
 
-                            // FIX: Tạo item để xuất kho với đầy đủ thông tin
-                            ExportRequestItem exportItem = new ExportRequestItem();
-                            exportItem.setId(originalItem.getId());
-                            exportItem.setExportRequestId(originalItem.getExportRequestId());
-                            exportItem.setProductName(originalItem.getProductName());
-                            exportItem.setProductCode(originalItem.getProductCode());
-                            exportItem.setUnit(originalItem.getUnit());
-                            exportItem.setQuantity(exportQuantity); // Số lượng xuất lần này
-                            exportItem.setQuantityRequested(originalItem.getQuantityRequested());
-                            exportItem.setNote(originalItem.getNote());
-                            exportItem.setProductId(originalItem.getProductId());
-                            exportItem.setUnitId(originalItem.getUnitId());
+              if (rejectReason == null || rejectReason.trim().isEmpty()) {
+                  response.sendRedirect("export?id=" + requestId + "&error=reject_reason_required");
+                  return;
+              }
 
-                            exportItems.add(exportItem);
-                            hasValidItems = true;
+              boolean updated = dao.updateRequestStatusToRejected(requestId, rejectReason.trim());
 
-                            System.out.println("Added export item: " + originalItem.getProductName()
-                                    + ", Quantity: " + exportQuantity
-                                    + ", Product Code: " + originalItem.getProductCode());
+              if (updated) {
+                  response.sendRedirect("exportRequest?action=list&message=reject_success");
+              } else {
+                  response.sendRedirect("export?id=" + requestId + "&error=reject_failed");
+              }
 
-                        } catch (NumberFormatException e) {
-                            validationErrors.add("Số lượng xuất cho " + originalItem.getProductName() + " không hợp lệ (chỉ nhập số nguyên dương)");
-                            System.out.println("NumberFormatException for item: " + originalItem.getProductName() + ", value: " + quantityParam);
-                        }
-                    }
-                }
+          } else {
+              response.sendRedirect("export?id=" + requestId + "&error=invalid_action");
+          }
 
-                System.out.println("Valid items count: " + exportItems.size());
-                System.out.println("Has valid items: " + hasValidItems);
-                System.out.println("Validation errors: " + validationErrors.size());
-
-                // Kiểm tra validation errors
-                if (!validationErrors.isEmpty()) {
-                    System.out.println("Validation errors found, forwarding back to form");
-                    for (String error : validationErrors) {
-                        System.out.println("Validation error: " + error);
-                    }
-                    request.setAttribute("validationErrors", validationErrors);
-                    request.setAttribute("errorMessage", "Có lỗi trong dữ liệu nhập:");
-                    doGet(request, response);
-                    return;
-                }
-
-                // Kiểm tra có item nào để xuất không
-                if (!hasValidItems) {
-                    System.out.println("No valid items to export");
-                    response.sendRedirect("export?id=" + requestId + "&error=no_valid_items_to_export");
-                    return;
-                }
-
-                // FIX: Kiểm tra lại dữ liệu trước khi gọi DAO
-                System.out.println("=== FINAL VALIDATION BEFORE DAO ===");
-                for (ExportRequestItem item : exportItems) {
-                    System.out.println("Final item check - Product: " + item.getProductName()
-                            + ", Code: " + item.getProductCode()
-                            + ", Quantity: " + item.getQuantity()
-                            + ", Request ID: " + item.getExportRequestId());
-
-                    if (item.getProductCode() == null || item.getProductCode().trim().isEmpty()) {
-                        System.out.println("ERROR: Product code is null or empty for " + item.getProductName());
-                        response.sendRedirect("export?id=" + requestId + "&error=invalid_product_data");
-                        return;
-                    }
-                }
-
-                // Xử lý xuất kho từng phần
-                System.out.println("Calling processPartialExport...");
-                boolean success = dao.processPartialExport(requestId, exportDate.trim(), processor,
-                        additionalNote != null ? additionalNote.trim() : null, exportItems);
-
-                System.out.println("Export result: " + success);
-
-                if (success) {
-                    // Kiểm tra trạng thái sau khi xuất kho
-                    ExportRequest updatedRequest = dao.getExportRequestByIdAnyStatus(requestId);
-                    if (updatedRequest != null) {
-                        System.out.println("Updated status: " + updatedRequest.getStatus());
-                        if ("completed".equals(updatedRequest.getStatus())) {
-                            // Đã hoàn thành -> chuyển về tab lịch sử
-                            response.sendRedirect("exportList?tab=history&message=export_completed");
-                        } else if ("partial_exported".equals(updatedRequest.getStatus())) {
-                            // Xuất từng phần -> vẫn ở tab đã duyệt
-                            response.sendRedirect("exportList?tab=approved&message=partial_export_success");
-                        } else {
-                            // Trường hợp khác
-                            response.sendRedirect("exportList?message=export_success");
-                        }
-                    } else {
-                        response.sendRedirect("exportList?message=export_success");
-                    }
-                } else {
-                    System.out.println("Export failed");
-                    response.sendRedirect("export?id=" + requestId + "&error=export_failed");
-                }
-
-            } else if ("reject".equalsIgnoreCase(action)) {
-                System.out.println("Processing REJECT action");
-
-                // Xử lý từ chối
-                String rejectReason = request.getParameter("rejectReason");
-
-                if (rejectReason == null || rejectReason.trim().isEmpty()) {
-                    System.out.println("ERROR: Missing reject reason");
-                    response.sendRedirect("export?id=" + requestId + "&error=reject_reason_required");
-                    return;
-                }
-
-                System.out.println("Reject reason: " + rejectReason);
-
-                boolean updated = dao.updateExportRequestStatusToRejected(requestId, rejectReason.trim());
-
-                if (updated) {
-                    System.out.println("Reject successful");
-                    // Từ chối -> chuyển về tab lịch sử
-                    response.sendRedirect("exportList?tab=history&message=reject_success");
-                } else {
-                    System.out.println("Reject failed");
-                    response.sendRedirect("export?id=" + requestId + "&error=reject_failed");
-                }
-
-            } else {
-                System.out.println("Invalid action: " + action);
-                response.sendRedirect("export?id=" + requestId + "&error=invalid_action");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Error processing export for requestId: " + requestId + ", Error: " + e.getMessage());
-            response.sendRedirect("export?id=" + requestId + "&error=processing_failed");
-        }
-    }
+      } catch (Exception e) {
+          e.printStackTrace();
+          System.err.println("Error processing export for requestId: " + requestId + ", Error: " + e.getMessage());
+          response.sendRedirect("export?id=" + requestId + "&error=processing_failed");
+      }
+  }
 }
