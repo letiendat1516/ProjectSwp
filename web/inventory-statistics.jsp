@@ -425,9 +425,6 @@
 
             <!-- Quick Actions -->
             <div class="quick-actions">
-                <a href="product-list" class="action-btn">
-                    Xem danh sách sản phẩm
-                </a>
                 <a href="add-product" class="action-btn">
                     Thêm sản phẩm mới
                 </a>
@@ -435,7 +432,7 @@
                     Tạo yêu cầu xuất kho
                 </a>
                 <a href="ListRequestImport.jsp" class="action-btn">
-                    Yêu cầu nhập kho
+                    Tạo yêu cầu nhập kho
                 </a>
             </div>
 
@@ -487,12 +484,12 @@
                 <!-- Low Stock Products -->
                 <div class="stat-card danger">
                     <div class="stat-header">
-                        <span class="stat-title">Sắp Hết Hàng</span>
+                        <span class="stat-title">Số Lượng Thấp</span>
                         <span class="stat-icon"></span>
                     </div>
                     <div class="stat-number">${lowStockCount}</div>
                     <div class="stat-description">
-                        Sản phẩm có số lượng tồn kho thấp
+                        Sản phẩm có số lượng thấp
                         <div class="progress-bar">
                             <div class="progress-fill danger" style="width: ${(lowStockCount * 100.0 / totalProducts)}%"></div>
                         </div>
@@ -520,7 +517,7 @@
                     </div>
                     <div class="stat-number">${activeProductsCount}</div>
                     <div class="stat-description">
-                        Sản phẩm đang được bán
+                        Sản phẩm đang hoạt động
                         <div class="progress-bar">
                             <div class="progress-fill success" style="width: ${(activeProductsCount * 100.0 / totalProducts)}%"></div>
                         </div>
@@ -530,11 +527,11 @@
                 <!-- Inactive Products -->
                 <div class="stat-card warning">
                     <div class="stat-header">
-                        <span class="stat-title">Sản Phẩm Ngưng Bán</span>
+                        <span class="stat-title">Sản Phẩm Ngưng Hoạt Động</span>
                     </div>
                     <div class="stat-number">${inactiveProductsCount}</div>
                     <div class="stat-description">
-                        Sản phẩm tạm ngưng kinh doanh
+                        Sản phẩm tạm ngưng hoạt động
                         <div class="progress-bar">
                             <div class="progress-fill warning" style="width: ${(inactiveProductsCount * 100.0 / totalProducts)}%"></div>
                         </div>
@@ -554,23 +551,12 @@
                                            period == 'quarter' ? '3 tháng qua' : '1 năm qua'}
                     </div>
                 </div>
-
-                <!-- Total Categories -->
-                <div class="stat-card info">
-                    <div class="stat-header">
-                        <span class="stat-title">Danh Mục Sản Phẩm</span>
-                    </div>
-                    <div class="stat-number">${totalCategories}</div>
-                    <div class="stat-description">
-                        Tổng số danh mục sản phẩm
-                    </div>
-                </div>
             </div>
 
             <!-- Top Low Stock Products -->
             <div class="table-container">
                 <div class="chart-title">
-                    Top Sản Phẩm Sắp Hết Hàng
+                    Sản Phẩm Sắp Hết Hàng
                 </div>
                 <c:choose>
                     <c:when test="${empty lowStockProducts}">
@@ -587,7 +573,7 @@
                                     <th>Mã sản phẩm</th>
                                     <th>Tên sản phẩm</th>
                                     <th>Danh mục</th>
-                                    <th>Số lượng tồn</th>
+                                    <th>Số lượng</th>
                                     <th>Ngưỡng tối thiểu</th>
                                     <th>Trạng thái</th>
                                 </tr>
@@ -609,7 +595,7 @@
                                             ${product.unitName}
                                         </td>
                                         <td>
-                                            <span class="badge badge-danger">Sắp hết hàng</span>
+                                            <span class="badge badge-danger">Số lượng thấp</span>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -638,7 +624,7 @@
                                 <tr>
                                     <th>Danh mục</th>
                                     <th>Số sản phẩm</th>
-                                    <th>Tổng tồn kho</th>
+                                    <th>Tổng số lượng</th>
                                     <th>Sản phẩm sắp hết</th>
                                 </tr>
                             </thead>
@@ -653,10 +639,10 @@
                                         <td>
                                             <c:choose>
                                                 <c:when test="${stat.lowStockCount > 0}">
-                                                    <span class="badge badge-danger">${stat.lowStockCount}</span>
+                                                    <span>${stat.lowStockCount}</span>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <span class="badge badge-success">0</span>
+                                                    <span>0</span>
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>

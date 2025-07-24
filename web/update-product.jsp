@@ -511,10 +511,6 @@
                                     <a href="product-list" class="btn btn-secondary" style="padding: 15px 30px; font-size: 16px; margin-left: 15px;">
                                         Hủy Bỏ
                                     </a>
-                                    <button type="button" onclick="confirmDelete()" class="btn btn-danger" 
-                                            style="padding: 15px 30px; font-size: 16px; margin-left: 15px;">
-                                        Xóa Sản Phẩm
-                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -550,23 +546,6 @@
                     this.classList.remove('error');
                 });
             });
-
-            // Delete confirmation
-            function confirmDelete() {
-                <c:if test="${not empty product}">
-                    var productName = '${product.name}';
-                    var productCode = '${product.code}';
-                    
-                    var confirmMessage = 'XÁC NHẬN XÓA SẢN PHẨM\n\n' +
-                        'Sản phẩm: ' + productName + '\n' +
-                        'Mã sản phẩm: ' + productCode + '\n\n' +
-                        'Bạn có chắc chắn muốn xóa sản phẩm này?';
-                    
-                    if (confirm(confirmMessage)) {
-                        window.location.href = 'delete-product?id=${product.id}';
-                    }
-                </c:if>
-            }
 
             // Initialize image preview on page load
             window.addEventListener('load', function() {
