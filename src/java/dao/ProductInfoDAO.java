@@ -96,10 +96,9 @@ public class ProductInfoDAO {
       StringBuilder sql = new StringBuilder();
       sql.append("SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, ");
       sql.append("p.min_stock_threshold, ");
-      sql.append("COALESCE(s.qty, 0) as stock_qty, s.status as stock_status, ");
+      sql.append("COALESCE(p.qty, 0) as stock_qty, p.stock_status, ");
       sql.append("c.name as category_name, u.name as unit_name, u.symbol as unit_symbol ");
       sql.append("FROM product_info p ");
-      sql.append("LEFT JOIN product_in_stock s ON p.id = s.product_id ");
       sql.append("LEFT JOIN category c ON p.cate_id = c.id ");
       sql.append("LEFT JOIN unit u ON p.unit_id = u.id ");
       sql.append("WHERE p.active_flag = 1 AND p.status != 'deleted' ");
@@ -214,10 +213,8 @@ public class ProductInfoDAO {
   //Thêm product mới
   public boolean addProduct(ProductInfo product, int createdBy) {
       String productSql = "INSERT INTO product_info (name, code, cate_id, unit_id, status, description, " +
-                         "supplier_id, expiration_date, additional_notes, min_stock_threshold, created_by) " +
-                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-      
-      String stockSql = "INSERT INTO product_in_stock (product_id, qty, status) VALUES (?, ?, 'active')";
+                         "supplier_id, expiration_date, additional_notes, min_stock_threshold, created_by, qty, stock_status) " +
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       
       System.out.println("DEBUG: Starting addProduct method");
       System.out.println("DEBUG: Product data - Name: " + product.getName() + ", Code: " + product.getCode());
@@ -233,14 +230,10 @@ public class ProductInfoDAO {
               return false;
           }
           
-          // Start transaction
-          con.setAutoCommit(false);
-          System.out.println("DEBUG: Database connection successful, transaction started");
+          System.out.println("DEBUG: Database connection successful");
           
-          int productId = -1;
-          
-          // Insert into product_info table
-          try (PreparedStatement productStmt = con.prepareStatement(productSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+          // Insert into product_info table with stock information
+          try (PreparedStatement productStmt = con.prepareStatement(productSql)) {
               productStmt.setString(1, product.getName());
               productStmt.setString(2, product.getCode());
               productStmt.setInt(3, product.getCate_id());
@@ -260,66 +253,30 @@ public class ProductInfoDAO {
               productStmt.setBigDecimal(10, product.getMinStockThreshold());
               productStmt.setInt(11, createdBy);
               
-              System.out.println("DEBUG: Executing product insert query");
-              int rowsAffected = productStmt.executeUpdate();
-              
-              if (rowsAffected > 0) {
-                  // Get the generated product ID
-                  try (ResultSet generatedKeys = productStmt.getGeneratedKeys()) {
-                      if (generatedKeys.next()) {
-                          productId = generatedKeys.getInt(1);
-                          System.out.println("DEBUG: Product inserted successfully with ID: " + productId);
-                      } else {
-                          throw new SQLException("Failed to get generated product ID");
-                      }
-                  }
-              } else {
-                  throw new SQLException("Product insert failed, no rows affected");
-              }
-          }
-          
-          // Insert initial stock record
-          try (PreparedStatement stockStmt = con.prepareStatement(stockSql)) {
-              stockStmt.setInt(1, productId);
-              
               // Set initial stock quantity (default to 0 if not provided)
               BigDecimal initialStock = product.getStockQuantity();
               if (initialStock == null) {
                   initialStock = BigDecimal.ZERO;
               }
-              stockStmt.setBigDecimal(2, initialStock);
+              productStmt.setBigDecimal(12, initialStock);
+              productStmt.setString(13, "active"); // Default stock status
               
-              System.out.println("DEBUG: Executing stock insert query for product ID: " + productId + " with quantity: " + initialStock);
-              int stockRowsAffected = stockStmt.executeUpdate();
+              System.out.println("DEBUG: Executing product insert query with stock data");
+              int rowsAffected = productStmt.executeUpdate();
               
-              if (stockRowsAffected > 0) {
-                  System.out.println("DEBUG: Stock record inserted successfully");
+              if (rowsAffected > 0) {
+                  System.out.println("DEBUG: Product with stock inserted successfully");
+                  return true;
               } else {
-                  throw new SQLException("Stock insert failed, no rows affected");
+                  throw new SQLException("Product insert failed, no rows affected");
               }
           }
-          
-          // Commit transaction
-          con.commit();
-          System.out.println("DEBUG: Transaction committed successfully");
-          
-          return true;
           
       } catch (SQLException e) {
           System.err.println("ERROR: SQL Exception in addProduct: " + e.getMessage());
           System.err.println("ERROR: SQL State: " + e.getSQLState());
           System.err.println("ERROR: Error Code: " + e.getErrorCode());
           e.printStackTrace();
-          
-          // Rollback transaction on error
-          if (con != null) {
-              try {
-                  con.rollback();
-                  System.out.println("DEBUG: Transaction rolled back due to error");
-              } catch (SQLException rollbackEx) {
-                  System.err.println("ERROR: Failed to rollback transaction: " + rollbackEx.getMessage());
-              }
-          }
           return false;
       } catch (Exception e) {
           System.err.println("ERROR: General Exception in addProduct: " + e.getMessage());
@@ -336,13 +293,12 @@ public class ProductInfoDAO {
           }
           return false;
       } finally {
-          // Restore auto-commit and close connection
+          // Close connection
           if (con != null) {
               try {
-                  con.setAutoCommit(true);
                   con.close();
               } catch (SQLException e) {
-                  System.err.println("ERROR: Failed to restore auto-commit or close connection: " + e.getMessage());
+                  System.err.println("ERROR: Failed to close connection: " + e.getMessage());
               }
           }
       }
@@ -513,15 +469,13 @@ public class ProductInfoDAO {
       if (hasMinStockThreshold) {
           sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, " +
                 "p.min_stock_threshold, " +
-                "COALESCE(s.qty, 0) as stock_qty " +
+                "COALESCE(p.qty, 0) as stock_qty " +
                 "FROM product_info p " +
-                "LEFT JOIN product_in_stock s ON p.id = s.product_id " +
                 "WHERE p.id = ?";
       } else {
           sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, " +
-                "COALESCE(s.qty, 0) as stock_qty " +
+                "COALESCE(p.qty, 0) as stock_qty " +
                 "FROM product_info p " +
-                "LEFT JOIN product_in_stock s ON p.id = s.product_id " +
                 "WHERE p.id = ?";
       }
       
@@ -677,8 +631,8 @@ public class ProductInfoDAO {
    */
   //Update số lượng tồn kho của product 
   public boolean updateProductStock(int productId, double newQuantity) {
-      // First try to update existing stock record
-      String updateSql = "UPDATE product_in_stock SET qty = ? WHERE product_id = ?";
+      // Update stock quantity directly in product_info table
+      String updateSql = "UPDATE product_info SET qty = ? WHERE id = ?";
       
       try (Connection con = Context.getJDBCConnection(); 
            PreparedStatement updateStmt = con.prepareStatement(updateSql)) {
@@ -687,18 +641,7 @@ public class ProductInfoDAO {
           updateStmt.setInt(2, productId);
           
           int rowsAffected = updateStmt.executeUpdate();
-          
-          // If no rows were updated, insert a new stock record
-          if (rowsAffected == 0) {
-              String insertSql = "INSERT INTO product_in_stock (product_id, qty, status) VALUES (?, ?, 'active')";
-              try (PreparedStatement insertStmt = con.prepareStatement(insertSql)) {
-                  insertStmt.setInt(1, productId);
-                  insertStmt.setDouble(2, newQuantity);
-                  return insertStmt.executeUpdate() > 0;
-              }
-          }
-          
-          return true;
+          return rowsAffected > 0;
           
       } catch (SQLException e) {
           e.printStackTrace();
@@ -766,7 +709,6 @@ public class ProductInfoDAO {
   public boolean canDeleteProduct(int productId) {
       // Check if product is referenced in other tables
       String[] dependencyTables = {
-          "product_in_stock",
           "request_items", 
           "invoice_detail"
       };
