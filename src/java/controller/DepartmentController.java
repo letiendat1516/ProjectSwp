@@ -557,71 +557,89 @@ public class DepartmentController extends HttpServlet {
     /**
      * Toggle trạng thái active/inactive của phòng ban
      */
-    private void toggleDepartmentStatus(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+   private void toggleDepartmentStatus(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-        // Set response type to JSON
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+    // Set response type to JSON
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
 
-        JsonObject jsonResponse = new JsonObject();
-        Gson gson = new Gson();
+    JsonObject jsonResponse = new JsonObject();
+    Gson gson = new Gson();
 
-        HttpSession session = request.getSession();
-        Users user = (Users) session.getAttribute("user");
+    HttpSession session = request.getSession();
+    Users user = (Users) session.getAttribute("user");
 
-        try {
-            // 1. Get department ID
-            String idStr = request.getParameter("id");
-            if (idStr == null || idStr.trim().isEmpty()) {
-                jsonResponse.addProperty("success", false);
-                jsonResponse.addProperty("message", "ID không hợp lệ");
-                response.getWriter().write(gson.toJson(jsonResponse));
-                return;
-            }
-
-            int departmentId = Integer.parseInt(idStr);
-
-            // 2. Get current department to check current status
-            Department department = departmentDAO.getDepartmentById(departmentId);
-            if (department == null) {
-                jsonResponse.addProperty("success", false);
-                jsonResponse.addProperty("message", "Không tìm thấy phòng ban");
-                response.getWriter().write(gson.toJson(jsonResponse));
-                return;
-            }
-
-            boolean currentStatus = department.isActiveFlag();
-
-            // 3. Toggle status
-            boolean success = departmentDAO.toggleDepartmentStatus(departmentId, user.getId());
-
-            if (success) {
-                boolean newStatus = !currentStatus;
-
-                jsonResponse.addProperty("success", true);
-                jsonResponse.addProperty("newStatus", newStatus ? "Hoạt động" : "Không hoạt động");
-                jsonResponse.addProperty("statusClass", newStatus ? "badge-success" : "badge-secondary");
-                jsonResponse.addProperty("buttonText", newStatus ? "Vô hiệu hóa" : "Kích hoạt");
-                jsonResponse.addProperty("buttonClass", newStatus ? "btn-danger" : "btn-success");
-                jsonResponse.addProperty("message", newStatus
-                        ? "Đã kích hoạt phòng ban thành công" : "Đã vô hiệu hóa phòng ban thành công");
-            } else {
-                jsonResponse.addProperty("success", false);
-                jsonResponse.addProperty("message", "Không thể cập nhật trạng thái phòng ban");
-            }
-
-        } catch (NumberFormatException e) {
+    try {
+        // 1. Get department ID
+        String idStr = request.getParameter("id");
+        if (idStr == null || idStr.trim().isEmpty()) {
             jsonResponse.addProperty("success", false);
             jsonResponse.addProperty("message", "ID không hợp lệ");
-        } catch (Exception e) {
-            jsonResponse.addProperty("success", false);
-            jsonResponse.addProperty("message", "Đã xảy ra lỗi: " + e.getMessage());
-            e.printStackTrace();
+            response.getWriter().write(gson.toJson(jsonResponse));
+            return;
         }
 
-        response.getWriter().write(gson.toJson(jsonResponse));
+        int departmentId = Integer.parseInt(idStr);
+
+        // 2. Get current department to check current status
+        Department department = departmentDAO.getDepartmentById(departmentId);
+        if (department == null) {
+            jsonResponse.addProperty("success", false);
+            jsonResponse.addProperty("message", "Không tìm thấy phòng ban");
+            response.getWriter().write(gson.toJson(jsonResponse));
+            return;
+        }
+
+        boolean currentStatus = department.isActiveFlag();
+
+        // 3. ✨ THÊM: Kiểm tra employees nếu đang deactivate
+        if (currentStatus) { // Nếu đang active và sẽ deactive
+            int employeeCount = departmentDAO.getEmployeeCountByDepartment(departmentId);
+            if (employeeCount > 0) {
+                // Thêm thông tin cảnh báo vào response
+                jsonResponse.addProperty("hasEmployees", true);
+                jsonResponse.addProperty("employeeCount", employeeCount);
+                jsonResponse.addProperty("warningMessage", 
+                    "Phòng ban có " + employeeCount + " nhân viên. Vô hiệu hóa sẽ loại bỏ tất cả nhân viên khỏi phòng ban này.");
+            }
+        }
+
+        // 4. Toggle status
+        boolean success = departmentDAO.toggleDepartmentStatus(departmentId, user.getId());
+
+        if (success) {
+            boolean newStatus = !currentStatus;
+
+            jsonResponse.addProperty("success", true);
+            jsonResponse.addProperty("newStatus", newStatus ? "Hoạt động" : "Không hoạt động");
+            jsonResponse.addProperty("statusClass", newStatus ? "badge-success" : "badge-secondary");
+            jsonResponse.addProperty("buttonText", newStatus ? "Vô hiệu hóa" : "Kích hoạt");
+            jsonResponse.addProperty("buttonClass", newStatus ? "btn-danger" : "btn-success");
+            
+            // ✨ THÊM: Message chi tiết hơn
+            String message = newStatus ? "Đã kích hoạt phòng ban thành công" : "Đã vô hiệu hóa phòng ban thành công";
+            if (!newStatus && jsonResponse.has("employeeCount")) {
+                message += ". Đã loại bỏ " + jsonResponse.get("employeeCount").getAsInt() + " nhân viên khỏi phòng ban.";
+            }
+            jsonResponse.addProperty("message", message);
+            
+        } else {
+            jsonResponse.addProperty("success", false);
+            jsonResponse.addProperty("message", "Không thể cập nhật trạng thái phòng ban");
+        }
+
+    } catch (NumberFormatException e) {
+        jsonResponse.addProperty("success", false);
+        jsonResponse.addProperty("message", "ID không hợp lệ");
+    } catch (Exception e) {
+        jsonResponse.addProperty("success", false);
+        jsonResponse.addProperty("message", "Đã xảy ra lỗi: " + e.getMessage());
+        e.printStackTrace();
     }
+
+    response.getWriter().write(gson.toJson(jsonResponse));
+}
 
     /**
      * Get employees by department (AJAX)

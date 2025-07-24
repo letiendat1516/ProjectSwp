@@ -3,7 +3,6 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/UserDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/include/sidebar.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/categoriesforward.jsp</file>
@@ -17,6 +16,7 @@
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ListRequestImportController.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category-statistics.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ExportRequestController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/RolePermissionServlet.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/model/PurchaseOrderInfo.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category_product/edit.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/SubmitPurchaseOrderServlet.java</file>
@@ -41,6 +41,7 @@
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/ApprovePurchaseRequest.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/ListRequestImportDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ApprovePurchaseRequestServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/permission.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/WEB-INF/web.xml</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/StatisticSupplierEvaluation.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/SupplierDAO.java</file>
@@ -48,17 +49,6 @@
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/AddProductController.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/SupplierEvaluationDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/ProductInfoDAO.java</file>
-=======
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ListRequestImportDAO.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/web/RequestForward.jsp</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/web/ListRequestImport.jsp</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/ExportRequestItem.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ListRequestExportDAO.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ListRequestExportController.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ListRequestImportController.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/ExportRequest.java</file>
-            <file>file:/D:/Project%20SWP/ProjectSwp/web/ListRequestExport.jsp</file>
->>>>>>> becfa2b04e60c453655afb2895cfee373b591186
         </group>
     </open-files>
 </project-private>

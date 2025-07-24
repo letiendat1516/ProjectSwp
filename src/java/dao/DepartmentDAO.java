@@ -408,31 +408,77 @@ public class DepartmentDAO {
         return false;
     }
     
-    /**
-     * Toggle department status
-     */
-    public boolean toggleDepartmentStatus(int id, int updatedBy) {
-        String sql = """
-            UPDATE department 
-            SET active_flag = NOT active_flag, updated_by = ?, update_date = ?
-            WHERE id = ?
-            """;
+/**
+ * Toggle department status với xử lý clear employees
+ */
+public boolean toggleDepartmentStatus(int id, int updatedBy) {
+    Connection conn = null;
+    try {
+        conn = new Context().getJDBCConnection();
+        conn.setAutoCommit(false);
         
-        try (Connection conn = new Context().getJDBCConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setInt(1, updatedBy);
-            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
-            ps.setInt(3, id);
-            
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error in toggleDepartmentStatus: " + e.getMessage());
-            e.printStackTrace();
+        // Kiểm tra trạng thái hiện tại
+        String checkSql = "SELECT active_flag FROM department WHERE id = ?";
+        boolean currentStatus = false;
+        try (PreparedStatement ps = conn.prepareStatement(checkSql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    currentStatus = rs.getBoolean("active_flag");
+                }
+            }
         }
         
+        if (currentStatus) {
+            // Đang active -> deactive: clear employees trước
+            String clearEmployeesSql = "UPDATE users SET department_id = NULL WHERE department_id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(clearEmployeesSql)) {
+                ps.setInt(1, id);
+                ps.executeUpdate();
+            }
+        }
+        
+        // Toggle status
+        String toggleSql = "UPDATE department SET active_flag = ?, manager_id = ?, updated_by = ?, update_date = ? WHERE id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(toggleSql)) {
+            ps.setBoolean(1, !currentStatus);
+            ps.setObject(2, currentStatus ? null : null); // Clear manager khi deactive
+            ps.setInt(3, updatedBy);
+            ps.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setInt(5, id);
+            ps.executeUpdate();
+        }
+        
+        conn.commit();
+        return true;
+        
+    } catch (SQLException e) {
+        if (conn != null) try { conn.rollback(); } catch (SQLException ex) {}
+        System.out.println("Error: " + e.getMessage());
         return false;
+    } finally {
+        if (conn != null) {
+            try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) {}
+        }
     }
+}
+
+/**
+ * Đếm employees trước khi deactive (để cảnh báo)
+ */
+public int getEmployeeCountByDepartment(int departmentId) {
+    String sql = "SELECT COUNT(*) FROM users WHERE department_id = ?";
+    try (Connection conn = new Context().getJDBCConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, departmentId);
+        try (ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    } catch (SQLException e) {
+        return 0;
+    }
+}
+
     
     /**
      * Assign manager to department (with validation)
