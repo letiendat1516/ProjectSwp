@@ -22,8 +22,9 @@ public class ProductInfo {
     private Date createdDate;
     private int updatedBy;
     private Date updatedDate;
-    private BigDecimal stockQuantity;
+    private BigDecimal stockQuantity; // This will now be stored directly in product_info table as 'qty'
     private BigDecimal minStockThreshold;
+    private String stockStatus; // Stock status from the unified table
     private String unitSymbol;
 
     // Default constructor
@@ -179,6 +180,14 @@ public void setUnitSymbol(String unitSymbol) {
 
     public void setMinStockThreshold(BigDecimal minStockThreshold) {
         this.minStockThreshold = minStockThreshold;
+    }
+
+    public String getStockStatus() {
+        return stockStatus;
+    }
+
+    public void setStockStatus(String stockStatus) {
+        this.stockStatus = stockStatus;
     }
 
     @Override

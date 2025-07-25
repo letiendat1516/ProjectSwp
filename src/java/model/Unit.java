@@ -12,6 +12,8 @@ public class Unit {
     private String name;
     // Symbol of the unit (e.g., kg, m)
     private String symbol;
+    // Status of the unit (1 = active, 0 = inactive)
+    private int status;
     
     public Unit() {
     }
@@ -19,12 +21,21 @@ public class Unit {
     public Unit(int id, String name) {
         this.id = id;
         this.name = name;
+        this.status = 1; // Default to active
     }
     
     public Unit(int id, String name, String symbol) {
         this.id = id;
         this.name = name;
         this.symbol = symbol;
+        this.status = 1; // Default to active
+    }
+    
+    public Unit(int id, String name, String symbol, int status) {
+        this.id = id;
+        this.name = name;
+        this.symbol = symbol;
+        this.status = status;
     }
     
     public int getId() {
@@ -49,5 +60,17 @@ public class Unit {
     
     public void setSymbol(String symbol) {
         this.symbol = symbol;
+    }
+    
+    public int getStatus() {
+        return status;
+    }
+    
+    public void setStatus(int status) {
+        this.status = status;
+    }
+    
+    public boolean isActive() {
+        return status == 1;
     }
 }

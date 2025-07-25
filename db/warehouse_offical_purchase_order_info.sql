@@ -25,9 +25,9 @@ DROP TABLE IF EXISTS `purchase_order_info`;
 CREATE TABLE `purchase_order_info` (
   `id` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `fullname` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `DoB` date DEFAULT NULL,
   `day_purchase` date NOT NULL,
-  `status` enum('pending','approved','rejected','completed') DEFAULT 'pending',
+  `day_quote` date DEFAULT NULL,
+  `status` enum('approved','rejected','re-quote','quoted','completed','pending_quote') DEFAULT 'pending_quote',
   `reason` text,
   `supplier` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `address` text,
@@ -47,4 +47,4 @@ CREATE TABLE `purchase_order_info` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-23 22:51:53
+-- Dump completed on 2025-07-22 13:38:32

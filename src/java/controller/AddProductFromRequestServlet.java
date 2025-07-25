@@ -19,7 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-public class AddProductController extends HttpServlet {
+public class AddProductFromRequestServlet extends HttpServlet {
   
   private final ProductInfoDAO productDAO = new ProductInfoDAO();
 
@@ -40,7 +40,7 @@ public class AddProductController extends HttpServlet {
       loadDropdownData(request);
       
       // Forward to add product form
-      request.getRequestDispatcher("/add-product.jsp").forward(request, response);
+      request.getRequestDispatcher("/add-product-request.jsp").forward(request, response);
   }
 
   @Override
@@ -75,7 +75,7 @@ public class AddProductController extends HttpServlet {
               loadDropdownData(request);
               request.setAttribute("error", validationError);
               request.setAttribute("formData", request.getParameterMap());
-              request.getRequestDispatcher("/add-product.jsp").forward(request, response);
+              request.getRequestDispatcher("/add-product-request.jsp").forward(request, response);
               return;
           }
           
@@ -84,16 +84,7 @@ public class AddProductController extends HttpServlet {
               loadDropdownData(request);
               request.setAttribute("error", "Mã sản phẩm đã tồn tại. Vui lòng chọn mã khác.");
               request.setAttribute("formData", request.getParameterMap());
-              request.getRequestDispatcher("/add-product.jsp").forward(request, response);
-              return;
-          }
-          
-          // Validate unit is active before setting
-          int unitId = Integer.parseInt(unitIdStr);
-          if (!productDAO.isUnitActive(unitId)) {
-              request.setAttribute("error", "Đơn vị tính đã chọn hiện đang ngừng hoạt động! Vui lòng chọn đơn vị khác.");
-              loadDropdownData(request);
-              request.getRequestDispatcher("add-product.jsp").forward(request, response);
+              request.getRequestDispatcher("/add-product-request.jsp").forward(request, response);
               return;
           }
           
@@ -102,7 +93,7 @@ public class AddProductController extends HttpServlet {
           product.setName(name.trim());
           product.setCode(code.trim().toUpperCase());
           product.setCate_id(Integer.parseInt(categoryIdStr));
-          product.setUnit_id(unitId);
+          product.setUnit_id(Integer.parseInt(unitIdStr));
           product.setStatus(status);
           product.setDescription(description != null ? description.trim() : "");
           
@@ -164,31 +155,31 @@ public class AddProductController extends HttpServlet {
               request.setAttribute("successMessage", "Sản phẩm đã được thêm thành công!");
               request.setAttribute("productName", product.getName());
               request.setAttribute("productCode", product.getCode());
-              request.getRequestDispatcher("/ProductSuccessNotification.jsp").forward(request, response);
+              request.getRequestDispatcher("/AddProductRequestSuccess.jsp").forward(request, response);
           } else {
               System.out.println("DEBUG: Product addition failed, returning to form with error");
               loadDropdownData(request);
               request.setAttribute("error", "Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.");
               request.setAttribute("formData", request.getParameterMap());
-              request.getRequestDispatcher("/add-product.jsp").forward(request, response);
+              request.getRequestDispatcher("/add-product-request.jsp").forward(request, response);
           }
           
       } catch (NumberFormatException e) {
           loadDropdownData(request);
           request.setAttribute("error", "Dữ liệu số không hợp lệ. Vui lòng kiểm tra lại.");
           request.setAttribute("formData", request.getParameterMap());
-          request.getRequestDispatcher("/add-product.jsp").forward(request, response);
+          request.getRequestDispatcher("/add-product-request.jsp").forward(request, response);
       } catch (ParseException e) {
           loadDropdownData(request);
           request.setAttribute("error", "Định dạng ngày không hợp lệ. Vui lòng sử dụng định dạng yyyy-MM-dd.");
           request.setAttribute("formData", request.getParameterMap());
-          request.getRequestDispatcher("/add-product.jsp").forward(request, response);
+          request.getRequestDispatcher("/add-product-request.jsp").forward(request, response);
       } catch (Exception e) {
           e.printStackTrace();
           loadDropdownData(request);
           request.setAttribute("error", "Có lỗi hệ thống xảy ra. Vui lòng thử lại sau.");
           request.setAttribute("formData", request.getParameterMap());
-          request.getRequestDispatcher("/add-product.jsp").forward(request, response);
+          request.getRequestDispatcher("/add-product-request.jsp").forward(request, response);
       }
   }
   

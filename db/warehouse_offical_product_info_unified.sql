@@ -16,7 +16,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `product_info`
+-- Table structure for unified table `product_info` (includes stock information)
 --
 
 DROP TABLE IF EXISTS `product_info`;
@@ -38,6 +38,8 @@ CREATE TABLE `product_info` (
   `created_by` int DEFAULT NULL COMMENT 'User ID who created this product record',
   `created_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Date and time when product was created',
   `updated_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Date and time when product was last updated',
+  `qty` decimal(10,2) DEFAULT 0.00 COMMENT 'Stock quantity (unified from product_in_stock)',
+  `stock_status` varchar(20) DEFAULT 'active' COMMENT 'Stock status (unified from product_in_stock)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`),
   KEY `unit_id` (`unit_id`),
@@ -46,12 +48,15 @@ CREATE TABLE `product_info` (
   KEY `fk_product_created_by` (`created_by`),
   KEY `idx_product_info_supplier_id` (`supplier_id`),
   KEY `idx_product_info_expiration_date` (`expiration_date`),
+  KEY `idx_product_qty` (`qty`),
+  KEY `idx_product_stock_status` (`stock_status`),
   CONSTRAINT `fk_product_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_product_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `supplier` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `product_info_ibfk_1` FOREIGN KEY (`cate_id`) REFERENCES `category` (`id`),
   CONSTRAINT `product_info_ibfk_2` FOREIGN KEY (`unit_id`) REFERENCES `unit` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -62,4 +67,4 @@ CREATE TABLE `product_info` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-22 13:38:33
+-- Dump completed on 2025-07-24 updated for unified table

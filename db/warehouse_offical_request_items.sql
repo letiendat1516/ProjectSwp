@@ -23,18 +23,19 @@ DROP TABLE IF EXISTS `request_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `request_items` (
+  `id` int NOT NULL AUTO_INCREMENT,
   `request_id` varchar(10) NOT NULL,
   `product_name` varchar(255) DEFAULT NULL,
   `product_code` varchar(50) NOT NULL,
   `unit` varchar(50) DEFAULT NULL,
   `quantity` decimal(10,2) DEFAULT NULL,
   `note` varchar(255) DEFAULT NULL,
-  `reason_detail` varchar(500) DEFAULT NULL,
-  PRIMARY KEY (`request_id`,`product_code`),
+  PRIMARY KEY (`id`),
   KEY `fk_product_code` (`product_code`),
+  KEY `fk_request_id` (`request_id`),
   CONSTRAINT `fk_product_code` FOREIGN KEY (`product_code`) REFERENCES `product_info` (`code`),
-  CONSTRAINT `fk_request_items_request` FOREIGN KEY (`request_id`) REFERENCES `request` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `fk_request_id` FOREIGN KEY (`request_id`) REFERENCES `request` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -46,4 +47,4 @@ CREATE TABLE `request_items` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-23 22:51:53
+-- Dump completed on 2025-07-22 13:38:33

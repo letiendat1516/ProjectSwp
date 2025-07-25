@@ -24,19 +24,12 @@ DROP TABLE IF EXISTS `request`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `request` (
   `id` varchar(10) NOT NULL,
-  `user_id` int DEFAULT NULL,
+  `fullname` varchar(50) DEFAULT NULL,
+  `role` varchar(20) DEFAULT NULL,
   `day_request` date DEFAULT NULL,
-  `status` enum('pending','approved','rejected','pending re-quote','quoted','completed') DEFAULT NULL,
+  `status` enum('pending','approved','rejected') DEFAULT NULL,
   `reason` text,
-  `supplier` varchar(100) DEFAULT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `approve_by` varchar(100) DEFAULT NULL,
-  `warehouse` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `request_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -49,4 +42,4 @@ CREATE TABLE `request` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-23 22:51:53
+-- Dump completed on 2025-07-22 13:38:33

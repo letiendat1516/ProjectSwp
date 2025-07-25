@@ -299,6 +299,44 @@
                 background-color: #f8d7da;
                 border-color: #f5c6cb;
             }
+
+            .alert-success {
+                color: #155724;
+                background-color: #d4edda;
+                border-color: #c3e6cb;
+            }
+
+            /* Animation cho thông báo thành công */
+            .alert-success {
+                animation: slideDown 0.5s ease-out;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Auto hide success message */
+            .alert-success.auto-hide {
+                animation: slideDown 0.5s ease-out, fadeOut 0.5s ease-out 4.5s forwards;
+            }
+
+            @keyframes fadeOut {
+                from {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+            }
         </style>
     </head>
     <body>
@@ -307,10 +345,20 @@
             <div class="main-content">
                 <h1>ĐƠN YÊU CẦU XUẤT KHO</h1>
 
+                <!-- Hiển thị thông báo lỗi -->
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger">
                         ${error}
                     </div>
+                </c:if>
+
+                <!-- Hiển thị thông báo thành công từ session -->
+                <c:if test="${not empty sessionScope.successMessage}">
+                    <div class="alert alert-success auto-hide" id="successAlert">
+                        <strong>✓ Thành công!</strong> ${sessionScope.successMessage}
+                    </div>
+                    <!-- Xóa message khỏi session sau khi hiển thị -->
+                    <c:remove var="successMessage" scope="session" />
                 </c:if>
 
                 <form id="exportForm" action="exportRequest" method="post">
@@ -427,6 +475,55 @@
             }<c:if test="${!status.last}">,</c:if>
             </c:forEach>
             ];
+            // Auto hide success message after 5 seconds
+            document.addEventListener('DOMContentLoaded', function() {
+            const successAlert = document.getElementById('successAlert');
+            if (successAlert) {
+            setTimeout(function() {
+            successAlert.style.display = 'none';
+            }, 5000);
+            }
+
+            // Reset form sau khi hiển thị thông báo thành công
+            if (successAlert) {
+            resetForm();
+            }
+
+            updateDeleteButtons();
+            console.log('Products data:', productsData);
+            console.log('Units data:', unitsData);
+            });
+            function resetForm() {
+            // Reset role selection
+            const roleSelect = document.querySelector('select[name="role"]');
+            if (roleSelect) {
+            roleSelect.selectedIndex = 0;
+            }
+
+            // Reset table về chỉ 1 hàng đầu tiên
+            const tbody = document.getElementById('itemsTableBody');
+            const rows = tbody.querySelectorAll('tr');
+            // Xóa tất cả các hàng ngoại trừ hàng đầu tiên
+            for (let i = rows.length - 1; i > 0; i--) {
+            rows[i].remove();
+            }
+
+            // Reset hàng đầu tiên
+            const firstRow = tbody.querySelector('tr');
+            if (firstRow) {
+            firstRow.querySelector('select[name="product_id"]').selectedIndex = 0;
+            firstRow.querySelector('input[name="product_name"]').value = '';
+            firstRow.querySelector('input[name="product_code"]').value = '';
+            firstRow.querySelector('select[name="unit"]').selectedIndex = 0;
+            firstRow.querySelector('select[name="unit"]').disabled = true;
+            firstRow.querySelector('input[name="quantity"]').value = '';
+            firstRow.querySelector('textarea[name="note"]').value = '';
+            }
+
+            rowCounter = 1;
+            updateDeleteButtons();
+            }
+
             function autoResize(textarea) {
             textarea.style.height = 'auto';
             textarea.style.height = textarea.scrollHeight + 'px';
@@ -447,23 +544,23 @@
             unitOptions += `<option value="${unit.symbol}" data-id="${unit.id}">${unit.symbol} - ${unit.name}</option>`;
             });
             newRow.innerHTML = `
-                  <td class="stt-cell">${rowCounter}</td>
-                  <td>
-                      <select name="product_id" onchange="updateProductInfo(this)" style="width: 100%;" required>
+                      <td class="stt-cell">${rowCounter}</td>
+                      <td>
+                          <select name="product_id" onchange="updateProductInfo(this)" style="width: 100%;" required>
             ${productOptions}
-                      </select>
-                      <input type="hidden" name="product_name" />
-                  </td>
-                  <td><input type="text" name="product_code" readonly style="width: 100%;" /></td>
-                  <td>
-                      <select name="unit" style="width: 100%;" disabled>
+                          </select>
+                          <input type="hidden" name="product_name" />
+                      </td>
+                      <td><input type="text" name="product_code" readonly style="width: 100%;" /></td>
+                      <td>
+                          <select name="unit" style="width: 100%;" disabled>
             ${unitOptions}
-                      </select>
-                  </td>
-                  <td><input type="number" name="quantity" class="quantity-input" style="width: 100%; text-align: center;" min="0.01" step="0.01" placeholder="0" required /></td>
-                  <td><textarea name="note" rows="1" style="width: 100%; resize: none;" oninput="autoResize(this)" placeholder="Ghi chú..."></textarea></td>
-                  <td><button type="button" class="delete-row-btn" onclick="deleteRow(this)">Xóa</button></td>
-              `;
+                          </select>
+                      </td>
+                      <td><input type="number" name="quantity" class="quantity-input" style="width: 100%; text-align: center;" min="0.01" step="0.01" placeholder="0" required /></td>
+                      <td><textarea name="note" rows="1" style="width: 100%; resize: none;" oninput="autoResize(this)" placeholder="Ghi chú..."></textarea></td>
+                      <td><button type="button" class="delete-row-btn" onclick="deleteRow(this)">Xóa</button></td>
+                  `;
             tbody.appendChild(newRow);
             updateDeleteButtons();
             }
@@ -515,7 +612,6 @@
             const unitSelect = row.querySelector("select[name='unit']");
             if (unitId && unitId !== 'null' && unitId !== '') {
             unitSelect.disabled = false;
-            // Reset selection trước
             unitSelect.selectedIndex = 0;
             // Tìm và chọn option có data-id tương ứng với unit_id của sản phẩm
             const unitOptions = unitSelect.querySelectorAll('option');
@@ -553,12 +649,6 @@
             alert('Vui lòng thêm ít nhất một sản phẩm với số lượng hợp lệ!');
             return false;
             }
-            });
-            // Khởi tạo khi trang load
-            document.addEventListener('DOMContentLoaded', function () {
-            console.log('Products data:', productsData);
-            console.log('Units data:', unitsData);
-            updateDeleteButtons();
             });
         </script>
     </body>
