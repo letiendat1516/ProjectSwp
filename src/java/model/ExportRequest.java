@@ -1,53 +1,39 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
+import java.sql.Timestamp;
 
-/**
- *
- * @author Dell
- */
 public class ExportRequest {
-
     private String id;
-    private int user_id;
-    private String role;
-    private Date day_request;
+    private int userId;
+    private Date dayRequest;
     private String status;
-    private String reason;
-    private String department;
-    private String recipient_name;
-    private String recipient_phone;
-    private String recipient_email;
-    private String approve_by;
-    private String warehouse;
-    private ArrayList<ExportRequestItem> items;
-    private String requester_name;
+    private String approveBy;
+    private String role;
+    private String reason;        // Thêm field này
+    private String rejectReason;  // Thêm field này
+    private Timestamp createdAt;
 
+    // Constructor mặc định
     public ExportRequest() {
     }
 
-    public ExportRequest(String id, int user_id, String role, Date day_request, String status, String reason, String department, String recipient_name, String recipient_phone, String recipient_email, String approve_by, String warehouse, ArrayList<ExportRequestItem> items, String requester_name) {
+    // Constructor đầy đủ
+    public ExportRequest(String id, int userId, Date dayRequest, String status, 
+                        String approveBy, String role, String reason, 
+                        String rejectReason, Timestamp createdAt) {
         this.id = id;
-        this.user_id = user_id;
-        this.role = role;
-        this.day_request = day_request;
+        this.userId = userId;
+        this.dayRequest = dayRequest;
         this.status = status;
+        this.approveBy = approveBy;
+        this.role = role;
         this.reason = reason;
-        this.department = department;
-        this.recipient_name = recipient_name;
-        this.recipient_phone = recipient_phone;
-        this.recipient_email = recipient_email;
-        this.approve_by = approve_by;
-        this.warehouse = warehouse;
-        this.items = items;
-        this.requester_name = requester_name;
+        this.rejectReason = rejectReason;
+        this.createdAt = createdAt;
     }
 
+    // Getters và Setters
     public String getId() {
         return id;
     }
@@ -56,28 +42,20 @@ public class ExportRequest {
         this.id = id;
     }
 
-    public int getUser_id() {
-        return user_id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public String getRole() {
-        return role;
+    public Date getDayRequest() {
+        return dayRequest;
     }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public Date getDay_request() {
-        return day_request;
-    }
-
-    public void setDay_request(Date day_request) {
-        this.day_request = day_request;
+    public void setDayRequest(Date dayRequest) {
+        this.dayRequest = dayRequest;
     }
 
     public String getStatus() {
@@ -88,6 +66,22 @@ public class ExportRequest {
         this.status = status;
     }
 
+    public String getApproveBy() {
+        return approveBy;
+    }
+
+    public void setApproveBy(String approveBy) {
+        this.approveBy = approveBy;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public String getReason() {
         return reason;
     }
@@ -96,67 +90,59 @@ public class ExportRequest {
         this.reason = reason;
     }
 
-    public String getDepartment() {
-        return department;
+    public String getRejectReason() {
+        return rejectReason;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
     }
 
-    public String getRecipient_name() {
-        return recipient_name;
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
 
-    public void setRecipient_name(String recipient_name) {
-        this.recipient_name = recipient_name;
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public String getRecipient_phone() {
-        return recipient_phone;
+    // Utility methods
+    public boolean isPending() {
+        return "pending".equals(this.status);
     }
 
-    public void setRecipient_phone(String recipient_phone) {
-        this.recipient_phone = recipient_phone;
+    public boolean isApproved() {
+        return "approved".equals(this.status);
     }
 
-    public String getRecipient_email() {
-        return recipient_email;
+    public boolean isRejected() {
+        return "rejected".equals(this.status);
     }
 
-    public void setRecipient_email(String recipient_email) {
-        this.recipient_email = recipient_email;
+    public boolean isCompleted() {
+        return "completed".equals(this.status);
     }
 
-    public String getApprove_by() {
-        return approve_by;
+    public boolean isPartialExported() {
+        return "partial_exported".equals(this.status);
     }
 
-    public void setApprove_by(String approve_by) {
-        this.approve_by = approve_by;
+    public boolean canBeProcessed() {
+        return isApproved() || isPartialExported();
     }
 
-    public String getWarehouse() {
-        return warehouse;
-    }
-
-    public void setWarehouse(String warehouse) {
-        this.warehouse = warehouse;
-    }
-
-    public ArrayList<ExportRequestItem> getItems() {
-        return items;
-    }
-
-    public void setItems(ArrayList<ExportRequestItem> items) {
-        this.items = items;
-    }
-
-    public String getRequester_name() {
-        return requester_name;
-    }
-
-    public void setRequester_name(String requester_name) {
-        this.requester_name = requester_name;
+    @Override
+    public String toString() {
+        return "ExportRequest{" +
+                "id='" + id + '\'' +
+                ", userId=" + userId +
+                ", dayRequest=" + dayRequest +
+                ", status='" + status + '\'' +
+                ", approveBy='" + approveBy + '\'' +
+                ", role='" + role + '\'' +
+                ", reason='" + reason + '\'' +
+                ", rejectReason='" + rejectReason + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }

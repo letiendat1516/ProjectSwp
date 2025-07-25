@@ -17,6 +17,9 @@
                 --danger: #ef4444;
                 --danger-dark: #dc2626;
                 --warning: #f59e0b;
+                --warning-dark: #d97706;
+                --info: #06b6d4;
+                --info-dark: #0891b2;
                 --secondary: #64748b;
                 --light: #f8fafc;
                 --dark: #1e293b;
@@ -82,15 +85,11 @@
                 font-size: 2rem;
                 font-weight: 700;
                 margin-bottom: 0.5rem;
-                position: relative;
-                z-index: 1;
             }
 
             .header p {
                 font-size: 1rem;
                 opacity: 0.9;
-                position: relative;
-                z-index: 1;
             }
 
             .content {
@@ -161,12 +160,19 @@
             }
 
             .info-value {
+                display: flex;
+                align-items: center;
                 padding: 0.75rem;
                 background: var(--gray-50);
                 border: 1px solid var(--gray-200);
                 border-radius: var(--border-radius);
                 font-size: 0.875rem;
                 color: var(--gray-800);
+            }
+
+            .info-value i {
+                margin-right: 0.5rem;
+                color: var(--primary);
             }
 
             .table-container {
@@ -244,8 +250,51 @@
             }
 
             .quantity-input {
+                width: 100px;
                 text-align: center;
+                border: 2px solid var(--warning);
+                background: #fffbeb;
                 font-weight: 600;
+            }
+
+            .quantity-input:focus {
+                border-color: var(--warning-dark);
+                box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+            }
+
+            .quantity-input.invalid {
+                border-color: var(--danger) !important;
+                background: #fef2f2 !important;
+                animation: shake 0.3s ease-in-out;
+            }
+
+            @keyframes shake {
+                0%, 100% {
+                    transform: translateX(0);
+                }
+                25% {
+                    transform: translateX(-5px);
+                }
+                75% {
+                    transform: translateX(5px);
+                }
+            }
+
+            .quantity-input::placeholder {
+                color: var(--gray-400);
+                font-style: italic;
+                font-weight: normal;
+            }
+
+            /* Ẩn spinner cho number input */
+            .quantity-input::-webkit-outer-spin-button,
+            .quantity-input::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            .quantity-input[type=number] {
+                -moz-appearance: textfield;
             }
 
             .btn {
@@ -269,10 +318,6 @@
                 box-shadow: var(--shadow-md);
             }
 
-            .btn:active {
-                transform: translateY(0);
-            }
-
             .btn-primary {
                 background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
                 color: white;
@@ -280,6 +325,15 @@
 
             .btn-primary:hover {
                 background: linear-gradient(135deg, var(--primary-dark) 0%, #1e40af 100%);
+            }
+
+            .btn-warning {
+                background: linear-gradient(135deg, var(--warning) 0%, var(--warning-dark) 100%);
+                color: white;
+            }
+
+            .btn-warning:hover {
+                background: linear-gradient(135deg, var(--warning-dark) 0%, #b45309 100%);
             }
 
             .btn-danger {
@@ -327,9 +381,14 @@
                 color: #065f46;
             }
 
-            .status-rejected {
-                background: #fee2e2;
-                color: #991b1b;
+            .status-partial {
+                background: #fef3c7;
+                color: #92400e;
+            }
+
+            .status-completed {
+                background: #dbeafe;
+                color: #1e40af;
             }
 
             .alert {
@@ -342,22 +401,16 @@
                 border-left: 4px solid;
             }
 
-            .alert-warning {
-                background: #fffbeb;
-                border-left-color: var(--warning);
-                color: #92400e;
-            }
-
             .alert-info {
                 background: #eff6ff;
                 border-left-color: var(--primary);
                 color: #1e40af;
             }
 
-            .alert-danger {
-                background: #fef2f2;
-                border-left-color: var(--danger);
-                color: #991b1b;
+            .alert-warning {
+                background: #fffbeb;
+                border-left-color: var(--warning);
+                color: #92400e;
             }
 
             .breadcrumb {
@@ -461,13 +514,6 @@
                 background: white;
             }
 
-            .reject-form {
-                background: white;
-                padding: 1rem;
-                border-radius: var(--border-radius);
-                border: 1px solid var(--danger);
-            }
-
             .reject-form textarea {
                 width: 100%;
                 min-height: 100px;
@@ -484,84 +530,93 @@
                 box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
             }
 
+            .progress-bar {
+                width: 100%;
+                height: 8px;
+                background: var(--gray-200);
+                border-radius: 4px;
+                overflow: hidden;
+                margin-top: 0.5rem;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background: linear-gradient(90deg, var(--success) 0%, var(--success-dark) 100%);
+                transition: width 0.3s ease;
+            }
+
+            .progress-fill.partial {
+                background: linear-gradient(90deg, var(--warning) 0%, var(--warning-dark) 100%);
+            }
+
+            .quantity-status {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.75rem;
+                margin-top: 0.25rem;
+            }
+
+            .quantity-status.completed {
+                color: var(--success-dark);
+            }
+
+            .quantity-status.partial {
+                color: var(--warning-dark);
+            }
+
+            .quantity-status.pending {
+                color: var(--gray-500);
+            }
+
+            .integer-only-note {
+                font-size: 0.75rem;
+                color: var(--warning-dark);
+                font-style: italic;
+                margin-top: 0.25rem;
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+
             @media (max-width: 768px) {
                 .main-content {
                     padding: 1rem;
                 }
-
                 .header {
                     padding: 1.5rem 1rem;
                 }
-
                 .header h1 {
                     font-size: 1.5rem;
                 }
-
                 .content {
                     padding: 1rem;
                 }
-
                 .section-body {
                     padding: 1rem;
                 }
-
                 .info-grid {
                     grid-template-columns: 1fr;
                     gap: 1rem;
                 }
-
                 .form-footer {
                     padding: 1.5rem 1rem;
                     flex-direction: column;
                 }
-
                 .btn {
                     width: 100%;
                 }
-
                 th, td {
                     padding: 0.75rem 0.5rem;
                     font-size: 0.75rem;
                 }
-            }
-
-            .loading {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(255, 255, 255, 0.9);
-                z-index: 9999;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .spinner {
-                width: 40px;
-                height: 40px;
-                border: 4px solid var(--gray-200);
-                border-top: 4px solid var(--primary);
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-            }
-
-            @keyframes spin {
-                0% {
-                    transform: rotate(0deg);
-                }
-                100% {
-                    transform: rotate(360deg);
+                .quantity-input {
+                    width: 80px;
                 }
             }
         </style>
     </head>
     <body>
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-        </div>
-
         <div class="layout-container">
             <jsp:include page="/include/sidebar.jsp" />
             <div class="main-content">
@@ -575,50 +630,78 @@
                         <div class="breadcrumb">
                             <a href="${pageContext.request.contextPath}/Admin.jsp"><i class="fas fa-home"></i> Trang chủ</a>
                             <i class="fas fa-chevron-right"></i>
-                            <a href="import">Danh sách yêu cầu</a>
+                            <a href="request/list">Danh sách yêu cầu</a>
                             <i class="fas fa-chevron-right"></i>
                             <span>Xử lý nhập kho</span>
                         </div>
 
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i>
-                            <div>
-                                <strong>Lưu ý:</strong> Vui lòng kiểm tra kỹ thông tin trước khi xác nhận nhập kho. 
-                                Sau khi xác nhận, dữ liệu sẽ được cập nhật vào hệ thống kho.
+                        <c:if test="${p.status == 'partial_imported'}">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div>
+                                    <strong>Nhập kho từng phần:</strong> Đơn hàng này đã được nhập kho một phần. 
+                                    Vui lòng kiểm tra số lượng còn lại và tiếp tục nhập kho.
+                                </div>
                             </div>
-                        </div>
+                        </c:if>
+
+                        <c:if test="${p.status == 'approved'}">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <div>
+                                    <strong>Lưu ý:</strong> Bạn có thể nhập kho từng phần hoặc nhập toàn bộ số lượng. 
+                                    Hệ thống sẽ tự động theo dõi số lượng còn lại. <strong>Chỉ được nhập số nguyên dương.</strong>
+                                </div>
+                            </div>
+                        </c:if>
 
                         <form action="import-confirm" method="post" id="importForm">
+                            <input type="hidden" name="id" value="${p.id}">
+
                             <!-- Thông tin đơn nhập kho -->
                             <div class="section">
                                 <div class="section-header">
                                     <div class="icon"><i class="fas fa-file-alt"></i></div>
                                     <h3>Thông tin đơn nhập kho</h3>
-                                    <span class="status-badge status-approved">
-                                        <i class="fas fa-check-circle"></i> Đã duyệt
-                                    </span>
+                                    <c:choose>
+                                        <c:when test="${p.status == 'approved'}">
+                                            <span class="status-badge status-approved">
+                                                <i class="fas fa-check-circle"></i> Đã duyệt
+                                            </span>
+                                        </c:when>
+                                        <c:when test="${p.status == 'partial_imported'}">
+                                            <span class="status-badge status-partial">
+                                                <i class="fas fa-clock"></i> Nhập từng phần
+                                            </span>
+                                        </c:when>
+                                        <c:when test="${p.status == 'completed'}">
+                                            <span class="status-badge status-completed">
+                                                <i class="fas fa-check-double"></i> Hoàn thành
+                                            </span>
+                                        </c:when>
+                                    </c:choose>
                                 </div>
                                 <div class="section-body">
                                     <div class="info-grid">
                                         <div class="info-item">
                                             <label class="info-label">Mã đơn nhập</label>
-                                            <input type="text" name="id" value="${p.id}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
-                                        </div>
-                                        <div class="info-item">
-                                            <label class="info-label">Ngày tạo đơn</label>
-                                            <input type="text" name="dayRequest" value="${p.day_request}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                            <div class="info-value">${p.id}</div>
                                         </div>
                                         <div class="info-item">
                                             <label class="info-label">Người tạo đơn</label>
-                                            <input type="text" name="userId" value="${p.user_id}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                            <div class="info-value">${p.fullname}</div>
                                         </div>
                                         <div class="info-item">
-                                            <label class="info-label">Trạng thái</label>
-                                            <input type="text" name="status" value="${p.status}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                            <label class="info-label">Ngày tạo đơn</label>
+                                            <div class="info-value">${p.dayPurchase}</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Ngày báo giá</label>
+                                            <div class="info-value">${p.dayQuote != null ? p.dayQuote : 'Chưa có'}</div>
                                         </div>
                                         <div class="info-item" style="grid-column: 1 / -1;">
                                             <label class="info-label">Lý do nhập kho</label>
-                                            <input type="text" name="reason" value="${p.reason}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                            <div class="info-value">${p.reason != null ? p.reason : 'Không có ghi chú'}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -634,25 +717,25 @@
                                     <div class="info-grid">
                                         <div class="info-item">
                                             <label class="info-label">Tên nhà cung cấp</label>
-                                            <input type="text" name="supplier" value="${p.supplier}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                            <div class="info-value">${p.supplier != null ? p.supplier : 'Chưa có thông tin'}</div>
                                         </div>
                                         <div class="info-item">
                                             <label class="info-label">Điện thoại</label>
-                                            <input type="text" name="phone" value="${p.phone}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                            <div class="info-value">${p.phone != null ? p.phone : 'Chưa có thông tin'}</div>
                                         </div>
                                         <div class="info-item">
                                             <label class="info-label">Email</label>
-                                            <input type="text" name="email" value="${p.email}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                            <div class="info-value">${p.email != null ? p.email : 'Chưa có thông tin'}</div>
                                         </div>
                                         <div class="info-item">
                                             <label class="info-label">Địa chỉ</label>
-                                            <input type="text" name="address" value="${p.address}" readonly class="info-value" style="border: none; padding: 0.75rem; background: var(--gray-50);">
+                                            <div class="info-value">${p.address != null ? p.address : 'Chưa có thông tin'}</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Danh sách vật tư -->
+                            <!-- Danh sách vật tư với nhập từng phần -->
                             <div class="section">
                                 <div class="section-header">
                                     <div class="icon"><i class="fas fa-boxes"></i></div>
@@ -660,12 +743,13 @@
                                 </div>
                                 <div class="section-body">
                                     <div class="alert alert-warning">
-                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <i class="fas fa-exclamation-circle"></i>
                                         <div>
-                                            <strong>Chú ý:</strong> Nhập số lượng thực tế nhận được. Có thể nhập ít hơn số lượng yêu cầu nếu cần thiết.
+                                            <strong>Lưu ý quan trọng:</strong> Chỉ được nhập số nguyên dương (1, 2, 3...). 
+                                            Không được nhập số thập phân (1.5, 2.3...) hoặc số âm.
+                                            <br><small>Nhấp đúp vào ô nhập để tự động điền số lượng tối đa.</small>
                                         </div>
                                     </div>
-
                                     <div class="table-container">
                                         <table>
                                             <thead>
@@ -673,39 +757,58 @@
                                                     <th><i class="fas fa-barcode"></i> Mã VT</th>
                                                     <th><i class="fas fa-tag"></i> Tên VT</th>
                                                     <th><i class="fas fa-ruler"></i> Đơn vị</th>
-                                                    <th><i class="fas fa-list-ol"></i> SL Yêu cầu</th>
-                                                    <th><i class="fas fa-check-circle"></i> Đã nhập</th>
-                                                    <th><i class="fas fa-plus-circle"></i> Nhập lần này</th>
+                                                    <th><i class="fas fa-list-ol"></i> SL Đặt</th>
+                                                    <th><i class="fas fa-check"></i> Đã nhập</th>
+                                                    <th><i class="fas fa-clock"></i> Còn lại</th>
+                                                    <th><i class="fas fa-plus"></i> Nhập lần này</th>
+                                                    <th><i class="fas fa-dollar-sign"></i> Đơn giá</th>
                                                     <th><i class="fas fa-sticky-note"></i> Ghi chú</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <c:forEach var="item" items="${itemList}" varStatus="status">
                                                     <tr>
-                                                        <td>
-                                                            <input type="text" name="code_${item.productCode}" value="${item.productCode}" readonly class="form-input">
+                                                        <td>${item.productCode != null ? item.productCode : 'N/A'}</td>
+                                                        <td>${item.productName}</td>
+                                                        <td>${item.unit != null ? item.unit : 'N/A'}</td>
+                                                        <td style="text-align: center; font-weight: 600;">${item.quantityOrdered}</td>
+                                                        <td style="text-align: center;">
+                                                            <span style="color: var(--success-dark); font-weight: 600;">${item.quantityImported}</span>
+                                                            <div class="progress-bar">
+                                                                <div class="progress-fill ${item.quantityImported >= item.quantityOrdered ? '' : 'partial'}" 
+                                                                     style="width: ${(item.quantityImported / item.quantityOrdered) * 100}%"></div>
+                                                            </div>
                                                         </td>
-                                                        <td>
-                                                            <input type="text" name="name_${item.productCode}" value="${item.productName}" readonly class="form-input">
+                                                        <td style="text-align: center;">
+                                                            <span style="color: var(--warning-dark); font-weight: 600;">${item.quantityPending}</span>
+                                                            <div class="quantity-status ${item.quantityPending == 0 ? 'completed' : 'partial'}">
+                                                                ${item.quantityPending == 0 ? 'Hoàn thành' : 'Chờ nhập'}
+                                                            </div>
                                                         </td>
-                                                        <td>
-                                                            <input type="text" name="unit_${item.productCode}" value="${item.unit}" readonly class="form-input">
+                                                        <td style="text-align: center;">
+                                                            <c:if test="${item.quantityPending > 0}">
+                                                                <input type="number" 
+                                                                       name="import_quantity_${item.id}" 
+                                                                       class="quantity-input" 
+                                                                       min="1" 
+                                                                       max="${item.quantityPending}" 
+                                                                       step="1"
+                                                                       placeholder="0"
+                                                                       title="Tối đa: ${item.quantityPending} (chỉ số nguyên)"
+                                                                       oninput="validateIntegerInput(this)">
+                                                                <div class="integer-only-note">
+                                                                    <i class="fas fa-info-circle"></i>
+                                                                    Chỉ số nguyên
+                                                                </div>
+                                                            </c:if>
+                                                            <c:if test="${item.quantityPending == 0}">
+                                                                <span style="color: var(--success-dark); font-weight: 600;">
+                                                                    <i class="fas fa-check-circle"></i> Đã đủ
+                                                                </span>
+                                                            </c:if>
                                                         </td>
-                                                        <td>
-                                                            <input type="text" value="${item.quantity}" readonly class="form-input quantity-input">
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" value="0" readonly class="form-input quantity-input">
-                                                        </td>
-                                                        <td>
-                                                            <input type="number" name="importQty_${item.productCode}" min="0" max="${item.quantity}" 
-                                                                   class="form-input editable quantity-input" required 
-                                                                   placeholder="Nhập SL">
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" name="note_${item.productCode}" 
-                                                                   class="form-input editable" placeholder="Ghi chú...">
-                                                        </td>
+                                                        <td style="text-align: right;">${item.pricePerUnit != null ? item.pricePerUnit : '0'}</td>
+                                                        <td>${item.note != null ? item.note : ''}</td>
                                                     </tr>
                                                 </c:forEach>
                                             </tbody>
@@ -714,50 +817,86 @@
                                 </div>
                             </div>
 
-                            <!-- Thông tin nhập kho -->
-                            <div class="section">
-                                <div class="section-header">
-                                    <div class="icon"><i class="fas fa-warehouse"></i></div>
-                                    <h3>Thông tin nhập kho</h3>
-                                </div>
-                                <div class="section-body">
-                                    <div class="info-grid">
-                                        <div class="info-item">
-                                            <label class="info-label">Kho nhập hàng *</label>
-                                            <select name="warehouse" required class="form-input editable">
-                                                <option value="">-- Chọn kho --</option>
-                                                <option value="kho1">Kho chính</option>
-                                                <option value="kho2">Kho chi nhánh</option>
-                                                <option value="kho3">Kho phụ liệu</option>
-                                            </select>
-                                        </div>
-                                        <div class="info-item">
-                                            <label class="info-label">Ngày nhập kho thực tế *</label>
-                                            <input type="date" name="importDate" required class="form-input editable" 
-                                                   value="${currentDate}" min="${currentDate}">
-                                        </div>
-                                        <div class="info-item">
-                                            <label class="info-label">Người nhập kho *</label>
-                                            <input type="text" name="receiver" required class="form-input editable" 
-                                                   placeholder="Nhập tên người nhận hàng">
-                                        </div>
-                                        <div class="info-item">
-                                            <label class="info-label">Ghi chú bổ sung</label>
-                                            <input type="text" name="additionalNote" class="form-input editable" 
-                                                   placeholder="Ghi chú thêm (nếu có)">
+                            <!-- Lịch sử nhập kho (nếu có) -->
+                            <c:if test="${not empty importHistory}">
+                                <div class="section">
+                                    <div class="section-header">
+                                        <div class="icon"><i class="fas fa-history"></i></div>
+                                        <h3>Lịch sử nhập kho</h3>
+                                    </div>
+                                    <div class="section-body">
+                                        <div class="table-container">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th><i class="fas fa-tag"></i> Tên VT</th>
+                                                        <th><i class="fas fa-barcode"></i> Mã VT</th>
+                                                        <th><i class="fas fa-plus"></i> SL Nhập</th>
+                                                        <th><i class="fas fa-calendar"></i> Ngày nhập</th>
+                                                        <th><i class="fas fa-user"></i> Người xử lý</th>
+                                                        <th><i class="fas fa-sticky-note"></i> Ghi chú</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <c:forEach var="history" items="${importHistory}">
+                                                        <tr>
+                                                            <td>${history[0]}</td>
+                                                            <td>${history[1]}</td>
+                                                            <td style="text-align: center; font-weight: 600; color: var(--success-dark);">
+                                                                ${history[2]}
+                                                            </td>
+                                                            <td>${history[3]}</td>
+                                                            <td>${history[4]}</td>
+                                                            <td>${history[5] != null ? history[5] : ''}</td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </c:if>
+
+                            <!-- Thông tin nhập kho -->
+                            <c:if test="${p.status != 'completed'}">
+                                <div class="section">
+                                    <div class="section-header">
+                                        <div class="icon"><i class="fas fa-warehouse"></i></div>
+                                        <h3>Thông tin nhập kho</h3>
+                                    </div>
+                                    <div class="section-body">
+                                        <div class="info-grid">
+                                            <div class="info-item">
+                                                <label class="info-label">Ngày nhập kho *</label>
+                                                <input type="date" name="importDate" class="form-input editable" 
+                                                       value="${currentDate}" required>
+                                            </div>
+                                            <div class="info-item">
+                                                <label class="info-label">Người xử lý</label>
+                                                <div class="info-value">
+                                                    <i class="fas fa-user"></i> ${sessionScope.user.fullname != null ? sessionScope.user.fullname : sessionScope.user.username}
+                                                </div>
+                                            </div>
+                                            <div class="info-item" style="grid-column: 1 / -1;">
+                                                <label class="info-label">Ghi chú bổ sung</label>
+                                                <input type="text" name="additionalNote" class="form-input editable" 
+                                                       placeholder="Nhập ghi chú thêm (nếu có)">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:if>
 
                             <div class="form-footer">
-                                <button type="button" onclick="confirmImport()" class="btn btn-primary">
-                                    <i class="fas fa-check-circle"></i> Xác nhận nhập kho
-                                </button>
-                                <button type="button" onclick="rejectImport()" class="btn btn-danger">
-                                    <i class="fas fa-times-circle"></i> Từ chối nhập kho
-                                </button>
-                                <a href="import" class="btn btn-secondary">
+                                <c:if test="${p.status != 'completed'}">
+                                    <button type="button" onclick="confirmImport()" class="btn btn-warning">
+                                        <i class="fas fa-plus-circle"></i> Nhập kho từng phần
+                                    </button>
+                                    <button type="button" onclick="rejectImport()" class="btn btn-danger">
+                                        <i class="fas fa-times-circle"></i> Từ chối nhập kho
+                                    </button>
+                                </c:if>
+                                <a href="request/list" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> Quay lại danh sách
                                 </a>
                             </div>
@@ -794,20 +933,96 @@
         </div>
 
         <script>
+            function validateIntegerInput(input) {
+                let value = input.value;
+
+                // Loại bỏ các ký tự không phải số
+                value = value.replace(/[^0-9]/g, '');
+
+                // Cập nhật lại giá trị input
+                input.value = value;
+
+                const numValue = parseInt(value) || 0;
+                const max = parseInt(input.getAttribute('max')) || 0;
+
+                // Reset classes
+                input.classList.remove('invalid');
+
+                if (numValue > max) {
+                    input.style.borderColor = 'var(--danger)';
+                    input.style.background = '#fef2f2';
+                    input.title = `Số lượng không được vượt quá ${max} (chỉ số nguyên)`;
+                    input.classList.add('invalid');
+                } else if (numValue > 0) {
+                    input.style.borderColor = 'var(--success)';
+                    input.style.background = '#f0fdf4';
+                    input.title = '';
+                } else {
+                    input.style.borderColor = 'var(--warning)';
+                    input.style.background = '#fffbeb';
+                    input.title = '';
+                }
+            }
+
+            function validateQuantities() {
+                let hasValidQuantity = false;
+                let hasInvalidInput = false;
+                const quantityInputs = document.querySelectorAll('.quantity-input');
+
+                quantityInputs.forEach(input => {
+                    const value = input.value.trim();
+                    if (value) {
+                        const numValue = parseInt(value);
+                        const max = parseInt(input.getAttribute('max')) || 0;
+
+                        // Kiểm tra xem có phải số nguyên không
+                        if (isNaN(numValue) || numValue !== parseFloat(value) || numValue < 1) {
+                            hasInvalidInput = true;
+                            input.classList.add('invalid');
+                        } else if (numValue > 0 && numValue <= max) {
+                            hasValidQuantity = true;
+                            input.classList.remove('invalid');
+                        } else if (numValue > max) {
+                            hasInvalidInput = true;
+                            input.classList.add('invalid');
+                        }
+                    }
+                });
+
+                return {hasValid: hasValidQuantity, hasInvalid: hasInvalidInput};
+            }
+
             function confirmImport() {
-                // Validate form
-                if (!validateForm()) {
+                const form = document.getElementById('importForm');
+                const importDate = form.importDate.value;
+
+                if (!importDate) {
+                    alert('Vui lòng chọn ngày nhập kho!');
                     return;
                 }
 
-                document.getElementById('modalTitle').textContent = 'Xác nhận nhập kho';
-                document.getElementById('modalIcon').innerHTML = '<i class="fas fa-check-circle" style="color: var(--success);"></i>';
-                document.getElementById('modalMessage').textContent = 'Bạn có chắc chắn muốn xác nhận nhập kho? Hành động này không thể hoàn tác.';
+                // Kiểm tra validation
+                const validation = validateQuantities();
+
+                if (validation.hasInvalid) {
+                    alert('Vui lòng chỉ nhập số nguyên dương (1, 2, 3...) cho số lượng nhập kho!\nKhông được nhập số thập phân hoặc số âm.');
+                    return;
+                }
+
+                if (!validation.hasValid) {
+                    alert('Vui lòng nhập số lượng hợp lệ cho ít nhất một sản phẩm!');
+                    return;
+                }
+
+                // Tiếp tục với modal confirmation
+                document.getElementById('modalTitle').textContent = 'Xác nhận nhập kho từng phần';
+                document.getElementById('modalIcon').innerHTML = '<i class="fas fa-plus-circle" style="color: var(--warning);"></i>';
+                document.getElementById('modalMessage').textContent = 'Bạn có chắc chắn muốn nhập kho với số lượng đã chọn? Các sản phẩm chưa nhập đủ sẽ được chuyển vào danh sách chờ.';
                 document.getElementById('rejectReasonContainer').style.display = 'none';
 
                 const confirmBtn = document.getElementById('confirmButton');
-                confirmBtn.className = 'btn btn-primary';
-                confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> Xác nhận nhập kho';
+                confirmBtn.className = 'btn btn-warning';
+                confirmBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Xác nhận nhập kho';
                 confirmBtn.onclick = () => submitForm('confirm');
 
                 document.getElementById('confirmModal').style.display = 'block';
@@ -830,15 +1045,13 @@
             function submitForm(action) {
                 const form = document.getElementById('importForm');
 
-                // Validate reject reason if rejecting
                 if (action === 'reject') {
                     const rejectReason = document.getElementById('rejectReason').value.trim();
                     if (!rejectReason) {
-                        showNotification('Vui lòng nhập lý do từ chối!', 'error');
+                        alert('Vui lòng nhập lý do từ chối!');
                         return;
                     }
 
-                    // Add reject reason to form
                     const reasonInput = document.createElement('input');
                     reasonInput.type = 'hidden';
                     reasonInput.name = 'rejectReason';
@@ -846,7 +1059,6 @@
                     form.appendChild(reasonInput);
                 }
 
-                // Tạo input hidden cho action
                 const actionInput = document.createElement('input');
                 actionInput.type = 'hidden';
                 actionInput.name = 'action';
@@ -854,67 +1066,11 @@
                 form.appendChild(actionInput);
 
                 // Hiển thị loading
-                document.getElementById('loading').style.display = 'flex';
+                const confirmBtn = document.getElementById('confirmButton');
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+                confirmBtn.disabled = true;
 
-                // Submit form
                 form.submit();
-
-                // Close modal
-                closeModal();
-            }
-
-            function validateForm() {
-                const requiredFields = document.querySelectorAll('input[required], select[required]');
-                let isValid = true;
-                let firstInvalidField = null;
-
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        field.style.borderColor = 'var(--danger)';
-                        field.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
-                        isValid = false;
-                        if (!firstInvalidField) {
-                            firstInvalidField = field;
-                        }
-                    } else {
-                        field.style.borderColor = 'var(--success)';
-                        field.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
-                    }
-                });
-
-                // Validate số lượng nhập
-                const quantityInputs = document.querySelectorAll('input[name^="importQty_"]');
-                let hasQuantity = false;
-
-                quantityInputs.forEach(input => {
-                    const value = parseInt(input.value) || 0;
-                    const max = parseInt(input.getAttribute('max')) || 0;
-
-                    if (value > 0) {
-                        hasQuantity = true;
-                        if (value > max) {
-                            input.style.borderColor = 'var(--danger)';
-                            input.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
-                            isValid = false;
-                            showNotification('Số lượng nhập không được vượt quá số lượng yêu cầu!', 'error');
-                        }
-                    }
-                });
-
-                if (!hasQuantity) {
-                    showNotification('Vui lòng nhập ít nhất một sản phẩm!', 'warning');
-                    isValid = false;
-                }
-
-                if (!isValid) {
-                    if (firstInvalidField) {
-                        firstInvalidField.focus();
-                        firstInvalidField.scrollIntoView({behavior: 'smooth', block: 'center'});
-                    }
-                    showNotification('Vui lòng kiểm tra và điền đầy đủ thông tin bắt buộc!', 'error');
-                }
-
-                return isValid;
             }
 
             function closeModal() {
@@ -922,60 +1078,47 @@
                 document.getElementById('rejectReason').value = '';
             }
 
-            function showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.className = `alert alert-${type}`;
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    z-index: 10000;
-                    min-width: 300px;
-                    max-width: 500px;
-                    animation: slideInRight 0.3s ease;
-                `;
-
-                const icon = type === 'success' ? 'check-circle' :
-                        type === 'error' ? 'exclamation-triangle' :
-                        type === 'warning' ? 'exclamation-triangle' : 'info-circle';
-
-                notification.innerHTML = `
-                    <i class="fas fa-${icon}"></i>
-                    <div>
-                        <strong>${type.charAt(0).toUpperCase() + type.slice(1)}:</strong> ${message}
-                    </div>
-                    <button onclick="this.parentElement.remove()" style="background: none; border: none; color: inherit; font-size: 1.2rem; cursor: pointer; margin-left: auto;">&times;</button>
-                `;
-
-                document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    if (notification.parentElement) {
-                        notification.remove();
-                    }
-                }, 5000);
-            }
-
             // Event listeners
             document.addEventListener('DOMContentLoaded', function () {
-                // Set current date as default
-                const dateInput = document.querySelector('input[name="importDate"]');
-                if (dateInput && !dateInput.value) {
-                    const today = new Date().toISOString().split('T')[0];
-                    dateInput.value = today;
-                }
+                const quantityInputs = document.querySelectorAll('.quantity-input');
 
-                // Add quantity change listeners
-                const quantityInputs = document.querySelectorAll('input[name^="importQty_"]');
                 quantityInputs.forEach(input => {
-                    input.addEventListener('change', function () {
-                        const value = parseInt(this.value) || 0;
-                        const max = parseInt(this.getAttribute('max')) || 0;
-
-                        if (value > max) {
-                            this.value = max;
-                            showNotification(`Số lượng tối đa cho sản phẩm này là ${max}`, 'warning');
+                    // Ngăn nhập ký tự không hợp lệ
+                    input.addEventListener('keypress', function (e) {
+                        // Chỉ cho phép số từ 0-9 và các phím điều khiển
+                        if (!/[0-9]/.test(e.key) &&
+                                !['Backspace', 'Delete', 'Tab', 'Enter', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                            e.preventDefault();
                         }
+                    });
+
+                    // Ngăn dán nội dung không hợp lệ
+                    input.addEventListener('paste', function (e) {
+                        e.preventDefault();
+                        let paste = (e.clipboardData || window.clipboardData).getData('text');
+                        paste = paste.replace(/[^0-9]/g, '');
+                        if (paste && parseInt(paste) > 0) {
+                            this.value = paste;
+                            validateIntegerInput(this);
+                        }
+                    });
+
+                    input.addEventListener('input', function () {
+                        validateIntegerInput(this);
+                    });
+
+                    // Auto-fill với số lượng tối đa khi double-click
+                    input.addEventListener('dblclick', function () {
+                        const max = parseInt(this.getAttribute('max')) || 0;
+                        if (max > 0) {
+                            this.value = max;
+                            validateIntegerInput(this);
+                        }
+                    });
+
+                    // Ngăn scroll wheel thay đổi giá trị
+                    input.addEventListener('wheel', function (e) {
+                        e.preventDefault();
                     });
                 });
 
@@ -998,25 +1141,37 @@
                     }
                 });
 
-                // REMOVED: Auto notification when page loads
-                // showNotification('Trang xử lý nhập kho đã được tải thành công!', 'success');
+                // Hiển thị tooltip cho progress bars
+                const progressBars = document.querySelectorAll('.progress-fill');
+                progressBars.forEach(bar => {
+                    const width = bar.style.width;
+                    bar.title = `Tiến độ nhập kho: ${width}`;
+                });
             });
 
-            // Add CSS animations
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideInRight {
-                    from {
-                        transform: translateX(100%);
-                        opacity: 0;
+            // Function để làm nổi bật các dòng có thể nhập
+            function highlightPendingItems() {
+                const rows = document.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const quantityInput = row.querySelector('.quantity-input');
+                    if (quantityInput) {
+                        row.style.backgroundColor = '#fffbeb';
+                        row.style.borderLeft = '3px solid var(--warning)';
                     }
-                    to {
-                        transform: translateX(0);
-                        opacity: 1;
-                    }
+                });
+            }
+
+            // Gọi function khi trang load
+            document.addEventListener('DOMContentLoaded', highlightPendingItems);
+
+            // Thêm validation khi form submit
+            document.getElementById('importForm').addEventListener('submit', function (e) {
+                const validation = validateQuantities();
+                if (validation.hasInvalid) {
+                    e.preventDefault();
+                    alert('Vui lòng chỉ nhập số nguyên dương cho số lượng nhập kho!');
                 }
-            `;
-            document.head.appendChild(style);
+            });
         </script>
     </body>
 </html>
