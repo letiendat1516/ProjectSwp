@@ -34,9 +34,34 @@ public class ExportDAO {
     }
 
     /**
+     * Test database connection
+     */
+    public boolean testConnection() {
+        try {
+            conn = Context.getJDBCConnection();
+            if (conn != null && !conn.isClosed()) {
+                System.out.println("Database connection successful");
+                return true;
+            } else {
+                System.err.println("Database connection failed");
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("Database connection error: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            closeResources();
+        }
+    }
+
+    /**
      * Lấy thông tin export request theo ID
      */
     public ExportRequest getExportRequestById(String id) {
+        System.out.println("=== getExportRequestById called ===");
+        System.out.println("ID: " + id);
+
         ExportRequest request = null;
         String sql = "SELECT * FROM export_request WHERE id = ? AND status IN ('approved', 'partial_exported')";
 
@@ -57,6 +82,10 @@ public class ExportDAO {
                 request.setReason(rs.getString("reason"));
                 request.setRejectReason(rs.getString("reject_reason"));
                 request.setCreatedAt(rs.getTimestamp("created_at"));
+
+                System.out.println("Found export request: " + request.getId() + " status: " + request.getStatus());
+            } else {
+                System.out.println("No export request found with ID: " + id);
             }
         } catch (SQLException e) {
             System.err.println("Error getting export request by ID: " + e.getMessage());
@@ -71,6 +100,9 @@ public class ExportDAO {
      * Lấy danh sách items với thông tin xuất kho từng phần
      */
     public List<ExportRequestItem> getExportRequestItemsByOrderId(String orderId) {
+        System.out.println("=== getExportRequestItemsByOrderId called ===");
+        System.out.println("Order ID: " + orderId);
+
         List<ExportRequestItem> list = new ArrayList<>();
         String sql = """
             SELECT 
@@ -120,7 +152,12 @@ public class ExportDAO {
 
                 item.setNote(rs.getString("note"));
                 list.add(item);
+
+                System.out.println("Item: " + item.getProductCode() + " - Requested: " + item.getQuantityRequested()
+                        + " - Exported: " + item.getQuantityExported() + " - Pending: " + item.getQuantityPending());
             }
+
+            System.out.println("Total items found: " + list.size());
         } catch (SQLException e) {
             System.err.println("Error getting export request items: " + e.getMessage());
             e.printStackTrace();
@@ -131,7 +168,7 @@ public class ExportDAO {
     }
 
     /**
-     * Xử lý xuất kho từng phần - FIXED VERSION
+     * Xử lý xuất kho từng phần - MAIN METHOD
      */
     public boolean processPartialExport(String requestId, String exportDate, String processor,
             String additionalNote, List<ExportRequestItem> exportItems) {
@@ -144,13 +181,11 @@ public class ExportDAO {
 
             System.out.println("=== Starting processPartialExport ===");
             System.out.println("Request ID: " + requestId);
-            System.out.println("Export Date: " + exportDate);
-            System.out.println("Processor: " + processor);
             System.out.println("Items to export: " + exportItems.size());
 
             // 1. Khởi tạo export_pending_items nếu chưa có
             if (!initializeExportPendingItemsInTransaction(connection, requestId)) {
-                System.err.println("Failed to initialize pending i  tems");
+                System.err.println("Failed to initialize pending items");
                 connection.rollback();
                 return false;
             }
@@ -159,11 +194,10 @@ public class ExportDAO {
             for (ExportRequestItem item : exportItems) {
                 double exportQuantity = item.getExportQuantity();
                 if (exportQuantity <= 0) {
-                    System.out.println("Skipping item with zero export quantity: " + item.getProductName());
                     continue;
                 }
 
-                System.out.println("Processing item: " + item.getProductName() + " - Export Quantity: " + exportQuantity);
+                System.out.println("Processing item: " + item.getProductCode() + " quantity: " + exportQuantity);
 
                 // 2.1 Cập nhật export_pending_items
                 if (!updateExportPendingItemsInTransaction(connection, requestId, item.getProductCode(), exportQuantity)) {
@@ -192,8 +226,7 @@ public class ExportDAO {
             boolean isCompleted = checkIfExportCompletedInTransaction(connection, requestId);
             String newStatus = isCompleted ? "completed" : "partial_exported";
 
-            System.out.println("Export completed check: " + isCompleted);
-            System.out.println("New status: " + newStatus);
+            System.out.println("Export completed check: " + isCompleted + " - New status: " + newStatus);
 
             // 4. Cập nhật trạng thái đơn hàng
             String reasonText = buildReasonText(exportDate, processor, additionalNote);
@@ -205,10 +238,6 @@ public class ExportDAO {
 
             connection.commit();
             System.out.println("=== Transaction committed successfully ===");
-
-            // 5. Verify data after commit
-            verifyExportResults(requestId);
-
             return true;
 
         } catch (Exception e) {
@@ -219,11 +248,9 @@ public class ExportDAO {
             try {
                 if (connection != null) {
                     connection.rollback();
-                    System.out.println("Transaction rolled back");
                 }
             } catch (SQLException ex) {
                 System.err.println("Error rolling back: " + ex.getMessage());
-                ex.printStackTrace();
             }
             return false;
         } finally {
@@ -243,33 +270,28 @@ public class ExportDAO {
      */
     private boolean initializeExportPendingItemsInTransaction(Connection connection, String requestId) {
         try {
-            // Kiểm tra xem đã có pending items chưa
             String checkSql = "SELECT COUNT(*) FROM export_pending_items WHERE export_request_id = ?";
             try (PreparedStatement checkPs = connection.prepareStatement(checkSql)) {
                 checkPs.setString(1, requestId);
                 try (ResultSet rs = checkPs.executeQuery()) {
                     if (rs.next() && rs.getInt(1) == 0) {
-                        // Chưa có, tạo mới từ export_request_items
                         String insertSql = """
-                            INSERT INTO export_pending_items 
-                            (export_request_id, product_name, product_code, unit, unit_id,
-                             quantity_requested, quantity_exported, quantity_pending, note, product_id)
-                            SELECT export_request_id, product_name, product_code, unit, unit_id,
-                                   quantity, 0, quantity, note, product_id
-                            FROM export_request_items 
-                            WHERE export_request_id = ?
-                            """;
-
+                        INSERT INTO export_pending_items 
+                        (export_request_id, product_name, product_code, unit, unit_id,
+                         quantity_requested, quantity_exported, quantity_pending, note, product_id)
+                        SELECT export_request_id, product_name, product_code, unit, unit_id,
+                               quantity, 0, quantity, note, product_id
+                        FROM export_request_items 
+                        WHERE export_request_id = ?
+                        """;
                         try (PreparedStatement insertPs = connection.prepareStatement(insertSql)) {
                             insertPs.setString(1, requestId);
                             int result = insertPs.executeUpdate();
                             System.out.println("Initialized " + result + " pending items for request " + requestId);
                             return result > 0;
                         }
-                    } else {
-                        System.out.println("Pending items already exist for request " + requestId);
-                        return true;
                     }
+                    return true;
                 }
             }
         } catch (SQLException e) {
@@ -300,7 +322,7 @@ public class ExportDAO {
                         double newExported = currentExported + exportQuantity;
                         double newPending = Math.max(0, quantityRequested - newExported);
 
-                        System.out.println("Updating pending item for " + productCode + ":");
+                        System.out.println("Updating pending items for " + productCode + ":");
                         System.out.println("  Requested: " + quantityRequested);
                         System.out.println("  Current exported: " + currentExported);
                         System.out.println("  Export quantity: " + exportQuantity);
@@ -315,10 +337,10 @@ public class ExportDAO {
 
                         // Cập nhật
                         String updateSql = """
-                            UPDATE export_pending_items 
-                            SET quantity_exported = ?, quantity_pending = ?, updated_at = CURRENT_TIMESTAMP
-                            WHERE export_request_id = ? AND product_code = ?
-                            """;
+                        UPDATE export_pending_items 
+                        SET quantity_exported = ?, quantity_pending = ?, updated_at = CURRENT_TIMESTAMP
+                        WHERE export_request_id = ? AND product_code = ?
+                        """;
 
                         try (PreparedStatement updatePs = connection.prepareStatement(updateSql)) {
                             updatePs.setDouble(1, newExported);
@@ -327,17 +349,17 @@ public class ExportDAO {
                             updatePs.setString(4, productCode);
 
                             int result = updatePs.executeUpdate();
-                            System.out.println("Update pending items result: " + result);
+                            System.out.println("Update result: " + result + " rows affected");
                             return result > 0;
                         }
                     } else {
-                        System.err.println("No pending item found for: " + productCode);
+                        System.err.println("No pending item found for productCode: " + productCode);
                         return false;
                     }
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error updating export pending items: " + e.getMessage());
+            System.err.println("SQL ERROR in updateExportPendingItemsInTransaction: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -367,7 +389,7 @@ public class ExportDAO {
                 ps.setString(7, exportedBy);
 
                 int result = ps.executeUpdate();
-                System.out.println("Export history added for " + productName + ": " + result + " rows");
+                System.out.println("Added export history for " + productCode + ": " + result + " rows");
                 return result > 0;
             }
         } catch (SQLException e) {
@@ -375,110 +397,6 @@ public class ExportDAO {
             e.printStackTrace();
             return false;
         }
-    }
-
-    /**
-     * Cập nhật trạng thái export_request trong transaction
-     */
-    private boolean updateExportRequestStatusInTransaction(Connection connection, String requestId,
-            String status, String reason) {
-        try {
-            String sql = "UPDATE export_request SET status = ?, reason = ? WHERE id = ?";
-
-            try (PreparedStatement ps = connection.prepareStatement(sql)) {
-                ps.setString(1, status);
-                ps.setString(2, reason);
-                ps.setString(3, requestId);
-
-                int result = ps.executeUpdate();
-                System.out.println("Export request status updated: " + result + " rows");
-                return result > 0;
-            }
-        } catch (SQLException e) {
-            System.err.println("Error updating export request status: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * Verify export results after transaction
-     */
-    private void verifyExportResults(String requestId) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = Context.getJDBCConnection();
-
-            // Check export_pending_items
-            String sql1 = "SELECT product_name, quantity_requested, quantity_exported, quantity_pending "
-                    + "FROM export_pending_items WHERE export_request_id = ?";
-            ps = conn.prepareStatement(sql1);
-            ps.setString(1, requestId);
-            rs = ps.executeQuery();
-
-            System.out.println("=== Export Pending Items After Transaction ===");
-            while (rs.next()) {
-                System.out.println("Product: " + rs.getString("product_name"));
-                System.out.println("  Requested: " + rs.getDouble("quantity_requested"));
-                System.out.println("  Exported: " + rs.getDouble("quantity_exported"));
-                System.out.println("  Pending: " + rs.getDouble("quantity_pending"));
-            }
-            rs.close();
-            ps.close();
-
-            // Check warehouse_export_history
-            String sql2 = "SELECT product_name, quantity_exported, export_date "
-                    + "FROM warehouse_export_history WHERE export_request_id = ? ORDER BY export_date DESC";
-            ps = conn.prepareStatement(sql2);
-            ps.setString(1, requestId);
-            rs = ps.executeQuery();
-
-            System.out.println("=== Export History After Transaction ===");
-            while (rs.next()) {
-                System.out.println("Product: " + rs.getString("product_name"));
-                System.out.println("  Exported: " + rs.getDouble("quantity_exported"));
-                System.out.println("  Date: " + rs.getTimestamp("export_date"));
-            }
-
-            // Check export_request status
-            rs.close();
-            ps.close();
-            String sql3 = "SELECT status, reason FROM export_request WHERE id = ?";
-            ps = conn.prepareStatement(sql3);
-            ps.setString(1, requestId);
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-                System.out.println("=== Export Request Status ===");
-                System.out.println("Status: " + rs.getString("status"));
-                System.out.println("Reason: " + rs.getString("reason"));
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error verifying export results: " + e.getMessage());
-        } finally {
-            closeResource(rs);
-            closeResource(ps);
-            closeResource(conn);
-        }
-    }
-
-    /**
-     * Helper method để build reason text
-     */
-    private String buildReasonText(String exportDate, String processor, String additionalNote) {
-        StringBuilder reason = new StringBuilder();
-        reason.append("Ngày xuất: ").append(exportDate);
-        reason.append("; Người xử lý: ").append(processor);
-
-        if (additionalNote != null && !additionalNote.trim().isEmpty()) {
-            reason.append("; Ghi chú: ").append(additionalNote.trim());
-        }
-
-        return reason.toString();
     }
 
     /**
@@ -493,7 +411,7 @@ public class ExportDAO {
             ps.setDouble(3, exportedQuantity);
 
             int rows = ps.executeUpdate();
-            System.out.println("Inventory update for " + productCode + ": " + rows + " rows affected");
+            System.out.println("Updated inventory for " + productCode + ": " + rows + " rows affected");
             return rows > 0;
 
         } catch (SQLException e) {
@@ -524,23 +442,54 @@ public class ExportDAO {
     }
 
     /**
-     * Helper method để đóng resource an toàn
+     * Cập nhật trạng thái export_request trong transaction
      */
-    private void closeResource(AutoCloseable resource) {
-        if (resource != null) {
-            try {
-                resource.close();
-            } catch (Exception e) {
-                System.err.println("Error closing resource: " + e.getMessage());
+    private boolean updateExportRequestStatusInTransaction(Connection connection, String requestId,
+            String status, String reason) {
+        try {
+            String sql = "UPDATE export_request SET status = ?, reason = ? WHERE id = ?";
+
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, status);
+                ps.setString(2, reason);
+                ps.setString(3, requestId);
+
+                int result = ps.executeUpdate();
+                System.out.println("Updated export request status to " + status + ": " + result + " rows");
+                return result > 0;
             }
+        } catch (SQLException e) {
+            System.err.println("Error updating export request status: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
+    }
+
+    /**
+     * Helper method để build reason text
+     */
+    private String buildReasonText(String exportDate, String processor, String additionalNote) {
+        StringBuilder reason = new StringBuilder();
+        reason.append("Ngày xuất: ").append(exportDate);
+        reason.append("; Người xử lý: ").append(processor);
+
+        if (additionalNote != null && !additionalNote.trim().isEmpty()) {
+            reason.append("; Ghi chú: ").append(additionalNote.trim());
+        }
+
+        return reason.toString();
     }
 
     /**
      * Cập nhật trạng thái đơn hàng thành rejected
      */
     public boolean updateRequestStatusToRejected(String requestId, String rejectReason) {
+        System.out.println("=== updateRequestStatusToRejected called ===");
+        System.out.println("Request ID: " + requestId);
+        System.out.println("Reject Reason: " + rejectReason);
+
         String sql = "UPDATE export_request SET status = 'rejected', reject_reason = ? WHERE id = ? AND status IN ('approved', 'partial_exported')";
+        System.out.println("SQL: " + sql);
 
         try {
             conn = Context.getJDBCConnection();
@@ -548,12 +497,28 @@ public class ExportDAO {
             ps.setString(1, rejectReason);
             ps.setString(2, requestId);
 
+            System.out.println("Executing update...");
             int rows = ps.executeUpdate();
-            System.out.println("Reject update result: " + rows + " rows affected");
+            System.out.println("Rows affected: " + rows);
+
+            // Verify the update
+            String verifySql = "SELECT status, reject_reason FROM export_request WHERE id = ?";
+            PreparedStatement verifyPs = conn.prepareStatement(verifySql);
+            verifyPs.setString(1, requestId);
+            ResultSet verifyRs = verifyPs.executeQuery();
+
+            if (verifyRs.next()) {
+                System.out.println("After update - Status: " + verifyRs.getString("status"));
+                System.out.println("After update - Reject reason: " + verifyRs.getString("reject_reason"));
+            }
+
+            verifyRs.close();
+            verifyPs.close();
+
             return rows > 0;
 
         } catch (SQLException e) {
-            System.err.println("Error updating request status to rejected: " + e.getMessage());
+            System.err.println("SQL Error in updateRequestStatusToRejected: " + e.getMessage());
             e.printStackTrace();
             return false;
         } finally {
@@ -575,9 +540,8 @@ public class ExportDAO {
 
             if (rs.next()) {
                 String status = rs.getString("status");
-                boolean processable = "approved".equals(status) || "partial_exported".equals(status);
-                System.out.println("Order " + requestId + " status: " + status + ", processable: " + processable);
-                return processable;
+                System.out.println("Order " + requestId + " status: " + status);
+                return "approved".equals(status) || "partial_exported".equals(status);
             }
         } catch (SQLException e) {
             System.err.println("Error checking order processable status: " + e.getMessage());
@@ -618,7 +582,8 @@ public class ExportDAO {
                 };
                 history.add(record);
             }
-            System.out.println("Export history loaded: " + history.size() + " records");
+
+            System.out.println("Export history found: " + history.size() + " records");
         } catch (SQLException e) {
             System.err.println("Error getting export history: " + e.getMessage());
             e.printStackTrace();
@@ -642,9 +607,8 @@ public class ExportDAO {
 
             if (rs.next()) {
                 double currentStock = rs.getDouble("current_stock");
-                boolean available = currentStock >= requestedQuantity;
-                System.out.println("Inventory check for " + productCode + ": current=" + currentStock + ", requested=" + requestedQuantity + ", available=" + available);
-                return available;
+                System.out.println("Inventory check for " + productCode + ": current=" + currentStock + ", requested=" + requestedQuantity);
+                return currentStock >= requestedQuantity;
             }
         } catch (SQLException e) {
             System.err.println("Error checking inventory: " + e.getMessage());
@@ -656,7 +620,7 @@ public class ExportDAO {
     }
 
     /**
-     * Khởi tạo export_pending_items từ export_request_items
+     * Khởi tạo export_pending_items từ export_request_items - PUBLIC METHOD
      */
     public boolean initializeExportPendingItems(String requestId) {
         Connection connection = null;
@@ -669,10 +633,8 @@ public class ExportDAO {
 
             if (result) {
                 connection.commit();
-                System.out.println("Successfully initialized pending items for request " + requestId);
             } else {
                 connection.rollback();
-                System.err.println("Failed to initialize pending items for request " + requestId);
             }
 
             return result;
@@ -699,31 +661,5 @@ public class ExportDAO {
         }
 
         return false;
-    }
-
-    /**
-     * Lấy trạng thái cuối cùng của export request
-     */
-    public String getFinalExportStatus(String requestId) {
-        String sql = "SELECT status FROM export_request WHERE id = ?";
-
-        try {
-            conn = Context.getJDBCConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, requestId);
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-                String status = rs.getString("status");
-                System.out.println("Final export status for " + requestId + ": " + status);
-                return status;
-            }
-        } catch (SQLException e) {
-            System.err.println("Error getting final export status: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            closeResources();
-        }
-        return "unknown";
     }
 }

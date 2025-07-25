@@ -620,7 +620,7 @@
                         <div class="breadcrumb">
                             <a href="${pageContext.request.contextPath}/Admin.jsp"><i class="fas fa-home"></i> Trang chủ</a>
                             <i class="fas fa-chevron-right"></i>
-                            <a href="export/list">Danh sách yêu cầu xuất</a>
+                            <a href="exportList">Danh sách yêu cầu xuất</a>
                             <i class="fas fa-chevron-right"></i>
                             <span>Xử lý xuất kho</span>
                         </div>
@@ -645,7 +645,8 @@
                             </div>
                         </c:if>
 
-                        <form action="exportList" method="post" id="exportForm">
+                        <!-- SỬA FORM ACTION TỪ exportList THÀNH export -->
+                        <form action="export" method="post" id="exportForm">
                             <input type="hidden" name="id" value="${exportRequest.id}">
 
                             <!-- Thông tin đơn xuất kho -->
@@ -856,7 +857,7 @@
                                         <i class="fas fa-times-circle"></i> Từ chối xuất kho
                                     </button>
                                 </c:if>
-                                <a href="export/list" class="btn btn-primary">
+                                <a href="exportList" class="btn btn-primary">
                                     <i class="fas fa-arrow-left"></i> Quay lại danh sách
                                 </a>
                             </div>
@@ -896,31 +897,31 @@
             function validateIntegerInput(input) {
                 let value = input.value;
 
-                // Loại bỏ các ký tự không phải số
+                // Chỉ giữ lại số
                 value = value.replace(/[^0-9]/g, '');
 
-                // Cập nhật lại giá trị input
+                // Cập nhật lại giá trị
                 input.value = value;
 
                 const numValue = parseInt(value) || 0;
                 const max = parseInt(input.getAttribute('max')) || 0;
 
+                console.log('Validating input:', {
+                    originalValue: input.value,
+                    numValue: numValue,
+                    max: max
+                });
+
                 // Reset classes
                 input.classList.remove('invalid');
 
-                if (numValue > max) {
+                if (numValue > max && max > 0) {
                     input.style.borderColor = 'var(--warning)';
                     input.style.background = '#fffbeb';
-                    input.title = `Số lượng không được vượt quá ${max} (chỉ số nguyên)`;
                     input.classList.add('invalid');
                 } else if (numValue > 0) {
                     input.style.borderColor = 'var(--danger)';
                     input.style.background = '#fef2f2';
-                    input.title = '';
-                } else {
-                    input.style.borderColor = 'var(--danger)';
-                    input.style.background = '#fef2f2';
-                    input.title = '';
                 }
             }
 
@@ -953,6 +954,8 @@
             }
 
             function confirmExport() {
+                console.log('=== confirmExport called ===');
+
                 const form = document.getElementById('exportForm');
                 const exportDate = form.exportDate.value;
 
@@ -989,6 +992,8 @@
             }
 
             function rejectExport() {
+                console.log('=== rejectExport called ===');
+
                 document.getElementById('modalTitle').textContent = 'Từ chối xuất kho';
                 document.getElementById('modalIcon').innerHTML = '<i class="fas fa-times-circle" style="color: var(--secondary);"></i>';
                 document.getElementById('modalMessage').textContent = 'Bạn có chắc chắn muốn từ chối yêu cầu xuất kho này?';
@@ -1003,10 +1008,17 @@
             }
 
             function submitForm(action) {
+                console.log('=== submitForm called ===');
+                console.log('Action:', action);
+
                 const form = document.getElementById('exportForm');
+                console.log('Form action before:', form.action);
+                console.log('Form method:', form.method);
 
                 if (action === 'reject') {
                     const rejectReason = document.getElementById('rejectReason').value.trim();
+                    console.log('Reject reason:', rejectReason);
+
                     if (!rejectReason) {
                         alert('Vui lòng nhập lý do từ chối!');
                         return;
@@ -1017,6 +1029,7 @@
                     reasonInput.name = 'rejectReason';
                     reasonInput.value = rejectReason;
                     form.appendChild(reasonInput);
+                    console.log('Added reject reason input');
                 }
 
                 const actionInput = document.createElement('input');
@@ -1024,12 +1037,21 @@
                 actionInput.name = 'action';
                 actionInput.value = action;
                 form.appendChild(actionInput);
+                console.log('Added action input:', action);
+
+                // Log all form data before submit
+                const formData = new FormData(form);
+                console.log('Form data before submit:');
+                for (let [key, value] of formData.entries()) {
+                    console.log('  ' + key + ':', value);
+                }
 
                 // Hiển thị loading
                 const confirmBtn = document.getElementById('confirmButton');
                 confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
                 confirmBtn.disabled = true;
 
+                console.log('Submitting form...');
                 form.submit();
             }
 
