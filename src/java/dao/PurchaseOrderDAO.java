@@ -177,7 +177,7 @@ public class PurchaseOrderDAO {
         if (status != null && !status.trim().isEmpty()) {
             if ("approved".equals(status)) {
             // Khi chọn "Đã hoàn thành", lọc cả 3 status
-            sqlIds.append(" AND po.status IN ('approved', 'completed', 'rejected')");
+            sqlIds.append(" AND po.status IN ('approved', 'completed', 'rejected','done')");
         } else {
             // Các status khác thì filter bình thường
             sqlIds.append(" AND po.status = ?");
@@ -382,7 +382,7 @@ public class PurchaseOrderDAO {
         if (status != null && !status.trim().isEmpty()) {
             if ("completed_group".equals(status)) {
                 // Khi filter "completed_group", bao gồm cả 3 status
-                sql.append(" AND po.status IN ('approved', 'completed', 'rejected')");
+                sql.append(" AND po.status IN ('approved', 'completed', 'rejected','done')");
             } else {
                 // Các status khác thì filter bình thường
                 sql.append(" AND po.status = ?");

@@ -93,21 +93,27 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
             List<String> userPermissions = userDAO.getUserPermissions(userId);
             session.setAttribute("userPermissions", userPermissions);
 
-            switch (user.getRoleName()) {
-                case "Admin":
-                    response.sendRedirect("Admin.jsp");
-                    break;
-                case "Nhân viên kho":
-                    response.sendRedirect("categoriesforward.jsp");
-                    break;
-                case "Nhân viên công ty":
-                    response.sendRedirect("RequestForward.jsp");
-                    break;
-                case "Giám đốc":
-                    response.sendRedirect("ApproveListForward.jsp");
-                    break;
-                default:
-                    response.sendRedirect("homepage.jsp");
+            String roleName = user.getRoleName();
+            if (roleName != null) {
+                switch (roleName) {
+                    case "Admin":
+                        response.sendRedirect("Admin.jsp");
+                        break;
+                    case "Nhân viên kho":
+                        response.sendRedirect("categoriesforward.jsp");
+                        break;
+                    case "Nhân viên công ty":
+                        response.sendRedirect("RequestForward.jsp");
+                        break;
+                    case "Giám đốc":
+                        response.sendRedirect("ApproveListForward.jsp");
+                        break;
+                    default:
+                        response.sendRedirect("homepage.jsp");
+                }
+            } else {
+                // Handle case where roleName is null
+                response.sendRedirect("homepage.jsp");
             }
             return;
         }

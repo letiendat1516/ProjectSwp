@@ -96,9 +96,10 @@ public class ProductInfoDAO {
       StringBuilder sql = new StringBuilder();
       sql.append("SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, ");
       sql.append("p.min_stock_threshold, ");
-      sql.append("COALESCE(p.qty, 0) as stock_qty, p.stock_status, ");
+      sql.append("COALESCE(s.qty, 0) as stock_qty, COALESCE(s.status, 'active') as stock_status, ");
       sql.append("c.name as category_name, u.name as unit_name, u.symbol as unit_symbol ");
       sql.append("FROM product_info p ");
+      sql.append("LEFT JOIN product_in_stock s ON p.id = s.product_id ");
       sql.append("LEFT JOIN category c ON p.cate_id = c.id ");
       sql.append("LEFT JOIN unit u ON p.unit_id = u.id ");
       sql.append("WHERE p.active_flag = 1 AND p.status != 'deleted' ");
@@ -213,8 +214,8 @@ public class ProductInfoDAO {
   //Thêm product mới
   public boolean addProduct(ProductInfo product, int createdBy) {
       String productSql = "INSERT INTO product_info (name, code, cate_id, unit_id, status, description, " +
-                         "supplier_id, expiration_date, additional_notes, min_stock_threshold, created_by, qty, stock_status) " +
-                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                         "supplier_id, expiration_date, additional_notes, min_stock_threshold, created_by) " +
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       
       System.out.println("DEBUG: Starting addProduct method");
       System.out.println("DEBUG: Product data - Name: " + product.getName() + ", Code: " + product.getCode());
@@ -225,6 +226,8 @@ public class ProductInfoDAO {
       Connection con = null;
       try {
           con = Context.getJDBCConnection();
+          con.setAutoCommit(false); // Start transaction
+          
           if (con == null) {
               System.err.println("ERROR: Database connection is null!");
               return false;
@@ -232,8 +235,10 @@ public class ProductInfoDAO {
           
           System.out.println("DEBUG: Database connection successful");
           
-          // Insert into product_info table with stock information
-          try (PreparedStatement productStmt = con.prepareStatement(productSql)) {
+          int productId = 0;
+          
+          // Insert into product_info table first
+          try (PreparedStatement productStmt = con.prepareStatement(productSql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
               productStmt.setString(1, product.getName());
               productStmt.setString(2, product.getCode());
               productStmt.setInt(3, product.getCate_id());
@@ -253,22 +258,43 @@ public class ProductInfoDAO {
               productStmt.setBigDecimal(10, product.getMinStockThreshold());
               productStmt.setInt(11, createdBy);
               
-              // Set initial stock quantity (default to 0 if not provided)
-              BigDecimal initialStock = product.getStockQuantity();
-              if (initialStock == null) {
-                  initialStock = BigDecimal.ZERO;
-              }
-              productStmt.setBigDecimal(12, initialStock);
-              productStmt.setString(13, "active"); // Default stock status
-              
-              System.out.println("DEBUG: Executing product insert query with stock data");
+              System.out.println("DEBUG: Executing product insert query");
               int rowsAffected = productStmt.executeUpdate();
               
               if (rowsAffected > 0) {
-                  System.out.println("DEBUG: Product with stock inserted successfully");
-                  return true;
+                  // Get generated product ID
+                  try (ResultSet generatedKeys = productStmt.getGeneratedKeys()) {
+                      if (generatedKeys.next()) {
+                          productId = generatedKeys.getInt(1);
+                          System.out.println("DEBUG: Product inserted successfully with ID: " + productId);
+                      } else {
+                          throw new SQLException("Failed to get generated product ID");
+                      }
+                  }
               } else {
                   throw new SQLException("Product insert failed, no rows affected");
+              }
+          }
+          
+          // Insert into product_in_stock table using separate method
+          BigDecimal initialStock = product.getStockQuantity() != null ? product.getStockQuantity() : BigDecimal.ZERO;
+          
+          // Create stock record in the same transaction
+          String stockSql = "INSERT INTO product_in_stock (product_id, qty, status) VALUES (?, ?, ?)";
+          try (PreparedStatement stockStmt = con.prepareStatement(stockSql)) {
+              stockStmt.setInt(1, productId);
+              stockStmt.setBigDecimal(2, initialStock);
+              stockStmt.setString(3, "active");
+              
+              System.out.println("DEBUG: Executing stock insert query");
+              int stockRows = stockStmt.executeUpdate();
+              
+              if (stockRows > 0) {
+                  con.commit(); // Commit both inserts
+                  System.out.println("DEBUG: Product and stock inserted successfully");
+                  return true;
+              } else {
+                  throw new SQLException("Stock insert failed");
               }
           }
           
@@ -631,22 +657,9 @@ public class ProductInfoDAO {
    */
   //Update số lượng tồn kho của product 
   public boolean updateProductStock(int productId, double newQuantity) {
-      // Update stock quantity directly in product_info table
-      String updateSql = "UPDATE product_info SET qty = ? WHERE id = ?";
-      
-      try (Connection con = Context.getJDBCConnection(); 
-           PreparedStatement updateStmt = con.prepareStatement(updateSql)) {
-          
-          updateStmt.setDouble(1, newQuantity);
-          updateStmt.setInt(2, productId);
-          
-          int rowsAffected = updateStmt.executeUpdate();
-          return rowsAffected > 0;
-          
-      } catch (SQLException e) {
-          e.printStackTrace();
-          return false;
-      }
+      // Use ProductInStockDAO for stock operations
+      ProductInStockDAO stockDAO = new ProductInStockDAO();
+      return stockDAO.upsertStock(productId, BigDecimal.valueOf(newQuantity), "active");
   }
   
   /**

@@ -366,7 +366,7 @@
                             <option value="pending_quote" ${param.statusFilter == 'pending_quote' ? 'selected' : ''}>Chờ báo giá</option>
                             <option value="quoted" ${param.statusFilter == 'quoted' ? 'selected' : ''}>Đã báo giá</option>                    
                             <option value="re-quote" ${param.statusFilter == 're-quote' ? 'selected' : ''}>Báo giá lại</option>
-                            <option value="approved" ${param.statusFilter == 'approved' || param.statusFilter == 'rejected' || param.statusFilter == 'completed' ? 'selected' : ''}>Đã hoàn thành</option>
+                            <option value="approved" ${param.statusFilter == 'approved' || param.statusFilter == 'rejected' || param.statusFilter == 'completed'||param.statusFilter == 'done' ? 'selected' : ''}>Đã hoàn thành</option>
 
                         </select>
                     </div>
@@ -413,7 +413,7 @@
                                             <c:set var="status" value="Báo giá lại" />
                                             <c:set var="rowClass" value="status-re-quote" />
                                         </c:when>
-                                        <c:when test="${po.status == 'approved' || po.status == 'completed' || po.status == 'rejected'}">
+                                        <c:when test="${po.status == 'approved' || po.status == 'completed' || po.status == 'rejected'||po.status == 'done'}">
                                             <c:set var="status" value="Đã hoàn thành" />
                                             <c:set var="rowClass" value="status-completed" />
                                         </c:when>

@@ -22,9 +22,9 @@ public class ProductInfo {
     private Date createdDate;
     private int updatedBy;
     private Date updatedDate;
-    private BigDecimal stockQuantity; // This will now be stored directly in product_info table as 'qty'
+    private BigDecimal stockQuantity; // Used for temporary storage during operations, actual stock stored in product_in_stock table
     private BigDecimal minStockThreshold;
-    private String stockStatus; // Stock status from the unified table
+    private String stockStatus; // Used for temporary storage during operations, actual stock status stored in product_in_stock table
     private String unitSymbol;
 
     // Default constructor

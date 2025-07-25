@@ -447,7 +447,7 @@
                             <option value="pending_quote" ${param.statusFilter == 'pending_quote' ? 'selected' : ''}>Chờ báo giá</option>
                             <option value="quoted" ${param.statusFilter == 'quoted' ? 'selected' : ''}>Cần phê duyệt</option>                    
                             <option value="re-quote" ${param.statusFilter == 're-quote' ? 'selected' : ''}>Đã từ chối (đợi báo lại)</option>
-                            <option value="approved" ${param.statusFilter == 'approved' || param.statusFilter == 'rejected' || param.statusFilter == 'completed' ? 'selected' : ''}>Đã duyệt</option>
+                            <option value="approved" ${param.statusFilter == 'approved' || param.statusFilter == 'rejected' || param.statusFilter == 'completed'||param.statusFilter == 'done' ? 'selected' : ''}>Đã duyệt</option>
                         </select>
                     </div>
                     <div class="filter-item">
@@ -493,7 +493,7 @@
                                             <c:set var="status" value="Đã từ chối" />
                                             <c:set var="rowClass" value="status-re-quote" />
                                         </c:when>
-                                        <c:when test="${po.status == 'approved' ||po.status =='completed'||po.status =='rejected'}">
+                                        <c:when test="${po.status == 'approved' ||po.status =='completed'||po.status =='rejected'||po.status =='done'}">
                                             <c:set var="status" value="Đã duyệt" />
                                             <c:set var="rowClass" value="status-completed" />
                                         </c:when>
