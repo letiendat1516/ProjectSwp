@@ -175,6 +175,7 @@
                 border-radius: 8px;
                 border: 1px solid #e9ecef;
                 margin: 20px 0;
+                overflow: visible;
             }
 
             .items-table table {
@@ -183,7 +184,7 @@
                 margin: 15px 0;
                 background: white;
                 border-radius: 6px;
-                overflow: hidden;
+                overflow: visible;
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             }
 
@@ -201,6 +202,8 @@
                 text-align: center;
                 border-bottom: 1px solid #e9ecef;
                 background: white;
+                position: relative;
+                overflow: visible;
             }
 
             .items-table tr:hover td {
@@ -237,6 +240,73 @@
             .items-table textarea:focus, .items-table input:focus, .items-table select:focus {
                 border-color: #4a90e2;
                 box-shadow: 0 0 0 1px rgba(74, 144, 226, 0.1);
+            }
+
+            /* Autocomplete styles */
+            .autocomplete-container {
+                position: relative;
+                width: 100%;
+                z-index: 1000;
+            }
+
+            .autocomplete-input {
+                width: 100%;
+                padding: 6px 8px;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+                font-size: 13px;
+                background: white;
+            }
+
+            .autocomplete-input:focus {
+                border-color: #4a90e2;
+                box-shadow: 0 0 0 1px rgba(74, 144, 226, 0.1);
+                outline: none;
+            }
+
+            .autocomplete-dropdown {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                border: 1px solid #dee2e6;
+                border-top: none;
+                border-radius: 0 0 4px 4px;
+                max-height: 200px;
+                overflow-y: auto;
+                z-index: 9999;
+                display: none;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                outline: none;
+                min-width: 300px;
+                white-space: nowrap;
+            }
+
+            .autocomplete-item {
+                padding: 8px 12px;
+                cursor: pointer;
+                border-bottom: 1px solid #f1f3f4;
+                font-size: 13px;
+                transition: background-color 0.2s;
+                user-select: none;
+            }
+
+            .autocomplete-item:hover,
+            .autocomplete-item.selected {
+                background-color: #f8f9ff;
+                color: #4a90e2;
+            }
+
+            .autocomplete-item:last-child {
+                border-bottom: none;
+            }
+
+            .no-results {
+                padding: 8px 12px;
+                color: #6c757d;
+                font-style: italic;
+                font-size: 13px;
             }
 
             /* Buttons */
@@ -516,14 +586,18 @@
                                     <td><input type="text" name="product_code" readonly style="width: 100%; text-align: center;" /></td>
 
                                     <td>
-                                        <select name="product_name" onchange="updateProductInfo(this)" style="width: 100%;">
-                                            <option value="" disabled selected>-- Chọn sản phẩm --</option>
-                                            <c:forEach var="p" items="${products_list}">
-                                                <option value="${p.name}" data-code="${p.code}" data-unit-symbol="${p.unitSymbol}">
-                                                    ${p.name}
-                                                </option>
-                                            </c:forEach>
-                                        </select>
+                                        <div class="autocomplete-container">
+                                            <input type="text" 
+                                                   name="product_name" 
+                                                   class="autocomplete-input" 
+                                                   placeholder="Nhập tên sản phẩm..."
+                                                   autocomplete="off"
+                                                   oninput="handleAutocomplete(this)"
+                                                   onkeydown="handleKeyDown(event, this)"
+                                                   onblur="hideDropdown(this)"
+                                                   onfocus="showDropdown(this)" />
+                                            <div class="autocomplete-dropdown"></div>
+                                        </div>
                                     </td>
 
                                     <td>
@@ -575,211 +649,375 @@
             </form>
         </div>
 
+        <!-- Hidden data for JavaScript -->
+        <script type="text/javascript">
+            // Tạo mảng sản phẩm từ JSP
+            const productsData = [
+            <c:forEach var="p" items="${products_list}" varStatus="status">
+            {
+            name: "${p.name}",
+                    code: "${p.code}",
+                    unitSymbol: "${p.unitSymbol}"
+            }<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+            ];
+            // Tạo mảng đơn vị từ JSP
+            const unitsData = [
+            <c:forEach var="u" items="${unit_list}" varStatus="status">
+            {
+            name: "${u.name}",
+                    symbol: "${u.symbol}"
+            }<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+            ];
+        </script>
+
         <script>
+            let selectedIndex = - 1;
+            let currentInput = null;
             // Set ngày hiện tại cho input date và làm readonly
             document.addEventListener('DOMContentLoaded', function () {
-                const dateInput = document.querySelector('input[name="day_request"]');
-                const today = new Date().toISOString().split('T')[0];
-                dateInput.value = today;
+            const dateInput = document.querySelector('input[name="day_request"]');
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
             });
-
             // Tự động resize textarea theo nội dung
             function autoResize(textarea) {
-                textarea.style.height = 'auto';
-                textarea.style.height = textarea.scrollHeight + 'px';
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
             }
 
             // Validation input số lượng
             function isNumberKey(evt) {
-                var charCode = (evt.which) ? evt.which : evt.keyCode;
-                var inputValue = evt.target.value;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            var inputValue = evt.target.value;
+            if ([8, 9, 27, 13, 37, 38, 39, 40, 46].indexOf(charCode) !== - 1) {
+            return true;
+            }
 
-                if ([8, 9, 27, 13, 37, 38, 39, 40, 46].indexOf(charCode) !== -1) {
-                    return true;
-                }
+            if (charCode == 46) {
+            if (inputValue.indexOf('.') !== - 1) {
+            return false;
+            }
+            return true;
+            }
 
-                if (charCode == 46) {
-                    if (inputValue.indexOf('.') !== -1) {
-                        return false;
-                    }
-                    return true;
-                }
+            if (charCode == 44) {
+            if (inputValue.indexOf(',') !== - 1 || inputValue.indexOf('.') !== - 1) {
+            return false;
+            }
+            return true;
+            }
 
-                if (charCode == 44) {
-                    if (inputValue.indexOf(',') !== -1 || inputValue.indexOf('.') !== -1) {
-                        return false;
-                    }
-                    return true;
-                }
+            if (charCode < 48 || charCode > 57) {
+            return false;
+            }
 
-                if (charCode < 48 || charCode > 57) {
-                    return false;
-                }
-
-                return true;
+            return true;
             }
 
             function validateQuantity(textarea) {
-                let value = textarea.value;
+            let value = textarea.value;
+            if (value.includes(',')) {
+            value = value.replace(',', '.');
+            textarea.value = value;
+            }
 
-                if (value.includes(',')) {
-                    value = value.replace(',', '.');
-                    textarea.value = value;
-                }
-
-                const parts = value.split('.');
-                if (parts.length > 2) {
-                    textarea.value = parts[0] + '.' + parts[1];
-                } else if (parts.length === 2 && parts[1].length > 2) {
-                    textarea.value = parts[0] + '.' + parts[1].substring(0, 2);
-                }
+            const parts = value.split('.');
+            if (parts.length > 2) {
+            textarea.value = parts[0] + '.' + parts[1];
+            } else if (parts.length === 2 && parts[1].length > 2) {
+            textarea.value = parts[0] + '.' + parts[1].substring(0, 2);
+            }
             }
 
             function formatQuantity(textarea) {
-                let value = textarea.value.trim();
-                if (value === '')
+            let value = textarea.value.trim();
+            if (value === '')
                     return;
+            value = value.replace(',', '.');
+            const numValue = parseFloat(value);
+            if (!isNaN(numValue) && numValue >= 0 && numValue <= Number.MAX_SAFE_INTEGER) {
+            textarea.value = numValue.toLocaleString('vi-VN', {
+            minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+            });
+            } else if (numValue > Number.MAX_SAFE_INTEGER) {
+            alert('Số lượng quá lớn! Vui lòng nhập số nhỏ hơn.');
+            textarea.value = '';
+            }
+            }
 
-                value = value.replace(',', '.');
-                const numValue = parseFloat(value);
+            // Autocomplete functions
+            function handleAutocomplete(input) {
+            currentInput = input;
+            const searchTerm = input.value.toLowerCase().trim();
+            const dropdown = input.nextElementSibling;
+            if (searchTerm === '') {
+            hideDropdown(input);
+            clearProductInfo(input);
+            return;
+            }
 
-                if (!isNaN(numValue) && numValue >= 0 && numValue <= Number.MAX_SAFE_INTEGER) {
-                    textarea.value = numValue.toLocaleString('vi-VN', {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 2
-                    });
-                } else if (numValue > Number.MAX_SAFE_INTEGER) {
-                    alert('Số lượng quá lớn! Vui lòng nhập số nhỏ hơn.');
-                    textarea.value = '';
-                }
+            // Tìm kiếm sản phẩm
+            const filteredProducts = productsData.filter(product =>
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.code.toLowerCase().includes(searchTerm)
+                    );
+            displayResults(dropdown, filteredProducts, searchTerm);
+            selectedIndex = - 1;
+            }
+
+            // Cập nhật hàm displayResults với mousedown
+            function displayResults(dropdown, products, searchTerm) {
+            dropdown.innerHTML = '';
+            if (products.length === 0) {
+            dropdown.innerHTML = '<div class="no-results">Không tìm thấy sản phẩm phù hợp</div>';
+            } else {
+            products.forEach((product, index) => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.innerHTML = highlightMatch(product.name, searchTerm) +
+                    ' <small style="color: #6c757d;">(' + product.code + ')</small>';
+            // Sử dụng mousedown để tránh conflict với blur
+            item.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            selectProduct(product);
+            });
+            dropdown.appendChild(item);
+            });
+            }
+
+            dropdown.style.display = 'block';
+            }
+
+            function highlightMatch(text, searchTerm) {
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<strong style="background-color: #fff3cd;">$1</strong>');
+            }
+
+            function selectProduct(product) {
+            if (!currentInput) return;
+            const row = currentInput.closest('tr');
+            // Điền tên sản phẩm
+            currentInput.value = product.name;
+            // Điền mã sản phẩm
+            const codeInput = row.querySelector('input[name="product_code"]');
+            codeInput.value = product.code;
+            // Điền đơn vị
+            updateUnitInfo(row, product.unitSymbol);
+            hideDropdown(currentInput);
+            }
+
+            function updateUnitInfo(row, unitSymbol) {
+            const unitInput = row.querySelector('input[name="unit"]');
+            const unitValueInput = row.querySelector('input[name="unit_value"]');
+            if (unitSymbol) {
+            unitInput.value = unitSymbol;
+            // Tìm tên đơn vị từ symbol
+            const unit = unitsData.find(u => u.symbol === unitSymbol);
+            if (unit) {
+            unitValueInput.value = unit.name;
+            }
+            } else {
+            unitInput.value = '';
+            unitValueInput.value = '';
+            }
+            }
+
+            function clearProductInfo(input) {
+            const row = input.closest('tr');
+            const codeInput = row.querySelector('input[name="product_code"]');
+            const unitInput = row.querySelector('input[name="unit"]');
+            const unitValueInput = row.querySelector('input[name="unit_value"]');
+            codeInput.value = '';
+            unitInput.value = '';
+            unitValueInput.value = '';
+            }
+
+            function handleKeyDown(event, input) {
+            const dropdown = input.nextElementSibling;
+            const items = dropdown.querySelectorAll('.autocomplete-item');
+            if (items.length === 0) return;
+            switch (event.key) {
+            case 'ArrowDown':
+                    event.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+            updateSelection(items);
+            break;
+            case 'ArrowUp':
+                    event.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, - 1);
+            updateSelection(items);
+            break;
+            case 'Enter':
+                    event.preventDefault();
+            if (selectedIndex >= 0 && items[selectedIndex]) {
+            items[selectedIndex].click();
+            }
+            break;
+            case 'Escape':
+                    hideDropdown(input);
+            break;
+            }
+            }
+
+            function updateSelection(items) {
+            items.forEach((item, index) => {
+            item.classList.toggle('selected', index === selectedIndex);
+            });
+            // Scroll to selected item
+            if (selectedIndex >= 0 && items[selectedIndex]) {
+            items[selectedIndex].scrollIntoView({
+            block: 'nearest'
+            });
+            }
+            }
+
+            function showDropdown(input) {
+            currentInput = input;
+            if (input.value.trim()) {
+            handleAutocomplete(input);
+            }
+            }
+
+            // Đơn giản hóa hideDropdown
+            function hideDropdown(input) {
+            const dropdown = input.nextElementSibling;
+            dropdown.style.display = 'none';
+            selectedIndex = - 1;
             }
 
             // Thêm hàng mới
             function addRow() {
-                const tbody = document.getElementById('itemsTableBody');
-                const currentRows = tbody.querySelectorAll('tr').length;
-                const nextSTT = currentRows + 1;
+            const tbody = document.getElementById('itemsTableBody');
+            const currentRows = tbody.querySelectorAll('tr').length;
+            const nextSTT = currentRows + 1;
+            const firstRow = tbody.querySelector('tr');
+            const newRow = firstRow.cloneNode(true);
+            // Reset STT
+            const sttTextarea = newRow.querySelector('textarea[name="stt"]');
+            sttTextarea.value = nextSTT;
+            // Reset các trường khác
+            const codeInput = newRow.querySelector('input[name="product_code"]');
+            codeInput.value = '';
+            const productInput = newRow.querySelector('input[name="product_name"]');
+            productInput.value = '';
+            const unitInput = newRow.querySelector('input[name="unit"]');
+            unitInput.value = '';
+            const unitValueInput = newRow.querySelector('input[name="unit_value"]');
+            unitValueInput.value = '';
+            const quantityTextarea = newRow.querySelector('textarea[name="quantity"]');
+            quantityTextarea.value = '';
+            const noteTextarea = newRow.querySelector('textarea[name="note"]');
+            noteTextarea.value = '';
+            // Reset dropdown
+            const dropdown = newRow.querySelector('.autocomplete-dropdown');
+            dropdown.innerHTML = '';
+            dropdown.style.display = 'none';
+            // Gắn lại event handlers
+            setupRowEventHandlers(newRow);
+            tbody.appendChild(newRow);
+            }
 
-                const firstRow = tbody.querySelector('tr');
-                const newRow = firstRow.cloneNode(true);
-
-                const sttTextarea = newRow.querySelector('textarea[name="stt"]');
-                sttTextarea.value = nextSTT;
-
-                const codeInput = newRow.querySelector('input[name="product_code"]');
-                codeInput.value = '';
-
-                const productSelect = newRow.querySelector('select[name="product_name"]');
-                productSelect.selectedIndex = 0;
-
-                const unitInput = newRow.querySelector('input[name="unit"]');
-                unitInput.value = '';
-
-                const unitValueInput = newRow.querySelector('input[name="unit_value"]');
-                unitValueInput.value = '';
-
-                const quantityTextarea = newRow.querySelector('textarea[name="quantity"]');
-                quantityTextarea.value = '';
-
-                const noteTextarea = newRow.querySelector('textarea[name="note"]');
-                noteTextarea.value = '';
-
-                // Đảm bảo các event handlers vẫn hoạt động
-                const newProductSelect = newRow.querySelector('select[name="product_name"]');
-                newProductSelect.onchange = function () {
-                    updateProductInfo(this);
-                };
-
-                const newQuantityTextarea = newRow.querySelector('textarea[name="quantity"]');
-                newQuantityTextarea.oninput = function () {
-                    validateQuantity(this);
-                    autoResize(this);
-                };
-                newQuantityTextarea.onblur = function () {
-                    formatQuantity(this);
-                };
-                newQuantityTextarea.onkeypress = function (event) {
-                    return isNumberKey(event);
-                };
-
-                const newSttTextarea = newRow.querySelector('textarea[name="stt"]');
-                newSttTextarea.oninput = function () {
-                    autoResize(this);
-                };
-
-                const newNoteTextarea = newRow.querySelector('textarea[name="note"]');
-                newNoteTextarea.oninput = function () {
-                    autoResize(this);
-                };
-
-                tbody.appendChild(newRow);
+            // Thay đổi setup event handlers
+            function setupRowEventHandlers(row) {
+            // Autocomplete input
+            const productInput = row.querySelector('input[name="product_name"]');
+            productInput.oninput = function() { handleAutocomplete(this); };
+            productInput.onkeydown = function(event) { handleKeyDown(event, this); };
+            // Thay đổi từ onblur sang onfocusout và thêm điều kiện
+            productInput.addEventListener('focusout', function(e) {
+            // Chỉ ẩn dropdown nếu không click vào dropdown
+            if (!e.relatedTarget || !e.relatedTarget.closest('.autocomplete-dropdown')) {
+            hideDropdown(this);
+            }
+            });
+            productInput.onfocus = function() { showDropdown(this); };
+            // Các event handlers khác giữ nguyên...
+            const quantityTextarea = row.querySelector('textarea[name="quantity"]');
+            quantityTextarea.oninput = function() {
+            validateQuantity(this);
+            autoResize(this);
+            };
+            quantityTextarea.onblur = function() {
+            formatQuantity(this);
+            };
+            quantityTextarea.onkeypress = function(event) {
+            return isNumberKey(event);
+            };
+            const sttTextarea = row.querySelector('textarea[name="stt"]');
+            sttTextarea.oninput = function() {
+            autoResize(this);
+            };
+            const noteTextarea = row.querySelector('textarea[name="note"]');
+            noteTextarea.oninput = function() {
+            autoResize(this);
+            };
             }
 
             // Xóa hàng cuối
             function removeLastRow() {
-                const tbody = document.getElementById('itemsTableBody');
-                const rows = tbody.querySelectorAll('tr');
-
-                if (rows.length > 1) {
-                    tbody.removeChild(rows[rows.length - 1]);
-                } else {
-                    alert('Phải có ít nhất một sản phẩm trong đơn hàng!');
-                }
+            const tbody = document.getElementById('itemsTableBody');
+            const rows = tbody.querySelectorAll('tr');
+            if (rows.length > 1) {
+            tbody.removeChild(rows[rows.length - 1]);
+            } else {
+            alert('Phải có ít nhất một sản phẩm trong đơn hàng!');
+            }
             }
 
             // Mở modal bổ sung sản phẩm
             function openSupplementModal() {
-                window.location.href = '${pageContext.request.contextPath}/add-product-request';
-            }
-
-            // Tự động fill code sản phẩm và unit symbol
-            function updateProductInfo(selectElement) {
-                const selectedOption = selectElement.options[selectElement.selectedIndex];
-                const code = selectedOption.getAttribute("data-code");
-                const unitSymbol = selectedOption.getAttribute("data-unit-symbol");
-
-                const row = selectElement.closest("tr");
-
-                // Điền mã sản phẩm
-                const codeInput = row.querySelector("input[name='product_code']");
-                codeInput.value = code || '';
-
-                // Điền đơn vị hiển thị và giá trị
-                const unitInput = row.querySelector("input[name='unit']");
-                const unitValueInput = row.querySelector("input[name='unit_value']");
-
-                if (unitSymbol) {
-                    unitInput.value = unitSymbol;
-                    // Tìm đơn vị tương ứng từ danh sách đơn vị
-            <c:forEach var="u" items="${unit_list}">
-                if ("${u.symbol}" === unitSymbol) {
-                    unitValueInput.value = "${u.name}";
-                    }
-            </c:forEach>
-                } else {
-                    unitInput.value = '';
-                    unitValueInput.value = '';
-                }
+            window.location.href = '${pageContext.request.contextPath}/add-product-request';
             }
 
             // Form validation
             document.querySelector('form').addEventListener('submit', function (e) {
-                const requiredFields = this.querySelectorAll('[required]');
-                let isValid = true;
+            const requiredFields = this.querySelectorAll('[required]');
+            let isValid = true;
+            requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+            isValid = false;
+            field.style.borderColor = '#dc3545';
+            } else {
+            field.style.borderColor = '#28a745';
+            }
+            });
+            // Kiểm tra xem có ít nhất một sản phẩm được chọn không
+            const productInputs = document.querySelectorAll('input[name="product_name"]');
+            let hasProduct = false;
+            productInputs.forEach(input => {
+            if (input.value.trim()) {
+            hasProduct = true;
+            }
+            });
+            if (!hasProduct) {
+            isValid = false;
+            alert('Vui lòng chọn ít nhất một sản phẩm!');
+            }
 
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        isValid = false;
-                        field.style.borderColor = '#dc3545';
-                    } else {
-                        field.style.borderColor = '#28a745';
-                    }
-                });
-
-                if (!isValid) {
-                    e.preventDefault();
-                    alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
-                }
+            if (!isValid) {
+            e.preventDefault();
+            alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+            }
+            });
+            // Đóng dropdown khi click bên ngoài
+            document.addEventListener('click', function(event) {
+            const autocompleteContainers = document.querySelectorAll('.autocomplete-container');
+            autocompleteContainers.forEach(container => {
+            if (!container.contains(event.target)) {
+            const dropdown = container.querySelector('.autocomplete-dropdown');
+            dropdown.style.display = 'none';
+            }
+            });
+            });
+            // Setup event handlers cho hàng đầu tiên khi trang load
+            document.addEventListener('DOMContentLoaded', function() {
+            const firstRow = document.querySelector('#itemsTableBody tr');
+            if (firstRow) {
+            setupRowEventHandlers(firstRow);
+            }
             });
         </script>
     </body>

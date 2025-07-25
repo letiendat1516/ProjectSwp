@@ -1,24 +1,17 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
-
 
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author Admin
- */
 public class PurchaseOrderInfo {
+
     private String id;
     private String fullname;
     private Date dayPurchase;
     private Date dayQuote;
     private String status;
     private String reason;
+    private String rejectReason; // Thêm trường mới
     private String supplier;
     private String address;
     private String phone;
@@ -29,13 +22,17 @@ public class PurchaseOrderInfo {
     public PurchaseOrderInfo() {
     }
 
-    public PurchaseOrderInfo(String id, String fullname, Date dayPurchase, Date dayQuote, String status, String reason, String supplier, String address, String phone, String email, String summary, List<PurchaseOrderItems> purchaseItems) {
+    public PurchaseOrderInfo(String id, String fullname, Date dayPurchase, Date dayQuote,
+            String status, String reason, String rejectReason, String supplier,
+            String address, String phone, String email, String summary,
+            List<PurchaseOrderItems> purchaseItems) {
         this.id = id;
         this.fullname = fullname;
         this.dayPurchase = dayPurchase;
         this.dayQuote = dayQuote;
         this.status = status;
         this.reason = reason;
+        this.rejectReason = rejectReason;
         this.supplier = supplier;
         this.address = address;
         this.phone = phone;
@@ -44,6 +41,7 @@ public class PurchaseOrderInfo {
         this.purchaseItems = purchaseItems;
     }
 
+    // Getters và Setters
     public String getId() {
         return id;
     }
@@ -90,6 +88,15 @@ public class PurchaseOrderInfo {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    // Getter và Setter cho rejectReason
+    public String getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
     }
 
     public String getSupplier() {
@@ -139,6 +146,4 @@ public class PurchaseOrderInfo {
     public void setPurchaseItems(List<PurchaseOrderItems> purchaseItems) {
         this.purchaseItems = purchaseItems;
     }
-
-    
 }

@@ -15,7 +15,6 @@ import model.Users;
 /**
  * Servlet xử lý phê duyệt, từ chối yêu cầu xuất kho và lọc danh sách.
  */
-@WebServlet(name = "ApproveExportRequestServlet", urlPatterns = {"/approveexportrequest"})
 public class ApproveExportRequestServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)

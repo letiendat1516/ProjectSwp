@@ -84,15 +84,15 @@ public class GetExportRequestWithItemsDAO {
               request.setId(requestId);
               
               // Lấy user_id và fullname
-              request.setUser_id(detailRs.getInt("user_id"));
+              request.setUserId(detailRs.getInt("user_id"));
               
               // THAY ĐỔI: Set tên người yêu cầu từ fullname (ưu tiên fullname > username > "Unknown User")
               String requesterName = detailRs.getString("requester_name");
-              request.setRequester_name(requesterName);
+              request.setRequesterName(requesterName);
               
               request.setStatus(detailRs.getString("status"));
               request.setReason(detailRs.getString("reason"));
-              request.setDay_request(detailRs.getDate("day_request"));
+              request.setDayRequest(detailRs.getDate("day_request"));
               request.setRole(detailRs.getString("role"));
               
               // Set other optional fields
@@ -103,27 +103,27 @@ public class GetExportRequestWithItemsDAO {
               }
               
               try {
-                  request.setRecipient_name(detailRs.getString("recipient_name"));
+                  request.setRecipientName(detailRs.getString("recipient_name"));
               } catch (SQLException e) {
-                  request.setRecipient_name(null);
+                  request.setRecipientName(null);
               }
               
               try {
-                  request.setRecipient_phone(detailRs.getString("recipient_phone"));
+                  request.setRecipientPhone(detailRs.getString("recipient_phone"));
               } catch (SQLException e) {
-                  request.setRecipient_phone(null);
+                  request.setRecipientPhone(null);
               }
               
               try {
-                  request.setRecipient_email(detailRs.getString("recipient_email"));
+                  request.setRecipientEmail(detailRs.getString("recipient_email"));
               } catch (SQLException e) {
-                  request.setRecipient_email(null);
+                  request.setRecipientEmail(null);
               }
               
               try {
-                  request.setApprove_by(detailRs.getString("approve_by"));
+                  request.setApproveBy(detailRs.getString("approve_by"));
               } catch (SQLException e) {
-                  request.setApprove_by(null);
+                  request.setApproveBy(null);
               }
               
               try {
@@ -165,9 +165,9 @@ public class GetExportRequestWithItemsDAO {
                   if (request != null) {
                       ExportRequestItem item = new ExportRequestItem();
                       
-                      item.setExport_request_id(requestId);
-                      item.setProduct_code(itemsRs.getString("product_code"));
-                      item.setProduct_name(itemsRs.getString("product_name"));
+                      item.setExportRequestId(requestId);
+                      item.setProductCode(itemsRs.getString("product_code"));
+                      item.setProductName(itemsRs.getString("product_name"));
                       item.setQuantity(itemsRs.getDouble("quantity"));
                       item.setUnit(itemsRs.getString("unit"));
                       item.setNote(itemsRs.getString("note"));
@@ -179,21 +179,21 @@ public class GetExportRequestWithItemsDAO {
                       }
                       
                       try {
-                          item.setReason_detail(itemsRs.getString("reason_detail"));
+                          item.setReasonDetail(itemsRs.getString("reason_detail"));
                       } catch (SQLException e) {
-                          item.setReason_detail(null);
+                          item.setReasonDetail(null);
                       }
                       
                       try {
-                          item.setProduct_id(itemsRs.getInt("product_id"));
+                          item.setProductId(itemsRs.getInt("product_id"));
                       } catch (SQLException e) {
-                          item.setProduct_id(0);
+                          item.setProductId(0);
                       }
                       
                       try {
-                          item.setExported_qty(itemsRs.getDouble("exported_qty"));
+                          item.setExportedQty(itemsRs.getDouble("exported_qty"));
                       } catch (SQLException e) {
-                          item.setExported_qty(0.0);
+                          item.setExportedQty(0.0);
                       }
                       
                       request.getItems().add(item);

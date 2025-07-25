@@ -11,35 +11,37 @@ public class ApprovedRequestItem {
     private String email;
     private String productName;
     private String productCode;
-    private String productFullName;
-    private double price;
     private String unit;
     private double quantity;
+    private double price;
     private String note;
     private String reasonDetail;
+    private String rejectReason; // Thêm trường mới
 
-    public ApprovedRequestItem(String requestId, String dayRequest, String status, String supplier, String address, String phone, String email, String productName, String productCode, String productFullName, double price, String unit, double quantity, String note, String reasonDetail) {
-        this.requestId = requestId;
-        this.dayRequest = dayRequest;
-        this.status = status;
-        this.supplier = supplier;
-        this.address = address;
-        this.phone = phone;
-        this.email = email;
-        this.productName = productName;
-        this.productCode = productCode;
-        this.productFullName = productFullName;
-        this.price = price;
-        this.unit = unit;
-        this.quantity = quantity;
-        this.note = note;
-        this.reasonDetail = reasonDetail;
-    }
+    // Các trường cho nhập kho từng phần
+    private double quantityOrdered;
+    private double quantityImported;
+    private double quantityPending;
+    private double importProgress;
 
+    // Constructors
     public ApprovedRequestItem() {
+        this.quantityImported = 0.0;
+        this.quantityPending = 0.0;
+        this.importProgress = 0.0;
     }
 
-    // Getters & Setters
+    // Method tiện ích để lấy lý do phù hợp theo trạng thái
+    public String getDisplayReason() {
+        if ("rejected".equalsIgnoreCase(this.status) && this.rejectReason != null && !this.rejectReason.trim().isEmpty()) {
+            return this.rejectReason;
+        } else if (this.reasonDetail != null && !this.reasonDetail.trim().isEmpty()) {
+            return this.reasonDetail;
+        }
+        return null;
+    }
+
+    // Getters và Setters
     public String getRequestId() {
         return requestId;
     }
@@ -112,22 +114,6 @@ public class ApprovedRequestItem {
         this.productCode = productCode;
     }
 
-    public String getProductFullName() {
-        return productFullName;
-    }
-
-    public void setProductFullName(String productFullName) {
-        this.productFullName = productFullName;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
     public String getUnit() {
         return unit;
     }
@@ -142,6 +128,14 @@ public class ApprovedRequestItem {
 
     public void setQuantity(double quantity) {
         this.quantity = quantity;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public String getNote() {
@@ -160,24 +154,56 @@ public class ApprovedRequestItem {
         this.reasonDetail = reasonDetail;
     }
 
-    @Override
-    public String toString() {
-        return "ApprovedRequestItem{"
-                + "requestId='" + requestId + '\''
-                + ", dayRequest='" + dayRequest + '\''
-                + ", status='" + status + '\''
-                + ", supplier='" + supplier + '\''
-                + ", address='" + address + '\''
-                + ", phone='" + phone + '\''
-                + ", email='" + email + '\''
-                + ", productName='" + productName + '\''
-                + ", productCode='" + productCode + '\''
-                + ", productFullName='" + productFullName + '\''
-                + ", price=" + price
-                + ", unit='" + unit + '\''
-                + ", quantity=" + quantity
-                + ", note='" + note + '\''
-                + ", reasonDetail='" + reasonDetail + '\''
-                + '}';
+    public String getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
+
+    public double getQuantityOrdered() {
+        return quantityOrdered;
+    }
+
+    public void setQuantityOrdered(double quantityOrdered) {
+        this.quantityOrdered = quantityOrdered;
+        calculateImportProgress();
+    }
+
+    public double getQuantityImported() {
+        return quantityImported;
+    }
+
+    public void setQuantityImported(double quantityImported) {
+        this.quantityImported = quantityImported;
+        calculateImportProgress();
+    }
+
+    public double getQuantityPending() {
+        return quantityPending;
+    }
+
+    public void setQuantityPending(double quantityPending) {
+        this.quantityPending = quantityPending;
+    }
+
+    public double getImportProgress() {
+        return importProgress;
+    }
+
+    public void setImportProgress(double importProgress) {
+        this.importProgress = importProgress;
+    }
+
+    private void calculateImportProgress() {
+        if (quantityOrdered > 0) {
+            this.importProgress = (quantityImported / quantityOrdered) * 100;
+            if (this.importProgress > 100) {
+                this.importProgress = 100;
+            }
+        } else {
+            this.importProgress = 0;
+        }
     }
 }
