@@ -3,7 +3,32 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/School/Project/Java/SWP/ProjectSwp/src/java/dao/ProductInfoDAO.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/product-list.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ListPurchaseOrder.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/model/Supplier.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/GetStatusOfPurchaseRequestInformationDAO.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/ImportDAO.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/PurchaseOrderDAO.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/ImportConfirmController.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ApproveExportRequest.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/ListRequestImportController.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/WEB-INF/web.xml</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ItemsSupplyRequestForm.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/ListRequestImportDAO.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/model/ExportRequestItem.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ListRequestImport.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/model/ExportRequest.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ApprovePurchaseRequest.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/DBContext/Context.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/ProductListController.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/GetExportRequestWithItemsDAO.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/ApproveExportRequestServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/ProductInfoDAO.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/MaterialUnitDAO.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ApprovePurchaseQuoted.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/model/ProductStock.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/WarehouseManagement.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/RequestForward.jsp</file>
         </group>
     </open-files>
 </project-private>

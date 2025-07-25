@@ -404,7 +404,7 @@
 
                   <div class="form-group">
                       <label>Ngày tạo báo giá <span class="required">*</span></label>
-                      <input type="date" name="quote_date" required>
+                      <input type="date" name="quote_date" readonly>
                   </div>
               </div>
           </div>
@@ -575,6 +575,13 @@
   </div>
 
   <script>
+      // Set ngày hiện tại cho input date và làm readonly
+            document.addEventListener('DOMContentLoaded', function () {
+                const dateInput = document.querySelector('input[name="quote_date"]');
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+            });
+            
       function autoResize(textarea) {
           textarea.style.height = 'auto';
           textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';

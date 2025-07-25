@@ -413,7 +413,11 @@
                                             <c:set var="status" value="Báo giá lại" />
                                             <c:set var="rowClass" value="status-re-quote" />
                                         </c:when>
+<<<<<<< HEAD
                                         <c:when test="${po.status == 'approved' || po.status == 'completed' || po.status == 'rejected'||po.status == 'done'}">
+=======
+                                        <c:when test="${po.status == 'approved' || po.status == 'completed' || po.status == 'rejected'|| po.status == 'done'}">
+>>>>>>> 35ae551 (fix)
                                             <c:set var="status" value="Đã hoàn thành" />
                                             <c:set var="rowClass" value="status-completed" />
                                         </c:when>
@@ -439,7 +443,7 @@
 
                                                 <!-- ✅ LOGIC HIỂN THỊ NÚT BÁO GIÁ THEO STATUS -->
                                                 <c:choose>
-                                                    <c:when test="${po.status == 'completed' || po.status == 'quoted' || po.status == 'approved'|| po.status == 'rejected'}">
+                                                    <c:when test="${po.status == 'completed' || po.status == 'quoted' || po.status == 'approved'|| po.status == 'rejected' || po.status == 'done'}">
                                                         <!-- Đã hoàn thành/Đã báo giá/Đã duyệt: Không hiển thị nút báo giá -->
                                                     </c:when>
                                                     <c:when test="${po.status == 're-quote'}">
