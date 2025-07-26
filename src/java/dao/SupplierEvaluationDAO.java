@@ -264,7 +264,9 @@ public class SupplierEvaluationDAO {
     public static void main(String[] args) {
         SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
         List<Supplier> list = sed.staticRated("desc");
-        System.out.println(list.size());
+        for(int i=0;i<list.size();i++){
+            System.out.println(list.get(i).getName());
+        }
         
     }
 

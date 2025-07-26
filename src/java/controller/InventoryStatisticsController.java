@@ -200,17 +200,17 @@ public class InventoryStatisticsController extends HttpServlet {
                             System.out.println("No products found in direct query");
                         }
                         
-                        // Check for product_in_stock table and count
+                        // Check for product stock data in unified table
                         try {
-                            PreparedStatement stockStmt = directConn.prepareStatement("SELECT COUNT(*) FROM product_in_stock");
+                            PreparedStatement stockStmt = directConn.prepareStatement("SELECT COUNT(*) FROM product_info WHERE qty > 0");
                             ResultSet stockRs = stockStmt.executeQuery();
                             if (stockRs.next()) {
-                                System.out.println("Product in stock count: " + stockRs.getInt(1));
+                                System.out.println("Products with stock count: " + stockRs.getInt(1));
                             } else {
                                 System.out.println("No product stock data found");
                             }
                         } catch (Exception e) {
-                            System.err.println("Error checking product_in_stock: " + e.getMessage());
+                            System.err.println("Error checking product stock: " + e.getMessage());
                         }
                         
                     } catch (Exception e) {

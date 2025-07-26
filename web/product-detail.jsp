@@ -407,7 +407,7 @@
             </a>
 
             <div class="header">
-                <h1>📦 Chi Tiết Sản Phẩm</h1>
+                <h1>Chi Tiết Sản Phẩm</h1>
                 <p>Thông tin chi tiết về sản phẩm trong hệ thống kho</p>
             </div>
 
@@ -429,7 +429,7 @@
                         <!-- Main Product Information -->
                         <div class="detail-card">
                             <div class="card-header">
-                                📋 Thông Tin Sản Phẩm
+                                Thông Tin Sản Phẩm
                             </div>
                             <div class="card-content">
                                 <div class="info-grid">
@@ -502,10 +502,10 @@
                                         <div class="info-value">
                                             ${supplier.name}
                                             <c:if test="${not empty supplier.contactEmail}">
-                                                <br><small style="color: #666;">📧 ${supplier.contactEmail}</small>
+                                                <br><small style="color: #666;">${supplier.contactEmail}</small>
                                             </c:if>
                                             <c:if test="${not empty supplier.contactPhone}">
-                                                <br><small style="color: #666;">📞 ${supplier.contactPhone}</small>
+                                                <br><small style="color: #666;">${supplier.contactPhone}</small>
                                             </c:if>
                                         </div>
                                     </div>
@@ -559,17 +559,17 @@
                                     <c:choose>
                                         <c:when test="${product.status == 'deleted'}">
                                             <a href="recover-product?id=${product.id}" class="btn btn-warning">
-                                                ♻️ Khôi Phục Sản Phẩm
+                                                Khôi Phục Sản Phẩm
                                             </a>
                                         </c:when>
                                         <c:otherwise>
                                             <a href="update-product?id=${product.id}" class="btn btn-primary">
-                                                ✏️ Chỉnh Sửa
+                                                Chỉnh Sửa
                                             </a>
                                         </c:otherwise>
                                     </c:choose>
                                     <a href="product-list" class="btn btn-secondary">
-                                        📋 Quay Lại Danh Sách
+                                        Quay Lại Danh Sách
                                     </a>
                                 </div>
                             </div>
@@ -578,7 +578,7 @@
                         <!-- Stock Information -->
                         <div class="detail-card">
                             <div class="card-header">
-                                📊 Thông Tin Kho
+                                Thông Tin Kho
                             </div>
                             <div class="card-content">
                                 <div class="stock-overview">
@@ -601,7 +601,7 @@
                                     <c:if test="${isLowStock}">
                                         <div class="info-group">
                                             <div class="info-value danger">
-                                                ⚠️ CẢNH BÁO: Sản phẩm sắp hết hàng!
+                                                CẢNH BÁO: Sản phẩm sắp hết hàng!
                                                 <br><small>Cần nhập thêm hàng để duy trì hoạt động kinh doanh.</small>
                                             </div>
                                         </div>
@@ -610,7 +610,7 @@
                                     <c:if test="${not isLowStock && product.stockQuantity > 0}">
                                         <div class="info-group">
                                             <div class="info-value success">
-                                                ✅ Tồn kho ổn định
+                                                Tồn kho ổn định
                                                 <br><small>Số lượng hiện tại đủ để đáp ứng nhu cầu.</small>
                                             </div>
                                         </div>
@@ -624,10 +624,10 @@
                     <div class="detail-card">
                         <div class="card-content">
                             <div class="no-data">
-                                <h3>❌ Không tìm thấy sản phẩm</h3>
+                                <h3>Không tìm thấy sản phẩm</h3>
                                 <p>Sản phẩm không tồn tại hoặc đã bị xóa khỏi hệ thống.</p>
                                 <a href="product-list" class="btn btn-primary" style="margin-top: 20px;">
-                                    📋 Quay Lại Danh Sách
+                                    Quay Lại Danh Sách
                                 </a>
                             </div>
                         </div>

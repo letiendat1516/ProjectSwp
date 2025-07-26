@@ -230,6 +230,34 @@
                     font-size: 1.15rem;
                 }
             }
+            
+            .pw-table th:nth-child(7),
+.pw-table td:nth-child(7) {
+    min-width: 110px;
+    text-align: center;
+}
+.pw-status-pending,
+.pw-status-approved,
+.pw-status-rejected {
+    white-space: nowrap;
+    padding: 3px 8px !important;
+    font-size: 13px;
+    min-width: 80px;
+    display: inline-block;
+    text-align: center;
+}
+
+/* Nút hành động mỏng và sát nhau hơn */
+.pw-table td.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.pw-btn-approve, .pw-btn-reject {
+    padding: 4px 10px;
+    font-size: 13px;
+    border-radius: 3px;
+}
         </style>
     </head>
     <body>

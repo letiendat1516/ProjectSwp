@@ -368,4 +368,29 @@ public class ImportDAO {
         }
         return history;
     }
+    // Thêm vào ImportDAO
+public boolean isOrderFullyImported(String purchaseOrderId) {
+    try (Connection con = Context.getJDBCConnection()) {
+        // Kiểm tra xem còn item nào chưa nhập đủ không
+        String sql = "SELECT COUNT(*) FROM warehouse_pending_items WHERE purchase_id = ? AND quantity_pending > 0";
+        
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, purchaseOrderId);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            int pendingCount = rs.getInt(1);
+            System.out.println("📊 Đơn " + purchaseOrderId + " còn " + pendingCount + " items chưa nhập đủ");
+            return pendingCount == 0; // Trả về true nếu không còn item nào pending
+        }
+        
+    } catch (SQLException e) {
+        System.err.println("❌ Lỗi kiểm tra isOrderFullyImported: " + e.getMessage());
+        e.printStackTrace();
+    }
+    
+    return false;
+}
+
+
 }

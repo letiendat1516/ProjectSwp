@@ -348,24 +348,6 @@
                         </div>
                     </div>
 
-                    <!-- Manager Assignment -->
-                    <div class="form-section">
-                        <h3>👤 Trưởng phòng</h3>
-                        
-                        <div class="form-group">
-                            <label for="managerId">Chọn trưởng phòng</label>
-                            <select class="form-control" id="managerId" name="managerId">
-                                <option value="">-- Chưa gán trưởng phòng --</option>
-                                <c:forEach var="manager" items="${availableManagers}">
-                                    <option value="${manager.id}">
-                                        ${manager.fullname} (${manager.username})
-                                        <c:if test="${not empty manager.email}"> - ${manager.email}</c:if>
-                                    </option>
-                                </c:forEach>
-                            </select>
-                            <div class="form-text">Có thể gán trưởng phòng sau khi tạo phòng ban</div>
-                        </div>
-                    </div>
 
                     <!-- Form Actions -->
                     <div class="form-actions">

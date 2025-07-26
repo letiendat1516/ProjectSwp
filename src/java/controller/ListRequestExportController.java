@@ -1,6 +1,6 @@
 package controller;
 
-import dao.ListRequestImportDAO;
+import dao.ListRequestExportDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -9,31 +9,22 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.ArrayList;
-import model.ApprovedRequestItem;
+import model.ExportRequestItem;
 
-@WebServlet("/request/list")
-public class ListRequestImportController extends HttpServlet {
-    
 
-    private static final int PAGE_SIZE = 10; // Số lượng item trên mỗi trang
+public class ListRequestExportController extends HttpServlet {
 
-    @Override
-    public void init() throws ServletException {
-        System.out.println("=== ListRequestImportController INITIALIZED ===");
-        super.init();
-    }
-    
+    private static final int PAGE_SIZE = 10;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        System.out.println("=== doGet called in ListRequestImportController ===");
-        
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
         try {
-            ListRequestImportDAO dao = new ListRequestImportDAO();
+            ListRequestExportDAO dao = new ListRequestExportDAO();
 
             // Lấy tham số tab
             String tab = request.getParameter("tab");
@@ -41,7 +32,7 @@ public class ListRequestImportController extends HttpServlet {
                 tab = "approved";
             }
 
-            // Lấy tham số page cho từng tab
+            // Lấy tham số page
             int approvedPage = 1;
             int historyPage = 1;
 
@@ -65,22 +56,22 @@ public class ListRequestImportController extends HttpServlet {
             }
 
             // Khởi tạo danh sách
-            List<ApprovedRequestItem> approvedItems = new ArrayList<>();
-            List<ApprovedRequestItem> historyItems = new ArrayList<>();
+            List<ExportRequestItem> approvedItems = new ArrayList<>();
+            List<ExportRequestItem> historyItems = new ArrayList<>();
             int approvedPages = 0;
             int historyPages = 0;
 
-            // Lấy tổng số để hiển thị thống kê (đếm từng đơn, không nhóm)
-            int totalApproved = dao.countApprovedRequestItems(null, null);
-            int totalHistory = dao.countCompletedRequestItems(null, null);
+            // Lấy tổng số để hiển thị thống kê
+                        int totalApproved = dao.countApprovedExportItems(null, null);
+            int totalHistory = dao.countCompletedExportItems(null, null);
 
             if ("approved".equals(tab)) {
                 // Load dữ liệu cho tab approved
                 String searchType = request.getParameter("searchType");
                 String searchValue = request.getParameter("searchValue");
 
-                approvedItems = dao.getApprovedRequestItems(searchType, searchValue, approvedPage, PAGE_SIZE);
-                int approvedTotal = dao.countApprovedRequestItems(searchType, searchValue);
+                approvedItems = dao.getApprovedExportItems(searchType, searchValue, approvedPage, PAGE_SIZE);
+                int approvedTotal = dao.countApprovedExportItems(searchType, searchValue);
                 approvedPages = (int) Math.ceil((double) approvedTotal / PAGE_SIZE);
 
                 // Set search parameters
@@ -94,8 +85,8 @@ public class ListRequestImportController extends HttpServlet {
                 String historySearchType = request.getParameter("historySearchType");
                 String historySearchValue = request.getParameter("historySearchValue");
 
-                historyItems = dao.getCompletedRequestItems(historySearchType, historySearchValue, historyPage, PAGE_SIZE);
-                int historyTotal = dao.countCompletedRequestItems(historySearchType, historySearchValue);
+                historyItems = dao.getCompletedExportItems(historySearchType, historySearchValue, historyPage, PAGE_SIZE);
+                int historyTotal = dao.countCompletedExportItems(historySearchType, historySearchValue);
                 historyPages = (int) Math.ceil((double) historyTotal / PAGE_SIZE);
 
                 // Set search parameters
@@ -114,7 +105,7 @@ public class ListRequestImportController extends HttpServlet {
             request.setAttribute("approvedPage", approvedPage);
             request.setAttribute("historyPage", historyPage);
 
-            // Thống kê tổng (đếm từng item, không nhóm)
+            // Thống kê tổng
             request.setAttribute("approvedCount", totalApproved);
             request.setAttribute("historyCount", totalHistory);
             request.setAttribute("totalCount", totalApproved + totalHistory);
@@ -129,7 +120,7 @@ public class ListRequestImportController extends HttpServlet {
             request.setAttribute("error", "Có lỗi xảy ra khi tải dữ liệu");
         }
 
-        request.getRequestDispatcher("/ListRequestImport.jsp").forward(request, response);
+        request.getRequestDispatcher("/ListRequestExport.jsp").forward(request, response);
     }
 
     @Override
@@ -138,3 +129,4 @@ public class ListRequestImportController extends HttpServlet {
         doGet(request, response);
     }
 }
+

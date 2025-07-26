@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dao.UserDAO;
@@ -35,7 +31,6 @@ public class RolePermissionServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -53,81 +48,50 @@ public class RolePermissionServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<Role> roles = dao.getAllRoles();
+        
+        List<Role> allRoles = dao.getAllRoles();
         List<Permission> permissions = dao.getAllPermissions();
 
-        // Lọc theo search (tên quyền)
-        String search = request.getParameter("search");
-        if (search != null && !search.trim().isEmpty()) {
-            String lowerSearch = search.trim().toLowerCase();
+        // Gộp tìm kiếm theo keyword (tên quyền và mã quyền)
+        String keyword = request.getParameter("keyword");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            String lowerKeyword = keyword.trim().toLowerCase();
             permissions = permissions.stream()
-                    .filter(p -> p.getName().toLowerCase().contains(lowerSearch))
-                    .collect(Collectors.toList());
-        }
-
-        // Lọc theo code
-        String code = request.getParameter("code");
-        if (code != null && !code.trim().isEmpty()) {
-            String lowerCode = code.trim().toLowerCase();
-            permissions = permissions.stream()
-                    .filter(p -> p.getCode().toLowerCase().contains(lowerCode))
+                    .filter(p -> p.getName().toLowerCase().contains(lowerKeyword) || 
+                                 p.getCode().toLowerCase().contains(lowerKeyword))
                     .collect(Collectors.toList());
         }
 
         // Lọc theo vai trò
         String roleIdStr = request.getParameter("role");
         Integer filterRoleId = null;
+        List<Role> filteredRoles = allRoles;
+        
         if (roleIdStr != null && !roleIdStr.isEmpty()) {
             try {
                 filterRoleId = Integer.parseInt(roleIdStr);
-            } catch (Exception e) {
+                final Integer selectedRoleId = filterRoleId;
+                filteredRoles = allRoles.stream()
+                        .filter(r -> r.getId() == selectedRoleId)
+                        .collect(Collectors.toList());
+            } catch (NumberFormatException e) {
+                // Ignore invalid role ID
             }
         }
-        List<Role> filteredRoles = roles;
-        if (filterRoleId != null) {
-            final Integer selectedRoleId = filterRoleId;
-            filteredRoles = roles.stream()
-                    .filter(r -> r.getId() == selectedRoleId)
-                    .collect(Collectors.toList());
-
-        }
-
-        // Phân trang
-        int pageSize = 10;
-        int page = 1;
-        String pageStr = request.getParameter("page");
-        if (pageStr != null) try {
-            page = Integer.parseInt(pageStr);
-        } catch (Exception e) {
-        }
-        if (page < 1) {
-            page = 1;
-        }
-
-        int totalItems = permissions.size();
-        int totalPages = (int) Math.ceil(totalItems / (double) pageSize);
-        int fromIdx = (page - 1) * pageSize;
-        int toIdx = Math.min(page * pageSize, totalItems);
-        if (fromIdx > totalItems) {
-            fromIdx = 0;
-        }
-        List<Permission> pageList = permissions.subList(fromIdx, toIdx);
 
         // Map roleId -> List<permissionId>
         Map<Integer, List<Integer>> rolePermissions = new HashMap<>();
-        for (Role role : roles) {
+        for (Role role : allRoles) {
             List<Integer> perms = dao.getPermissionIdsByRoleId(role.getId());
             rolePermissions.put(role.getId(), perms);
         }
 
+        // Set attributes
+        request.setAttribute("allRoles", allRoles);
         request.setAttribute("roles", filteredRoles);
-        request.setAttribute("permissions", pageList);
+        request.setAttribute("permissions", permissions);
         request.setAttribute("rolePermissions", rolePermissions);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-
-        request.setAttribute("filterSearch", search);
-        request.setAttribute("filterCode", code);
+        request.setAttribute("filterKeyword", keyword);
         request.setAttribute("filterRole", roleIdStr);
 
         request.getRequestDispatcher("permission.jsp").forward(request, response);
@@ -136,82 +100,86 @@ public class RolePermissionServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String search = request.getParameter("search");
-        String code = request.getParameter("code");
+        
+        String action = request.getParameter("action");
+        String keyword = request.getParameter("keyword");
         String role = request.getParameter("role");
-        String pageStr = request.getParameter("page");
-        int page = 1;
-        if (pageStr != null) try {
-            page = Integer.parseInt(pageStr);
+
+        try {
+            if ("reset".equals(action)) {
+                // Reset toàn bộ phân quyền
+                handleResetAll();
+                redirectWithMessage(response, keyword, role, "reset=1");
+            } else {
+                // Lưu phân quyền (action = "save" hoặc null)
+                handleSavePermissions(request, keyword, role);
+                redirectWithMessage(response, keyword, role, "success=1");
+            }
         } catch (Exception e) {
-        }
-            List<Role> roles = dao.getAllRoles();
-            List<Permission> allPermissions = dao.getAllPermissions();
-
-            // Áp dụng filter để lấy permission trên trang hiện tại
-            String lowerSearch = (search != null) ? search.trim().toLowerCase() : "";
-            String lowerCode = (code != null) ? code.trim().toLowerCase() : "";
-            List<Permission> filteredPermissions = allPermissions;
-            if (!lowerSearch.isEmpty()) {
-                filteredPermissions = filteredPermissions.stream()
-                        .filter(p -> p.getName().toLowerCase().contains(lowerSearch))
-                        .collect(Collectors.toList());
-            }
-            if (!lowerCode.isEmpty()) {
-                filteredPermissions = filteredPermissions.stream()
-                        .filter(p -> p.getCode().toLowerCase().contains(lowerCode))
-                        .collect(Collectors.toList());
-            }
-
-            int pageSize = 10;
-            int totalItems = filteredPermissions.size();
-            int fromIdx = (page - 1) * pageSize;
-            int toIdx = Math.min(page * pageSize, totalItems);
-            if (fromIdx > totalItems) {
-                fromIdx = 0;
-            }
-            List<Permission> pagePermissions = filteredPermissions.subList(fromIdx, toIdx);
-            List<Integer> pagePermIds = pagePermissions.stream().map(Permission::getId).collect(Collectors.toList());
-
-            for (Role roleObj : roles) {
-                // checkedPerms: quyền được check trên trang này
-                List<Integer> checkedPerms = new ArrayList<>();
-                for (Permission perm : pagePermissions) {
-                    String param = "perm_" + perm.getId() + "_role_" + roleObj.getId();
-                    if (request.getParameter(param) != null) {
-                        checkedPerms.add(perm.getId());
-                    }
-                }
-                // Xóa chỉ các quyền thuộc trang này cho vai trò đó
-                dao.deletePermissionsOfRoleForPermissions(roleObj.getId(), pagePermIds);
-                // Thêm các quyền được chọn trên trang hiện tại
-                if (!checkedPerms.isEmpty()) {
-                    dao.addPermissionsToRole(roleObj.getId(), checkedPerms);
-                }
-
-            }
-            try {
-            // Redirect giữ filter, page và báo thành công
-            StringBuilder sb = new StringBuilder("role-permission?success=1");
-            if (search != null && !search.trim().isEmpty()) {
-                sb.append("&search=").append(java.net.URLEncoder.encode(search, "UTF-8"));
-            }
-            if (code != null && !code.trim().isEmpty()) {
-                sb.append("&code=").append(java.net.URLEncoder.encode(code, "UTF-8"));
-            }
-            if (role != null && !role.isEmpty()) {
-                sb.append("&role=").append(java.net.URLEncoder.encode(role, "UTF-8"));
-            }
-            if (pageStr != null) {
-                sb.append("&page=").append(pageStr);
-            }
-
-            response.sendRedirect(sb.toString());
-
-        } catch (Exception e) {
-            response.sendRedirect("role-permission?error=1");
+            e.printStackTrace();
+            redirectWithMessage(response, keyword, role, "error=1");
         }
     }
+
+    private void handleResetAll() {
+    boolean success = dao.deleteAllRolePermissions();
+    System.out.println("Reset all permissions result: " + success);
 }
 
+    private void handleSavePermissions(HttpServletRequest request, String keyword, String role) {
+        List<Role> allRoles = dao.getAllRoles();
+        List<Permission> allPermissions = dao.getAllPermissions();
 
+        // Áp dụng filter để lấy permissions hiện tại
+        List<Permission> filteredPermissions = allPermissions;
+        
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            String lowerKeyword = keyword.trim().toLowerCase();
+            filteredPermissions = filteredPermissions.stream()
+                    .filter(p -> p.getName().toLowerCase().contains(lowerKeyword) || 
+                                 p.getCode().toLowerCase().contains(lowerKeyword))
+                    .collect(Collectors.toList());
+        }
+
+        // Xử lý cho từng role
+        for (Role roleObj : allRoles) {
+            // Lấy danh sách quyền được check
+            List<Integer> checkedPerms = new ArrayList<>();
+            for (Permission perm : filteredPermissions) {
+                String param = "perm_" + perm.getId() + "_role_" + roleObj.getId();
+                if (request.getParameter(param) != null) {
+                    checkedPerms.add(perm.getId());
+                }
+            }
+            
+            // Lấy danh sách ID của permissions hiện tại
+            List<Integer> currentPermIds = filteredPermissions.stream()
+                    .map(Permission::getId)
+                    .collect(Collectors.toList());
+            
+            // Xóa các quyền hiện tại cho vai trò đó
+            if (!currentPermIds.isEmpty()) {
+                dao.deletePermissionsOfRoleForPermissions(roleObj.getId(), currentPermIds);
+            }
+            
+            // Thêm các quyền được chọn
+            if (!checkedPerms.isEmpty()) {
+                dao.addPermissionsToRole(roleObj.getId(), checkedPerms);
+            }
+        }
+    }
+
+    private void redirectWithMessage(HttpServletResponse response, String keyword, String role, 
+                                     String message) throws IOException {
+        StringBuilder sb = new StringBuilder("role-permission?" + message);
+        
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sb.append("&keyword=").append(java.net.URLEncoder.encode(keyword, "UTF-8"));
+        }
+        if (role != null && !role.isEmpty()) {
+            sb.append("&role=").append(java.net.URLEncoder.encode(role, "UTF-8"));
+        }
+
+        response.sendRedirect(sb.toString());
+    }
+}

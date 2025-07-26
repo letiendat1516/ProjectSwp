@@ -1,9 +1,11 @@
 <%--
-  Document   : ExportRequestSuccessNotification
-  Created on : June 11, 2025, 3:43:00 PM
-  Author     : Monica
+Document   : ExportRequestSuccess
+Created on : July 12, 2025, 4:58:00 PM
+Author     : Monica
 --%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -51,20 +53,24 @@
       }
 
       .checkmark__circle {
-          stroke: #dc3545;
+          stroke: #28a745;
           stroke-width: 2;
           stroke-miterlimit: 10;
           fill: none;
           animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+          stroke-dasharray: 166;
+          stroke-dashoffset: 166;
       }
 
       .checkmark__check {
           transform-origin: 50% 50%;
-          stroke: #dc3545;
+          stroke: #28a745;
           stroke-width: 2;
           stroke-linecap: round;
           stroke-linejoin: round;
           animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.3s forwards;
+          stroke-dasharray: 48;
+          stroke-dashoffset: 48;
       }
 
       @keyframes stroke {
@@ -124,12 +130,19 @@
           color: #6c757d;
           text-align: right;
           flex: 1;
+          font-weight: 500;
+      }
+
+      .status-pending {
+          color: #ffc107;
+          font-weight: bold;
       }
 
       p {
           color: #555;
           font-size: 16px;
           margin-bottom: 30px;
+          line-height: 1.5;
       }
 
       .button-group {
@@ -149,6 +162,8 @@
           text-decoration: none;
           color: #fff;
           min-width: 150px;
+          display: inline-block;
+          text-align: center;
       }
 
       .btn-home {
@@ -176,6 +191,14 @@
       .btn-view:hover {
           background: #0056b3;
           transform: translateY(-2px);
+      }
+
+      .highlight {
+          background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+          padding: 2px 6px;
+          border-radius: 4px;
+          color: #333;
+          font-weight: bold;
       }
 
       @media (max-width: 768px) {
@@ -207,42 +230,54 @@
 <body>
   <div class="container">
       <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-          <circle class="checkmark__circle" cx="26" cy="26" r="25" stroke-dasharray="166" stroke-dashoffset="166"/>
-          <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke-dasharray="48" stroke-dashoffset="48"/>
+          <circle class="checkmark__circle" cx="26" cy="26" r="25"/>
+          <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
       </svg>
+      
       <h1>Tạo Đơn Xuất Kho Thành Công!</h1>
-      <p>Đơn yêu cầu xuất kho của bạn đã được tạo thành công. Hệ thống sẽ xử lý yêu cầu trong thời gian sớm nhất.</p>
+      
+      <p>
+          Đơn yêu cầu xuất kho của bạn đã được tạo thành công với mã số 
+          <span class="highlight">${exportRequestId}</span>. 
+          Hệ thống sẽ xử lý yêu cầu trong thời gian sớm nhất.
+      </p>
       
       <div class="success-info">
           <h3>Thông Tin Đơn Xuất Kho</h3>
+          
           <div class="info-row">
               <span class="info-label">Mã đơn:</span>
-              <span class="info-value">${requestScope.exportRequestId}</span>
+              <span class="info-value">${exportRequestId}</span>
           </div>
+          
           <div class="info-row">
               <span class="info-label">Người yêu cầu:</span>
-              <span class="info-value">${sessionScope.currentUser}</span>
+              <span class="info-value">${currentUser}</span>
           </div>
+          
           <div class="info-row">
               <span class="info-label">Ngày tạo:</span>
-              <span class="info-value">${requestScope.requestDate}</span>
+              <span class="info-value">${requestDate}</span>
           </div>
+          
           <div class="info-row">
-              <span class="info-label">Bộ phận:</span>
-              <span class="info-value">${requestScope.department}</span>
+              <span class="info-label">Vai trò:</span>
+              <span class="info-value">${role}</span>
           </div>
+          
           <div class="info-row">
-              <span class="info-label">Người nhận:</span>
-              <span class="info-value">${requestScope.recipientName}</span>
+              <span class="info-label">Số lượng mặt hàng:</span>
+              <span class="info-value">${itemCount} sản phẩm</span>
           </div>
+          
           <div class="info-row">
               <span class="info-label">Trạng thái:</span>
-              <span class="info-value">Chờ xử lý</span>
+              <span class="info-value status-pending">Chờ xử lý</span>
           </div>
       </div>
       
       <div class="button-group">
-          <a href="Admin.jsp" class="btn btn-home">Quay Về Trang Chủ</a>
+          <a href="dashboard.jsp" class="btn btn-home">Quay Về Trang Chủ</a>
           <a href="exportRequest" class="btn btn-continue">Tạo Đơn Mới</a>
           <a href="viewExportRequests" class="btn btn-view">Xem Danh Sách Đơn</a>
       </div>

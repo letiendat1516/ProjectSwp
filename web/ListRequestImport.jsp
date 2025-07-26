@@ -86,7 +86,7 @@
             .card-body {
                 padding: 1.5rem;
             }
-.card-footer {
+            .card-footer {
                 background: var(--gray-50);
                 padding: 1rem 1.5rem;
                 border-top: 1px solid var(--gray-200);
@@ -189,7 +189,7 @@
                 transition: all 0.3s ease;
                 display: flex;
                 align-items: center;
-justify-content: center;
+                justify-content: center;
                 gap: 0.5rem;
                 text-decoration: none;
             }
@@ -295,7 +295,7 @@ justify-content: center;
             /* Buttons */
             .btn {
                 display: inline-block;
-font-weight: 500;
+                font-weight: 500;
                 text-align: center;
                 padding: 0.625rem 1rem;
                 font-size: 0.875rem;
@@ -398,7 +398,7 @@ font-weight: 500;
             .alert-info {
                 background: #eff6ff;
                 color: #1e40af;
-}
+            }
             .alert-info .alert-icon {
                 background: var(--info);
                 color: white;
@@ -499,7 +499,7 @@ font-weight: 500;
                 color: #1e40af;
             }
             .status-rejected {
-background: #fee2e2;
+                background: #fee2e2;
                 color: #991b1b;
             }
             .status-partial-imported {
@@ -598,7 +598,7 @@ background: #fee2e2;
             .page-item.active .page-link {
                 background: var(--primary);
                 border-color: var(--primary);
-color: white;
+                color: white;
             }
 
             .page-item.disabled .page-link {
@@ -694,7 +694,7 @@ color: white;
                 <!-- Breadcrumbs -->
                 <div class="breadcrumbs mb-4">
                     <a href="${pageContext.request.contextPath}/Admin.jsp">Trang chủ</a>
-<span class="separator"><i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i></span>
+                    <span class="separator"><i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i></span>
                     <span class="current">Danh sách yêu cầu nhập kho</span>
                 </div>
 
@@ -749,7 +749,7 @@ color: white;
                                 <!-- Filter Panel -->
                                 <div class="filter-panel">
                                     <div class="filter-title">
-<i class="fas fa-search"></i> Tìm kiếm yêu cầu đã duyệt
+                                        <i class="fas fa-search"></i> Tìm kiếm yêu cầu đã duyệt
                                     </div>
                                     <form method="get" action="">
                                         <input type="hidden" name="tab" value="approved">
@@ -787,7 +787,7 @@ color: white;
                                 <c:if test="${not empty searchValue}">
                                     <div class="alert alert-info mb-3">
                                         <div class="alert-icon">
-<i class="fas fa-info-circle"></i>
+                                            <i class="fas fa-info-circle"></i>
                                         </div>
                                         <div class="alert-content">
                                             <div class="alert-title">Kết quả tìm kiếm</div>
@@ -831,7 +831,7 @@ color: white;
                                             <c:choose>
                                                 <c:when test="${empty approvedItems}">
                                                     <tr>
-<td colspan="13" class="text-center" style="padding: 2rem;">
+                                                        <td colspan="13" class="text-center" style="padding: 2rem;">
                                                             <div style="color: var(--gray-400);">
                                                                 <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i>
                                                                 <p>Không có yêu cầu đơn nhập kho đã duyệt nào để hiển thị.</p>
@@ -862,7 +862,7 @@ color: white;
                                                                     <span style="color: var(--success); font-weight: 600;">
                                                                         <fmt:formatNumber value="${item.quantityImported}"/>
                                                                     </span>
-<div class="progress-bar">
+                                                                    <div class="progress-bar">
                                                                         <div class="progress-fill ${item.importProgress >= 100 ? 'progress-complete' : 'progress-partial'}" 
                                                                              style="width: ${item.importProgress}%;"></div>
                                                                     </div>
@@ -892,7 +892,7 @@ color: white;
                                                             <td style="text-align: center;">
                                                                 <c:choose>
                                                                     <c:when test="${item.status == 'approved'}">
-<span class="status-badge" style="background: #dbeafe; color: #1e40af;">
+                                                                        <span class="status-badge" style="background: #dbeafe; color: #1e40af;">
                                                                             <i class="fas fa-check-circle"></i> Đã duyệt
                                                                         </span>
                                                                     </c:when>
@@ -927,7 +927,7 @@ color: white;
 
                                 <!-- Pagination for approved tab -->
                                 <c:if test="${approvedPages > 1}">
-<div class="pagination">
+                                    <div class="pagination">
                                         <c:forEach begin="1" end="${approvedPages}" var="i">
                                             <div class="page-item ${currentPage == i ? 'active' : ''}">
                                                 <a class="page-link" href="?tab=approved&page=${i}&searchType=${searchType}&searchValue=${searchValue}">${i}</a>
@@ -965,7 +965,7 @@ color: white;
                                                        autocomplete="off">
                                             </div>
                                             <div class="filter-item">
-<div class="search-group">
+                                                <div class="search-group">
                                                     <button type="submit" class="btn btn-primary btn-icon">
                                                         <i class="fas fa-search"></i> Tìm kiếm
                                                     </button>
@@ -1008,7 +1008,7 @@ color: white;
                                         <thead>
                                             <tr>
                                                 <th>STT</th>
-<th>Mã đơn</th>
+                                                <th>Mã đơn</th>
                                                 <th>Ngày nhập</th>
                                                 <th>Tên sản phẩm</th>
                                                 <th>Mã sản phẩm</th>
@@ -1046,7 +1046,7 @@ color: white;
                                                                 <fmt:formatNumber value="${item.quantity}"/>
                                                             </td>
                                                             <td style="text-align: right;">
-<fmt:formatNumber value="${item.price}" type="currency" currencySymbol="₫"/>
+                                                                <fmt:formatNumber value="${item.price}" type="currency" currencySymbol="₫"/>
                                                             </td>
                                                             <td style="text-align: right;">
                                                                 <fmt:formatNumber value="${item.quantity * item.price}" type="currency" currencySymbol="₫"/>
@@ -1075,7 +1075,7 @@ color: white;
                                                                 <c:choose>
                                                                     <c:when test="${item.status == 'rejected' || item.status == 'REJECTED'}">
                                                                         <c:if test="${not empty item.rejectReason}">
-<div class="reason-content reason-danger" title="Lý do từ chối: ${item.rejectReason}">
+                                                                            <div class="reason-content reason-danger" title="Lý do từ chối: ${item.rejectReason}">
                                                                                 <i class="fas fa-times-circle"></i>
                                                                                 ${item.rejectReason}
                                                                             </div>
@@ -1103,7 +1103,7 @@ color: white;
                                                                             <div class="reason-content reason-success">
                                                                                 <i class="fas fa-check-circle"></i> Hoàn thành
                                                                             </div>
-</c:if>
+                                                                        </c:if>
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <div class="reason-content reason-muted">
@@ -1148,7 +1148,7 @@ color: white;
                             <a href="${pageContext.request.contextPath}/Admin.jsp" class="btn btn-primary btn-icon">
                                 <i class="fas fa-arrow-left"></i> Quay lại
                             </a>
-</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1213,7 +1213,7 @@ color: white;
                     }
 
                     if (e.key === 'Escape') {
-const activeSearchInput = document.querySelector('.tab-content.active input[type="text"]');
+                        const activeSearchInput = document.querySelector('.tab-content.active input[type="text"]');
                         if (activeSearchInput && activeSearchInput.value) {
                             activeSearchInput.value = '';
                             activeSearchInput.focus();

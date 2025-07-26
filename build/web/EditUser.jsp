@@ -266,7 +266,9 @@ if (user == null) {
                         </div>
                         <div>
                             <label class="form-simple-label" for="departmentId">Phòng ban:</label>
-                            <select id="departmentId" name="departmentId" class="form-simple-select" required>
+                            <select id="departmentId" name="departmentId" class="form-simple-select">
+                                <option value="" <c:if test="${editUser.departmentId == null}">selected</c:if>>Không</option>
+
                                 <c:forEach var="dept" items="${departments}">
                                     <option value="${dept.id}" 
                                             <c:if test="${editUser.departmentId == dept.id}">selected</c:if>>

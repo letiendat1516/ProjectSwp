@@ -1,5 +1,5 @@
 <%-- 
-    Document   : AddUser
+    Document   : permission
     Created on : 22 thg 5, 2025, 22:38:49
     Author     : phucn
 --%>
@@ -165,6 +165,20 @@
             .search-btn:hover {
                 background: #135bad;
             }
+            .reset-btn {
+                background: #6c757d;
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+                padding: 9px 18px;
+                font-weight: bold;
+                font-size: 1rem;
+                cursor: pointer;
+                margin-top: 3px;
+            }
+            .reset-btn:hover {
+                background: #5a6268;
+            }
             table {
                 width: 100%;
                 border-collapse: collapse;
@@ -180,6 +194,13 @@
                 background: #e6f0fa;
                 color: #1976d2;
             }
+            input[type="checkbox"] {
+                width: 24px;
+                height: 24px;
+                cursor: pointer;
+                vertical-align: middle;
+            }
+
             .checkbox-col {
                 width: 62px;
             }
@@ -187,6 +208,13 @@
                 position: sticky;
                 left: 0;
                 background: #e6f0fa;
+            }
+            .action-buttons {
+                margin: 22px 0;
+                text-align: center;
+                display: flex;
+                gap: 15px;
+                justify-content: center;
             }
             .save-btn {
                 background: #28a745;
@@ -196,32 +224,23 @@
                 padding: 12px 32px;
                 font-size: 1.1rem;
                 font-weight: bold;
-                margin: 22px auto 0 auto;
-                display: block;
                 cursor: pointer;
             }
             .save-btn:hover {
                 background: #218838;
             }
-            .pagination {
-                margin: 22px 0 10px 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                gap: 9px;
-            }
-            .pagination-btn {
-                background: #fff;
-                border: 1px solid #b8cdf1;
-                border-radius: 5px;
-                padding: 6px 14px;
-                font-size: 15px;
-                cursor: pointer;
-                color: #1976d2;
-            }
-            .pagination-btn.active {
-                background: #1976d2;
+            .reset-all-btn {
+                background: #dc3545;
                 color: #fff;
+                border: none;
+                border-radius: 6px;
+                padding: 12px 32px;
+                font-size: 1.1rem;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            .reset-all-btn:hover {
+                background: #c82333;
             }
         </style>
     </head>
@@ -248,40 +267,40 @@
                 <div class="form-container">
                     <center>
                         <c:if test="${param.success == '1'}">
-                            <div class="msg success">Lưu phân quyền thành công!</div>
+                            <div class="msg success">Lưu phân quyền thành công! Có thể sử dụng sau khi đăng nhập lại.</div>
                             <c:remove var="message" scope="session"/>
                         </c:if>
                         <c:if test="${param.error == '1'}">
                             <div class="msg error">Có lỗi xảy ra khi lưu phân quyền!</div>
                         </c:if>
+                        <c:if test="${param.reset == '1'}">
+                            <div class="msg success">Đã reset toàn bộ phân quyền thành công!</div>
+                        </c:if>
                     </center>
-                    
+
                     <form class="search-form" method="get" action="role-permission">
                         <div class="search-group">
-                            <label for="search">Từ khóa:</label>
-                            <input type="text" name="search" id="search" value="${filterSearch != null ? filterSearch : ''}" placeholder="..."/>
-                        </div>
-                        <div class="search-group">
-                            <label for="code">Mã quyền:</label>
-                            <input type="text" name="code" id="code" value="${filterCode != null ? filterCode : ''}" placeholder="VD: USER_VIEW"/>
+                            <label for="keyword">Từ khóa (Tên/Mã quyền):</label>
+                            <input type="text" name="keyword" id="keyword" 
+                                   value="${filterKeyword != null ? filterKeyword : ''}" 
+                                   placeholder="Nhập tên quyền hoặc mã"/>
                         </div>
                         <div class="search-group">
                             <label for="role">Vai trò:</label>
                             <select name="role" id="role">
-                                <option value="">-- Tất cả vai trò --</option>
-                                <c:forEach var="r" items="${roles}">
-                                    <option value="${r.id}" ${filterRole == r.id ? 'selected' : ''}>${r.roleName}</option>
-                                </c:forEach>
+                                <option value="">Tất cả vai trò</option>
+                               <c:forEach var="r" items="${allRoles}">
+                                <option value="${r.id}" ${filterRole == r.id ? 'selected' : ''}>${r.roleName}</option>
+                               </c:forEach>
                             </select>
                         </div>
                         <button type="submit" class="search-btn">Lọc</button>
+                        <a href="role-permission" class="reset-btn" style="text-decoration: none; display: inline-block;">Reset</a>
                     </form>
 
                     <form action="role-permission" method="post">
-                        <input type="hidden" name="search" value="${filterSearch != null ? filterSearch : ''}">
-                        <input type="hidden" name="code" value="${filterCode != null ? filterCode : ''}">
+                        <input type="hidden" name="keyword" value="${filterKeyword != null ? filterKeyword : ''}">
                         <input type="hidden" name="role" value="${filterRole != null ? filterRole : ''}">
-                        <input type="hidden" name="page" value="${currentPage}">
 
                         <table>
                             <thead>
@@ -310,20 +329,17 @@
                                 </c:forEach>
                             </tbody>
                         </table>
-                        <button class="save-btn" type="submit">Lưu phân quyền</button>
+
+                        <div class="action-buttons">
+                            <button class="save-btn" type="submit" name="action" value="save">Lưu phân quyền</button>
+                            <button class="reset-all-btn" type="submit" name="action" value="reset" 
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa toàn bộ phân quyền không?')">
+                                Reset toàn bộ
+                            </button>
+                        </div>
                     </form>
-                    <div class="pagination">
-                        <c:if test="${currentPage > 1}">
-                            <a class="pagination-btn" href="?search=${filterSearch}&code=${filterCode}&role=${filterRole}&page=${currentPage - 1}">Trước</a>
-                        </c:if>
-                        <c:forEach var="i" begin="1" end="${totalPages}">
-                            <a class="pagination-btn ${currentPage == i ? 'active' : ''}"
-                               href="?search=${filterSearch}&code=${filterCode}&role=${filterRole}&page=${i}">${i}</a>
-                        </c:forEach>
-                        <c:if test="${currentPage < totalPages}">
-                            <a class="pagination-btn" href="?search=${filterSearch}&code=${filterCode}&role=${filterRole}&page=${currentPage + 1}">Sau</a>
-                        </c:if>
-                    </div>
                 </div>
-                </body>
-                </html>
+            </div>
+        </div>
+    </body>
+</html>

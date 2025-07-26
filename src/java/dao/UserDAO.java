@@ -143,6 +143,52 @@ public class UserDAO extends Context {
         }
         return codes;
     }
+    
+    // Gán tất cả quyền cho role
+public void assignAllPermissionsToRole(int roleId) {
+    List<Integer> allPermissionIds = getAllPermissionIds();
+    String sql = "INSERT IGNORE INTO role_permission (role_id, permission_id) VALUES (?, ?)";
+    try (Connection conn = getJDBCConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        for (Integer permissionId : allPermissionIds) {
+            ps.setInt(1, roleId);
+            ps.setInt(2, permissionId);
+            ps.addBatch();
+        }
+        ps.executeBatch();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+// Xóa tất cả quyền của role
+public void deleteAllPermissionsOfRole(int roleId) {
+    String sql = "DELETE FROM role_permission WHERE role_id = ?";
+    try (Connection conn = getJDBCConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, roleId);
+        ps.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+// Lấy toàn bộ permissionId
+public List<Integer> getAllPermissionIds() {
+    List<Integer> ids = new ArrayList<>();
+    String sql = "SELECT id FROM permission";
+    try (Connection conn = getJDBCConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            ids.add(rs.getInt("id"));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return ids;
+}
+
 
     public void addPermissionsToRole(int roleId, List<Integer> permissionIds) {
         if (permissionIds == null || permissionIds.isEmpty()) {
@@ -161,6 +207,33 @@ public class UserDAO extends Context {
         }
     }
 
+    /**
+     * Xóa toàn bộ phân quyền của một vai trò
+     *
+     * @param roleId ID của vai trò cần xóa phân quyền
+     */
+
+public boolean deleteAllRolePermissions() {
+    String sql = "DELETE FROM role_permission";
+    try (Connection conn = getJDBCConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        int rowsAffected = ps.executeUpdate();
+        System.out.println("Deleted " + rowsAffected + " permissions for all roles");
+        return rowsAffected >= 0;
+    } catch (SQLException e) {
+        System.err.println("Error deleting all role permissions: " + e.getMessage());
+        e.printStackTrace();
+        return false;
+    }
+}
+
+
+    /**
+     * Xóa các quyền cụ thể của một vai trò
+     *
+     * @param roleId ID của vai trò
+     * @param permissionIds Danh sách ID các quyền cần xóa
+     */
     public void deletePermissionsOfRoleForPermissions(int roleId, List<Integer> permissionIds) {
         if (permissionIds == null || permissionIds.isEmpty()) {
             return;
@@ -233,107 +306,102 @@ public class UserDAO extends Context {
         }
     }
 
-    public Users getUserById(int id) { 
-    String sql = "SELECT u.*, r.role_name, d.dept_name "
-            + "FROM users u "
-            + "LEFT JOIN user_role ur ON u.id = ur.user_id "
-            + "LEFT JOIN role r ON ur.role_id = r.id "
-            + "LEFT JOIN department d ON u.department_id = d.id "
-            + "WHERE u.id = ?";
-    try (Connection connection = Context.getJDBCConnection(); 
-         PreparedStatement stmt = connection.prepareStatement(sql)) {
-        stmt.setInt(1, id);
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                Users user = new Users();
-                user.setId(rs.getInt("id"));
-                user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password"));
-                user.setDob(rs.getDate("dob"));
-                user.setPhone(rs.getString("phone"));
-                user.setFullname(rs.getString("fullname"));
-                user.setEmail(rs.getString("email"));
-                user.setActiveFlag(rs.getInt("active_flag"));
-                user.setCreateDate(rs.getTimestamp("create_date"));
-                user.setRoleName(rs.getString("role_name"));
-                user.setDepartmentId(rs.getObject("department_id") != null ? rs.getInt("department_id") : null);
-                user.setDeptName(rs.getString("dept_name"));
-                return user;
+    public Users getUserById(int id) {
+        String sql = "SELECT u.*, r.role_name, d.dept_name "
+                + "FROM users u "
+                + "LEFT JOIN user_role ur ON u.id = ur.user_id "
+                + "LEFT JOIN role r ON ur.role_id = r.id "
+                + "LEFT JOIN department d ON u.department_id = d.id "
+                + "WHERE u.id = ?";
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Users user = new Users();
+                    user.setId(rs.getInt("id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
+                    user.setDob(rs.getDate("dob"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setFullname(rs.getString("fullname"));
+                    user.setEmail(rs.getString("email"));
+                    user.setActiveFlag(rs.getInt("active_flag"));
+                    user.setCreateDate(rs.getTimestamp("create_date"));
+                    user.setRoleName(rs.getString("role_name"));
+                    user.setDepartmentId(rs.getObject("department_id") != null ? rs.getInt("department_id") : null);
+                    user.setDeptName(rs.getString("dept_name"));
+                    return user;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return null;
     }
-    return null;
-}
-
 
     public void updateUser(Users user, int roleId) throws SQLException {
-    Connection connection = Context.getJDBCConnection();
-    connection.setAutoCommit(false);
-    try {
-        String sqlUser = "UPDATE users SET username=?, fullname=?, email=?, phone=?, dob=?, active_flag=?, department_id=?, password=? WHERE id=?";
-        try (PreparedStatement stmtUser = connection.prepareStatement(sqlUser)) {
-            stmtUser.setString(1, user.getUsername());
-            stmtUser.setString(2, user.getFullname());
-            stmtUser.setString(3, user.getEmail());
-            stmtUser.setString(4, user.getPhone());
-            if (user.getDob() != null) {
-                stmtUser.setDate(5, new java.sql.Date(user.getDob().getTime()));
-            } else {
-                stmtUser.setNull(5, java.sql.Types.DATE);
+        Connection connection = Context.getJDBCConnection();
+        connection.setAutoCommit(false);
+        try {
+            String sqlUser = "UPDATE users SET username=?, fullname=?, email=?, phone=?, dob=?, active_flag=?, department_id=?, password=? WHERE id=?";
+            try (PreparedStatement stmtUser = connection.prepareStatement(sqlUser)) {
+                stmtUser.setString(1, user.getUsername());
+                stmtUser.setString(2, user.getFullname());
+                stmtUser.setString(3, user.getEmail());
+                stmtUser.setString(4, user.getPhone());
+                if (user.getDob() != null) {
+                    stmtUser.setDate(5, new java.sql.Date(user.getDob().getTime()));
+                } else {
+                    stmtUser.setNull(5, java.sql.Types.DATE);
+                }
+                stmtUser.setInt(6, user.getActiveFlag());
+                if (user.getDepartmentId() != null) {
+                    stmtUser.setInt(7, user.getDepartmentId());
+                } else {
+                    stmtUser.setNull(7, java.sql.Types.INTEGER);
+                }
+                stmtUser.setString(8, user.getPassword()); // Luôn truyền mật khẩu (cũ hoặc mới)
+                stmtUser.setInt(9, user.getId());
+                stmtUser.executeUpdate();
             }
-            stmtUser.setInt(6, user.getActiveFlag());
-            if (user.getDepartmentId() != null) {
-                stmtUser.setInt(7, user.getDepartmentId());
-            } else {
-                stmtUser.setNull(7, java.sql.Types.INTEGER);
+
+            String sqlDelete = "DELETE FROM user_role WHERE user_id=?";
+            try (PreparedStatement stmtDelete = connection.prepareStatement(sqlDelete)) {
+                stmtDelete.setInt(1, user.getId());
+                stmtDelete.executeUpdate();
             }
-            stmtUser.setString(8, user.getPassword()); // Luôn truyền mật khẩu (cũ hoặc mới)
-            stmtUser.setInt(9, user.getId());
-            stmtUser.executeUpdate();
-        }
 
-        String sqlDelete = "DELETE FROM user_role WHERE user_id=?";
-        try (PreparedStatement stmtDelete = connection.prepareStatement(sqlDelete)) {
-            stmtDelete.setInt(1, user.getId());
-            stmtDelete.executeUpdate();
-        }
+            String sqlInsert = "INSERT INTO user_role(user_id, role_id) VALUES (?, ?)";
+            try (PreparedStatement stmtInsert = connection.prepareStatement(sqlInsert)) {
+                stmtInsert.setInt(1, user.getId());
+                stmtInsert.setInt(2, roleId);
+                stmtInsert.executeUpdate();
+            }
 
-        String sqlInsert = "INSERT INTO user_role(user_id, role_id) VALUES (?, ?)";
-        try (PreparedStatement stmtInsert = connection.prepareStatement(sqlInsert)) {
-            stmtInsert.setInt(1, user.getId());
-            stmtInsert.setInt(2, roleId);
-            stmtInsert.executeUpdate();
+            connection.commit();
+        } catch (Exception e) {
+            connection.rollback();
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
         }
-
-        connection.commit();
-    } catch (Exception e) {
-        connection.rollback();
-        throw e;
-    } finally {
-        connection.setAutoCommit(true);
     }
-}
-
 
     public void updateProfile(Users user) throws SQLException {
-    String sql = "UPDATE users SET fullname=?, email=?, phone=?, dob=? WHERE id=?";
-    try (Connection connection = Context.getJDBCConnection();
-         PreparedStatement stmt = connection.prepareStatement(sql)) {
-        stmt.setString(1, user.getFullname());
-        stmt.setString(2, user.getEmail());
-        stmt.setString(3, user.getPhone());
-        if (user.getDob() != null) {
-            stmt.setDate(4, new java.sql.Date(user.getDob().getTime()));
-        } else {
-            stmt.setNull(4, java.sql.Types.DATE);
+        String sql = "UPDATE users SET fullname=?, email=?, phone=?, dob=? WHERE id=?";
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, user.getFullname());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getPhone());
+            if (user.getDob() != null) {
+                stmt.setDate(4, new java.sql.Date(user.getDob().getTime()));
+            } else {
+                stmt.setNull(4, java.sql.Types.DATE);
+            }
+            stmt.setInt(5, user.getId());
+            stmt.executeUpdate();
         }
-        stmt.setInt(5, user.getId());
-        stmt.executeUpdate();
     }
-}
-
 
     public List<Users> filterUsers(Integer roleId, String status, String keyword, Integer departmentId, boolean includeAdmin) {
         List<Users> list = new ArrayList<>();

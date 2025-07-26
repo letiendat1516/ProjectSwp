@@ -28,6 +28,10 @@
         <servlet-name>EdituserServlet</servlet-name>
         <servlet-class>controller.EdituserServlet</servlet-class>
     </servlet>
+        <servlet>
+        <servlet-name>UserFilterServlet</servlet-name>
+        <servlet-class>controller.UserFilterServlet</servlet-class>
+    </servlet>
     <!-- Request Management Servlets -->
     <servlet>
         <servlet-name>LoadingRequestServlet</servlet-name>
@@ -175,6 +179,14 @@
     </servlet>
     <!-- ========== SERVLET MAPPINGS ========== -->
     <!-- Category Mapping -->
+     <servlet>
+        <servlet-name>ListRequestExportController</servlet-name>
+        <servlet-class>controller.ListRequestExportController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExportConfirmController</servlet-name>
+        <servlet-class>controller.ExportConfirmController</servlet-class>
+    </servlet>
     <servlet>
         <servlet-name>ApproveExportRequestServlet</servlet-name>
         <servlet-class>controller.ApproveExportRequestServlet</servlet-class>
@@ -204,6 +216,10 @@
     <servlet-mapping>
         <servlet-name>EdituserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
+    </servlet-mapping>
+        <servlet-mapping>
+        <servlet-name>UserFilterServlet</servlet-name>
+        <url-pattern>/userfilter</url-pattern>
     </servlet-mapping>
     <!-- Request Management Mappings -->
     <servlet-mapping>
@@ -437,8 +453,19 @@
         <url-pattern>/recover-product</url-pattern>
         <url-pattern>/product-detail.jsp</url-pattern>
         <url-pattern>/product-detail</url-pattern>
+        <url-pattern>/loadingrequest</url-pattern>
+
     </filter-mapping>
     <!-- ========== SESSION CONFIGURATION ========== -->
+        <!-- Session Configuration -->
+    <servlet-mapping>
+        <servlet-name>ListRequestExportController</servlet-name>
+        <url-pattern>/exportList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExportConfirmController</servlet-name>
+        <url-pattern>/export</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ApproveExportRequestServlet</servlet-name>
         <url-pattern>/approveexportrequest</url-pattern>

@@ -27,7 +27,7 @@
     <jsp:include page="/include/sidebar.jsp" />
     <div class="main-content">
         <a href="product-list" class="back-btn">← Quay lại danh sách sản phẩm</a>
-        <h1>🗑️ Sản Phẩm Đã Xóa</h1>
+        <h1>Sản Phẩm Đã Xóa</h1>
         <c:choose>
             <c:when test="${empty deletedProducts}">
                 <div class="no-data">Không có sản phẩm nào đã bị xóa.</div>
@@ -53,7 +53,7 @@
 
                                 <td><span style="color: #dc3545; font-weight: bold;">Đã xóa</span></td>
                                 <td>
-                                    <a href="recover-product?id=${product.id}" class="btn-recover">♻️ Khôi phục</a>
+                                    <a href="recover-product?id=${product.id}" class="btn-recover">Khôi phục</a>
                                 </td>
                             </tr>
                         </c:forEach>

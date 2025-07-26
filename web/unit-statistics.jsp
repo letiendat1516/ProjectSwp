@@ -48,7 +48,7 @@
 
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            color: black;
             padding: 30px;
             border-radius: 15px;
             margin-bottom: 30px;
@@ -59,7 +59,6 @@
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         .header p {
@@ -520,8 +519,7 @@
             </a>
 
             <div class="header">
-                <h1>📊 Thống Kê Đơn Vị Tính</h1>
-                <p>Tổng quan về các đơn vị tính trong hệ thống và mức độ sử dụng</p>
+                <h1>Thống Kê Đơn Vị Tính</h1>
             </div>
 
             <c:if test="${not empty error}">
@@ -565,10 +563,6 @@
                 <div class="stat-card products-using">
                     <div class="stat-number">${totalProductsUsingUnits}</div>
                     <div class="stat-label">Sản phẩm sử dụng đơn vị</div>
-                </div>
-                <div class="stat-card recent-units">
-                    <div class="stat-number">${recentUnitsCount}</div>
-                    <div class="stat-label">Hoạt động gần đây</div>
                 </div>
             </div>
 
@@ -627,7 +621,7 @@
             <div class="details-section">
                 <!-- Top Used Units -->
                 <div class="detail-panel">
-                    <div class="panel-header">🔥 Đơn vị được sử dụng nhiều nhất</div>
+                    <div class="panel-header">Đơn vị được sử dụng nhiều nhất</div>
                     <div class="panel-content">
                         <div class="unit-list">
                             <c:forEach var="unit" items="${topUsedUnits}">
@@ -651,7 +645,7 @@
 
                 <!-- Least Used Units -->
                 <div class="detail-panel">
-                    <div class="panel-header">📉 Đơn vị ít được sử dụng</div>
+                    <div class="panel-header">Đơn vị ít được sử dụng</div>
                     <div class="panel-content">
                         <div class="unit-list">
                             <c:forEach var="unit" items="${leastUsedUnits}">
@@ -671,28 +665,6 @@
                             </c:if>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Recent Activities -->
-            <div class="recent-activities">
-                <div class="panel-header">📅 Hoạt động gần đây</div>
-                <div class="panel-content">
-                    <c:forEach var="activity" items="${recentUnitActivities}">
-                        <div class="activity-item">
-                            <div class="activity-icon">📦</div>
-                            <div class="activity-content">
-                                <div class="activity-description">${activity.description}</div>
-                                <div class="activity-meta">
-                                    Loại: ${activity.unitType} | Sản phẩm sử dụng: ${activity.productCount}
-                                </div>
-                            </div>
-                            <div class="activity-time">${activity.formattedDate}</div>
-                        </div>
-                    </c:forEach>
-                    <c:if test="${empty recentUnitActivities}">
-                        <div class="no-data">Không có hoạt động nào gần đây</div>
-                    </c:if>
                 </div>
             </div>
         </div>

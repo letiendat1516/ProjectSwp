@@ -687,28 +687,15 @@
             textarea.style.height = textarea.scrollHeight + 'px';
             }
 
-            // Validation input số lượng
+            // Validation input số lượng - chỉ cho phép số nguyên dương
             function isNumberKey(evt) {
             var charCode = (evt.which) ? evt.which : evt.keyCode;
-            var inputValue = evt.target.value;
+            // Cho phép các phím điều khiển (backspace, delete, tab, escape, enter, arrows)
             if ([8, 9, 27, 13, 37, 38, 39, 40, 46].indexOf(charCode) !== - 1) {
             return true;
             }
 
-            if (charCode == 46) {
-            if (inputValue.indexOf('.') !== - 1) {
-            return false;
-            }
-            return true;
-            }
-
-            if (charCode == 44) {
-            if (inputValue.indexOf(',') !== - 1 || inputValue.indexOf('.') !== - 1) {
-            return false;
-            }
-            return true;
-            }
-
+            // Chỉ cho phép số từ 0-9, không cho phép dấu chấm, phẩy, dấu âm
             if (charCode < 48 || charCode > 57) {
             return false;
             }
@@ -717,35 +704,43 @@
             }
 
             function validateQuantity(textarea) {
-            let value = textarea.value;
-            if (value.includes(',')) {
-            value = value.replace(',', '.');
+            let value = textarea.value.trim();
+            // Loại bỏ các ký tự không phải số
+            value = value.replace(/[^0-9]/g, '');
+            // Cập nhật giá trị đã được làm sạch
             textarea.value = value;
-            }
-
-            const parts = value.split('.');
-            if (parts.length > 2) {
-            textarea.value = parts[0] + '.' + parts[1];
-            } else if (parts.length === 2 && parts[1].length > 2) {
-            textarea.value = parts[0] + '.' + parts[1].substring(0, 2);
+            // Kiểm tra độ dài tối đa (tránh số quá lớn)
+            if (value.length > 10) {
+            textarea.value = value.substring(0, 10);
             }
             }
 
             function formatQuantity(textarea) {
             let value = textarea.value.trim();
-            if (value === '')
-                    return;
-            value = value.replace(',', '.');
-            const numValue = parseFloat(value);
-            if (!isNaN(numValue) && numValue >= 0 && numValue <= Number.MAX_SAFE_INTEGER) {
-            textarea.value = numValue.toLocaleString('vi-VN', {
-            minimumFractionDigits: 0,
-                    maximumFractionDigits: 2
-            });
-            } else if (numValue > Number.MAX_SAFE_INTEGER) {
-            alert('Số lượng quá lớn! Vui lòng nhập số nhỏ hơn.');
-            textarea.value = '';
+            if (value === '') {
+            return;
             }
+
+            // Chuyển thành số nguyên
+            const numValue = parseInt(value, 10);
+            // Kiểm tra tính hợp lệ
+            if (isNaN(numValue) || numValue <= 0) {
+            alert('Số lượng phải là số nguyên dương (lớn hơn 0)!');
+            textarea.value = '';
+            textarea.focus();
+            return;
+            }
+
+            // Kiểm tra giới hạn tối đa
+            if (numValue > 999999999) {
+            alert('Số lượng quá lớn! Vui lòng nhập số nhỏ hơn 1 tỷ.');
+            textarea.value = '';
+            textarea.focus();
+            return;
+            }
+
+            // Format số với dấu phẩy phân cách hàng nghìn
+            textarea.value = numValue.toLocaleString('vi-VN');
             }
 
             // Autocomplete functions
@@ -972,10 +967,11 @@
             window.location.href = '${pageContext.request.contextPath}/add-product-request';
             }
 
-            // Form validation
+            // Form validation - cập nhật
             document.querySelector('form').addEventListener('submit', function (e) {
             const requiredFields = this.querySelectorAll('[required]');
             let isValid = true;
+            // Kiểm tra các trường bắt buộc
             requiredFields.forEach(field => {
             if (!field.value.trim()) {
             isValid = false;
@@ -997,9 +993,14 @@
             alert('Vui lòng chọn ít nhất một sản phẩm!');
             }
 
+            // Kiểm tra validation số lượng
+            if (!validateQuantityOnSubmit()) {
+            isValid = false;
+            }
+
             if (!isValid) {
             e.preventDefault();
-            alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+            alert('Vui lòng điền đầy đủ thông tin bắt buộc và kiểm tra lại số lượng!');
             }
             });
             // Đóng dropdown khi click bên ngoài
@@ -1019,6 +1020,32 @@
             setupRowEventHandlers(firstRow);
             }
             });
+            // Thêm validation khi submit form
+            function validateQuantityOnSubmit() {
+            const quantityInputs = document.querySelectorAll('textarea[name="quantity"]');
+            let isValid = true;
+            quantityInputs.forEach(input => {
+            const value = input.value.replace(/[,\.]/g, '').trim(); // Loại bỏ dấu phẩy format
+
+            if (value === '') {
+            input.style.borderColor = '#dc3545';
+            isValid = false;
+            return;
+            }
+
+            const numValue = parseInt(value, 10);
+            if (isNaN(numValue) || numValue <= 0) {
+            input.style.borderColor = '#dc3545';
+            alert('Số lượng phải là số nguyên dương (lớn hơn 0)!');
+            input.focus();
+            isValid = false;
+            return;
+            }
+
+            input.style.borderColor = '#28a745';
+            });
+            return isValid;
+            }
         </script>
     </body>
 </html>

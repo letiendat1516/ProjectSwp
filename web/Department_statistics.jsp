@@ -109,7 +109,7 @@
             /* Stats Cards */
             .stats-container {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
                 gap: 20px;
                 margin-bottom: 30px;
             }
@@ -169,6 +169,13 @@
             }
             .stat-card.danger .value {
                 color: #dc3545;
+            }
+            /* ✨ THÊM: Inactive card style */
+            .stat-card.inactive {
+                border-top: 4px solid #fd7e14;
+            }
+            .stat-card.inactive .value {
+                color: #fd7e14;
             }
 
             /* Date info */
@@ -381,6 +388,7 @@
 
                 <!-- Stats Cards -->
                 <div class="stats-container">
+                    <!-- Tổng số phòng ban -->
                     <div class="stat-card primary">
                         <h3>Tổng số phòng ban</h3>
                         <div class="value">
@@ -393,6 +401,8 @@
                             Tất cả phòng ban trong hệ thống
                         </div>
                     </div>
+                    
+                    <!-- Phòng ban hoạt động -->
                     <div class="stat-card success">
                         <h3>Phòng ban hoạt động</h3>
                         <div class="value">
@@ -407,6 +417,27 @@
                             </c:if>
                         </div>
                     </div>
+                    
+                    <!-- ✨ THÊM: Phòng ban không hoạt động -->
+                    <div class="stat-card inactive">
+                        <h3>Phòng ban không hoạt động</h3>
+                        <div class="value">
+                            <c:choose>
+                                <c:when test="${not empty overview.inactiveDepartments}">${overview.inactiveDepartments}</c:when>
+                                <c:otherwise>0</c:otherwise>
+                            </c:choose>
+                        </div>
+                        <div class="sub-text">
+                            <c:if test="${not empty overview.inactivePercentage}">
+                                <fmt:formatNumber value="${overview.inactivePercentage}" maxFractionDigits="0"/>% tổng phòng ban
+                            </c:if>
+                            <c:if test="${empty overview.inactivePercentage}">
+                                Phòng ban tạm ngưng hoạt động
+                            </c:if>
+                        </div>
+                    </div>
+                    
+                    <!-- Chưa có trưởng phòng -->
                     <div class="stat-card warning">
                         <h3>Chưa có trưởng phòng</h3>
                         <div class="value">
@@ -480,45 +511,6 @@
                         </tbody>
                     </table>
                 </div>
-
-                <!-- Recent Activities -->
-                <div class="recent-container">
-                    <h3>Hoạt động gần đây</h3>
-                    <ul class="recent-list">
-                        <c:forEach items="${recentActivities}" var="activity">
-                            <li class="recent-item">
-                                <div>
-                                    <strong>${activity.deptName}</strong>
-                                    <span class="dept-badge">${activity.deptCode}</span>
-                                    <span class="activity-badge ${activity.activityType}">
-                                        <c:choose>
-                                            <c:when test="${activity.activityType == 'create'}">
-                                                Tạo mới
-                                            </c:when>
-                                            <c:otherwise>
-                                                Cập nhật
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </span>
-                                    <c:if test="${not empty activity.updatedBy}">
-                                        <span style="font-size: 12px; color: #666;">
-                                            bởi ${activity.updatedBy}
-                                        </span>
-                                    </c:if>
-                                </div>
-                                <div class="recent-date">
-                                    ${activity.updateDate}
-                                </div>
-                            </li>
-                        </c:forEach>
-                        <c:if test="${empty recentActivities}">
-                            <li class="recent-item">
-                                <span style="color: #999;">Chưa có hoạt động nào gần đây</span>
-                            </li>
-                        </c:if>
-                    </ul>
-                </div>
-
             </div>
         </div>
     </body>

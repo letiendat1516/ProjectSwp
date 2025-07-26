@@ -211,6 +211,20 @@
         .btn-deactivate:hover {
             background: #f57c00;
         }
+        
+        /* Action column styling */
+        .action-column {
+            width: 200px;
+            min-width: 200px;
+            white-space: nowrap;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
         .search-container {
             margin-bottom: 24px;
             display: flex;
@@ -314,6 +328,22 @@
                 width: 100%;
                 margin: 8px 0 0 0;
             }
+            
+            /* Responsive action buttons */
+            .action-buttons {
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .action-column {
+                width: 150px;
+                min-width: 150px;
+            }
+            
+            .btn-edit {
+                font-size: 0.85rem;
+                padding: 4px 8px;
+            }
         }
         .layout-container {
                 display: flex;
@@ -389,13 +419,8 @@
                 <input type="text" id="searchInput" name="searchTerm" placeholder="Tên, kí hiệu,..." value="${searchTerm}" />
                 <button type="submit" class="btn-primary">Tìm kiếm</button>
             </form>
-            <select id="statusFilter" onchange="filterByStatus(this.value)">
-                <option value="all">Tất cả trạng thái</option>
-                <option value="active">Hoạt động</option>
-                <option value="inactive">Ngừng hoạt động</option>
-            </select>
             <a href="createMaterialUnit" class="btn-primary">Thêm đơn vị mới</a>
-            <a href="../unit-statistics" class="btn-primary" style="background: #17a2b8; margin-left: 10px;">📊 Thống Kê Đơn Vị</a>
+            <a href="../unit-statistics" class="btn-primary" style="background: #17a2b8; margin-left: 10px;">Thống Kê Đơn Vị</a>
         </div>
 
         <script>
@@ -418,33 +443,31 @@
         }
         
         function toggleUnitStatus(unitId, currentStatus) {
+            console.log('toggleUnitStatus called with unitId:', unitId, 'currentStatus:', currentStatus);
             if (currentStatus == 1) {
                 // Deactivating - show options
                 if (confirm('Bạn có muốn ngừng hoạt động đơn vị này không?')) {
-                    // After deactivation, ask if user wants to delete
-                    if (confirm('Đơn vị đã được ngừng hoạt động. Bạn có muốn xóa đơn vị này luôn không?')) {
-                        // Redirect to deactivate and then delete
-                        window.location.href = 'deactivateMaterialUnit?id=' + unitId + '&deleteAfter=true';
-                    } else {
-                        // Just deactivate
-                        window.location.href = 'deactivateMaterialUnit?id=' + unitId;
-                    }
+                    console.log('Redirecting to deactivate URL');
+                    window.location.href = 'deactivateMaterialUnit?id=' + unitId;
                 }
             } else {
                 // Activating
                 if (confirm('Bạn có muốn kích hoạt đơn vị này không?')) {
+                    console.log('Redirecting to activate URL');
                     window.location.href = 'activateMaterialUnit?id=' + unitId;
                 }
             }
         }
         
         function deleteUnit(unitId, canDelete) {
+            console.log('deleteUnit called with unitId:', unitId, 'canDelete:', canDelete);
             if (!canDelete) {
                 alert('Không thể xóa đơn vị đang được sử dụng. Vui lòng ngừng hoạt động đơn vị trước, sau đó chọn xóa khi ngừng hoạt động.');
                 return;
             }
             
             if (confirm('Bạn có muốn xóa đơn vị này không?')) {
+                console.log('Redirecting to delete URL');
                 window.location.href = 'deleteMaterialUnit?id=' + unitId;
             }
         }
@@ -500,7 +523,7 @@
                     <th onclick="sortTable(2)">Kí hiệu ↕</th>
                     <th onclick="sortTable(3)">Mô tả ↕</th>
                     <th onclick="sortTable(4)">Trạng thái ↕</th>
-                    <th>Thao tác</th>
+                    <th class="action-column">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
@@ -527,18 +550,20 @@
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
-                                <td>
-                                    <a href="editMaterialUnit?id=${unit.id}" class="btn-edit">Thay đổi</a>
-                                    <c:choose>
-                                        <c:when test="${unit.status == 1}">
-                                            <button onclick="toggleUnitStatus(${unit.id}, ${unit.status})" class="btn-edit btn-deactivate">Ngừng hoạt động</button>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <button onclick="toggleUnitStatus(${unit.id}, ${unit.status})" class="btn-edit btn-activate">Kích hoạt</button>
-                                            <!-- Show delete option for inactive units -->
-                                            <button onclick="deleteUnit(${unit.id}, true)" class="btn-edit btn-delete">Xóa</button>
-                                        </c:otherwise>
-                                    </c:choose>
+                                <td class="action-column">
+                                    <div class="action-buttons">
+                                        <a href="editMaterialUnit?id=${unit.id}" class="btn-edit">✏️ Thay đổi</a>
+                                        <c:choose>
+                                            <c:when test="${unit.status == 1}">
+                                                <button onclick="toggleUnitStatus('${unit.id}', '${unit.status}')" class="btn-edit btn-deactivate">⏸️ Ngừng hoạt động</button>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <button onclick="toggleUnitStatus('${unit.id}', '${unit.status}')" class="btn-edit btn-activate">✅ Kích hoạt</button>
+                                                <!-- Show delete option for inactive units -->
+                                                <button onclick="deleteUnit('${unit.id}', true)" class="btn-edit btn-delete">🗑️ Xóa</button>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
                                 </td>
                             </tr>
                         </c:forEach>
