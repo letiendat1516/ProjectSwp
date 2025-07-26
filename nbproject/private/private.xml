@@ -3,6 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/UserDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/include/sidebar.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/categoriesforward.jsp</file>
@@ -49,6 +50,25 @@
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/AddProductController.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/SupplierEvaluationDAO.java</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/ProductInfoDAO.java</file>
+=======
+            <file>file:/D:/Project%20SWP/ProjectSwp/web/WEB-INF/web.xml</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ExportConfirmController.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/GetExportRequestWithItemsDAO.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ExportRequestItemsDAO.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/Users.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ListRequestExportController.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/web/ListRequestExport.jsp</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ApproveExportRequestServlet.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ExportRequestDAO.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/controller/ExportRequestController.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/test/TestExportRequestDAO.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ExportDAO.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/dao/ListRequestExportDAO.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/ExportRequestItem.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/DBContext/Context.java</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/web/ExportManagement.jsp</file>
+            <file>file:/D:/Project%20SWP/ProjectSwp/src/java/model/ExportRequest.java</file>
+>>>>>>> fa762af737b06f7bad2f50ac83eff6970e72fed2
         </group>
     </open-files>
 </project-private>

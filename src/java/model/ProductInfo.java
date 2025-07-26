@@ -22,21 +22,24 @@ public class ProductInfo {
     private Date createdDate;
     private int updatedBy;
     private Date updatedDate;
-    private BigDecimal stockQuantity;
+    private BigDecimal stockQuantity; // This will now be stored directly in product_info table as 'qty'
     private BigDecimal minStockThreshold;
+    private String stockStatus; // Stock status from the unified table
+    private String unitSymbol;
 
     // Default constructor
     public ProductInfo() {
     }
 
     // Constructor with basic fields
-    public ProductInfo(String name, String code, int cate_id, int unit_id, String status, String description) {
+    public ProductInfo(String name, String code, int cate_id, int unit_id, String status, String description,String unitSymbol) {
         this.name = name;
         this.code = code;
         this.cate_id = cate_id;
         this.unit_id = unit_id;
         this.status = status;
         this.description = description;
+        this.unitSymbol = unitSymbol;
     }
 
     // Getters and Setters
@@ -47,6 +50,13 @@ public class ProductInfo {
     public void setId(int id) {
         this.id = id;
     }
+    public String getUnitSymbol() {
+    return unitSymbol;
+}
+
+public void setUnitSymbol(String unitSymbol) {
+    this.unitSymbol = unitSymbol;
+}
 
     public String getName() {
         return name;
@@ -170,6 +180,14 @@ public class ProductInfo {
 
     public void setMinStockThreshold(BigDecimal minStockThreshold) {
         this.minStockThreshold = minStockThreshold;
+    }
+
+    public String getStockStatus() {
+        return stockStatus;
+    }
+
+    public void setStockStatus(String stockStatus) {
+        this.stockStatus = stockStatus;
     }
 
     @Override

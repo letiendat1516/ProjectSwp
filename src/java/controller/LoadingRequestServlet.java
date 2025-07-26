@@ -26,6 +26,7 @@ import model.Users;
 
 /**
  * Servlet xử lý yêu cầu mua hàng: hiển thị form và xử lý submit
+ *
  * @author Admin
  */
 public class LoadingRequestServlet extends HttpServlet {
@@ -61,26 +62,31 @@ public class LoadingRequestServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         Users currentUser = (Users) session.getAttribute("user");
 
-        // Khởi tạo các DAO
+        // **TỐI ƯU** - Chỉ gọi một lần getUserById để lấy đầy đủ thông tin
         UserDAO dao = new UserDAO();
-        String fullname = dao.getFullName(currentUser.getId());
+        Users userWithFullInfo = dao.getUserById(currentUser.getId());
+
+        String fullname = userWithFullInfo.getFullname();
+        String departmentName = userWithFullInfo.getDeptName();
+
         RequestInformationDAO requestInfo = new RequestInformationDAO();
         ProductInfoDAO product = new ProductInfoDAO();
-        
+
         // Lấy ID yêu cầu tiếp theo
         String nextID = requestInfo.getNextRequestId();
-        
-        // Lấy danh sách sản phẩm và đơn vị
-        List<ProductInfo> products_list = product.getAllProducts();
+
+        // Lấy danh sách sản phẩm với đơn vị đo
+        List<ProductInfo> products_list = product.getAllProductsWithUnitSymbols();
         MaterialUnitDAO unitDAO = new MaterialUnitDAO();
         List<MaterialUnit> unit_list = unitDAO.getAllMaterialUnits();
-        
+
         // Set attributes để hiển thị trên form
         request.setAttribute("nextID", nextID);
         request.setAttribute("products_list", products_list);
         request.setAttribute("unit_list", unit_list);
         session.setAttribute("currentUser", fullname);
-        
+        session.setAttribute("currentUserDepartment", departmentName);
+
         // Chuyển đến trang form
         request.getRequestDispatcher("ItemsSupplyRequestForm.jsp").forward(request, response);
     }
@@ -97,7 +103,7 @@ public class LoadingRequestServlet extends HttpServlet {
         String role = request.getParameter("role");
         String dayRequestStr = request.getParameter("day_request");
         String reason = request.getParameter("reason");
-        
+
         // Chuyển đổi string thành Date
         Date dayRequest = null;
         try {
@@ -109,34 +115,39 @@ public class LoadingRequestServlet extends HttpServlet {
         // Lấy thông tin chi tiết các mặt hàng (mảng từ multiple rows)
         String[] productNameArr = request.getParameterValues("product_name");
         String[] productCodeArr = request.getParameterValues("product_code");
-        String[] unitArr = request.getParameterValues("unit");
+
+        // Thay đổi từ unit thành unit_value để lấy tên đơn vị thay vì ký hiệu
+        String[] unitArr = request.getParameterValues("unit_value");
+
         String[] quantityArr = request.getParameterValues("quantity");
         String[] noteArr = request.getParameterValues("note");
-        
+
         // Chuyển đổi quantity từ string sang int
         int[] quantityIntArr = new int[quantityArr.length];
         for (int i = 0; i < quantityArr.length; i++) {
             try {
-                quantityIntArr[i] = Integer.parseInt(quantityArr[i]);
+                // Xử lý chuỗi định dạng số lượng (loại bỏ dấu phẩy ngăn cách hàng nghìn)
+                String cleanQuantity = quantityArr[i].replace(".", "").replace(",", ".");
+                quantityIntArr[i] = Integer.parseInt(cleanQuantity);
             } catch (NumberFormatException e) {
             }
         }
-        
+
         // Lấy user ID từ session
         HttpSession session = request.getSession(false);
         Users currentUser = (Users) session.getAttribute("user");
         String user_name = currentUser.getFullname();
-        
+
         // Khởi tạo DAO để lưu vào database
         RequestItemsDAO requestitemsDAO = new RequestItemsDAO();
         RequestInformationDAO requestInformationDAO = new RequestInformationDAO();
 
         // Lưu thông tin yêu cầu chính và lấy request_id
         String request_id = requestInformationDAO.addRequestInformationIntoDB(user_name, role, dayRequest, "pending", reason);
-        
+
         // Lưu chi tiết các items của yêu cầu
         requestitemsDAO.addItemsIntoDB(request_id, productNameArr, productCodeArr, unitArr, quantityIntArr, noteArr);
-        
+
         // Redirect đến trang thông báo thành công
         response.sendRedirect("RequestSuccessNotification.jsp");
     }

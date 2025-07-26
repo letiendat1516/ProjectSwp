@@ -1,16 +1,17 @@
 package controller;
 
 import dao.ListRequestExportDAO;
+import dao.ExportDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.ArrayList;
 import model.ExportRequestItem;
-
+import model.Users;
 
 public class ListRequestExportController extends HttpServlet {
 
@@ -41,14 +42,10 @@ public class ListRequestExportController extends HttpServlet {
                 if (pageParam != null && !pageParam.isEmpty()) {
                     if ("approved".equals(tab)) {
                         approvedPage = Integer.parseInt(pageParam);
-                        if (approvedPage < 1) {
-                            approvedPage = 1;
-                        }
+                        if (approvedPage < 1) approvedPage = 1;
                     } else if ("history".equals(tab)) {
                         historyPage = Integer.parseInt(pageParam);
-                        if (historyPage < 1) {
-                            historyPage = 1;
-                        }
+                        if (historyPage < 1) historyPage = 1;
                     }
                 }
             } catch (NumberFormatException e) {
@@ -62,7 +59,7 @@ public class ListRequestExportController extends HttpServlet {
             int historyPages = 0;
 
             // Lấy tổng số để hiển thị thống kê
-                        int totalApproved = dao.countApprovedExportItems(null, null);
+            int totalApproved = dao.countApprovedExportItems(null, null);
             int totalHistory = dao.countCompletedExportItems(null, null);
 
             if ("approved".equals(tab)) {
@@ -78,7 +75,6 @@ public class ListRequestExportController extends HttpServlet {
                 request.setAttribute("searchType", searchType);
                 request.setAttribute("searchValue", searchValue);
                 request.setAttribute("approvedTotal", approvedTotal);
-                request.setAttribute("currentPage", approvedPage);
 
             } else if ("history".equals(tab)) {
                 // Load dữ liệu cho tab history
@@ -93,7 +89,6 @@ public class ListRequestExportController extends HttpServlet {
                 request.setAttribute("historySearchType", historySearchType);
                 request.setAttribute("historySearchValue", historySearchValue);
                 request.setAttribute("historyTotal", historyTotal);
-                request.setAttribute("currentPage", historyPage);
             }
 
             // Set attributes
@@ -126,7 +121,9 @@ public class ListRequestExportController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        // Redirect tất cả POST requests về GET để tránh xung đột
+        // Các thao tác export sẽ được xử lý bởi ExportConfirmController
         doGet(request, response);
     }
 }
-

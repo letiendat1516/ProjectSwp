@@ -14,7 +14,11 @@ public class Context {
     public static Connection getJDBCConnection() {
         String url = "jdbc:mysql://localhost:3306/warehouse_offical";
         String user = "root";
+<<<<<<< HEAD
         String password = "letiendat";
+=======
+        String password = "admin";
+>>>>>>> fa762af737b06f7bad2f50ac83eff6970e72fed2
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             

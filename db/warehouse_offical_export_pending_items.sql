@@ -16,30 +16,31 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `supplier_evaluation`
+-- Table structure for table `export_pending_items`
 --
 
-DROP TABLE IF EXISTS `supplier_evaluation`;
+DROP TABLE IF EXISTS `export_pending_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `supplier_evaluation` (
+CREATE TABLE `export_pending_items` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `supplier_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `expected_delivery_time` int DEFAULT NULL,
-  `product_quality` int DEFAULT NULL,
-  `market_price_comparison` int DEFAULT NULL,
-  `transparency_reputation` int DEFAULT NULL,
-  `service_quality` int DEFAULT NULL,
-  `comment` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `avg_rate` decimal(2,1) DEFAULT NULL,
-  `comment_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  `edit_count` int DEFAULT '0',
+  `export_request_id` varchar(10) NOT NULL,
+  `product_name` varchar(255) DEFAULT NULL,
+  `product_code` varchar(50) NOT NULL,
+  `unit` varchar(50) DEFAULT NULL,
+  `unit_id` int DEFAULT NULL,
+  `quantity_requested` decimal(10,2) DEFAULT NULL,
+  `quantity_exported` decimal(10,2) DEFAULT '0.00',
+  `quantity_pending` decimal(10,2) DEFAULT NULL,
+  `note` varchar(255) DEFAULT NULL,
+  `product_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `supplier_id` (`supplier_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `supplier_evaluation_ibfk_1` FOREIGN KEY (`supplier_id`) REFERENCES `supplier` (`id`),
-  CONSTRAINT `supplier_evaluation_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  KEY `fk_export_pending_request_id` (`export_request_id`),
+  KEY `fk_export_pending_product_code` (`product_code`),
+  KEY `fk_export_pending_unit_id` (`unit_id`),
+  CONSTRAINT `fk_export_pending_product_code` FOREIGN KEY (`product_code`) REFERENCES `product_info` (`code`),
+  CONSTRAINT `fk_export_pending_request_id` FOREIGN KEY (`export_request_id`) REFERENCES `export_request` (`id`),
+  CONSTRAINT `fk_export_pending_unit_id` FOREIGN KEY (`unit_id`) REFERENCES `unit` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +53,4 @@ CREATE TABLE `supplier_evaluation` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-23 22:51:54
+-- Dump completed on 2025-07-22 13:38:33

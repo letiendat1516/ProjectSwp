@@ -2,147 +2,283 @@ package model;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
+/**
+ * Model class for Export Request
+ * Represents a warehouse export request with all necessary information
+ */
 public class ExportRequest {
-    private String id;
-    private int userId;
-    private Date dayRequest;
-    private String status;
-    private String approveBy;
-    private String role;
-    private String reason;        // Thêm field này
-    private String rejectReason;  // Thêm field này
-    private Timestamp createdAt;
 
-    // Constructor mặc định
-    public ExportRequest() {
-    }
+  private String id;
+  private int userId;
+  private String role;
+  private Date dayRequest;
+  private String status; // pending, approved, rejected, completed
+  private String reason;
+  private String rejectReason;
+  private String department;
+  private String recipientName;
+  private String recipientPhone;
+  private String recipientEmail;
+  private String approveBy;
+  private String warehouse;
+  private ArrayList<ExportRequestItem> items;
+  private String requesterName;
+  private Timestamp createdAt;
+  
+  // New fields from the first file
+  private Date exportDate;
+  private String exportedBy;
+  private String exportNote;
+  private Timestamp updatedAt;
 
-    // Constructor đầy đủ
-    public ExportRequest(String id, int userId, Date dayRequest, String status, 
-                        String approveBy, String role, String reason, 
-                        String rejectReason, Timestamp createdAt) {
-        this.id = id;
-        this.userId = userId;
-        this.dayRequest = dayRequest;
-        this.status = status;
-        this.approveBy = approveBy;
-        this.role = role;
-        this.reason = reason;
-        this.rejectReason = rejectReason;
-        this.createdAt = createdAt;
-    }
+  // Default constructor
+  public ExportRequest() {
+  }
 
-    // Getters và Setters
-    public String getId() {
-        return id;
-    }
+  // Constructor with basic parameters
+  public ExportRequest(String id, int userId, Date dayRequest, String status, 
+                      String approveBy, String role, String reason) {
+      this.id = id;
+      this.userId = userId;
+      this.dayRequest = dayRequest;
+      this.status = status;
+      this.approveBy = approveBy;
+      this.role = role;
+      this.reason = reason;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  // Full constructor with all parameters
+  public ExportRequest(String id, int userId, String role, Date dayRequest, String status, 
+                      String reason, String rejectReason, String department, String recipientName, 
+                      String recipientPhone, String recipientEmail, String approveBy, 
+                      String warehouse, ArrayList<ExportRequestItem> items, String requesterName, 
+                      Timestamp createdAt) {
+      this.id = id;
+      this.userId = userId;
+      this.role = role;
+      this.dayRequest = dayRequest;
+      this.status = status;
+      this.reason = reason;
+      this.rejectReason = rejectReason;
+      this.department = department;
+      this.recipientName = recipientName;
+      this.recipientPhone = recipientPhone;
+      this.recipientEmail = recipientEmail;
+      this.approveBy = approveBy;
+      this.warehouse = warehouse;
+      this.items = items;
+      this.requesterName = requesterName;
+      this.createdAt = createdAt;
+  }
 
-    public int getUserId() {
-        return userId;
-    }
+  // Getters and Setters
+  public String getId() {
+      return id;
+  }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
+  public void setId(String id) {
+      this.id = id;
+  }
 
-    public Date getDayRequest() {
-        return dayRequest;
-    }
+  public int getUserId() {
+      return userId;
+  }
 
-    public void setDayRequest(Date dayRequest) {
-        this.dayRequest = dayRequest;
-    }
+  public void setUserId(int userId) {
+      this.userId = userId;
+  }
 
-    public String getStatus() {
-        return status;
-    }
+  public String getRole() {
+      return role;
+  }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+  public void setRole(String role) {
+      this.role = role;
+  }
 
-    public String getApproveBy() {
-        return approveBy;
-    }
+  public Date getDayRequest() {
+      return dayRequest;
+  }
 
-    public void setApproveBy(String approveBy) {
-        this.approveBy = approveBy;
-    }
+  public void setDayRequest(Date dayRequest) {
+      this.dayRequest = dayRequest;
+  }
 
-    public String getRole() {
-        return role;
-    }
+  public String getStatus() {
+      return status;
+  }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
+  public void setStatus(String status) {
+      this.status = status;
+  }
 
-    public String getReason() {
-        return reason;
-    }
+  public String getReason() {
+      return reason;
+  }
 
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
+  public void setReason(String reason) {
+      this.reason = reason;
+  }
 
-    public String getRejectReason() {
-        return rejectReason;
-    }
+  public String getRejectReason() {
+      return rejectReason;
+  }
 
-    public void setRejectReason(String rejectReason) {
-        this.rejectReason = rejectReason;
-    }
+  public void setRejectReason(String rejectReason) {
+      this.rejectReason = rejectReason;
+  }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
+  public String getDepartment() {
+      return department;
+  }
 
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
+  public void setDepartment(String department) {
+      this.department = department;
+  }
 
-    // Utility methods
-    public boolean isPending() {
-        return "pending".equals(this.status);
-    }
+  public String getRecipientName() {
+      return recipientName;
+  }
 
-    public boolean isApproved() {
-        return "approved".equals(this.status);
-    }
+  public void setRecipientName(String recipientName) {
+      this.recipientName = recipientName;
+  }
 
-    public boolean isRejected() {
-        return "rejected".equals(this.status);
-    }
+  public String getRecipientPhone() {
+      return recipientPhone;
+  }
 
-    public boolean isCompleted() {
-        return "completed".equals(this.status);
-    }
+  public void setRecipientPhone(String recipientPhone) {
+      this.recipientPhone = recipientPhone;
+  }
 
-    public boolean isPartialExported() {
-        return "partial_exported".equals(this.status);
-    }
+  public String getRecipientEmail() {
+      return recipientEmail;
+  }
 
-    public boolean canBeProcessed() {
-        return isApproved() || isPartialExported();
-    }
+  public void setRecipientEmail(String recipientEmail) {
+      this.recipientEmail = recipientEmail;
+  }
 
-    @Override
-    public String toString() {
-        return "ExportRequest{" +
-                "id='" + id + '\'' +
-                ", userId=" + userId +
-                ", dayRequest=" + dayRequest +
-                ", status='" + status + '\'' +
-                ", approveBy='" + approveBy + '\'' +
-                ", role='" + role + '\'' +
-                ", reason='" + reason + '\'' +
-                ", rejectReason='" + rejectReason + '\'' +
-                ", createdAt=" + createdAt +
-                '}';
-    }
+  public String getApproveBy() {
+      return approveBy;
+  }
+
+  public void setApproveBy(String approveBy) {
+      this.approveBy = approveBy;
+  }
+
+  public String getWarehouse() {
+      return warehouse;
+  }
+
+  public void setWarehouse(String warehouse) {
+      this.warehouse = warehouse;
+  }
+
+  public ArrayList<ExportRequestItem> getItems() {
+      return items;
+  }
+
+  public void setItems(ArrayList<ExportRequestItem> items) {
+      this.items = items;
+  }
+
+  public String getRequesterName() {
+      return requesterName;
+  }
+
+  public void setRequesterName(String requesterName) {
+      this.requesterName = requesterName;
+  }
+
+  public Timestamp getCreatedAt() {
+      return createdAt;
+  }
+
+  public void setCreatedAt(Timestamp createdAt) {
+      this.createdAt = createdAt;
+  }
+
+  // New getters and setters from the first file
+  public Date getExportDate() {
+      return exportDate;
+  }
+
+  public void setExportDate(Date exportDate) {
+      this.exportDate = exportDate;
+  }
+
+  public String getExportedBy() {
+      return exportedBy;
+  }
+
+  public void setExportedBy(String exportedBy) {
+      this.exportedBy = exportedBy;
+  }
+
+  public String getExportNote() {
+      return exportNote;
+  }
+
+  public void setExportNote(String exportNote) {
+      this.exportNote = exportNote;
+  }
+
+  public Timestamp getUpdatedAt() {
+      return updatedAt;
+  }
+
+  public void setUpdatedAt(Timestamp updatedAt) {
+      this.updatedAt = updatedAt;
+  }
+
+  // Utility methods
+  public boolean isPending() {
+      return "pending".equals(this.status);
+  }
+
+  public boolean isApproved() {
+      return "approved".equals(this.status);
+  }
+
+  public boolean isRejected() {
+      return "rejected".equals(this.status);
+  }
+
+  public boolean isCompleted() {
+      return "completed".equals(this.status);
+  }
+
+  public boolean canBeProcessed() {
+      return isApproved();
+  }
+
+  @Override
+  public String toString() {
+      return "ExportRequest{" +
+              "id='" + id + '\'' +
+              ", userId=" + userId +
+              ", role='" + role + '\'' +
+              ", dayRequest=" + dayRequest +
+              ", status='" + status + '\'' +
+              ", reason='" + reason + '\'' +
+              ", rejectReason='" + rejectReason + '\'' +
+              ", department='" + department + '\'' +
+              ", recipientName='" + recipientName + '\'' +
+              ", recipientPhone='" + recipientPhone + '\'' +
+              ", recipientEmail='" + recipientEmail + '\'' +
+              ", approveBy='" + approveBy + '\'' +
+              ", warehouse='" + warehouse + '\'' +
+              ", exportDate=" + exportDate +
+              ", exportedBy='" + exportedBy + '\'' +
+              ", exportNote='" + exportNote + '\'' +
+              ", items=" + items +
+              ", requesterName='" + requesterName + '\'' +
+              ", createdAt=" + createdAt +
+              ", updatedAt=" + updatedAt +
+              '}';
+  }
 }

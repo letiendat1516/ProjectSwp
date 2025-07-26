@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+    
     <!-- ========== SERVLET DEFINITIONS ========== -->
-
-    <!-- Category Parent Controller (đã có @WebServlet annotation) -->
-    <!-- Không cần khai báo servlet cho CategoryParentController vì đã dùng annotation -->
 
     <!-- Category Servlet -->
     <servlet>
         <servlet-name>CategoryServlet</servlet-name>
         <servlet-class>controller.CategoryServlet</servlet-class>
     </servlet>
+    
     <!-- Authentication Servlets -->
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
@@ -19,6 +18,7 @@
         <servlet-name>LogoutServlet</servlet-name>
         <servlet-class>controller.LogoutServlet</servlet-class>
     </servlet>
+    
     <!-- User Management Servlets -->
     <servlet>
         <servlet-name>AdduserServlet</servlet-name>
@@ -49,11 +49,25 @@
         <servlet-name>ImportConfirmController</servlet-name>
         <servlet-class>controller.ImportConfirmController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ListRequestExportController</servlet-name>
+        <servlet-class>controller.ListRequestExportController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExportConfirmController</servlet-name>
+        <servlet-class>controller.ExportConfirmController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ApproveExportRequestServlet</servlet-name>
+        <servlet-class>controller.ApproveExportRequestServlet</servlet-class>
+    </servlet>
+    
     <!-- Role Management Servlet -->
     <servlet>
         <servlet-name>RolePermissionServlet</servlet-name>
         <servlet-class>controller.RolePermissionServlet</servlet-class>
     </servlet>
+    
     <!-- Profile Management Servlets -->
     <servlet>
         <servlet-name>ProfileServlet</servlet-name>
@@ -63,6 +77,7 @@
         <servlet-name>EditProfileServlet</servlet-name>
         <servlet-class>controller.EditProfileServlet</servlet-class>
     </servlet>
+    
     <!-- Forgot Password Servlets -->
     <servlet>
         <servlet-name>ForgotPasswordServlet</servlet-name>
@@ -76,6 +91,7 @@
         <servlet-name>ResetUserPasswordServlet</servlet-name>
         <servlet-class>controller.ResetUserPasswordServlet</servlet-class>
     </servlet>
+
     <!-- Material Unit Management Servlets -->
     <servlet>
         <servlet-name>MaterialUnitServlet</servlet-name>
@@ -93,12 +109,26 @@
         <servlet-name>DeleteMaterialUnitServlet</servlet-name>
         <servlet-class>controller.DeleteMaterialUnitServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ActivateMaterialUnitServlet</servlet-name>
+        <servlet-class>controller.ActivateMaterialUnitServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeactivateMaterialUnitServlet</servlet-name>
+        <servlet-class>controller.DeactivateMaterialUnitServlet</servlet-class>
+    </servlet>
+    
     <!-- Export Request -->
     <servlet>
         <servlet-name>ExportRequestController</servlet-name>
         <servlet-class>controller.ExportRequestController</servlet-class>
     </servlet>
+    
     <!-- Product Management -->
+    <servlet>
+        <servlet-name>AddProductFromRequestServlet</servlet-name>
+        <servlet-class>controller.AddProductFromRequestServlet</servlet-class>
+    </servlet>
     <servlet>
         <servlet-name>AddProductController</servlet-name>
         <servlet-class>controller.AddProductController</servlet-class>
@@ -115,6 +145,11 @@
         <servlet-name>ProductListController</servlet-name>
         <servlet-class>controller.ProductListController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ProductDetailController</servlet-name>
+        <servlet-class>controller.ProductDetailController</servlet-class>
+    </servlet>
+    
     <!-- Purchase Order Management -->
     <servlet>
         <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
@@ -144,7 +179,8 @@
         <servlet-name>SubmitRequoteFormServlet</servlet-name>
         <servlet-class>controller.SubmitRequoteFormServlet</servlet-class>
     </servlet>
-    <!-- Category Parent Statistics Servlet -->
+    
+    <!-- Statistics Servlets -->
     <servlet>
         <servlet-name>CategoryParentStatisticsController</servlet-name>
         <servlet-class>controller.CategoryParentStatisticsController</servlet-class>
@@ -153,20 +189,24 @@
         <servlet-name>CategoryStatisticsController</servlet-name>
         <servlet-class>controller.CategoryStatisticsController</servlet-class>
     </servlet>
+
+    <servlet>
+        <servlet-name>InventoryStatisticsController</servlet-name>
+        <servlet-class>controller.InventoryStatisticsController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UnitStatisticsController</servlet-name>
+        <servlet-class>controller.UnitStatisticsController</servlet-class>
+    </servlet>
+   
     <!-- ========== SERVLET MAPPINGS ========== -->
+    
     <!-- Category Mapping -->
-    <servlet>
-        <servlet-name>ListRequestExportController</servlet-name>
-        <servlet-class>controller.ListRequestExportController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ExportConfirmController</servlet-name>
-        <servlet-class>controller.ExportConfirmController</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
         <url-pattern>/CategoryServlet</url-pattern>
     </servlet-mapping>
+    
     <!-- Authentication Mappings -->
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
@@ -176,6 +216,7 @@
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
+    
     <!-- User Management Mappings -->
     <servlet-mapping>
         <servlet-name>AdduserServlet</servlet-name>
@@ -193,6 +234,7 @@
         <servlet-name>UserFilterServlet</servlet-name>
         <url-pattern>/userfilter</url-pattern>
     </servlet-mapping>
+
     <!-- Request Management Mappings -->
     <servlet-mapping>
         <servlet-name>LoadingRequestServlet</servlet-name>
@@ -206,11 +248,25 @@
         <servlet-name>ImportConfirmController</servlet-name>
         <url-pattern>/import-confirm</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ListRequestExportController</servlet-name>
+        <url-pattern>/exportList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExportConfirmController</servlet-name>
+        <url-pattern>/export</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ApproveExportRequestServlet</servlet-name>
+        <url-pattern>/approveexportrequest</url-pattern>
+    </servlet-mapping>
+    
     <!-- Role Management Mapping -->
     <servlet-mapping>
         <servlet-name>RolePermissionServlet</servlet-name>
         <url-pattern>/role-permission</url-pattern>
     </servlet-mapping>
+    
     <!-- Profile Management Mappings -->
     <servlet-mapping>
         <servlet-name>ProfileServlet</servlet-name>
@@ -220,6 +276,7 @@
         <servlet-name>EditProfileServlet</servlet-name>
         <url-pattern>/editprofile</url-pattern>
     </servlet-mapping>
+    
     <!-- Reset Password Mappings -->
     <servlet-mapping>
         <servlet-name>ForgotPasswordServlet</servlet-name>
@@ -233,6 +290,7 @@
         <servlet-name>ResetUserPasswordServlet</servlet-name>
         <url-pattern>/reset-user-password</url-pattern>
     </servlet-mapping>
+
     <!-- Material Unit Management Mappings -->
     <servlet-mapping>
         <servlet-name>MaterialUnitServlet</servlet-name>
@@ -250,12 +308,26 @@
         <servlet-name>DeleteMaterialUnitServlet</servlet-name>
         <url-pattern>/material_unit/deleteMaterialUnit</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ActivateMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/activateMaterialUnit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeactivateMaterialUnitServlet</servlet-name>
+        <url-pattern>/material_unit/deactivateMaterialUnit</url-pattern>
+    </servlet-mapping>
+    
     <!-- Export Request Mapping -->
     <servlet-mapping>
         <servlet-name>ExportRequestController</servlet-name>
         <url-pattern>/exportRequest</url-pattern>
     </servlet-mapping>
+    
     <!-- Product Management Mappings -->
+    <servlet-mapping>
+        <servlet-name>AddProductFromRequestServlet</servlet-name>
+        <url-pattern>/add-product-request</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AddProductController</servlet-name>
         <url-pattern>/add-product</url-pattern>
@@ -272,6 +344,11 @@
         <servlet-name>ProductListController</servlet-name>
         <url-pattern>/product-list</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProductDetailController</servlet-name>
+        <url-pattern>/product-detail</url-pattern>
+    </servlet-mapping>
+    
     <!-- Purchase Order Mappings -->
     <servlet-mapping>
         <servlet-name>ApprovePurchaseRequestServlet</servlet-name>
@@ -301,7 +378,8 @@
         <servlet-name>SubmitRequoteFormServlet</servlet-name>
         <url-pattern>/submitrequoteform</url-pattern>
     </servlet-mapping>
-    <!-- Category Parent Statistics Mapping -->
+    
+    <!-- Statistics Mappings -->
     <servlet-mapping>
         <servlet-name>CategoryParentStatisticsController</servlet-name>
         <url-pattern>/category-parent/statistics</url-pattern>
@@ -310,7 +388,17 @@
         <servlet-name>CategoryStatisticsController</servlet-name>
         <url-pattern>/category/statistics</url-pattern>
     </servlet-mapping>
-    <!-- ========== FILTERS ========== -->
+
+    <servlet-mapping>
+        <servlet-name>InventoryStatisticsController</servlet-name>
+        <url-pattern>/inventory-statistics</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UnitStatisticsController</servlet-name>
+        <url-pattern>/unit-statistics</url-pattern>
+    </servlet-mapping>
+
+    
     <!-- UTF-8 Encoding Filter -->
     <filter>
         <filter-name>encodingFilter</filter-name>
@@ -377,7 +465,6 @@
         <url-pattern>/department/edit</url-pattern>
         <url-pattern>/Department_detail.jsp</url-pattern>
         <url-pattern>/department/detail</url-pattern>
-        <url-pattern>/Department_list.jsp</url-pattern>
         <url-pattern>/department/statistics</url-pattern>
         <url-pattern>/material_unit/materialUnit.jsp</url-pattern>
         <url-pattern>/material_unit/materialUnit</url-pattern>
@@ -395,17 +482,11 @@
         <url-pattern>/deleted-products.jsp</url-pattern>
         <url-pattern>/deleted-products</url-pattern>
         <url-pattern>/recover-product</url-pattern>
-        <url-pattern>/ItemsSupplyRequestForm.jsp</url-pattern>
+        <url-pattern>/product-detail.jsp</url-pattern>
+        <url-pattern>/product-detail</url-pattern>
         <url-pattern>/loadingrequest</url-pattern>
-        <url-pattern>/ListRequestImport.jsp</url-pattern>
-        <url-pattern>/import</url-pattern>
-        <url-pattern>/ExportRequest.jsp</url-pattern>
-        <url-pattern>/exportRequest</url-pattern>
-        <url-pattern>/ListPurchaseOrder.jsp</url-pattern>
-        <url-pattern>/listpurchaseorder</url-pattern>
-        <url-pattern>/password_request.jsp</url-pattern>
-        <url-pattern>/passwordrequest</url-pattern>
     </filter-mapping>
+    
     <!-- ========== SESSION CONFIGURATION ========== -->
     <!-- Session Configuration -->
     <servlet-mapping>
@@ -416,15 +497,18 @@
         <servlet-name>ExportConfirmController</servlet-name>
         <url-pattern>/export</url-pattern>
     </servlet-mapping>
+
     <session-config>
         <session-timeout>15</session-timeout>
         <!-- 15 phút -->
     </session-config>
+    
     <!-- ========== WELCOME FILES ========== -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
         <welcome-file>login.jsp</welcome-file>
     </welcome-file-list>
+    
     <!-- ========== ERROR PAGES ========== -->
     <error-page>
         <error-code>404</error-code>
@@ -434,4 +518,5 @@
         <error-code>500</error-code>
         <location>/error/500.jsp</location>
     </error-page>
+    
 </web-app>
