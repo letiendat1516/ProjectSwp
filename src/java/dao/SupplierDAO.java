@@ -307,15 +307,4 @@ public class SupplierDAO {
         return null;
     }
 
-    public static void main(String[] args) {
-        SupplierDAO sd = new SupplierDAO();
-        Supplier s = sd.getSupplierByName("Công ty TNHH Bao Bì Bình Minh");
-        int n = sd.countTotalSuppliers();
-        System.out.println(n);
-        System.out.println(s.getSupplierID());
-        // limit (offset),(limit)
-        List<Supplier> l = sd.getSuppliersByPage(2, 5);
-        System.out.println(l.get(0).getEmail());
-    }
-
 }

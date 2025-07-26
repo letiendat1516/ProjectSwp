@@ -8,7 +8,6 @@ import model.Unit;
 import model.Supplier;
 import model.Users;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -66,8 +65,6 @@ public class AddProductController extends HttpServlet {
           String supplierIdStr = request.getParameter("supplierId");
           String expirationDateStr = request.getParameter("expirationDate");
           String additionalNotes = request.getParameter("additionalNotes");
-          String stockQuantityStr = request.getParameter("stockQuantity");
-          String minStockThresholdStr = request.getParameter("minStockThreshold");
           
           // Validate required fields
           String validationError = validateInput(name, code, categoryIdStr, unitIdStr, status);
@@ -106,22 +103,6 @@ public class AddProductController extends HttpServlet {
           product.setStatus(status);
           product.setDescription(description != null ? description.trim() : "");
           
-          // Set initial stock quantity
-          if (stockQuantityStr != null && !stockQuantityStr.trim().isEmpty()) {
-              try {
-                  BigDecimal stockQuantity = new BigDecimal(stockQuantityStr.trim());
-                  if (stockQuantity.compareTo(BigDecimal.ZERO) >= 0) {
-                      product.setStockQuantity(stockQuantity);
-                  } else {
-                      product.setStockQuantity(BigDecimal.ZERO);
-                  }
-              } catch (NumberFormatException e) {
-                  product.setStockQuantity(BigDecimal.ZERO);
-              }
-          } else {
-              product.setStockQuantity(BigDecimal.ZERO);
-          }
-          
           // Set optional fields
           if (supplierIdStr != null && !supplierIdStr.isEmpty()) {
               product.setSupplierId(Integer.parseInt(supplierIdStr));
@@ -135,22 +116,6 @@ public class AddProductController extends HttpServlet {
           
           if (additionalNotes != null && !additionalNotes.isEmpty()) {
               product.setAdditionalNotes(additionalNotes.trim());
-          }
-          
-          // Set minimum stock threshold
-          if (minStockThresholdStr != null && !minStockThresholdStr.trim().isEmpty()) {
-              try {
-                  BigDecimal minStockThreshold = new BigDecimal(minStockThresholdStr.trim());
-                  if (minStockThreshold.compareTo(BigDecimal.ZERO) >= 0) {
-                      product.setMinStockThreshold(minStockThreshold);
-                  } else {
-                      product.setMinStockThreshold(BigDecimal.ZERO);
-                  }
-              } catch (NumberFormatException e) {
-                  product.setMinStockThreshold(BigDecimal.ZERO);
-              }
-          } else {
-              product.setMinStockThreshold(BigDecimal.ZERO);
           }
           
           // Add product to database

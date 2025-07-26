@@ -73,7 +73,7 @@ public class PurchaseOrderDAO {
         } finally {
             try {
                 if (con != null) {
-con.setAutoCommit(true);
+                    con.setAutoCommit(true);
                     con.close();
                 }
             } catch (SQLException e) {
@@ -147,7 +147,7 @@ con.setAutoCommit(true);
             System.out.println("=== COMPLETED: Found " + purchaseOrders.size() + " purchase orders ===");
 
         } catch (Exception e) {
-System.out.println("Error in getAllPurchaseOrders: " + e.getMessage());
+            System.out.println("Error in getAllPurchaseOrders: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -233,7 +233,8 @@ System.out.println("Error in getAllPurchaseOrders: " + e.getMessage());
         }
 
         String placeholders = String.join(",", ids.stream().map(id -> "?").toArray(String[]::new));
-String sql = "SELECT po.id, po.fullname, po.day_purchase, po.day_quote, po.status, "
+
+        String sql = "SELECT po.id, po.fullname, po.day_purchase, po.day_quote, po.status, "
                 + "po.reason, po.supplier, po.address, po.phone, po.email, po.summary "
                 + "FROM purchase_order_info po "
                 + "WHERE po.id IN (" + placeholders + ") "
@@ -299,7 +300,7 @@ String sql = "SELECT po.id, po.fullname, po.day_purchase, po.day_quote, po.statu
                     item.setProductName(rs.getString("product_name"));
                     item.setProductCode(rs.getString("product_code"));
                     item.setUnit(rs.getString("unit"));
-item.setQuantity(rs.getBigDecimal("quantity"));
+                    item.setQuantity(rs.getBigDecimal("quantity"));
                     item.setPricePerUnit(rs.getBigDecimal("price_per_unit"));
                     item.setTotalPrice(rs.getBigDecimal("total_price"));
                     item.setNote(rs.getString("note"));
@@ -370,7 +371,7 @@ item.setQuantity(rs.getBigDecimal("quantity"));
 
         if (startDate != null && !startDate.trim().isEmpty()) {
             sql.append(" AND po.day_purchase >= ?");
-params.add(Date.valueOf(startDate));
+            params.add(Date.valueOf(startDate));
         }
 
         if (endDate != null && !endDate.trim().isEmpty()) {
@@ -452,7 +453,7 @@ params.add(Date.valueOf(startDate));
             ps.setString(2, supplier);
             ps.setString(3, address);
             ps.setString(4, phone);
-ps.setString(5, email);
+            ps.setString(5, email);
             ps.setString(6, summary);
             ps.setString(7, purchaseOrderId);
 
@@ -524,7 +525,7 @@ ps.setString(5, email);
         try (Connection con = Context.getJDBCConnection()) {
             String sql = "SELECT poi.purchase_id, poi.product_code, poi.quantity, " +
                         "pi.id as product_id, pi.name as product_name, " +
-"pis.qty as current_stock " +
+                        "pis.qty as current_stock " +
                         "FROM purchase_order_items poi " +
                         "INNER JOIN purchase_order_info po ON poi.purchase_id = po.id " +
                         "LEFT JOIN product_info pi ON poi.product_code = pi.code " +
@@ -580,7 +581,7 @@ ps.setString(5, email);
                         "pis.qty as current_stock " +
                         "FROM purchase_order_items poi " +
                         "LEFT JOIN product_info pi ON poi.product_code = pi.code " +
-"LEFT JOIN product_in_stock pis ON pi.id = pis.product_id " +
+                        "LEFT JOIN product_in_stock pis ON pi.id = pis.product_id " +
                         "WHERE poi.purchase_id = ? " +
                         "ORDER BY poi.product_code";
             
@@ -643,7 +644,7 @@ ps.setString(5, email);
             }
             
             String currentStatus = checkRs.getString("status");
-System.out.println("📋 Đơn " + purchaseOrderId + " hiện tại có status: " + currentStatus);
+            System.out.println("📋 Đơn " + purchaseOrderId + " hiện tại có status: " + currentStatus);
             
             // 2. Kiểm tra xem đã done chưa để tránh cộng trùng
             if ("done".equals(currentStatus)) {
@@ -711,7 +712,7 @@ System.out.println("📋 Đơn " + purchaseOrderId + " hiện tại có status: 
             
             // Lấy danh sách các đơn completed (chưa được cộng stock)
             String getCompletedOrdersSql = "SELECT id FROM purchase_order_info WHERE status = 'completed'";
-PreparedStatement getOrdersPs = con.prepareStatement(getCompletedOrdersSql);
+            PreparedStatement getOrdersPs = con.prepareStatement(getCompletedOrdersSql);
             ResultSet ordersRs = getOrdersPs.executeQuery();
             
             List<String> completedOrderIds = new ArrayList<>();
@@ -781,7 +782,7 @@ PreparedStatement getOrdersPs = con.prepareStatement(getCompletedOrdersSql);
      * Xem các đơn theo status để kiểm tra
      */
     public void showOrdersByStatus(String status) {
-try (Connection con = Context.getJDBCConnection()) {
+        try (Connection con = Context.getJDBCConnection()) {
             String sql = "SELECT id, fullname, day_purchase, status FROM purchase_order_info WHERE status = ? ORDER BY id";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, status);
@@ -849,7 +850,7 @@ try (Connection con = Context.getJDBCConnection()) {
     private boolean updateStockForSpecificOrder(Connection con, String purchaseOrderId) throws SQLException {
         // Lấy các items của đơn này
         String getItemsSql = "SELECT product_code, quantity FROM purchase_order_items WHERE purchase_id = ?";
-PreparedStatement getItemsPs = con.prepareStatement(getItemsSql);
+        PreparedStatement getItemsPs = con.prepareStatement(getItemsSql);
         getItemsPs.setString(1, purchaseOrderId);
         ResultSet itemsRs = getItemsPs.executeQuery();
         
@@ -898,3 +899,5 @@ PreparedStatement getItemsPs = con.prepareStatement(getItemsSql);
         return true; // Trả về true ngay cả khi có một số item không tìm thấy
     }
 }
+
+                
