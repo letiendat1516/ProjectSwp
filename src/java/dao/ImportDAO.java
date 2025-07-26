@@ -368,4 +368,31 @@ public class ImportDAO {
         }
         return history;
     }
+    // Thêm vào ImportDAO
+public boolean isOrderFullyImported(String purchaseOrderId) {
+    try (Connection con = Context.getJDBCConnection()) {
+        String sql = "SELECT COUNT(*) as total_items, " +
+                    "COUNT(CASE WHEN quantity_imported >= quantity_ordered THEN 1 END) as completed_items " +
+                    "FROM purchase_order_items " +
+                    "WHERE purchase_id = ?";
+        
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, purchaseOrderId);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            int totalItems = rs.getInt("total_items");
+            int completedItems = rs.getInt("completed_items");
+            
+            System.out.println("📊 Đơn " + purchaseOrderId + ": " + completedItems + "/" + totalItems + " items đã hoàn thành");
+            return totalItems > 0 && totalItems == completedItems;
+        }
+        
+    } catch (SQLException e) {
+        System.err.println("❌ Lỗi kiểm tra isOrderFullyImported: " + e.getMessage());
+        e.printStackTrace();
+    }
+    
+    return false;
+}
 }

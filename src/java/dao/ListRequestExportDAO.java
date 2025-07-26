@@ -13,7 +13,8 @@ import java.math.BigDecimal;
 public class ListRequestExportDAO {
 
     /**
-     * Lấy danh sách yêu cầu xuất kho đã duyệt với phân trang và tìm kiếm
+     * Lấy danh sách yêu cầu xuất kho đã duyệt (chỉ approved) với phân trang và
+     * tìm kiếm
      */
     public List<ExportRequestItem> getApprovedExportItems(String searchType, String searchValue, int page, int pageSize) {
         List<ExportRequestItem> list = new ArrayList<>();
@@ -32,20 +33,16 @@ public class ListRequestExportDAO {
                     .append("er.role, ")
                     .append("er.reason, ")
                     .append("er.reject_reason, ")
-                    .append("COALESCE(epi.product_name, eri.product_name) as product_name, ")
-                    .append("COALESCE(epi.product_code, eri.product_code) as product_code, ")
-                    .append("COALESCE(epi.unit, eri.unit) as unit, ")
-                    .append("COALESCE(epi.quantity_requested, eri.quantity) as quantity_requested, ")
-                    .append("COALESCE(epi.quantity_exported, 0) as quantity_exported, ")
-                    .append("COALESCE(epi.quantity_pending, eri.quantity) as quantity_pending, ")
-                    .append("COALESCE(epi.note, eri.note) as note ")
+                    .append("eri.product_name, ")
+                    .append("eri.product_code, ")
+                    .append("eri.unit, ")
+                    .append("eri.quantity, ")
+                    .append("eri.note, ")
+                    .append("eri.product_id, ")
+                    .append("eri.unit_id ")
                     .append("FROM export_request er ")
                     .append("INNER JOIN export_request_items eri ON er.id = eri.export_request_id ")
-                    .append("LEFT JOIN export_pending_items epi ON er.id = epi.export_request_id ")
-                    .append("    AND eri.product_code = epi.product_code ")
-                    .append("WHERE er.status IN ('approved', 'partial_exported') ");
-
-            sql.append("AND (epi.quantity_pending > 0 OR epi.id IS NULL) ");
+                    .append("WHERE er.status = 'approved' ");
 
             // Thêm điều kiện tìm kiếm
             if (searchValue != null && !searchValue.trim().isEmpty()) {
@@ -54,19 +51,15 @@ public class ListRequestExportDAO {
                         sql.append("AND er.id LIKE ? ");
                         break;
                     case "productName":
-                        sql.append("AND (epi.product_name LIKE ? OR eri.product_name LIKE ?) ");
+                        sql.append("AND eri.product_name LIKE ? ");
                         break;
                     case "productCode":
-                        sql.append("AND (epi.product_code LIKE ? OR eri.product_code LIKE ?) ");
+                        sql.append("AND eri.product_code LIKE ? ");
                         break;
                 }
             }
 
-            sql.append("ORDER BY ")
-                    .append("CASE WHEN er.status = 'partial_exported' THEN 0 ELSE 1 END, ")
-                    .append("er.day_request DESC, ")
-                    .append("er.id DESC, ")
-                    .append("COALESCE(epi.product_name, eri.product_name) ASC ");
+            sql.append("ORDER BY er.day_request DESC, er.id DESC, eri.product_name ASC ");
             sql.append("LIMIT ?, ?");
 
             conn = Context.getJDBCConnection();
@@ -75,16 +68,7 @@ public class ListRequestExportDAO {
             int paramIndex = 1;
             if (searchValue != null && !searchValue.trim().isEmpty()) {
                 String searchPattern = "%" + searchValue.trim() + "%";
-                switch (searchType != null ? searchType : "requestId") {
-                    case "requestId":
-                        ps.setString(paramIndex++, searchPattern);
-                        break;
-                    case "productName":
-                    case "productCode":
-                        ps.setString(paramIndex++, searchPattern);
-                        ps.setString(paramIndex++, searchPattern);
-                        break;
-                }
+                ps.setString(paramIndex++, searchPattern);
             }
 
             ps.setInt(paramIndex++, (page - 1) * pageSize);
@@ -106,7 +90,7 @@ public class ListRequestExportDAO {
     }
 
     /**
-     * Lấy danh sách lịch sử xuất kho hoàn thành
+     * Lấy danh sách yêu cầu xuất kho đã hoàn thành hoặc từ chối với phân trang và tìm kiếm
      */
     public List<ExportRequestItem> getCompletedExportItems(String searchType, String searchValue, int page, int pageSize) {
         List<ExportRequestItem> list = new ArrayList<>();
@@ -116,28 +100,20 @@ public class ListRequestExportDAO {
 
         try {
             StringBuilder sql = new StringBuilder();
-
             sql.append("SELECT ")
-                    .append("weh.export_request_id, ")
+                    .append("er.id as export_request_id, ")
                     .append("er.day_request, ")
                     .append("er.status, ")
-                    .append("er.user_id, ")
-                    .append("er.role, ")
                     .append("er.reason, ")
                     .append("er.reject_reason, ")
-                    .append("weh.product_name, ")
-                    .append("weh.product_code, ")
-                    .append("COALESCE(eri.unit, epi.unit) as unit, ")
-                    .append("COALESCE(eri.quantity, 0) as quantity_requested, ")
-                    .append("weh.quantity_exported, ")
-                    .append("weh.note, ")
-                    .append("weh.export_date ")
-                    .append("FROM warehouse_export_history weh ")
-                    .append("INNER JOIN export_request er ON weh.export_request_id = er.id ")
-                    .append("LEFT JOIN export_request_items eri ON er.id = eri.export_request_id ")
-                    .append("    AND weh.product_name = eri.product_name ")
-                    .append("LEFT JOIN export_pending_items epi ON er.id = epi.export_request_id ")
-                    .append("    AND weh.product_name = epi.product_name ")
+                    .append("eri.product_name, ")
+                    .append("eri.product_code, ")
+                    .append("eri.unit, ")
+                    .append("eri.quantity, ")
+                    .append("eri.exported_qty, ")
+                    .append("eri.note ")
+                    .append("FROM export_request er ")
+                    .append("INNER JOIN export_request_items eri ON er.id = eri.export_request_id ")
                     .append("WHERE er.status IN ('completed', 'rejected') ");
 
             // Thêm điều kiện tìm kiếm
@@ -147,15 +123,15 @@ public class ListRequestExportDAO {
                         sql.append("AND er.id LIKE ? ");
                         break;
                     case "productName":
-                        sql.append("AND weh.product_name LIKE ? ");
+                        sql.append("AND eri.product_name LIKE ? ");
                         break;
                     case "productCode":
-                        sql.append("AND weh.product_code LIKE ? ");
+                        sql.append("AND eri.product_code LIKE ? ");
                         break;
                 }
             }
 
-            sql.append("ORDER BY weh.export_date DESC, er.id DESC, weh.product_name ASC ");
+            sql.append("ORDER BY er.day_request DESC, er.id DESC ");
             sql.append("LIMIT ?, ?");
 
             conn = Context.getJDBCConnection();
@@ -170,8 +146,21 @@ public class ListRequestExportDAO {
             ps.setInt(paramIndex, pageSize);
 
             rs = ps.executeQuery();
+
             while (rs.next()) {
-                ExportRequestItem item = mapResultSetToCompletedExportItem(rs);
+                ExportRequestItem item = new ExportRequestItem();
+                item.setExportRequestId(rs.getString("export_request_id"));
+                item.setDayRequest(rs.getString("day_request"));
+                item.setStatus(rs.getString("status"));
+                item.setProductName(rs.getString("product_name"));
+                item.setProductCode(rs.getString("product_code"));
+                item.setUnit(rs.getString("unit"));
+                item.setQuantity(rs.getDouble("quantity"));
+                item.setExportedQty(rs.getDouble("exported_qty"));
+                item.setNote(rs.getString("note"));
+                item.setReasonDetail(rs.getString("reason"));
+                item.setRejectReason(rs.getString("reject_reason"));
+
                 list.add(item);
             }
 
@@ -186,7 +175,7 @@ public class ListRequestExportDAO {
     }
 
     /**
-     * Đếm số lượng approved export items
+     * Đếm số lượng approved export items (chỉ approved)
      */
     public int countApprovedExportItems(String searchType, String searchValue) {
         int count = 0;
@@ -196,13 +185,10 @@ public class ListRequestExportDAO {
 
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT COUNT(DISTINCT CONCAT(er.id, '-', COALESCE(epi.product_code, eri.product_code))) ")
+            sql.append("SELECT COUNT(DISTINCT CONCAT(er.id, '-', eri.product_code)) ")
                     .append("FROM export_request er ")
                     .append("INNER JOIN export_request_items eri ON er.id = eri.export_request_id ")
-                    .append("LEFT JOIN export_pending_items epi ON er.id = epi.export_request_id ")
-                    .append("    AND eri.product_code = epi.product_code ")
-                    .append("WHERE er.status IN ('approved', 'partial_exported') ")
-                    .append("AND (epi.quantity_pending > 0 OR epi.id IS NULL) ");
+                    .append("WHERE er.status = 'approved' ");
 
             // Thêm điều kiện tìm kiếm
             if (searchValue != null && !searchValue.trim().isEmpty()) {
@@ -211,10 +197,10 @@ public class ListRequestExportDAO {
                         sql.append("AND er.id LIKE ? ");
                         break;
                     case "productName":
-                        sql.append("AND (epi.product_name LIKE ? OR eri.product_name LIKE ?) ");
+                        sql.append("AND eri.product_name LIKE ? ");
                         break;
                     case "productCode":
-                        sql.append("AND (epi.product_code LIKE ? OR eri.product_code LIKE ?) ");
+                        sql.append("AND eri.product_code LIKE ? ");
                         break;
                 }
             }
@@ -225,16 +211,7 @@ public class ListRequestExportDAO {
             int paramIndex = 1;
             if (searchValue != null && !searchValue.trim().isEmpty()) {
                 String searchPattern = "%" + searchValue.trim() + "%";
-                switch (searchType != null ? searchType : "requestId") {
-                    case "requestId":
-                        ps.setString(paramIndex, searchPattern);
-                        break;
-                    case "productName":
-                    case "productCode":
-                        ps.setString(paramIndex++, searchPattern);
-                        ps.setString(paramIndex, searchPattern);
-                        break;
-                }
+                ps.setString(paramIndex, searchPattern);
             }
 
             rs = ps.executeQuery();
@@ -252,7 +229,7 @@ public class ListRequestExportDAO {
     }
 
     /**
-     * Đếm số lượng completed export items
+     * Đếm số lượng completed export items - SỬA LẠI ĐỂ DÙNG export_request và export_request_items
      */
     public int countCompletedExportItems(String searchType, String searchValue) {
         int count = 0;
@@ -262,8 +239,9 @@ public class ListRequestExportDAO {
 
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT COUNT(*) FROM warehouse_export_history weh ")
-                    .append("INNER JOIN export_request er ON weh.export_request_id = er.id ")
+            sql.append("SELECT COUNT(*) ")
+                    .append("FROM export_request er ")
+                    .append("INNER JOIN export_request_items eri ON er.id = eri.export_request_id ")
                     .append("WHERE er.status IN ('completed', 'rejected') ");
 
             // Thêm điều kiện tìm kiếm
@@ -273,10 +251,10 @@ public class ListRequestExportDAO {
                         sql.append("AND er.id LIKE ? ");
                         break;
                     case "productName":
-                        sql.append("AND weh.product_name LIKE ? ");
+                        sql.append("AND eri.product_name LIKE ? ");
                         break;
                     case "productCode":
-                        sql.append("AND weh.product_code LIKE ? ");
+                        sql.append("AND eri.product_code LIKE ? ");
                         break;
                 }
             }
@@ -303,6 +281,37 @@ public class ListRequestExportDAO {
         return count;
     }
 
+    /**
+     * Đếm tổng số export requests đã hoàn thành (cho thống kê)
+     */
+    public int getCompletedExportRequestsCount() {
+        int count = 0;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            String sql = "SELECT COUNT(DISTINCT er.id) FROM export_request er " +
+                        "WHERE er.status IN ('completed', 'rejected')";
+
+            conn = Context.getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error counting completed export requests: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeResources(conn, ps, rs);
+        }
+
+        return count;
+    }
+
     // Helper methods để map ResultSet
     private ExportRequestItem mapResultSetToExportRequestItem(ResultSet rs) throws SQLException {
         ExportRequestItem item = new ExportRequestItem();
@@ -315,17 +324,11 @@ public class ListRequestExportDAO {
             item.setProductCode(rs.getString("product_code"));
             item.setUnit(rs.getString("unit"));
 
-            BigDecimal quantityRequested = rs.getBigDecimal("quantity_requested");
-            BigDecimal quantityExported = rs.getBigDecimal("quantity_exported");
-            BigDecimal quantityPending = rs.getBigDecimal("quantity_pending");
+            BigDecimal quantity = rs.getBigDecimal("quantity");
+            item.setQuantity(quantity != null ? quantity.doubleValue() : 0.0);
 
-            item.setQuantityRequested(quantityRequested != null ? quantityRequested.doubleValue() : 0.0);
-            item.setQuantityExported(quantityExported != null ? quantityExported.doubleValue() : 0.0);
-            item.setQuantityPending(quantityPending != null ? quantityPending.doubleValue() : 0.0);
-
-            // Set cho compatibility
-            item.setQuantity(item.getQuantityRequested());
-            item.setExportedQty(item.getQuantityExported());
+            // Cho approved items, chưa có số lượng đã xuất
+            item.setQuantityExported(0.0);
 
             item.setNote(rs.getString("note"));
             item.setReasonDetail(rs.getString("reason"));
@@ -338,7 +341,7 @@ public class ListRequestExportDAO {
                 item.setExportRequestId("N/A");
             }
             if (item.getStatus() == null) {
-                item.setStatus("unknown");
+                item.setStatus("approved");
             }
             if (item.getProductName() == null) {
                 item.setProductName("N/A");
@@ -353,7 +356,7 @@ public class ListRequestExportDAO {
 
         try {
             item.setExportRequestId(rs.getString("export_request_id"));
-            item.setDayRequest(rs.getString("export_date")); // Sử dụng export_date thay vì day_request
+            item.setDayRequest(rs.getString("export_date"));
             item.setStatus(rs.getString("status"));
             item.setProductName(rs.getString("product_name"));
             item.setProductCode(rs.getString("product_code"));
@@ -362,10 +365,7 @@ public class ListRequestExportDAO {
             BigDecimal quantityRequested = rs.getBigDecimal("quantity_requested");
             BigDecimal quantityExported = rs.getBigDecimal("quantity_exported");
 
-            item.setQuantityRequested(quantityRequested != null ? quantityRequested.doubleValue() : 0.0);
-            item.setQuantity(item.getQuantityRequested());
-
-            // Cho lịch sử, quantity exported chính là quantity đã xuất
+            item.setQuantity(quantityRequested != null ? quantityRequested.doubleValue() : 0.0);
             item.setExportedQty(quantityExported != null ? quantityExported.doubleValue() : 0.0);
 
             item.setNote(rs.getString("note"));

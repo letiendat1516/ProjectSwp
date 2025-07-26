@@ -3,189 +3,170 @@ package model;
 import java.util.Date;
 
 public class ExportRequestItem {
-  private int id;
-  private String exportRequestId;
-  private String productName;
-  private String productCode;
-  private String unit;
-  private double quantity;
-  private String note;
-  private int productId;
-  private int unitId;
-  
-  // Các trường cho xuất kho từng phần
-  private double quantityRequested;
-  private double quantityExported;
-  private double quantityPending;
-  private double exportQuantity; // Số lượng xuất lần này
-  
-  // Các trường khác
-  private String dayRequest;
-  private String status;
-  private String reasonDetail;
-  private String rejectReason;
-  private double exportedQty; // Compatibility field
+    private int id;
+    private String exportRequestId;
+    private String productName;
+    private String productCode;
+    private String unit;
+    private double quantity;
+    private String note;
+    private int productId;
+    private int unitId;
+    
+    // Các trường khác
+    private String dayRequest;
+    private String status;
+    private String reasonDetail;
+    private String rejectReason;
+    private double exportedQty; // Số lượng đã xuất (cho lịch sử)
+    private double quantityExported; // Alias cho exportedQty
 
-  // Constructors
-  public ExportRequestItem() {}
+    // Constructors
+    public ExportRequestItem() {}
 
-  // Getters and Setters
-  public int getId() {
-      return id;
-  }
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
 
-  public void setId(int id) {
-      this.id = id;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public String getExportRequestId() {
-      return exportRequestId;
-  }
+    public String getExportRequestId() {
+        return exportRequestId;
+    }
 
-  public void setExportRequestId(String exportRequestId) {
-      this.exportRequestId = exportRequestId;
-  }
+    public void setExportRequestId(String exportRequestId) {
+        this.exportRequestId = exportRequestId;
+    }
 
-  public String getProductName() {
-      return productName;
-  }
+    public String getProductName() {
+        return productName;
+    }
 
-  public void setProductName(String productName) {
-      this.productName = productName;
-  }
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
 
-  public String getProductCode() {
-      return productCode;
-  }
+    public String getProductCode() {
+        return productCode;
+    }
 
-  public void setProductCode(String productCode) {
-      this.productCode = productCode;
-  }
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
+    }
 
-  public String getUnit() {
-      return unit;
-  }
+    public String getUnit() {
+        return unit;
+    }
 
-  public void setUnit(String unit) {
-      this.unit = unit;
-  }
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
-  public double getQuantity() {
-      return quantity;
-  }
+    public double getQuantity() {
+        return quantity;
+    }
 
-  public void setQuantity(double quantity) {
-      this.quantity = quantity;
-  }
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
+    }
 
-  public String getNote() {
-      return note;
-  }
+    public String getNote() {
+        return note;
+    }
 
-  public void setNote(String note) {
-      this.note = note;
-  }
+    public void setNote(String note) {
+        this.note = note;
+    }
 
-  public int getProductId() {
-      return productId;
-  }
+    public int getProductId() {
+        return productId;
+    }
 
-  public void setProductId(int productId) {
-      this.productId = productId;
-  }
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
 
-  public int getUnitId() {
-      return unitId;
-  }
+    public int getUnitId() {
+        return unitId;
+    }
 
-  public void setUnitId(int unitId) {
-      this.unitId = unitId;
-  }
+    public void setUnitId(int unitId) {
+        this.unitId = unitId;
+    }
 
-  public double getQuantityRequested() {
-      return quantityRequested;
-  }
+    public String getDayRequest() {
+        return dayRequest;
+    }
 
-  public void setQuantityRequested(double quantityRequested) {
-      this.quantityRequested = quantityRequested;
-  }
+    public void setDayRequest(String dayRequest) {
+        this.dayRequest = dayRequest;
+    }
 
-  public double getQuantityExported() {
-      return quantityExported;
-  }
+    public String getStatus() {
+        return status;
+    }
 
-  public void setQuantityExported(double quantityExported) {
-      this.quantityExported = quantityExported;
-  }
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-  public double getQuantityPending() {
-      return quantityPending;
-  }
+    public String getReasonDetail() {
+        return reasonDetail;
+    }
 
-  public void setQuantityPending(double quantityPending) {
-      this.quantityPending = quantityPending;
-  }
+    public void setReasonDetail(String reasonDetail) {
+        this.reasonDetail = reasonDetail;
+    }
 
-  public double getExportQuantity() {
-      return exportQuantity;
-  }
+    public String getRejectReason() {
+        return rejectReason;
+    }
 
-  public void setExportQuantity(double exportQuantity) {
-      this.exportQuantity = exportQuantity;
-  }
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
 
-  public String getDayRequest() {
-      return dayRequest;
-  }
+    public double getExportedQty() {
+        return exportedQty;
+    }
 
-  public void setDayRequest(String dayRequest) {
-      this.dayRequest = dayRequest;
-  }
+    public void setExportedQty(double exportedQty) {
+        this.exportedQty = exportedQty;
+    }
 
-  public String getStatus() {
-      return status;
-  }
+    public double getQuantityExported() {
+        return quantityExported;
+    }
 
-  public void setStatus(String status) {
-      this.status = status;
-  }
+    public void setQuantityExported(double quantityExported) {
+        this.quantityExported = quantityExported;
+    }
 
-  public String getReasonDetail() {
-      return reasonDetail;
-  }
+    // Utility methods
+    public boolean isApproved() {
+        return "approved".equals(this.status);
+    }
 
-  public void setReasonDetail(String reasonDetail) {
-      this.reasonDetail = reasonDetail;
-  }
+    public boolean isCompleted() {
+        return "completed".equals(this.status);
+    }
 
-  public String getRejectReason() {
-      return rejectReason;
-  }
+    public boolean isRejected() {
+        return "rejected".equals(this.status);
+    }
 
-  public void setRejectReason(String rejectReason) {
-      this.rejectReason = rejectReason;
-  }
-
-  public double getExportedQty() {
-      return exportedQty;
-  }
-
-  public void setExportedQty(double exportedQty) {
-      this.exportedQty = exportedQty;
-  }
-
-  @Override
-  public String toString() {
-      return "ExportRequestItem{" +
-              "id=" + id +
-              ", exportRequestId='" + exportRequestId + '\'' +
-              ", productName='" + productName + '\'' +
-              ", productCode='" + productCode + '\'' +
-              ", quantityRequested=" + quantityRequested +
-              ", quantityExported=" + quantityExported +
-              ", quantityPending=" + quantityPending +
-              ", exportQuantity=" + exportQuantity +
-              ", status='" + status + '\'' +
-              '}';
-  }
+    @Override
+    public String toString() {
+        return "ExportRequestItem{" +
+                "id=" + id +
+                ", exportRequestId='" + exportRequestId + '\'' +
+                ", productName='" + productName + '\'' +
+                ", productCode='" + productCode + '\'' +
+                ", status='" + status + '\'' +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

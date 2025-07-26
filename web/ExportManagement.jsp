@@ -249,51 +249,15 @@
                 box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
             }
 
-            .quantity-input {
-                width: 100px;
+            .quantity-display {
                 text-align: center;
-                border: 2px solid var(--danger);
-                background: #fef2f2;
                 font-weight: 600;
-            }
-
-            .quantity-input:focus {
-                border-color: var(--danger-dark);
-                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-            }
-
-            .quantity-input.invalid {
-                border-color: var(--warning) !important;
-                background: #fffbeb !important;
-                animation: shake 0.3s ease-in-out;
-            }
-
-            @keyframes shake {
-                0%, 100% {
-                    transform: translateX(0);
-                }
-                25% {
-                    transform: translateX(-5px);
-                }
-                75% {
-                    transform: translateX(5px);
-                }
-            }
-
-            .quantity-input::placeholder {
-                color: var(--gray-400);
-                font-style: italic;
-                font-weight: normal;
-            }
-
-            .quantity-input::-webkit-outer-spin-button,
-            .quantity-input::-webkit-inner-spin-button {
-                -webkit-appearance: none;
-                margin: 0;
-            }
-
-            .quantity-input[type=number] {
-                -moz-appearance: textfield;
+                color: var(--danger-dark);
+                background: #fef2f2;
+                padding: 0.75rem;
+                border: 2px solid var(--danger);
+                border-radius: var(--border-radius);
+                font-size: 0.875rem;
             }
 
             .btn {
@@ -371,16 +335,6 @@
                 color: #065f46;
             }
 
-            .status-partial {
-                background: #fef3c7;
-                color: #92400e;
-            }
-
-            .status-completed {
-                background: #dbeafe;
-                color: #1e40af;
-            }
-
             .alert {
                 padding: 1rem 1.25rem;
                 border-radius: var(--border-radius);
@@ -401,6 +355,12 @@
                 background: #fffbeb;
                 border-left-color: var(--warning);
                 color: #92400e;
+            }
+
+            .alert-error {
+                background: #fef2f2;
+                border-left-color: var(--danger);
+                color: #991b1b;
             }
 
             .breadcrumb {
@@ -520,55 +480,6 @@
                 box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
             }
 
-            .progress-bar {
-                width: 100%;
-                height: 8px;
-                background: var(--gray-200);
-                border-radius: 4px;
-                overflow: hidden;
-                margin-top: 0.5rem;
-            }
-
-            .progress-fill {
-                height: 100%;
-                background: linear-gradient(90deg, var(--danger) 0%, var(--danger-dark) 100%);
-                transition: width 0.3s ease;
-            }
-
-            .progress-fill.partial {
-                background: linear-gradient(90deg, var(--warning) 0%, var(--warning-dark) 100%);
-            }
-
-            .quantity-status {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                font-size: 0.75rem;
-                margin-top: 0.25rem;
-            }
-
-            .quantity-status.completed {
-                color: var(--danger-dark);
-            }
-
-            .quantity-status.partial {
-                color: var(--warning-dark);
-            }
-
-            .quantity-status.pending {
-                color: var(--gray-500);
-            }
-
-            .integer-only-note {
-                font-size: 0.75rem;
-                color: var(--danger-dark);
-                font-style: italic;
-                margin-top: 0.25rem;
-                display: flex;
-                align-items: center;
-                gap: 0.25rem;
-            }
-
             @media (max-width: 768px) {
                 .main-content {
                     padding: 1rem;
@@ -600,9 +511,6 @@
                     padding: 0.75rem 0.5rem;
                     font-size: 0.75rem;
                 }
-                .quantity-input {
-                    width: 80px;
-                }
             }
         </style>
     </head>
@@ -620,33 +528,55 @@
                         <div class="breadcrumb">
                             <a href="${pageContext.request.contextPath}/Admin.jsp"><i class="fas fa-home"></i> Trang chủ</a>
                             <i class="fas fa-chevron-right"></i>
-                            <a href="exportList">Danh sách yêu cầu xuất</a>
+                            <a href="${pageContext.request.contextPath}/exportList">Danh sách yêu cầu xuất</a>
                             <i class="fas fa-chevron-right"></i>
                             <span>Xử lý xuất kho</span>
                         </div>
 
-                        <c:if test="${exportRequest.status == 'partial_exported'}">
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
+                        <!-- Error/Success Messages -->
+                        <c:if test="${param.error != null}">
+                            <div class="alert alert-error">
+                                <i class="fas fa-exclamation-circle"></i>
                                 <div>
-                                    <strong>Xuất kho từng phần:</strong> Đơn hàng này đã được xuất kho một phần. 
-                                    Vui lòng kiểm tra số lượng còn lại và tiếp tục xuất kho.
+                                    <c:choose>
+                                        <c:when test="${param.error == 'missing_required_fields'}">
+                                            <strong>Lỗi:</strong> Vui lòng điền đầy đủ thông tin bắt buộc!
+                                        </c:when>
+                                        <c:when test="${param.error == 'insufficient_inventory'}">
+                                            <strong>Lỗi:</strong> Không đủ tồn kho cho sản phẩm ${param.product}!
+                                        </c:when>
+                                        <c:when test="${param.error == 'export_failed'}">
+                                            <strong>Lỗi:</strong> Xuất kho thất bại. Không đủ tồn kho cho sản phẩm. Vui lòng thử lại!
+                                        </c:when>
+                                        <c:when test="${param.error == 'reject_reason_required'}">
+                                            <strong>Lỗi:</strong> Vui lòng nhập lý do từ chối!
+                                        </c:when>
+                                        <c:when test="${param.error == 'reject_failed'}">
+                                            <strong>Lỗi:</strong> Từ chối thất bại. Vui lòng thử lại!
+                                        </c:when>
+                                        <c:when test="${param.error == 'order_not_processable'}">
+                                            <strong>Lỗi:</strong> Đơn hàng không thể xử lý hoặc đã được xử lý!
+                                        </c:when>
+                                        <c:when test="${param.error == 'no_items_to_export'}">
+                                            <strong>Lỗi:</strong> Không có sản phẩm nào để xuất kho!
+                                        </c:when>
+                                        <c:otherwise>
+                                            <strong>Lỗi:</strong> Có lỗi xảy ra trong quá trình xử lý!
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
                         </c:if>
 
-                        <c:if test="${exportRequest.status == 'approved'}">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i>
-                                <div>
-                                    <strong>Lưu ý:</strong> Bạn có thể xuất kho từng phần hoặc xuất toàn bộ số lượng. 
-                                    Hệ thống sẽ tự động theo dõi số lượng còn lại và cập nhật tồn kho. <strong>Chỉ được nhập số nguyên dương.</strong>
-                                </div>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Lưu ý:</strong> Hệ thống sẽ tự động xuất đúng số lượng yêu cầu cho tất cả sản phẩm. 
+                                Tồn kho sẽ được cập nhật và đơn hàng chuyển trạng thái thành hoàn thành.
                             </div>
-                        </c:if>
+                        </div>
 
-                        <!-- SỬA FORM ACTION TỪ exportList THÀNH export -->
-                        <form action="export" method="post" id="exportForm">
+                        <form action="${pageContext.request.contextPath}/export" method="post" id="exportForm">
                             <input type="hidden" name="id" value="${exportRequest.id}">
 
                             <!-- Thông tin đơn xuất kho -->
@@ -654,45 +584,41 @@
                                 <div class="section-header">
                                     <div class="icon"><i class="fas fa-file-export"></i></div>
                                     <h3>Thông tin đơn xuất kho</h3>
-                                    <c:choose>
-                                        <c:when test="${exportRequest.status == 'approved'}">
-                                            <span class="status-badge status-approved">
-                                                <i class="fas fa-check-circle"></i> Đã duyệt
-                                            </span>
-                                        </c:when>
-                                        <c:when test="${exportRequest.status == 'partial_exported'}">
-                                            <span class="status-badge status-partial">
-                                                <i class="fas fa-clock"></i> Xuất từng phần
-                                            </span>
-                                        </c:when>
-                                        <c:when test="${exportRequest.status == 'completed'}">
-                                            <span class="status-badge status-completed">
-                                                <i class="fas fa-check-double"></i> Hoàn thành
-                                            </span>
-                                        </c:when>
-                                    </c:choose>
+                                    <span class="status-badge status-approved">
+                                        <i class="fas fa-check-circle"></i> Đã duyệt
+                                    </span>
                                 </div>
                                 <div class="section-body">
                                     <div class="info-grid">
                                         <div class="info-item">
                                             <label class="info-label">Mã đơn xuất</label>
-                                            <div class="info-value">${exportRequest.id}</div>
+                                            <div class="info-value">
+                                                <i class="fas fa-hashtag"></i> ${exportRequest.id}
+                                            </div>
                                         </div>
                                         <div class="info-item">
                                             <label class="info-label">Người yêu cầu</label>
-                                            <div class="info-value">User ID: ${exportRequest.userId}</div>
+                                            <div class="info-value">
+                                                <i class="fas fa-user"></i> User ID: ${exportRequest.userId}
+                                            </div>
                                         </div>
                                         <div class="info-item">
                                             <label class="info-label">Ngày yêu cầu</label>
-                                            <div class="info-value">${exportRequest.dayRequest}</div>
+                                            <div class="info-value">
+                                                <i class="fas fa-calendar"></i> ${exportRequest.dayRequest}
+                                            </div>
                                         </div>
                                         <div class="info-item">
                                             <label class="info-label">Người duyệt</label>
-                                            <div class="info-value">${exportRequest.approveBy != null ? exportRequest.approveBy : 'Chưa có'}</div>
+                                            <div class="info-value">
+                                                <i class="fas fa-user-check"></i> ${exportRequest.approveBy != null ? exportRequest.approveBy : 'Chưa có'}
+                                            </div>
                                         </div>
                                         <div class="info-item" style="grid-column: 1 / -1;">
                                             <label class="info-label">Lý do xuất kho</label>
-                                            <div class="info-value">${exportRequest.reason != null ? exportRequest.reason : 'Không có ghi chú'}</div>
+                                            <div class="info-value">
+                                                <i class="fas fa-comment"></i> ${exportRequest.reason != null ? exportRequest.reason : 'Không có ghi chú'}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -708,9 +634,8 @@
                                     <div class="alert alert-warning">
                                         <i class="fas fa-exclamation-circle"></i>
                                         <div>
-                                            <strong>Lưu ý quan trọng:</strong> Chỉ được nhập số nguyên dương (1, 2, 3...). 
-                                            Không được nhập số thập phân (1.5, 2.3...) hoặc số âm.
-                                            <br><small>Nhấp đúp vào ô nhập để tự động điền số lượng tối đa.</small>
+                                            <strong>Thông tin:</strong> Hệ thống sẽ tự động xuất đúng số lượng yêu cầu cho tất cả sản phẩm. 
+                                            Vui lòng kiểm tra thông tin trước khi xác nhận.
                                         </div>
                                     </div>
                                     <div class="table-container">
@@ -720,10 +645,7 @@
                                                     <th><i class="fas fa-barcode"></i> Mã VT</th>
                                                     <th><i class="fas fa-tag"></i> Tên VT</th>
                                                     <th><i class="fas fa-ruler"></i> Đơn vị</th>
-                                                    <th><i class="fas fa-list-ol"></i> SL Yêu cầu</th>
-                                                    <th><i class="fas fa-check"></i> Đã xuất</th>
-                                                    <th><i class="fas fa-clock"></i> Còn lại</th>
-                                                    <th><i class="fas fa-minus"></i> Xuất lần này</th>
+                                                    <th><i class="fas fa-minus"></i> Số lượng xuất</th>
                                                     <th><i class="fas fa-sticky-note"></i> Ghi chú</th>
                                                 </tr>
                                             </thead>
@@ -731,45 +653,16 @@
                                                 <c:forEach var="item" items="${itemList}" varStatus="status">
                                                     <tr>
                                                         <td>${item.productCode != null ? item.productCode : 'N/A'}</td>
-                                                        <td>${item.productName}</td>
+                                                        <td><strong>${item.productName}</strong></td>
                                                         <td>${item.unit != null ? item.unit : 'N/A'}</td>
-                                                        <td style="text-align: center; font-weight: 600;">${item.quantityRequested}</td>
                                                         <td style="text-align: center;">
-                                                            <span style="color: var(--danger-dark); font-weight: 600;">${item.quantityExported}</span>
-                                                            <div class="progress-bar">
-                                                                <div class="progress-fill ${item.quantityExported >= item.quantityRequested ? '' : 'partial'}" 
-                                                                     style="width: ${(item.quantityExported / item.quantityRequested) * 100}%"></div>
+                                                            <div class="quantity-display">
+                                                                <i class="fas fa-box"></i> ${item.quantity}
                                                             </div>
+                                                            <!-- Hidden input để gửi số lượng -->
+                                                            <input type="hidden" name="export_quantity_${item.id}" value="${item.quantity}">
                                                         </td>
-                                                        <td style="text-align: center;">
-                                                            <span style="color: var(--warning-dark); font-weight: 600;">${item.quantityPending}</span>
-                                                            <div class="quantity-status ${item.quantityPending == 0 ? 'completed' : 'partial'}">
-                                                                ${item.quantityPending == 0 ? 'Hoàn thành' : 'Chờ xuất'}
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <c:if test="${item.quantityPending > 0}">
-                                                                <input type="number" 
-                                                                       name="export_quantity_${item.id}" 
-                                                                       class="quantity-input" 
-                                                                       min="1" 
-                                                                       max="${item.quantityPending}" 
-                                                                       step="1"
-                                                                       placeholder="0"
-                                                                       title="Tối đa: ${item.quantityPending} (chỉ số nguyên)"
-                                                                       oninput="validateIntegerInput(this)">
-                                                                <div class="integer-only-note">
-                                                                    <i class="fas fa-info-circle"></i>
-                                                                    Chỉ số nguyên
-                                                                </div>
-                                                            </c:if>
-                                                            <c:if test="${item.quantityPending == 0}">
-                                                                <span style="color: var(--danger-dark); font-weight: 600;">
-                                                                    <i class="fas fa-check-circle"></i> Đã đủ
-                                                                </span>
-                                                            </c:if>
-                                                        </td>
-                                                        <td>${item.note != null ? item.note : ''}</td>
+                                                        <td>${item.note != null ? item.note : '-'}</td>
                                                     </tr>
                                                 </c:forEach>
                                             </tbody>
@@ -778,86 +671,42 @@
                                 </div>
                             </div>
 
-                            <!-- Lịch sử xuất kho (nếu có) -->
-                            <c:if test="${not empty exportHistory}">
-                                <div class="section">
-                                    <div class="section-header">
-                                        <div class="icon"><i class="fas fa-history"></i></div>
-                                        <h3>Lịch sử xuất kho</h3>
-                                    </div>
-                                    <div class="section-body">
-                                        <div class="table-container">
-                                            <table>
-                                                <thead>
-                                                    <tr>
-                                                        <th><i class="fas fa-tag"></i> Tên VT</th>
-                                                        <th><i class="fas fa-barcode"></i> Mã VT</th>
-                                                        <th><i class="fas fa-minus"></i> SL Xuất</th>
-                                                        <th><i class="fas fa-calendar"></i> Ngày xuất</th>
-                                                        <th><i class="fas fa-user"></i> Người xử lý</th>
-                                                        <th><i class="fas fa-sticky-note"></i> Ghi chú</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <c:forEach var="history" items="${exportHistory}">
-                                                        <tr>
-                                                            <td>${history[0]}</td>
-                                                            <td>${history[1]}</td>
-                                                            <td style="text-align: center; font-weight: 600; color: var(--danger-dark);">
-                                                                ${history[2]}
-                                                            </td>
-                                                            <td>${history[3]}</td>
-                                                            <td>${history[4]}</td>
-                                                            <td>${history[5] != null ? history[5] : ''}</td>
-                                                        </tr>
-                                                    </c:forEach>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </c:if>
-
                             <!-- Thông tin xuất kho -->
-                            <c:if test="${exportRequest.status != 'completed'}">
-                                <div class="section">
-                                    <div class="section-header">
-                                        <div class="icon"><i class="fas fa-shipping-fast"></i></div>
-                                        <h3>Thông tin xuất kho</h3>
-                                    </div>
-                                    <div class="section-body">
-                                        <div class="info-grid">
-                                            <div class="info-item">
-                                                <label class="info-label">Ngày xuất kho *</label>
-                                                <input type="date" name="exportDate" class="form-input editable" 
-                                                       value="${currentDate}" required>
+                            <div class="section">
+                                <div class="section-header">
+                                    <div class="icon"><i class="fas fa-shipping-fast"></i></div>
+                                    <h3>Thông tin xuất kho</h3>
+                                </div>
+                                <div class="section-body">
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label class="info-label">Ngày xuất kho *</label>
+                                            <input type="date" name="exportDate" class="form-input editable" 
+                                                   value="${currentDate}" required>
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Người xử lý</label>
+                                            <div class="info-value">
+                                                <i class="fas fa-user"></i> ${sessionScope.user.fullname != null ? sessionScope.user.fullname : sessionScope.user.username}
                                             </div>
-                                            <div class="info-item">
-                                                <label class="info-label">Người xử lý</label>
-                                                <div class="info-value">
-                                                    <i class="fas fa-user"></i> ${sessionScope.user.fullname != null ? sessionScope.user.fullname : sessionScope.user.username}
-                                                </div>
-                                            </div>
-                                            <div class="info-item" style="grid-column: 1 / -1;">
-                                                <label class="info-label">Ghi chú bổ sung</label>
-                                                <input type="text" name="additionalNote" class="form-input editable" 
-                                                       placeholder="Nhập ghi chú thêm (nếu có)">
-                                            </div>
+                                        </div>
+                                        <div class="info-item" style="grid-column: 1 / -1;">
+                                            <label class="info-label">Ghi chú bổ sung</label>
+                                            <input type="text" name="additionalNote" class="form-input editable" 
+                                                   placeholder="Nhập ghi chú thêm (nếu có)">
                                         </div>
                                     </div>
                                 </div>
-                            </c:if>
+                            </div>
 
                             <div class="form-footer">
-                                <c:if test="${exportRequest.status != 'completed'}">
-                                    <button type="button" onclick="confirmExport()" class="btn btn-danger">
-                                        <i class="fas fa-minus-circle"></i> Xuất kho từng phần
-                                    </button>
-                                    <button type="button" onclick="rejectExport()" class="btn btn-secondary">
-                                        <i class="fas fa-times-circle"></i> Từ chối xuất kho
-                                    </button>
-                                </c:if>
-                                <a href="exportList" class="btn btn-primary">
+                                <button type="button" onclick="confirmExport()" class="btn btn-danger">
+                                    <i class="fas fa-check-circle"></i> Xác nhận xuất kho
+                                </button>
+                                <button type="button" onclick="rejectExport()" class="btn btn-secondary">
+                                    <i class="fas fa-times-circle"></i> Từ chối xuất kho
+                                </button>
+                                <a href="${pageContext.request.contextPath}/exportList" class="btn btn-primary">
                                     <i class="fas fa-arrow-left"></i> Quay lại danh sách
                                 </a>
                             </div>
@@ -894,68 +743,7 @@
         </div>
 
         <script>
-            function validateIntegerInput(input) {
-                let value = input.value;
-
-                // Chỉ giữ lại số
-                value = value.replace(/[^0-9]/g, '');
-
-                // Cập nhật lại giá trị
-                input.value = value;
-
-                const numValue = parseInt(value) || 0;
-                const max = parseInt(input.getAttribute('max')) || 0;
-
-                console.log('Validating input:', {
-                    originalValue: input.value,
-                    numValue: numValue,
-                    max: max
-                });
-
-                // Reset classes
-                input.classList.remove('invalid');
-
-                if (numValue > max && max > 0) {
-                    input.style.borderColor = 'var(--warning)';
-                    input.style.background = '#fffbeb';
-                    input.classList.add('invalid');
-                } else if (numValue > 0) {
-                    input.style.borderColor = 'var(--danger)';
-                    input.style.background = '#fef2f2';
-                }
-            }
-
-            function validateQuantities() {
-                let hasValidQuantity = false;
-                let hasInvalidInput = false;
-                const quantityInputs = document.querySelectorAll('.quantity-input');
-
-                quantityInputs.forEach(input => {
-                    const value = input.value.trim();
-                    if (value) {
-                        const numValue = parseInt(value);
-                        const max = parseInt(input.getAttribute('max')) || 0;
-
-                        // Kiểm tra xem có phải số nguyên không
-                        if (isNaN(numValue) || numValue !== parseFloat(value) || numValue < 1) {
-                            hasInvalidInput = true;
-                            input.classList.add('invalid');
-                        } else if (numValue > 0 && numValue <= max) {
-                            hasValidQuantity = true;
-                            input.classList.remove('invalid');
-                        } else if (numValue > max) {
-                            hasInvalidInput = true;
-                            input.classList.add('invalid');
-                        }
-                    }
-                });
-
-                return {hasValid: hasValidQuantity, hasInvalid: hasInvalidInput};
-            }
-
             function confirmExport() {
-                console.log('=== confirmExport called ===');
-
                 const form = document.getElementById('exportForm');
                 const exportDate = form.exportDate.value;
 
@@ -964,36 +752,20 @@
                     return;
                 }
 
-                // Kiểm tra validation
-                const validation = validateQuantities();
-
-                if (validation.hasInvalid) {
-                    alert('Vui lòng chỉ nhập số nguyên dương (1, 2, 3...) cho số lượng xuất kho!\nKhông được nhập số thập phân hoặc số âm.');
-                    return;
-                }
-
-                if (!validation.hasValid) {
-                    alert('Vui lòng nhập số lượng hợp lệ cho ít nhất một sản phẩm!');
-                    return;
-                }
-
-                // Tiếp tục với modal confirmation
-                document.getElementById('modalTitle').textContent = 'Xác nhận xuất kho từng phần';
-                document.getElementById('modalIcon').innerHTML = '<i class="fas fa-minus-circle" style="color: var(--danger);"></i>';
-                document.getElementById('modalMessage').textContent = 'Bạn có chắc chắn muốn xuất kho với số lượng đã chọn? Các sản phẩm chưa xuất đủ sẽ được chuyển vào danh sách chờ.';
+                document.getElementById('modalTitle').textContent = 'Xác nhận xuất kho';
+                document.getElementById('modalIcon').innerHTML = '<i class="fas fa-check-circle" style="color: var(--danger);"></i>';
+                document.getElementById('modalMessage').textContent = 'Bạn có chắc chắn muốn xuất kho với số lượng đã hiển thị? Đơn hàng sẽ được chuyển thành trạng thái hoàn thành và tồn kho sẽ được cập nhật.';
                 document.getElementById('rejectReasonContainer').style.display = 'none';
 
                 const confirmBtn = document.getElementById('confirmButton');
                 confirmBtn.className = 'btn btn-danger';
-                confirmBtn.innerHTML = '<i class="fas fa-minus-circle"></i> Xác nhận xuất kho';
+                confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> Xác nhận xuất kho';
                 confirmBtn.onclick = () => submitForm('confirm');
 
                 document.getElementById('confirmModal').style.display = 'block';
             }
 
             function rejectExport() {
-                console.log('=== rejectExport called ===');
-
                 document.getElementById('modalTitle').textContent = 'Từ chối xuất kho';
                 document.getElementById('modalIcon').innerHTML = '<i class="fas fa-times-circle" style="color: var(--secondary);"></i>';
                 document.getElementById('modalMessage').textContent = 'Bạn có chắc chắn muốn từ chối yêu cầu xuất kho này?';
@@ -1008,17 +780,10 @@
             }
 
             function submitForm(action) {
-                console.log('=== submitForm called ===');
-                console.log('Action:', action);
-
                 const form = document.getElementById('exportForm');
-                console.log('Form action before:', form.action);
-                console.log('Form method:', form.method);
 
                 if (action === 'reject') {
                     const rejectReason = document.getElementById('rejectReason').value.trim();
-                    console.log('Reject reason:', rejectReason);
-
                     if (!rejectReason) {
                         alert('Vui lòng nhập lý do từ chối!');
                         return;
@@ -1029,7 +794,6 @@
                     reasonInput.name = 'rejectReason';
                     reasonInput.value = rejectReason;
                     form.appendChild(reasonInput);
-                    console.log('Added reject reason input');
                 }
 
                 const actionInput = document.createElement('input');
@@ -1037,21 +801,11 @@
                 actionInput.name = 'action';
                 actionInput.value = action;
                 form.appendChild(actionInput);
-                console.log('Added action input:', action);
 
-                // Log all form data before submit
-                const formData = new FormData(form);
-                console.log('Form data before submit:');
-                for (let [key, value] of formData.entries()) {
-                    console.log('  ' + key + ':', value);
-                }
-
-                // Hiển thị loading
                 const confirmBtn = document.getElementById('confirmButton');
                 confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
                 confirmBtn.disabled = true;
 
-                console.log('Submitting form...');
                 form.submit();
             }
 
@@ -1062,49 +816,6 @@
 
             // Event listeners
             document.addEventListener('DOMContentLoaded', function () {
-                const quantityInputs = document.querySelectorAll('.quantity-input');
-
-                quantityInputs.forEach(input => {
-                    // Ngăn nhập ký tự không hợp lệ
-                    input.addEventListener('keypress', function (e) {
-                        // Chỉ cho phép số từ 0-9 và các phím điều khiển
-                        if (!/[0-9]/.test(e.key) &&
-                                !['Backspace', 'Delete', 'Tab', 'Enter', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-                            e.preventDefault();
-                        }
-                    });
-
-                    // Ngăn dán nội dung không hợp lệ
-                    input.addEventListener('paste', function (e) {
-                        e.preventDefault();
-                        let paste = (e.clipboardData || window.clipboardData).getData('text');
-                        paste = paste.replace(/[^0-9]/g, '');
-                        if (paste && parseInt(paste) > 0) {
-                            this.value = paste;
-                            validateIntegerInput(this);
-                        }
-                    });
-
-                    input.addEventListener('input', function () {
-                        validateIntegerInput(this);
-                    });
-
-                    // Auto-fill với số lượng tối đa khi double-click
-                    input.addEventListener('dblclick', function () {
-                        const max = parseInt(this.getAttribute('max')) || 0;
-                        if (max > 0) {
-                            this.value = max;
-                            validateIntegerInput(this);
-                        }
-                    });
-
-                    // Ngăn scroll wheel thay đổi giá trị
-                    input.addEventListener('wheel', function (e) {
-                        e.preventDefault();
-                    });
-                });
-
-                // Close modal when clicking outside
                 window.onclick = function (event) {
                     const modal = document.getElementById('confirmModal');
                     if (event.target === modal) {
@@ -1112,7 +823,6 @@
                     }
                 };
 
-                // Keyboard shortcuts
                 document.addEventListener('keydown', function (e) {
                     if (e.ctrlKey && e.key === 'Enter') {
                         e.preventDefault();
@@ -1123,36 +833,18 @@
                     }
                 });
 
-                // Hiển thị tooltip cho progress bars
-                const progressBars = document.querySelectorAll('.progress-fill');
-                progressBars.forEach(bar => {
-                    const width = bar.style.width;
-                    bar.title = `Tiến độ xuất kho: ${width}`;
+                // Auto-dismiss error alerts after 10 seconds
+                const alerts = document.querySelectorAll('.alert-error');
+                alerts.forEach(alert => {
+                    setTimeout(() => {
+                        alert.style.opacity = '0';
+                        alert.style.transform = 'translateY(-20px)';
+                        alert.style.transition = 'all 0.5s ease';
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 500);
+                    }, 10000);
                 });
-            });
-
-            // Function để làm nổi bật các dòng có thể xuất
-            function highlightPendingItems() {
-                const rows = document.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    const quantityInput = row.querySelector('.quantity-input');
-                    if (quantityInput) {
-                        row.style.backgroundColor = '#fef2f2';
-                        row.style.borderLeft = '3px solid var(--danger)';
-                    }
-                });
-            }
-
-            // Gọi function khi trang load
-            document.addEventListener('DOMContentLoaded', highlightPendingItems);
-
-            // Thêm validation khi form submit
-            document.getElementById('exportForm').addEventListener('submit', function (e) {
-                const validation = validateQuantities();
-                if (validation.hasInvalid) {
-                    e.preventDefault();
-                    alert('Vui lòng chỉ nhập số nguyên dương cho số lượng xuất kho!');
-                }
             });
         </script>
     </body>

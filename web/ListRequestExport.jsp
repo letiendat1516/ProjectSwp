@@ -357,38 +357,6 @@
                 background: var(--warning-dark);
             }
 
-            /* Button continue styling - Nút tiếp tục xuất kho */
-            .btn-continue {
-                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                color: white;
-                border: none;
-                font-weight: 600;
-                position: relative;
-                overflow: hidden;
-                box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-            }
-
-            .btn-continue:hover {
-                background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-                transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
-            }
-
-            .btn-continue::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-                transition: left 0.5s;
-            }
-
-            .btn-continue:hover::before {
-                left: 100%;
-            }
-
             .btn-icon {
                 display: inline-flex;
                 align-items: center;
@@ -504,19 +472,6 @@
                 background: var(--gray-50);
             }
 
-            /* Highlight cho đơn xuất từng phần */
-            .table-warning {
-                background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
-                border-left: 4px solid var(--warning) !important;
-                box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15) !important;
-            }
-
-            .table-warning:hover {
-                background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25) !important;
-            }
-
             /* Status Badges */
             .status-badge {
                 display: inline-block;
@@ -543,27 +498,6 @@
             .status-rejected {
                 background: #fee2e2;
                 color: #991b1b;
-            }
-
-            /* Status badge cho partial exported */
-            .status-partial-exported {
-                background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
-                color: #92400e;
-                border: 2px solid #f59e0b;
-                font-weight: 700;
-                animation: pulse-warning 2s infinite;
-            }
-
-            @keyframes pulse-warning {
-                0% {
-                    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
-                }
-                70% {
-                    box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
-                }
-                100% {
-                    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
-                }
             }
 
             /* Reason Cell */
@@ -595,26 +529,6 @@
                 background: #d1fae5;
                 color: #065f46;
                 border: 1px solid #86efac;
-            }
-
-            /* Text warning color */
-            .text-warning {
-                color: var(--warning) !important;
-                font-weight: 600;
-            }
-
-            /* Icon animation for partial export */
-            .fa-clock {
-                animation: tick 2s infinite linear;
-            }
-
-            @keyframes tick {
-                0% {
-                    transform: rotate(0deg);
-                }
-                100% {
-                    transform: rotate(360deg);
-                }
             }
 
             /* Pagination */
@@ -767,18 +681,6 @@
                     </div>
                 </c:if>
 
-                <c:if test="${param.message == 'partial_export_success'}">
-                    <div class="alert alert-warning">
-                        <div class="alert-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="alert-content">
-                            <div class="alert-title">Xuất kho từng phần thành công!</div>
-                            <div>Một phần hàng đã được xuất. Đơn hàng vẫn còn sản phẩm chưa xuất và sẽ tiếp tục hiển thị để xử lý.</div>
-                        </div>
-                    </div>
-                </c:if>
-
                 <c:if test="${param.message == 'reject_success'}">
                     <div class="alert alert-danger">
                         <div class="alert-icon">
@@ -910,8 +812,7 @@
                                                 <th>Tên sản phẩm</th>
                                                 <th>Mã sản phẩm</th>
                                                 <th>Đơn vị</th>
-                                                <th>SL Yêu cầu</th>
-                                                <th>SL Đã xuất</th>
+                                                <th>Số lượng</th>
                                                 <th>Trạng thái</th>
                                                 <th>Ghi chú</th>
                                                 <th>Thao tác</th>
@@ -921,7 +822,7 @@
                                             <c:choose>
                                                 <c:when test="${empty approvedItems}">
                                                     <tr>
-                                                        <td colspan="11" class="text-center" style="padding: 2rem;">
+                                                        <td colspan="10" class="text-center" style="padding: 2rem;">
                                                             <div style="color: var(--gray-400);">
                                                                 <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i>
                                                                 <p>Không có yêu cầu đã duyệt nào để hiển thị.</p>
@@ -931,16 +832,10 @@
                                                 </c:when>
                                                 <c:otherwise>
                                                     <c:forEach var="item" items="${approvedItems}" varStatus="status">
-                                                        <!-- Thêm class để phân biệt màu -->
-                                                        <tr class="${item.status == 'partial_exported' ? 'table-warning' : ''}">
+                                                        <tr>
                                                             <td>${(approvedPage - 1) * pageSize + status.index + 1}</td>
                                                             <td>
                                                                 <strong>${item.exportRequestId}</strong>
-                                                                <!-- Thêm icon để phân biệt -->
-                                                                <c:if test="${item.status == 'partial_exported'}">
-                                                                    <br><i class="fas fa-clock text-warning" title="Đang xuất từng phần"></i>
-                                                                    <small class="text-warning">Xuất từng phần</small>
-                                                                </c:if>
                                                             </td>
                                                             <td>
                                                                 <c:choose>
@@ -974,40 +869,9 @@
                                                                 <fmt:formatNumber value="${item.quantity}" maxFractionDigits="2"/>
                                                             </td>
                                                             <td style="text-align: center;">
-                                                                <c:choose>
-                                                                    <c:when test="${item.quantityExported > 0}">
-                                                                        <span style="color: var(--success-dark); font-weight: 700;">
-                                                                            <fmt:formatNumber value="${item.quantityExported}" maxFractionDigits="2"/>
-                                                                        </span>
-                                                                        <c:if test="${item.quantityPending > 0}">
-                                                                            <br><small style="color: var(--warning-dark);">
-                                                                                Còn: <fmt:formatNumber value="${item.quantityPending}" maxFractionDigits="2"/>
-                                                                            </small>
-                                                                        </c:if>
-                                                                    </c:when>
-                                                                    <c:otherwise>
-                                                                        <span style="color: var(--gray-500); font-weight: 500;">0</span>
-                                                                    </c:otherwise>
-                                                                </c:choose>
-                                                            </td>
-                                                            <td style="text-align: center;">
-                                                                <c:choose>
-                                                                    <c:when test="${item.status == 'approved'}">
-                                                                        <span class="status-badge status-pending">
-                                                                            <i class="fas fa-check-circle"></i> Chờ xuất kho
-                                                                        </span>
-                                                                    </c:when>
-                                                                    <c:when test="${item.status == 'partial_exported'}">
-                                                                        <span class="status-badge status-partial-exported">
-                                                                            <i class="fas fa-clock"></i> Xuất từng phần
-                                                                        </span>
-                                                                    </c:when>
-                                                                    <c:otherwise>
-                                                                        <span class="status-badge status-processing">
-                                                                            <i class="fas fa-question-circle"></i> ${item.status}
-                                                                        </span>
-                                                                    </c:otherwise>
-                                                                </c:choose>
+                                                                <span class="status-badge status-pending">
+                                                                    <i class="fas fa-check-circle"></i> Chờ xuất kho
+                                                                </span>
                                                             </td>
                                                             <td style="max-width: 150px; word-wrap: break-word;">
                                                                 <c:choose>
@@ -1023,22 +887,11 @@
                                                             </td>
                                                             <td>
                                                                 <div class="d-flex gap-2">
-                                                                    <c:choose>
-                                                                        <c:when test="${item.status == 'partial_exported'}">
-                                                                            <a href="${pageContext.request.contextPath}/export?id=${item.exportRequestId}" 
-                                                                               class="btn btn-sm btn-continue">
-                                                                                <i class="fas fa-forward"></i> 
-                                                                                Tiếp tục xuất kho
-                                                                            </a>
-                                                                        </c:when>
-                                                                        <c:otherwise>
-                                                                            <a href="${pageContext.request.contextPath}/export?id=${item.exportRequestId}" 
-                                                                               class="btn btn-sm btn-success">
-                                                                                <i class="fas fa-check"></i> 
-                                                                                Xử lý xuất kho
-                                                                            </a>
-                                                                        </c:otherwise>
-                                                                    </c:choose>
+                                                                    <a href="${pageContext.request.contextPath}/export?id=${item.exportRequestId}" 
+                                                                       class="btn btn-sm btn-success">
+                                                                        <i class="fas fa-check"></i> 
+                                                                        Xử lý xuất kho
+                                                                    </a>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -1337,6 +1190,7 @@
                         input.setSelectionRange(input.value.length, input.value.length);
                     }
                 });
+
                 // Highlight search results
                 const searchValue = '${searchValue}' || '${historySearchValue}';
                 if (searchValue && searchValue.trim() !== '') {
@@ -1367,6 +1221,7 @@
                         }
                     });
                 });
+
                 // Keyboard shortcuts
                 document.addEventListener('keydown', function (e) {
                     // Ctrl + F to focus search
@@ -1388,6 +1243,7 @@
                         }
                     }
                 });
+
                 // Tooltip for truncated text
                 const reasonCells = document.querySelectorAll('.reason-content');
                 reasonCells.forEach(cell => {
@@ -1403,6 +1259,7 @@
                         });
                     }
                 });
+
                 // Auto refresh every 30 seconds if no search is active
                 if (!searchValue || searchValue.trim() === '') {
                     setInterval(function () {
@@ -1426,11 +1283,7 @@
                         const originalText = this.innerHTML;
 
                         if (icon) {
-                            if (this.classList.contains('btn-continue')) {
-                                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
-                            } else {
-                                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải...';
-                            }
+                            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải...';
                         }
 
                         // Disable button to prevent double click
@@ -1443,23 +1296,6 @@
                             this.style.pointerEvents = '';
                             this.style.opacity = '';
                         }, 3000);
-                    });
-                });
-
-                // Enhanced visual effects for partial export rows
-                const partialRows = document.querySelectorAll('.table-warning');
-                partialRows.forEach(row => {
-                    // Add subtle animation
-                    row.style.animation = 'fadeInUp 0.5s ease-out';
-
-                    // Add hover effect
-                    row.addEventListener('mouseenter', function () {
-                        this.style.transform = 'translateY(-2px)';
-                        this.style.transition = 'all 0.3s ease';
-                    });
-
-                    row.addEventListener('mouseleave', function () {
-                        this.style.transform = 'translateY(0)';
                     });
                 });
 
@@ -1486,55 +1322,6 @@
                         setTimeout(() => {
                             this.remove();
                         }, 300);
-                    });
-                });
-
-                // Enhanced status badge animations
-                const statusBadges = document.querySelectorAll('.status-partial-exported');
-                statusBadges.forEach(badge => {
-                    badge.addEventListener('mouseenter', function () {
-                        this.style.transform = 'scale(1.05)';
-                        this.style.transition = 'transform 0.2s ease';
-                    });
-
-                    badge.addEventListener('mouseleave', function () {
-                        this.style.transform = 'scale(1)';
-                    });
-                });
-
-                // Progress indication for tables with many rows
-                const tableRows = document.querySelectorAll('tbody tr');
-                if (tableRows.length > 10) {
-                    // Add loading indicator for large tables
-                    const loadingIndicator = document.createElement('div');
-                    loadingIndicator.innerHTML = `
-                        <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-                                    background: white; padding: 2rem; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-                                    display: none; z-index: 9999;" id="tableLoadingIndicator">
-                            <div style="text-align: center;">
-                                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
-                                <p>Đang tải dữ liệu...</p>
-                            </div>
-                        </div>
-                    `;
-                    document.body.appendChild(loadingIndicator);
-                }
-
-                // Smooth scroll to top when changing pages
-                const pageLinks = document.querySelectorAll('.page-link');
-                pageLinks.forEach(link => {
-                    link.addEventListener('click', function (e) {
-                        // Show loading indicator
-                        const indicator = document.getElementById('tableLoadingIndicator');
-                        if (indicator) {
-                            indicator.style.display = 'block';
-                        }
-
-                        // Smooth scroll to top
-                        window.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
                     });
                 });
 
@@ -1602,10 +1389,8 @@
                 // Add tooltips for action buttons
                 const actionButtonsTooltip = document.querySelectorAll('.btn');
                 actionButtonsTooltip.forEach(btn => {
-                    if (btn.classList.contains('btn-continue')) {
-                        btn.title = 'Tiếp tục xuất kho cho đơn hàng chưa hoàn thành';
-                    } else if (btn.classList.contains('btn-success')) {
-                        btn.title = 'Bắt đầu xử lý xuất kho';
+                    if (btn.classList.contains('btn-success')) {
+                        btn.title = 'Bắt đầu xử lý xuất kho toàn bộ đơn hàng';
                     }
                 });
 
@@ -1653,17 +1438,6 @@
                             transform: translateY(100vh) rotate(360deg);
                         }
                     }
-                    
-                    @keyframes fadeInUp {
-                        from {
-                            opacity: 0;
-                            transform: translateY(20px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                    }
                 `;
                 document.head.appendChild(style);
 
@@ -1704,9 +1478,10 @@
                     });
                 });
 
-                console.log('ExportList.jsp loaded successfully with enhanced features!');
+                console.log('ExportList.jsp loaded successfully - Full export mode enabled!');
             });
         </script>
     </body>
 </html>
+
 

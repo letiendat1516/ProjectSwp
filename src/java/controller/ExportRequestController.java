@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.apache.catalina.User;
 
 public class ExportRequestController extends HttpServlet {
 
@@ -74,6 +75,9 @@ public class ExportRequestController extends HttpServlet {
             request.setAttribute("currentUser", fullname);
             request.setAttribute("age", age);
             request.setAttribute("dob", dob);
+            Users u = (Users) session.getAttribute("user");
+            request.setAttribute("roleID", u.id);
+            
 
             // Forward đến JSP
             System.out.println("Forward to ExportRequest.jsp");

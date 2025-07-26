@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import java.sql.Date;
@@ -9,8 +5,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /**
- *
- * @author Dell
+ * Model class for Export Request
+ * Represents a warehouse export request with all necessary information
  */
 public class ExportRequest {
 
@@ -18,7 +14,7 @@ public class ExportRequest {
   private int userId;
   private String role;
   private Date dayRequest;
-  private String status;
+  private String status; // pending, approved, rejected, completed
   private String reason;
   private String rejectReason;
   private String department;
@@ -30,6 +26,12 @@ public class ExportRequest {
   private ArrayList<ExportRequestItem> items;
   private String requesterName;
   private Timestamp createdAt;
+  
+  // New fields from the first file
+  private Date exportDate;
+  private String exportedBy;
+  private String exportNote;
+  private Timestamp updatedAt;
 
   // Default constructor
   public ExportRequest() {
@@ -200,6 +202,60 @@ public class ExportRequest {
       this.createdAt = createdAt;
   }
 
+  // New getters and setters from the first file
+  public Date getExportDate() {
+      return exportDate;
+  }
+
+  public void setExportDate(Date exportDate) {
+      this.exportDate = exportDate;
+  }
+
+  public String getExportedBy() {
+      return exportedBy;
+  }
+
+  public void setExportedBy(String exportedBy) {
+      this.exportedBy = exportedBy;
+  }
+
+  public String getExportNote() {
+      return exportNote;
+  }
+
+  public void setExportNote(String exportNote) {
+      this.exportNote = exportNote;
+  }
+
+  public Timestamp getUpdatedAt() {
+      return updatedAt;
+  }
+
+  public void setUpdatedAt(Timestamp updatedAt) {
+      this.updatedAt = updatedAt;
+  }
+
+  // Utility methods
+  public boolean isPending() {
+      return "pending".equals(this.status);
+  }
+
+  public boolean isApproved() {
+      return "approved".equals(this.status);
+  }
+
+  public boolean isRejected() {
+      return "rejected".equals(this.status);
+  }
+
+  public boolean isCompleted() {
+      return "completed".equals(this.status);
+  }
+
+  public boolean canBeProcessed() {
+      return isApproved();
+  }
+
   @Override
   public String toString() {
       return "ExportRequest{" +
@@ -216,9 +272,13 @@ public class ExportRequest {
               ", recipientEmail='" + recipientEmail + '\'' +
               ", approveBy='" + approveBy + '\'' +
               ", warehouse='" + warehouse + '\'' +
+              ", exportDate=" + exportDate +
+              ", exportedBy='" + exportedBy + '\'' +
+              ", exportNote='" + exportNote + '\'' +
               ", items=" + items +
               ", requesterName='" + requesterName + '\'' +
               ", createdAt=" + createdAt +
+              ", updatedAt=" + updatedAt +
               '}';
   }
 }
