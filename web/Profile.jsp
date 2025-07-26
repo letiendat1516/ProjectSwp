@@ -82,11 +82,14 @@
             .profile-container {
                 background: #fff;
                 border-radius: 8px;
-                max-width: 460px;
+                max-width: 100%;
+                width: 100%;
                 margin: 36px auto;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.08);
                 padding: 38px 34px 22px 34px;
+                box-sizing: border-box;
             }
+
             h2 {
                 text-align: center;
                 margin-bottom: 24px;
@@ -97,11 +100,20 @@
             td {
                 padding: 10px 6px;
                 font-size: 1.06rem;
+
             }
             td.label {
                 font-weight: bold;
                 color: #3498db;
-                width: 34%;
+                width: 740px;
+                text-align: right;
+                padding-right: 20px;
+                font-size: 1.09rem;
+            }
+
+            .profile-container .btn-row {
+                text-align: center;
+                margin-top: 20px;
             }
             .edit-link, .pw-link {
                 display: inline-block;
@@ -154,18 +166,11 @@
                 </div>
 
                 <div class="profile-container">
-                    <h2>My Profile</h2>
                     <table>
                         <tr><td class="label">Username:</td><td>${user.username}</td></tr>
                         <tr><td class="label">Họ và tên:</td><td>${user.fullname}</td></tr>
                         <tr><td class="label">Email:</td><td>${user.email}</td></tr>
                         <tr><td class="label">SĐT:</td><td>${user.phone}</td></tr>
-                        <tr><td class="label">Ngày sinh:</td><td>
-                                <c:choose>
-                                    <c:when test="${not empty user.dob}">${user.dob}</c:when>
-                                    <c:otherwise>-</c:otherwise>
-                                </c:choose>
-                            </td></tr>
                         <tr><td class="label">Phòng ban:</td><td>${user.deptName != null ? user.deptName : 'Chưa có'}</td></tr>
                         <tr><td class="label">Chức vụ:</td><td>${user.roleName}</td></tr>
                         <tr><td class="label">Trạng thái:</td>

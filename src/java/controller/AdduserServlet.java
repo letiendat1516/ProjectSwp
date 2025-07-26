@@ -7,12 +7,14 @@ package controller;
 import dao.DepartmentDAO;
 import dao.UserDAO;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import org.mindrot.jbcrypt.BCrypt;
 import java.util.List;
 import model.Department;
@@ -60,15 +62,13 @@ public class AdduserServlet extends HttpServlet {
 
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-
         String fullname = request.getParameter("fullname");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
-        String dobStr = request.getParameter("dob");
         int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
         int roleId = Integer.parseInt(request.getParameter("role"));
         String departmentIdStr = request.getParameter("departmentId");
+
         Integer departmentId = null;
         if (departmentIdStr != null && !departmentIdStr.isEmpty()) {
             try {
@@ -80,49 +80,66 @@ public class AdduserServlet extends HttpServlet {
             }
         }
 
-        Users user = new Users();
-        user.setUsername(username);
-        user.setPassword(hashedPassword);
+        UserDAO userDAO = new UserDAO();
+        List<String> errors = new ArrayList<>();
 
-        user.setFullname(fullname);
-        user.setEmail(email);
-        user.setPhone(phone);
-
-        // Xử lý ngày sinh
-        java.sql.Date dob = null;
+        // Kiểm tra
         try {
-            if (dobStr != null && !dobStr.trim().isEmpty()) {
-                dob = java.sql.Date.valueOf(dobStr); // Format: yyyy-MM-dd
+            if (userDAO.isUsernameExists(username)) {
+                errors.add("Username '" + username + "' đã tồn tại!");
             }
-        } catch (IllegalArgumentException e) {
-            request.setAttribute("error", "Ngày sinh không hợp lệ!");
-            request.getRequestDispatcher("AddUser.jsp").forward(request, response);
-            return;
-        }
-        user.setDob(dob); // Đặt giá trị ngày sinh
-        if (dob != null) {
-            java.time.LocalDate birthDate = dob.toLocalDate();
-            java.time.LocalDate today = java.time.LocalDate.now();
-            int age = java.time.Period.between(birthDate, today).getYears();
 
-            if (age < 18 || age > 60) {
-                request.setAttribute("error", "Tuổi người dùng phải từ 18 đến 60!");
+            if (userDAO.isEmailExists(email)) {
+                errors.add("Email '" + email + "' đã được sử dụng bởi người dùng khác!");
+            }
+
+            if (userDAO.isPhoneExists(phone)) {
+                errors.add("Số điện thoại '" + phone + "' đã được sử dụng bởi người dùng khác!");
+            }
+
+            // Nếu có lỗi, trả về form với thông báo chi tiết
+            if (!errors.isEmpty()) {
+                String errorMessage = String.join("<br>", errors);
+                request.setAttribute("error", errorMessage);
+
+                request.setAttribute("username", username);
+                request.setAttribute("fullname", fullname);
+                request.setAttribute("email", email);
+                request.setAttribute("phone", phone);
+                request.setAttribute("departmentIdSelected", departmentIdStr);
+                request.setAttribute("roleSelected", String.valueOf(roleId));
+                request.setAttribute("activeFlagSelected", String.valueOf(activeFlag));
+
                 request.getRequestDispatcher("AddUser.jsp").forward(request, response);
                 return;
             }
-        }
 
-        user.setDepartmentId(departmentId);
-        user.setActiveFlag(activeFlag);
+            // Nếu không có lỗi, thêm user
+            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-        try {
-            UserDAO userDAO = new UserDAO();
+            Users user = new Users();
+            user.setUsername(username);
+            user.setPassword(hashedPassword);
+            user.setFullname(fullname);
+            user.setEmail(email);
+            user.setPhone(phone);
+            user.setDepartmentId(departmentId);
+            user.setActiveFlag(activeFlag);
+
             userDAO.addUser(user, roleId);
             HttpSession session = request.getSession();
-            session.setAttribute("message", "Thêm người dùng thành công!");
-            response.sendRedirect("adduser");
+            session.setAttribute("message", "Thêm người dùng '" + fullname + "' thành công!");
+            response.sendRedirect("usermanager");
+
+        } catch (SQLException e) {
+            System.err.println("Database error in AddUser: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi cơ sở dữ liệu: " + e.getMessage());
+            request.getRequestDispatcher("AddUser.jsp").forward(request, response);
         } catch (Exception e) {
-            request.setAttribute("error", "Không thể thêm người dùng");
+            System.err.println("Unexpected error in AddUser: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "Có lỗi xảy ra khi thêm người dùng: " + e.getMessage());
             request.getRequestDispatcher("AddUser.jsp").forward(request, response);
         }
     }
@@ -130,6 +147,6 @@ public class AdduserServlet extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
+    }
 
 }

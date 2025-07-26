@@ -27,7 +27,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Admin Dashboard - Warehouse Manager</title>
+        <title>Admin Dashboard - Warehouse Management</title>
         <style>
             body {
                 font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
@@ -139,14 +139,16 @@
     <body>
         <div class="container">
             <div class="sidebar">
-                <h2>Warehouse Manager</h2>
+                <h2>Warehouse Management</h2>
                 <a href="usermanager" class="nav-item">Quản lý người dùng</a>
+                <a href="department/list" class="nav-item">Quản lý Phòng ban</a>
                 <a href="role-permission" class="nav-item">Phân quyền người dùng</a>
                 <a href="categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
                 <a href="passwordrequest" class="nav-item">Reset mật khẩu</a>
                 <a href="ApproveListForward.jsp" class="nav-item">Đơn từ</a>
                 <a href="RequestForward.jsp" class="nav-item">Giao dịch</a>
                 <a href="StatisticSupplierEvaluation.jsp" class="nav-item">Thống kê</a>
+               
             </div>
             <div class="main-content">
                 <div class="header">

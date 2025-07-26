@@ -71,13 +71,15 @@
             background: #c70000;
         }
         .profile-container {
-            background: #fff;
-            border-radius: 8px;
-            max-width: 460px;
-            margin: 36px auto;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            padding: 38px 34px 22px 34px;
-        }
+                background: #fff;
+                border-radius: 8px;
+                max-width: 100%;
+                width: 100%;
+                margin: 36px auto;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                padding: 38px 34px 22px 34px;
+                box-sizing: border-box;
+            }
         h2 {
             text-align: center;
             margin-bottom: 24px;
@@ -95,7 +97,7 @@
         td.label {
             font-weight: bold;
             color: #3498db;
-            width: 34%;
+            width: 10%;
         }
         input, select {
             width: 98%;
@@ -205,16 +207,12 @@
                         <tr>
                             <td class="label">SĐT:</td>
                             <td><input type="text" name="phone" value="${user.phone}" 
-                                pattern="^[0-9]{9,12}$" title="Số điện thoại không hợp lệ" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label">Ngày sinh:</td>
-                            <td><input type="date" name="dob" value="${user.dob}" required /></td>
+                                pattern="^[0]+[0-9]{9}$" title="Số đầu tiên phải là 0, độ dài 10 số" /></td>
                         </tr>
                     </table>
                     <div class="btn-row">
                         <button type="submit" class="save-btn">Lưu thay đổi</button>
-                        <a href="profile" class="cancel-link">Huỷ</a>
+                        <a href="profile" class="cancel-link">Quay lại</a>
                     </div>
                 </form>
             </div>

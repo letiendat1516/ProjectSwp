@@ -154,9 +154,14 @@ response.setDateHeader("Expires", 0); // Proxies
                 color: #1567c1;
                 margin-bottom: 15px;
             }
+
+            .filter-label {
+                font-size: 0.9rem;
+                color: #5a7da0;
+            }
             .filter-bar {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                grid-template-columns: repeat(5, 1fr);
                 gap: 15px;
                 align-items: end;
             }
@@ -164,37 +169,41 @@ response.setDateHeader("Expires", 0); // Proxies
                 display: flex;
                 flex-direction: column;
                 gap: 5px;
+                height: 100%;
+                justify-content: flex-end;
             }
-            .filter-label {
-                font-size: 0.9rem;
-                color: #5a7da0;
+            .filter-bar select,
+            .filter-bar input[type="text"],
+            .filter-bar .search-btn,
+            .filter-bar .btn {
+                height: 36px;
+                padding: 0 14px;
+                font-size: 1rem;
+                border-radius: 5px;
+                box-sizing: border-box;
+                width: 100%;
+                margin: 0;
+                display: block;
             }
-            .filter-bar select, .filter-bar input[type="text"] {
-                padding: 10px;
-                border: 2px solid #e1e5e9;
-                border-radius: 4px;
-                font-size: 14px;
-                width: 95%;
+            .filter-bar .search-btn,
+            .filter-bar {
+                min-width: 90px;
+                font-weight: bold;
             }
-            .filter-bar select:focus, .filter-bar input[type="text"]:focus {
-                outline: none;
-                border-color: #3a8dde;
-            }
-            .search-btn {
-                background: #3a8dde;
-                color: #fff;
-                padding: 10px;
+            .reset-btn {
+                padding: 10px 20px;
                 border: none;
-                border-radius: 4px;
-                cursor: pointer;
+                border-radius: 5px;
+                text-decoration: none;
                 font-size: 14px;
                 font-weight: 500;
-                height: 100%;
-                width: 95%;
-            }
-
-            .search-btn:hover {
-                background: #1567c1;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.2s ease;
+                cursor: pointer;
+                background: lightgrey;
+                color: black;
             }
             .table-container {
                 background: #fff;
@@ -308,7 +317,7 @@ response.setDateHeader("Expires", 0); // Proxies
     <body>
         <div class="container">
             <div class="sidebar">
-                <h2>Warehouse Manager</h2>
+                <h2>Warehouse Management</h2>
                 <a href="usermanager" class="nav-item">Quản lý người dùng</a>
                 <a href="role-permission" class="nav-item">Phân quyền người dùng</a>
                 <a href="categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
@@ -339,18 +348,18 @@ response.setDateHeader("Expires", 0); // Proxies
                                 <div class="filter-group">
                                     <label class="filter-label">Vai trò</label>
                                     <select id="role" name="role">
-                                        <option value="all" selected>Tất cả vai trò</option>
-                                        <option value="2">Nhân viên kho</option>
-                                        <option value="3">Nhân viên công ty</option>
-                                        <option value="4">Giám đốc công ty</option>
+                                        <option value="all" ${param.role == 'all' || empty param.role ? 'selected' : ''}>Tất cả vai trò</option>
+                                        <option value="2" ${param.role == '2' ? 'selected' : ''}>Nhân viên kho</option>
+                                        <option value="3" ${param.role == '3' ? 'selected' : ''}>Nhân viên công ty</option>
+                                        <option value="4" ${param.role == '4' ? 'selected' : ''}>Giám đốc công ty</option>
                                     </select>
                                 </div>
                                 <div class="filter-group">
                                     <label class="filter-label">Trạng thái</label>
                                     <select name="status">
-                                        <option value="">Tất cả trạng thái</option>
-                                        <option value="active">Đang hoạt động</option>
-                                        <option value="inactive">Không hoạt động</option>
+                                        <option value="" ${empty param.status ? 'selected' : ''}>Tất cả trạng thái</option>
+                                        <option value="active" ${param.status == 'active' ? 'selected' : ''}>Đang hoạt động</option>
+                                        <option value="inactive" ${param.status == 'inactive' ? 'selected' : ''}>Không hoạt động</option>
                                     </select>
                                 </div>
                                 <div class="filter-group">
@@ -366,13 +375,18 @@ response.setDateHeader("Expires", 0); // Proxies
                                 </div>
 
                                 <div class="filter-group">
-                                    <label class="filter-label">Từ khóa</label>
-                                    <input type="text" name="keyword" placeholder="Tìm theo tên đăng nhập, họ tên...">
+                                    <label class="filter-label">Tên người dùng</label>
+                                    <input type="text" name="keyword" value="${keyword != null ? keyword : ''}">
                                 </div>
+
                                 <div class="filter-group">
                                     <button type="submit" class="search-btn">Tìm kiếm</button>
                                 </div>
+                                <div> <a href="usermanager" class="reset-btn">Reset</a></div>
+
+
                             </div>
+                            <input type="hidden" name="search" value="1" />
                             <input type="hidden" name="page" value="usermanager" />
                         </form>
                     </div>
@@ -447,24 +461,24 @@ response.setDateHeader("Expires", 0); // Proxies
                     </div>
                     <c:if test="${totalPages > 1}">
                         <center>
-                        <div class="pagination">
-                            <c:if test="${currentPage > 1}">
-                                <a href="usermanager?page=${currentPage - 1}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">Trước</a>
-                            </c:if>
-                            <c:forEach begin="1" end="${totalPages}" var="i">
-                                <c:choose>
-                                    <c:when test="${i == currentPage}">
-                                        <button class="active">${i}</button>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <a href="usermanager?page=${i}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">${i}</a>
-                                    </c:otherwise>
-                                </c:choose>
-                            </c:forEach>
-                            <c:if test="${currentPage < totalPages}">
-                                <a href="usermanager?page=${currentPage + 1}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">Sau</a>
-                            </c:if>
-                        </div>
+                            <div class="pagination">
+                                <c:if test="${currentPage > 1}">
+                                    <a href="usermanager?page=${currentPage - 1}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">Trước</a>
+                                </c:if>
+                                <c:forEach begin="1" end="${totalPages}" var="i">
+                                    <c:choose>
+                                        <c:when test="${i == currentPage}">
+                                            <button class="active">${i}</button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="usermanager?page=${i}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">${i}</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
+                                <c:if test="${currentPage < totalPages}">
+                                    <a href="usermanager?page=${currentPage + 1}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">Sau</a>
+                                </c:if>
+                            </div>
                         </center>
                     </c:if>
                 </div>

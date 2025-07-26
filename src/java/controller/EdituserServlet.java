@@ -7,6 +7,7 @@ package controller;
 import dao.DepartmentDAO;
 import dao.UserDAO;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -81,7 +82,6 @@ public class EdituserServlet extends HttpServlet {
             String fullname = request.getParameter("fullname");
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
-            String dobStr = request.getParameter("dob");
             int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
             int roleId = Integer.parseInt(request.getParameter("role"));
             String departmentIdStr = request.getParameter("departmentId");
@@ -89,6 +89,25 @@ public class EdituserServlet extends HttpServlet {
                     ? Integer.parseInt(departmentIdStr) : null;
 
             UserDAO userDAO = new UserDAO();
+
+            //(trừ chính user đang edit)
+            // Kiểm tra username
+            if (userDAO.isUsernameExistsForEdit(username, id)) {
+                returnEditWithError(request, response, id, "Tên đăng nhập đã tồn tại!");
+                return;
+            }
+
+            // Kiểm tra email
+            if (userDAO.isEmailExistsForEdit(email, id)) {
+                returnEditWithError(request, response, id, "Email đã tồn tại!");
+                return;
+            }
+
+            // Kiểm tra số điện thoại
+            if (userDAO.isPhoneExistsForEdit(phone, id)) {
+                returnEditWithError(request, response, id, "Số điện thoại đã tồn tại!");
+                return;
+            }
 
             // Xử lý mật khẩu: nếu không đổi thì lấy lại mật khẩu cũ
             String hashedPassword;
@@ -98,7 +117,7 @@ public class EdituserServlet extends HttpServlet {
                 hashedPassword = userDAO.getUserById(id).getPassword();
             }
 
-            // Build user object
+
             Users user = new Users();
             user.setId(id);
             user.setUsername(username);
@@ -107,52 +126,55 @@ public class EdituserServlet extends HttpServlet {
             user.setEmail(email);
             user.setPhone(phone);
             user.setDepartmentId(departmentId);
-
-            // Xử lý ngày sinh và validate tuổi
-            java.sql.Date dob = null;
-            if (dobStr != null && !dobStr.trim().isEmpty()) {
-                try {
-                    dob = java.sql.Date.valueOf(dobStr);
-                } catch (IllegalArgumentException e) {
-                    returnEditWithError(request, response, id, "Ngày sinh không hợp lệ!");
-                    return;
-                }
-            }
-            user.setDob(dob);
-            if (dob != null) {
-                int age = java.time.Period.between(dob.toLocalDate(), java.time.LocalDate.now()).getYears();
-                if (age < 18 || age > 60) {
-                    returnEditWithError(request, response, id, "Tuổi người dùng phải từ 18 đến 60!");
-                    return;
-                }
-            }
-
             user.setActiveFlag(activeFlag);
-
             userDAO.updateUser(user, roleId);
 
-            // Thành công
+
             HttpSession session = request.getSession();
             session.setAttribute("message", "Cập nhật người dùng thành công!");
             response.sendRedirect("usermanager");
+
+        } catch (SQLException e) {
+            try {
+                int id = Integer.parseInt(request.getParameter("id"));
+                // Xử lý lỗi SQL cụ thể
+                String errorMessage = "Lỗi cơ sở dữ liệu: " + e.getMessage();
+                if (e.getMessage().contains("username")) {
+                    errorMessage = "Tên đăng nhập đã tồn tại!";
+                } else if (e.getMessage().contains("email")) {
+                    errorMessage = "Email đã tồn tại!";
+                } else if (e.getMessage().contains("phone")) {
+                    errorMessage = "Số điện thoại đã tồn tại!";
+                }
+                returnEditWithError(request, response, id, errorMessage);
+            } catch (Exception ex) {
+                response.sendRedirect("usermanager");
+            }
         } catch (Exception e) {
             // Gặp lỗi thì lấy lại dữ liệu, forward về form và báo lỗi
             try {
                 int id = Integer.parseInt(request.getParameter("id"));
-                returnEditWithError(request, response, id, "Không thể cập nhật người dùng!");
+                returnEditWithError(request, response, id, "Không thể cập nhật người dùng: " + e.getMessage());
             } catch (Exception ex) {
                 response.sendRedirect("usermanager");
             }
         }
     }
 
-// Hàm phụ: forward về EditUser.jsp với dữ liệu và lỗi
+// Hàm forward về EditUser.jsp với dữ liệu và lỗi
     private void returnEditWithError(HttpServletRequest request, HttpServletResponse response, int userId, String errorMsg)
             throws ServletException, IOException {
         UserDAO userDAO = new UserDAO();
         DepartmentDAO deptDAO = new DepartmentDAO();
         Users user = userDAO.getUserById(userId);
         List<Department> departments = deptDAO.getAllDepartments();
+
+        // Giữ lại dữ liệu người dùng đã nhập
+        user.setUsername(request.getParameter("username"));
+        user.setFullname(request.getParameter("fullname"));
+        user.setEmail(request.getParameter("email"));
+        user.setPhone(request.getParameter("phone"));
+
         request.setAttribute("editUser", user);
         request.setAttribute("departments", departments);
         request.setAttribute("error", errorMsg);
@@ -162,6 +184,6 @@ public class EdituserServlet extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
+    }
 
 }

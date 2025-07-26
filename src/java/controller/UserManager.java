@@ -43,39 +43,24 @@ public class UserManager extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("/login.jsp");
             return;
         }
 
-        // Đọc các param filter/search
         String roleParam = request.getParameter("role");
         String status = request.getParameter("status");
-        String keyword = request.getParameter("keyword");
+        String fullname = request.getParameter("keyword");
         String departmentIdStr = request.getParameter("departmentId");
-        String pageParam = request.getParameter("page");
-        int pageIndex = 1;
-        int pageSize = 10;
-        if (pageParam != null) {
-            try {
-                pageIndex = Integer.parseInt(pageParam);
-                if (pageIndex < 1) {
-                    pageIndex = 1;
-                }
-            } catch (NumberFormatException e) {
-                pageIndex = 1;
-            }
-        }
+        String isSearch = request.getParameter("search");
+        boolean isFiltering = "1".equals(isSearch);
 
         boolean includeAdmin = false;
         Integer roleId = null;
-        Integer departmentId = null;
-
         if (roleParam != null) {
             if ("all".equalsIgnoreCase(roleParam)) {
-                includeAdmin = true;
+                includeAdmin = false;
             } else {
                 try {
                     roleId = Integer.parseInt(roleParam);
@@ -84,6 +69,9 @@ public class UserManager extends HttpServlet {
                 }
             }
         }
+
+        // Xử lý department parameter
+        Integer departmentId = null;
         if (departmentIdStr != null && !departmentIdStr.trim().isEmpty()) {
             try {
                 departmentId = Integer.parseInt(departmentIdStr);
@@ -92,34 +80,60 @@ public class UserManager extends HttpServlet {
             }
         }
 
-        // Truy vấn phòng ban cho dropdown
         DepartmentDAO deptDAO = new DepartmentDAO();
         List<Department> departments = deptDAO.getAllDepartments();
         request.setAttribute("departments", departments);
 
-        // Truy vấn user theo filter và phân trang
         UserDAO userDAO = new UserDAO();
+        List<Users> userList;
+        int totalPages = 1;
+        int totalUsers = 0;
 
-        // Lấy tổng số user theo filter
-        int totalUsers = userDAO.countFilteredUsers(roleId, status, keyword, departmentId, includeAdmin);
-        int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
-        if (pageIndex > totalPages && totalPages > 0) {
-            pageIndex = totalPages;
-        }
-        if (pageIndex < 1) {
-            pageIndex = 1;
+        int pageIndex = 1;
+        int pageSize = 10;
+
+        if (!isFiltering) {
+            String pageParam = request.getParameter("page");
+            if (pageParam != null && !pageParam.equals("usermanager")) {
+                try {
+                    pageIndex = Integer.parseInt(pageParam);
+                    if (pageIndex < 1) {
+                        pageIndex = 1;
+                    }
+                } catch (NumberFormatException e) {
+                    pageIndex = 1;
+                }
+            }
         }
 
-        List<Users> userList = userDAO.filterUsersWithPaging(roleId, status, keyword, departmentId, includeAdmin, pageIndex, pageSize);
+        //filter/search
+        if (isFiltering) {
+            userList = userDAO.filterUsers(roleId, status, fullname, departmentId, includeAdmin);
+            totalUsers = userList.size();
+            totalPages = 1;
+            request.setAttribute("currentPage", 1);
+        } else {
+            totalUsers = userDAO.countFilteredUsers(roleId, status, fullname, departmentId, includeAdmin);
+            totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+
+            if (pageIndex > totalPages && totalPages > 0) {
+                pageIndex = totalPages;
+            }
+            if (pageIndex < 1) {
+                pageIndex = 1;
+            }
+
+            userList = userDAO.filterUsersWithPaging(roleId, status, fullname, departmentId, includeAdmin, pageIndex, pageSize);
+            request.setAttribute("currentPage", pageIndex);
+        }
 
         request.setAttribute("userList", userList);
         request.setAttribute("totalPages", totalPages);
-        request.setAttribute("currentPage", pageIndex);
+        request.setAttribute("totalUsers", totalUsers);
 
-        // Giữ lại các filter param để trả lại view
         request.setAttribute("roleSelected", roleParam);
         request.setAttribute("statusSelected", status);
-        request.setAttribute("keyword", keyword);
+        request.setAttribute("keyword", fullname);
         request.setAttribute("departmentIdSelected", departmentIdStr);
 
         request.getRequestDispatcher("UserManager.jsp").forward(request, response);

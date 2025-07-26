@@ -328,7 +328,7 @@
                                        id="phone" 
                                        name="phone" 
                                        value="${phone}" 
-                                       maxlength="20" 
+                                       maxlength="10" 
                                        pattern="[0-9+\-\s()]+"
                                        placeholder="0123456789">
                                 <div class="form-text">Số điện thoại liên hệ của phòng ban</div>

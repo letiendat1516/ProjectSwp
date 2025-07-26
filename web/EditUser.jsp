@@ -109,16 +109,18 @@ if (user == null) {
                 background: orange;
             }
             .form-container {
-                max-width: 900px;
-                margin: auto;
+                width: 100%;
+                margin: 0;
+                padding: 24px 32px 32px 32px;
+                border-radius: 10px;
                 background: white;
-                padding: 5px 32px 15px 32px;
-                border-radius: 8px;
                 box-shadow: 0 6px 32px rgba(21,103,193,0.07), 0 1.5px 8px rgba(35,58,88,0.09);
+                box-sizing: border-box;
             }
             .form-simple {
-                max-width: 700px;
-                margin: 40px auto;
+                width: 100%;
+                max-width: 100%;
+                margin: 40px auto 0 auto;
                 background: #fff;
                 border-radius: 14px;
                 box-shadow: 0 6px 32px rgba(21,103,193,0.10);
@@ -126,6 +128,7 @@ if (user == null) {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 gap: 18px 26px;
+                box-sizing: border-box;
             }
             .form-simple-title {
                 grid-column: 1 / -1;
@@ -136,19 +139,22 @@ if (user == null) {
                 margin-bottom: 12px;
             }
             .form-simple-label {
-                margin-bottom: 6px;
+                margin-bottom: 7px;
                 font-weight: 500;
                 color: #2d3c54;
+                display: block;
             }
             .form-simple-input, .form-simple-select {
                 width: 100%;
-                padding: 10px 12px;
-                border-radius: 6px;
-                border: 1.1px solid #d3d9e7;
+                min-height: 44px;
+                padding: 10px 14px;
+                border-radius: 7px;
+                border: 1.2px solid #d3d9e7;
                 background: #f8fafc;
-                font-size: 1rem;
+                font-size: 1.05rem;
                 outline: none;
                 transition: border .16s;
+                box-sizing: border-box;
             }
             .form-simple-input:focus, .form-simple-select:focus {
                 border: 1.5px solid #2196f3;
@@ -197,6 +203,21 @@ if (user == null) {
                 text-align: center;
                 font-weight: 500;
             }
+            @media (max-width: 900px) {
+                .main-content, .header {
+                    max-width: 100vw;
+                    padding-left: 0;
+                    padding-right: 0;
+                }
+                .form-container {
+                    padding: 10px 2vw 20px 2vw;
+                }
+                .form-simple {
+                    grid-template-columns: 1fr;
+                    padding: 18px 3vw 14px 3vw;
+                }
+            }
+
         </style>
     </head>
     <body>
@@ -257,20 +278,15 @@ if (user == null) {
                         <div>
                             <label class="form-simple-label" for="phone">SĐT:</label>
                             <input type="text" id="phone" name="phone" class="form-simple-input" value="${editUser.phone}" required
-                                   pattern="^[0]+[0-9]{8,11}$"
-                                   title="Số điện thoại không hợp lệ">
-                        </div>
-                        <div>
-                            <label class="form-simple-label" for="dob">Ngày sinh:</label>
-                            <input type="date" id="dob" name="dob" class="form-simple-input" value="${editUser.dob}" required>
+                                   pattern="^[0]+[0-9]{9}$"
+                                   title="Số đầu tiên phải là 0. Độ dài 10 số">
                         </div>
                         <div>
                             <label class="form-simple-label" for="departmentId">Phòng ban:</label>
                             <select id="departmentId" name="departmentId" class="form-simple-select">
                                 <option value="" <c:if test="${editUser.departmentId == null}">selected</c:if>>Không</option>
-
                                 <c:forEach var="dept" items="${departments}">
-                                    <option value="${dept.id}" 
+                                    <option value="${dept.id}"
                                             <c:if test="${editUser.departmentId == dept.id}">selected</c:if>>
                                         ${dept.deptName}
                                     </option>

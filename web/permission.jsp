@@ -247,7 +247,7 @@
     <body>
         <div class="container">
             <div class="sidebar">
-                <h2>Warehouse Manager</h2>
+                <h2>Warehouse Management</h2>
                 <a href="usermanager" class="nav-item">Quản lý người dùng</a>
                 <a href="role-permission" class="nav-item">Phân quyền người dùng</a>
                 <a href="categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>

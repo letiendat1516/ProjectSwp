@@ -455,8 +455,7 @@
                 <!-- Top Departments by Employee Count -->
                 <div class="table-container">
                     <h3>Phòng ban có nhiều nhân viên nhất</h3>
-                    <button class="btn btn-excel" onclick="window.location.href='${pageContext.request.contextPath}/department/statistics/export'">📊 Xuất Excel</button>
-                    
+                     
                     <table>
                         <thead>
                             <tr>
