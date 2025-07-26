@@ -59,6 +59,37 @@ public class ProductInfoDAO {
   }
 
   /**
+   * Get only active products (excludes inactive and deleted products)
+   * @return List of active ProductInfo objects
+   */
+  public List<ProductInfo> getActiveProducts() {
+      List<ProductInfo> list = new ArrayList<>();
+      String sql = "SELECT id, name, code, cate_id, unit_id, status, description, min_stock_threshold FROM product_info WHERE status = 'active'";
+
+      try (
+              Connection con = Context.getJDBCConnection(); 
+              PreparedStatement stmt = con.prepareStatement(sql); 
+              ResultSet rs = stmt.executeQuery();) {
+          while (rs.next()) {
+              ProductInfo p = new ProductInfo();
+              p.setId(rs.getInt(COL_ID));
+              p.setName(rs.getString(COL_NAME));
+              p.setCode(rs.getString(COL_CODE));
+              p.setCate_id(rs.getInt(COL_CATE_ID));
+              p.setUnit_id(rs.getInt(COL_UNIT_ID));
+              p.setStatus(rs.getString(COL_STATUS));
+              p.setDescription(rs.getString(COL_DESCRIPTION));
+              p.setMinStockThreshold(rs.getBigDecimal("min_stock_threshold"));
+              list.add(p);
+          }
+      } catch (SQLException e) {
+          e.printStackTrace();
+      }
+
+      return list;
+  }
+
+  /**
    * Get product name by ID
    * @param productId The ID of the product
    * @return Product name as String
@@ -376,6 +407,29 @@ public class ProductInfoDAO {
           e.printStackTrace();
       }
       return categories;
+  }
+  
+  /**
+   * Get category name by ID
+   * @param categoryId The ID of the category
+   * @return Category name as String
+   */
+  public String getCategoryNameById(int categoryId) {
+      String sql = "SELECT name FROM category WHERE id = ? AND active_flag = 1";
+      try (Connection con = Context.getJDBCConnection(); 
+           PreparedStatement stmt = con.prepareStatement(sql)) {
+          
+          stmt.setInt(1, categoryId);
+          ResultSet rs = stmt.executeQuery();
+          
+          if (rs.next()) {
+              return rs.getString("name");
+          }
+          
+      } catch (SQLException e) {
+          e.printStackTrace();
+      }
+      return null;
   }
   
   /**
@@ -881,6 +935,289 @@ public List<ProductInfo> getAllProductsWithUnitSymbols() {
         e.printStackTrace();
     }
     return products;
+}
+
+/**
+ * Get products with their stock information for stock management
+ * @param page Page number (0-based)
+ * @param pageSize Number of items per page
+ * @param search Search keyword
+ * @return List of ProductInfo objects with stock data
+ */
+public List<ProductInfo> getProductsWithStockInfo(int page, int pageSize, String search) {
+    List<ProductInfo> products = new ArrayList<>();
+    StringBuilder sql = new StringBuilder();
+    sql.append("SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, ")
+       .append("p.min_stock_threshold, p.supplier_id, p.expiration_date, p.additional_notes, ")
+       .append("c.name as category_name, u.name as unit_name, u.symbol as unit_symbol, ")
+       .append("s.name as supplier_name, ")
+       .append("ps.qty as stock_quantity, ps.status as stock_status ")
+       .append("FROM product_info p ")
+       .append("LEFT JOIN category c ON p.cate_id = c.id ")
+       .append("LEFT JOIN unit u ON p.unit_id = u.id ")
+       .append("LEFT JOIN supplier s ON p.supplier_id = s.id ")
+       .append("LEFT JOIN product_in_stock ps ON p.id = ps.product_id ")
+       .append("WHERE p.status = 'active' ");
+    
+    if (search != null && !search.trim().isEmpty()) {
+        sql.append("AND (p.name LIKE ? OR p.code LIKE ? OR c.name LIKE ?) ");
+    }
+    
+    sql.append("ORDER BY p.name ASC ");
+    sql.append("LIMIT ? OFFSET ?");
+    
+    try (Connection con = Context.getJDBCConnection();
+         PreparedStatement stmt = con.prepareStatement(sql.toString())) {
+        
+        int paramIndex = 1;
+        if (search != null && !search.trim().isEmpty()) {
+            String searchParam = "%" + search.trim() + "%";
+            stmt.setString(paramIndex++, searchParam);
+            stmt.setString(paramIndex++, searchParam);
+            stmt.setString(paramIndex++, searchParam);
+        }
+        
+        stmt.setInt(paramIndex++, pageSize);
+        stmt.setInt(paramIndex, page * pageSize);
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                ProductInfo product = new ProductInfo();
+                product.setId(rs.getInt("id"));
+                product.setName(rs.getString("name"));
+                product.setCode(rs.getString("code"));
+                product.setCate_id(rs.getInt("cate_id"));
+                product.setUnit_id(rs.getInt("unit_id"));
+                product.setStatus(rs.getString("status"));
+                product.setDescription(rs.getString("description"));
+                product.setSupplierId(rs.getInt("supplier_id"));
+                
+                // Handle dates and thresholds
+                if (rs.getDate("expiration_date") != null) {
+                    product.setExpirationDate(rs.getDate("expiration_date"));
+                }
+                
+                product.setAdditionalNotes(rs.getString("additional_notes"));
+                
+                if (rs.getBigDecimal("min_stock_threshold") != null) {
+                    product.setMinStockThreshold(rs.getBigDecimal("min_stock_threshold"));
+                }
+                
+                // Set stock information
+                if (rs.getBigDecimal("stock_quantity") != null) {
+                    product.setStockQuantity(rs.getBigDecimal("stock_quantity"));
+                }
+                product.setStockStatus(rs.getString("stock_status"));
+                
+                // Set additional fields for display
+                product.setUnitSymbol(rs.getString("unit_symbol"));
+                
+                products.add(product);
+            }
+        }
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return products;
+}
+
+/**
+ * Get total count of products for stock management pagination
+ * @param search Search keyword
+ * @return Total count
+ */
+public int getTotalProductCountForStock(String search) {
+    StringBuilder sql = new StringBuilder();
+    sql.append("SELECT COUNT(*) FROM product_info p ")
+       .append("LEFT JOIN category c ON p.cate_id = c.id ")
+       .append("WHERE p.status = 'active' ");
+    
+    if (search != null && !search.trim().isEmpty()) {
+        sql.append("AND (p.name LIKE ? OR p.code LIKE ? OR c.name LIKE ?) ");
+    }
+    
+    try (Connection con = Context.getJDBCConnection();
+         PreparedStatement stmt = con.prepareStatement(sql.toString())) {
+        
+        if (search != null && !search.trim().isEmpty()) {
+            String searchParam = "%" + search.trim() + "%";
+            stmt.setString(1, searchParam);
+            stmt.setString(2, searchParam);
+            stmt.setString(3, searchParam);
+        }
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return 0;
+}
+
+/**
+ * Get products that don't have stock records yet
+ * @return List of ProductInfo objects
+ */
+public List<ProductInfo> getProductsWithoutStock() {
+    List<ProductInfo> products = new ArrayList<>();
+    String sql = "SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, " +
+                "c.name as category_name, u.name as unit_name, u.symbol as unit_symbol " +
+                "FROM product_info p " +
+                "LEFT JOIN category c ON p.cate_id = c.id " +
+                "LEFT JOIN unit u ON p.unit_id = u.id " +
+                "LEFT JOIN product_in_stock ps ON p.id = ps.product_id " +
+                "WHERE p.status = 'active' AND ps.product_id IS NULL " +
+                "ORDER BY p.name ASC";
+    
+    try (Connection con = Context.getJDBCConnection();
+         PreparedStatement stmt = con.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+        
+        while (rs.next()) {
+            ProductInfo product = new ProductInfo();
+            product.setId(rs.getInt("id"));
+            product.setName(rs.getString("name"));
+            product.setCode(rs.getString("code"));
+            product.setCate_id(rs.getInt("cate_id"));
+            product.setUnit_id(rs.getInt("unit_id"));
+            product.setStatus(rs.getString("status"));
+            product.setDescription(rs.getString("description"));
+            product.setUnitSymbol(rs.getString("unit_symbol"));
+            products.add(product);
+        }
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return products;
+}
+
+/**
+ * Update minimum stock threshold for a product
+ * @param productId Product ID
+ * @param minThreshold New minimum threshold
+ * @return true if successful
+ */
+public boolean updateMinStockThreshold(int productId, BigDecimal minThreshold) {
+    String sql = "UPDATE product_info SET min_stock_threshold = ? WHERE id = ?";
+    
+    try (Connection con = Context.getJDBCConnection();
+         PreparedStatement stmt = con.prepareStatement(sql)) {
+        
+        stmt.setBigDecimal(1, minThreshold);
+        stmt.setInt(2, productId);
+        
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+/**
+ * Get products with pagination (no stock information)
+ * @param page Page number (0-based)
+ * @param pageSize Number of products per page
+ * @param search Search term for product name or code
+ * @param sortBy Sort field (name, code, status, category)
+ * @param sortOrder Sort order (asc or desc)
+ * @return List of ProductInfo objects
+ */
+public List<ProductInfo> getProductsPaginated(int page, int pageSize, String search, String sortBy, String sortOrder) {
+    List<ProductInfo> list = new ArrayList<>();
+    StringBuilder sql = new StringBuilder();
+    
+    sql.append("SELECT p.id, p.name, p.code, p.cate_id, p.unit_id, p.status, p.description, p.min_stock_threshold, ");
+    sql.append("c.name as category_name, u.name as unit_name, u.symbol as unit_symbol ");
+    sql.append("FROM product_info p ");
+    sql.append("LEFT JOIN category c ON p.cate_id = c.id ");
+    sql.append("LEFT JOIN unit u ON p.unit_id = u.id ");
+    sql.append("WHERE p.status != 'deleted' ");
+    
+    if (search != null && !search.trim().isEmpty()) {
+        sql.append("AND (p.name LIKE ? OR p.code LIKE ?) ");
+    }
+    
+    // Add sorting
+    if (sortBy != null && !sortBy.trim().isEmpty()) {
+        switch (sortBy.toLowerCase()) {
+            case "name":
+                sql.append("ORDER BY p.name ");
+                break;
+            case "code":
+                sql.append("ORDER BY p.code ");
+                break;
+            case "status":
+                sql.append("ORDER BY p.status ");
+                break;
+            case "category":
+                sql.append("ORDER BY c.name ");
+                break;
+            default:
+                sql.append("ORDER BY p.id ");
+                break;
+        }
+        
+        if ("desc".equalsIgnoreCase(sortOrder)) {
+            sql.append("DESC ");
+        } else {
+            sql.append("ASC ");
+        }
+    } else {
+        sql.append("ORDER BY p.id ASC ");
+    }
+    
+    sql.append("LIMIT ? OFFSET ?");
+    
+    try (Connection con = Context.getJDBCConnection(); 
+         PreparedStatement stmt = con.prepareStatement(sql.toString())) {
+        
+        int paramIndex = 1;
+        
+        if (search != null && !search.trim().isEmpty()) {
+            String searchPattern = "%" + search.trim() + "%";
+            stmt.setString(paramIndex++, searchPattern);
+            stmt.setString(paramIndex++, searchPattern);
+        }
+        
+        stmt.setInt(paramIndex++, pageSize);
+        stmt.setInt(paramIndex, page * pageSize);
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        while (rs.next()) {
+            ProductInfo product = new ProductInfo();
+            product.setId(rs.getInt("id"));
+            product.setName(rs.getString("name"));
+            product.setCode(rs.getString("code"));
+            product.setCate_id(rs.getInt("cate_id"));
+            product.setUnit_id(rs.getInt("unit_id"));
+            product.setStatus(rs.getString("status"));
+            product.setDescription(rs.getString("description"));
+            product.setMinStockThreshold(rs.getBigDecimal("min_stock_threshold"));
+            product.setUnitSymbol(rs.getString("unit_symbol"));
+            
+            // Store category name in additionalNotes temporarily
+            String categoryName = rs.getString("category_name");
+            product.setAdditionalNotes(categoryName != null ? categoryName : "Chưa phân loại");
+            
+            list.add(product);
+        }
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return list;
 }
 
 }

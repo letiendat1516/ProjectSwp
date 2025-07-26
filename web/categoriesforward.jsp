@@ -323,6 +323,23 @@
                             </a>
                         </div>
                     </div>
+
+                    <!-- Stock Management -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Quản lý Tồn kho</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-container">
+                                <span class="material-icons">warehouse</span>
+                            </div>
+                            <h4 class="card-title">Quản lý Tồn kho Sản phẩm</h4>
+                            <p class="card-text">Theo dõi, cập nhật số lượng tồn kho và thiết lập ngưỡng cảnh báo cho sản phẩm.</p>
+                            <a href="product-stock/list" class="btn btn-primary">
+                                Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

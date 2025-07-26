@@ -3,7 +3,7 @@ package controller;
 // Controller for listing, searching, and paginating products
 
 import dao.ProductInfoDAO;
-import model.ProductStock;
+import model.ProductInfo;
 import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -65,18 +65,13 @@ public class ProductListController extends HttpServlet {
         }
         
         // Get products with pagination and search
-        List<ProductStock> products = productDAO.getProductsWithStock(page, pageSize, search, sortBy, sortOrder);
+        List<ProductInfo> products = productDAO.getProductsPaginated(page, pageSize, search, sortBy, sortOrder);
         int totalProducts = productDAO.getTotalProductCount(search);
         int totalPages = (int) Math.ceil((double) totalProducts / pageSize);
         
-        // Calculate statistics for all products (not just current page)
-        List<ProductStock> allProductsForStats = productDAO.getProductsWithStock(0, Integer.MAX_VALUE, search, sortBy, sortOrder);
-        long lowStockCount = calculateLowStockCount(allProductsForStats);
-        long nearExpirationCount = calculateNearExpirationCount(allProductsForStats);
-        
         // Set attributes for JSP
         setRequestAttributes(request, products, page, totalPages, pageSize, totalProducts, 
-                           search, sortBy, sortOrder, lowStockCount, nearExpirationCount);
+                           search, sortBy, sortOrder);
         
         // Forward to JSP
         request.getRequestDispatcher("/product-list.jsp").forward(request, response);
@@ -94,18 +89,9 @@ public class ProductListController extends HttpServlet {
         }
     }
     
-    private long calculateLowStockCount(List<ProductStock> products) {
-        return products.stream().mapToLong(p -> p.isLowStock() ? 1 : 0).sum();
-    }
-    
-    private long calculateNearExpirationCount(List<ProductStock> products) {
-        return products.stream().mapToLong(p -> p.isNearExpiration() ? 1 : 0).sum();
-    }
-    
-    private void setRequestAttributes(HttpServletRequest request, List<ProductStock> products,
+    private void setRequestAttributes(HttpServletRequest request, List<ProductInfo> products,
                                     int page, int totalPages, int pageSize, int totalProducts,
-                                    String search, String sortBy, String sortOrder,
-                                    long lowStockCount, long nearExpirationCount) {
+                                    String search, String sortBy, String sortOrder) {
         request.setAttribute("products", products);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
@@ -114,7 +100,5 @@ public class ProductListController extends HttpServlet {
         request.setAttribute("search", search != null ? search : "");
         request.setAttribute("sortBy", sortBy != null ? sortBy : "");
         request.setAttribute("sortOrder", sortOrder);
-        request.setAttribute("lowStockCount", lowStockCount);
-        request.setAttribute("nearExpirationCount", nearExpirationCount);
     }
 }

@@ -341,14 +341,6 @@
             flex-wrap: nowrap;
         }
 
-        .highlight-low-stock {
-            background: rgba(220, 53, 69, 0.1) !important;
-        }
-
-        .highlight-expiring {
-            background: rgba(255, 193, 7, 0.1) !important;
-        }
-
         .pagination {
             display: flex;
             justify-content: center;
@@ -509,7 +501,7 @@
         
                 <div class="header">
                     <h1 class="page-title">Quản Lý Sản Phẩm</h1>
-                    <p>Quản lý trạng thái và theo dõi tồn kho sản phẩm</p>
+                    <p>Quản lý thông tin cơ bản của sản phẩm trong hệ thống</p>
                     <div class="header-user">
                         <label class="label"><%= user.getFullname()%></label>
                         <a href="logout" class="logout-btn">Đăng xuất</a>
@@ -519,6 +511,7 @@
         <div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
             <a href="categoriesforward.jsp" class="back-btn">← Quay lại Trang trước</a>
             <a href="add-product" class="add-product-btn">Thêm Sản Phẩm Mới</a>
+            <a href="product-stock/list" class="add-product-btn" style="background: #28a745; color: white;">Quản Lý Tồn Kho</a>
             <a href="inventory-statistics" class="add-product-btn" style="background: #17a2b8; color: white;">Thống Kê Kho Hàng</a>
         </div>        <!-- Success Message -->
         <c:if test="${not empty param.success}">
@@ -589,19 +582,13 @@
                                     Danh mục
                                     <span class="sort-icon ${sortBy == 'category' ? (sortOrder == 'asc' ? 'sort-asc' : 'sort-desc') : ''}"></span>
                                 </th>
-
-                                <th class="sortable" onclick="sortTable('stock')">
-                                    Số lượng
-                                    <span class="sort-icon ${sortBy == 'stock' ? (sortOrder == 'asc' ? 'sort-asc' : 'sort-desc') : ''}"></span>
-                                </th>                               
                                 <th>Đơn vị</th>
-                                <th>Cảnh báo</th>
                                 <th class="action-column">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:forEach var="product" items="${products}">
-                                <tr class="${product.lowStock ? 'highlight-low-stock' : ''} ${product.nearExpiration ? 'highlight-expiring' : ''}">
+                                <tr>
                                     <td>
                                         <strong>
                                             <a href="product-detail?id=${product.id}" style="color: #667eea; text-decoration: none; font-weight: bold;">
@@ -627,27 +614,8 @@
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
-                                    <td>${product.categoryName != null ? product.categoryName : 'Chưa phân loại'}</td>
-
-                                    <td>
-                                        <strong>
-                                            <fmt:formatNumber value="${product.stockQuantity}" type="number" maxFractionDigits="2" />
-                                        </strong>
-                                        <c:if test="${product.minStockThreshold != null && product.minStockThreshold > 0}">
-                                            <br><small style="color: #666;">Ngưỡng: <fmt:formatNumber value="${product.minStockThreshold}" type="number" maxFractionDigits="2" /></small>
-                                        </c:if>
-                                    </td>
-                                    <td>${product.unitSymbol != null ? product.unitSymbol : product.unitName}</td>
-                                    <td>
-                                        <c:if test="${product.lowStock}">
-                                            <span class="badge badge-danger">
-                                                Số lượng thấp
-                                            </span>
-                                        </c:if>
-                                        <c:if test="${product.nearExpiration}">
-                                            <span class="badge badge-warning">Sắp hết hạn</span>
-                                        </c:if>
-                                    </td>
+                                    <td>${product.additionalNotes}</td>
+                                    <td>${product.unitSymbol != null ? product.unitSymbol : 'N/A'}</td>
                                     <td class="action-column">
                                         <div class="action-buttons">
                                             <a href="update-product?id=${product.id}" class="btn-edit" title="Chỉnh sửa sản phẩm">
