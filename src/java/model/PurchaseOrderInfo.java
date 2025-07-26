@@ -18,7 +18,6 @@ public class PurchaseOrderInfo {
     private String email;
     private String summary;
     private List<PurchaseOrderItems> purchaseItems;
-
     public PurchaseOrderInfo() {
     }
 

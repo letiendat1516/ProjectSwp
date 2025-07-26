@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +57,7 @@ public class ExportDAO {
                 request.setRejectReason(rs.getString("reject_reason"));
                 request.setApproveBy(rs.getString("approve_by"));
                 request.setCreatedAt(rs.getTimestamp("created_at"));
+                request.setExportAt(rs.getTimestamp("export_at")); // Added export_at
 
                 System.out.println("✅ Found export request: " + id + " with status: " + request.getStatus());
             } else {
@@ -186,7 +188,7 @@ public class ExportDAO {
                 System.out.println("   ✅ Successfully processed item: " + item.getProductCode());
             }
 
-            // 4. Cập nhật trạng thái export_request thành completed
+            // 4. Cập nhật trạng thái export_request thành completed và ghi export_at
             if (!updateRequestStatusToCompleted(connection, requestId, processor, additionalNote)) {
                 System.err.println("❌ Failed to update request status to completed");
                 connection.rollback();
@@ -250,7 +252,7 @@ public class ExportDAO {
     }
 
     /**
-     * Cập nhật trạng thái export_request thành completed (PHIÊN BẢN ĐỠN GIẢN)
+     * Cập nhật trạng thái export_request thành completed
      */
     private boolean updateRequestStatusToCompleted(Connection connection, String requestId,
             String processor, String additionalNote) {
@@ -272,7 +274,8 @@ public class ExportDAO {
         UPDATE export_request 
         SET status = 'completed',
             approve_by = ?,
-            reason = CONCAT(COALESCE(reason, ''), ' | ', ?)
+            reason = CONCAT(COALESCE(reason, ''), ' | ', ?),
+            export_at = CURRENT_TIMESTAMP
         WHERE id = ? AND status = 'approved'
         """;
 
@@ -287,7 +290,7 @@ public class ExportDAO {
             System.out.println("   Rows affected: " + updatedRows);
 
             if (updatedRows > 0) {
-                System.out.println("   ✅ Updated export_request status to completed with reason");
+                System.out.println("   ✅ Updated export_request status to completed with reason and export_at");
                 return true;
             } else {
                 System.err.println("❌ No rows updated - request may not exist or not in approved status");
@@ -325,13 +328,9 @@ public class ExportDAO {
     }
 
     /**
-     * Kiểm tra tồn kho trong transaction
-     */
-    /**
      * Kiểm tra tồn kho trong transaction từ bảng product_in_stock
      */
     private boolean checkInventoryAvailabilityInTransaction(Connection connection, String productCode, double requestedQuantity) {
-        // Lấy product_id từ product_code
         String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
         String checkStockSql = "SELECT SUM(qty) as total_stock FROM product_in_stock WHERE product_id = ? AND status = 'active'";
 
@@ -341,7 +340,6 @@ public class ExportDAO {
                 if (idRs.next()) {
                     int productId = idRs.getInt("id");
 
-                    // Kiểm tra tồn kho từ product_in_stock
                     try (PreparedStatement stockPs = connection.prepareStatement(checkStockSql)) {
                         stockPs.setInt(1, productId);
                         try (ResultSet stockRs = stockPs.executeQuery()) {
@@ -370,18 +368,13 @@ public class ExportDAO {
      * Cập nhật tồn kho sau khi xuất từ bảng product_in_stock
      */
     private boolean updateInventoryAfterExport(Connection connection, String productCode, double exportedQuantity) {
-        // Lấy product_id từ product_code
         String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
-
-        // Lấy các record trong product_in_stock theo thứ tự FIFO (First In, First Out)
         String getStockRecordsSql = """
         SELECT id, qty 
         FROM product_in_stock 
         WHERE product_id = ? AND status = 'active' AND qty > 0 
         ORDER BY id ASC
         """;
-
-        // Cập nhật qty trong product_in_stock
         String updateStockSql = "UPDATE product_in_stock SET qty = ? WHERE id = ?";
 
         try (PreparedStatement getIdPs = connection.prepareStatement(getProductIdSql)) {
@@ -393,33 +386,27 @@ public class ExportDAO {
 
                     System.out.println("   🔄 Updating inventory for product ID: " + productId + ", export quantity: " + exportedQuantity);
 
-                    // Lấy danh sách các record tồn kho
                     try (PreparedStatement getStockPs = connection.prepareStatement(getStockRecordsSql)) {
                         getStockPs.setInt(1, productId);
                         try (ResultSet stockRs = getStockPs.executeQuery()) {
-
                             while (stockRs.next() && remainingToExport > 0) {
                                 int stockId = stockRs.getInt("id");
                                 double currentQty = stockRs.getDouble("qty");
 
                                 if (currentQty <= remainingToExport) {
-                                    // Xuất hết record này
                                     try (PreparedStatement updatePs = connection.prepareStatement(updateStockSql)) {
-                                        updatePs.setDouble(1, 0); // Set qty = 0
+                                        updatePs.setDouble(1, 0);
                                         updatePs.setInt(2, stockId);
                                         updatePs.executeUpdate();
-
                                         remainingToExport -= currentQty;
                                         System.out.println("     📉 Stock record ID " + stockId + ": " + currentQty + " → 0 (exported: " + currentQty + ")");
                                     }
                                 } else {
-                                    // Xuất một phần record này
                                     double newQty = currentQty - remainingToExport;
                                     try (PreparedStatement updatePs = connection.prepareStatement(updateStockSql)) {
                                         updatePs.setDouble(1, newQty);
                                         updatePs.setInt(2, stockId);
                                         updatePs.executeUpdate();
-
                                         System.out.println("     📉 Stock record ID " + stockId + ": " + currentQty + " → " + newQty + " (exported: " + remainingToExport + ")");
                                         remainingToExport = 0;
                                     }
@@ -472,7 +459,6 @@ public class ExportDAO {
                 System.err.println("❌ Failed to reject request - may not exist or not in approved status: " + requestId);
                 return false;
             }
-
         } catch (SQLException e) {
             System.err.println("💥 Error updating request status to rejected: " + e.getMessage());
             e.printStackTrace();
@@ -521,8 +507,6 @@ public class ExportDAO {
 
         try {
             conn = Context.getJDBCConnection();
-
-            // Lấy product_id
             ps = conn.prepareStatement(getProductIdSql);
             ps.setString(1, productCode);
             rs = ps.executeQuery();
@@ -532,7 +516,6 @@ public class ExportDAO {
                 rs.close();
                 ps.close();
 
-                // Kiểm tra tồn kho
                 ps = conn.prepareStatement(checkStockSql);
                 ps.setInt(1, productId);
                 rs = ps.executeQuery();
@@ -564,8 +547,6 @@ public class ExportDAO {
 
         try {
             conn = Context.getJDBCConnection();
-
-            // Lấy product_id
             ps = conn.prepareStatement(getProductIdSql);
             ps.setString(1, productCode);
             rs = ps.executeQuery();
@@ -575,7 +556,6 @@ public class ExportDAO {
                 rs.close();
                 ps.close();
 
-                // Lấy tổng tồn kho
                 ps = conn.prepareStatement(getStockSql);
                 ps.setInt(1, productId);
                 rs = ps.executeQuery();
@@ -611,8 +591,6 @@ public class ExportDAO {
 
         try {
             conn = Context.getJDBCConnection();
-
-            // Lấy product_id
             ps = conn.prepareStatement(getProductIdSql);
             ps.setString(1, productCode);
             rs = ps.executeQuery();
@@ -624,7 +602,6 @@ public class ExportDAO {
 
                 System.out.println("📋 Stock details for " + productCode + " (ID: " + productId + "):");
 
-                // Lấy chi tiết tồn kho
                 ps = conn.prepareStatement(getDetailsSql);
                 ps.setInt(1, productId);
                 rs = ps.executeQuery();
@@ -655,14 +632,14 @@ public class ExportDAO {
         }
     }
 
-    // Thêm method này vào ExportDAO
+    /**
+     * Test database connection
+     */
     public void testDatabaseConnection() {
         try {
             Connection conn = Context.getJDBCConnection();
             if (conn != null) {
                 System.out.println("✅ Database connection successful");
-
-                // Test simple query
                 String sql = "SELECT COUNT(*) FROM export_request";
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery();
@@ -683,5 +660,4 @@ public class ExportDAO {
             e.printStackTrace();
         }
     }
-
 }
