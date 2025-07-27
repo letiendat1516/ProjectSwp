@@ -327,57 +327,9 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="stockQuantity">Số Lượng Tồn Kho</label>
-                        <input type="number" id="stockQuantity" name="stockQuantity" class="form-control" 
-                               value="${formData.stockQuantity[0]}" min="0" step="0.01" placeholder="0">
-                        <div class="form-help">Số lượng hiện có trong kho (tùy chọn)</div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="minStockThreshold">Ngưỡng Cảnh Báo Tồn Kho</label>
-                        <input type="number" id="minStockThreshold" name="minStockThreshold" class="form-control" 
-                               value="${formData.minStockThreshold[0]}" min="0" step="0.01" placeholder="10">
-                        <div class="form-help">Số lượng tối thiểu để cảnh báo sắp hết hàng (mặc định: 10)</div>
-                    </div>
+           
                 </div>
-                
-                <!-- Additional Information -->
-                <div class="section-title">📦 Thông Tin Bổ Sung</div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" for="supplierId">Nhà Cung Cấp</label>
-                        <select id="supplierId" name="supplierId" class="form-control">
-                            <option value="">-- Chọn nhà cung cấp --</option>                            <c:forEach var="supplier" items="${suppliers}">
-                                <option value="${supplier.supplierID}" 
-                                        ${formData.supplierId[0] == supplier.supplierID ? 'selected' : ''}>
-                                    ${supplier.name}
-                                </option>
-                            </c:forEach>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="expirationDate">Ngày Hết Hạn</label>
-                        <input type="date" id="expirationDate" name="expirationDate" class="form-control" 
-                               value="${formData.expirationDate[0]}">
-                        <div class="form-help">Để trống nếu sản phẩm không có hạn sử dụng</div>
-                    </div>
-
-                    <!-- Description and Notes moved inside the form-grid with full-width -->
-                    <div class="form-group full-width">
-                        <label class="form-label" for="description">Mô Tả Sản Phẩm</label>
-                        <textarea id="description" name="description" class="form-control" 
-                                  rows="4" placeholder="Nhập mô tả chi tiết về sản phẩm...">${formData.description[0]}</textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label class="form-label" for="additionalNotes">Ghi Chú Bổ Sung</label>
-                        <textarea id="additionalNotes" name="additionalNotes" class="form-control" 
-                                  rows="3" placeholder="Ghi chú thêm về sản phẩm...">${formData.additionalNotes[0]}</textarea>
-                        <div class="form-help">Thông tin bổ sung, lưu ý đặc biệt về sản phẩm</div>
-                    </div>
-                </div>
+        
 
                 <!-- Submit Buttons -->
                 <div style="text-align: center; margin-top: 30px;">

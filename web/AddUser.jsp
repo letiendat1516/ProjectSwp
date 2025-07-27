@@ -260,7 +260,7 @@
                             <input type="password" id="password" name="password" 
                                    class="form-simple-input" 
                                    required
-                                   pattern="^[a-zA-Z0-9]{7,}$"
+                                   pattern="[a-zA-Z0-9._%+-]{7,}$"
                                    title="Tối thiểu 7 kí tự, bao gồm cả chữ, số hoặc kí tự đặc biệt">
                         </div>
                         <div>

@@ -10,7 +10,6 @@ import model.Unit;
 import model.Users;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
@@ -138,18 +137,6 @@ public class UpdateProductController extends HttpServlet {
             System.out.println("DEBUG: Product name: " + existingProduct.getName());
             
             if (success) {
-                // Update stock quantity if provided
-                String stockQuantityStr = request.getParameter("stockQuantity");
-                if (stockQuantityStr != null && !stockQuantityStr.trim().isEmpty()) {
-                    try {
-                        double stockQuantity = Double.parseDouble(stockQuantityStr);
-                        productDAO.updateProductStock(productId, stockQuantity);
-                        System.out.println("DEBUG: Stock updated to: " + stockQuantity);
-                    } catch (NumberFormatException e) {
-                        System.err.println("Failed to update stock quantity: " + e.getMessage());
-                    }
-                }
-                
                 System.out.println("DEBUG: Update successful, preparing redirect");
                 
                 // Set success attributes for ProductSuccessNotification.jsp
@@ -188,7 +175,6 @@ public class UpdateProductController extends HttpServlet {
         String description = request.getParameter("description");
         String expirationDateStr = request.getParameter("expirationDate");
         String additionalNotes = request.getParameter("additionalNotes");
-        String minStockThresholdStr = request.getParameter("minStockThreshold");
         
         // Basic validation
         if (name == null || name.trim().isEmpty()) {
@@ -237,17 +223,6 @@ public class UpdateProductController extends HttpServlet {
             if (expirationDateStr != null && !expirationDateStr.trim().isEmpty()) {
                 Date expirationDate = Date.valueOf(expirationDateStr);
                 product.setExpirationDate(expirationDate);
-            }
-            
-            if (minStockThresholdStr != null && !minStockThresholdStr.trim().isEmpty()) {
-                BigDecimal minStockThreshold = new BigDecimal(minStockThresholdStr);
-                if (minStockThreshold.compareTo(BigDecimal.ZERO) >= 0) {
-                    product.setMinStockThreshold(minStockThreshold);
-                } else {
-                    product.setMinStockThreshold(BigDecimal.ZERO);
-                }
-            } else {
-                product.setMinStockThreshold(BigDecimal.ZERO);
             }
             
         } catch (NumberFormatException e) {

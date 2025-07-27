@@ -11,231 +11,141 @@ public class GetExportRequestWithItemsDAO {
   /**
    * Lấy danh sách export requests với filter và phân trang
    */
-  public List<ExportRequest> getFilteredExportRequests(java.sql.Date startDate, java.sql.Date endDate, 
-                                                      String status, String role, 
-                                                      int page, int pageSize) {
-      List<ExportRequest> requests = new ArrayList<>();
-      
-      try (Connection conn = Context.getJDBCConnection()) {
-          if (conn == null) {
-              System.err.println("Cannot get database connection!");
-              return requests;
-          }
-          
-          // BƯỚC 1: Lấy danh sách export request IDs với filter (có join với users)
-          String sql = buildExportRequestQuery(startDate, endDate, status, role, true);
-          System.out.println("=== STEP 1: Get Export Request IDs ===");
-          System.out.println("SQL: " + sql);
-          
-          PreparedStatement ps = conn.prepareStatement(sql);
-          int paramIndex = setQueryParameters(ps, startDate, endDate, status, role, 1);
-          
-          // Set pagination parameters
-          ps.setInt(paramIndex++, pageSize);
-          ps.setInt(paramIndex, (page - 1) * pageSize);
-          
-          // Debug parameters
-          System.out.print("Params: [");
-          if (startDate != null) System.out.print(startDate + ", ");
-          if (endDate != null) System.out.print(endDate + ", ");
-          if (status != null) System.out.print(status + ", ");
-          if (role != null) System.out.print(role + ", ");
-          System.out.println(pageSize + ", " + ((page - 1) * pageSize) + "]");
-          
-          ResultSet rs = ps.executeQuery();
-          List<String> requestIds = new ArrayList<>();
-          
-          while (rs.next()) {
-              requestIds.add(rs.getString("id"));
-          }
-          rs.close();
-          ps.close();
-          
-          System.out.println("Found " + requestIds.size() + " request IDs: " + requestIds);
-          
-          if (requestIds.isEmpty()) {
-              return requests;
-          }
-          
-          // BƯỚC 2: Lấy chi tiết export requests với JOIN users để lấy fullname
-          String detailSql = "SELECT er.*, " +
-                            "COALESCE(u.fullname, u.username, 'Unknown User') as requester_name " +
-                            "FROM export_request er " +
-                            "LEFT JOIN users u ON er.user_id = u.id " +
-                            "WHERE er.id IN (" + 
-                            String.join(",", Collections.nCopies(requestIds.size(), "?")) + 
-                            ") ORDER BY er.day_request DESC, er.id DESC";
-          
-          System.out.println("=== STEP 2: Get Export Request Details with Fullname ===");
-System.out.println("SQL: " + detailSql);
-          
-          PreparedStatement detailPs = conn.prepareStatement(detailSql);
-          for (int i = 0; i < requestIds.size(); i++) {
-              detailPs.setString(i + 1, requestIds.get(i));
-          }
-          
-          ResultSet detailRs = detailPs.executeQuery();
-          Map<String, ExportRequest> requestMap = new HashMap<>();
-          
-          while (detailRs.next()) {
-              ExportRequest request = new ExportRequest();
-              
-              String requestId = detailRs.getString("id");
-              request.setId(requestId);
-              
-              // Lấy user_id và fullname
-              request.setUserId(detailRs.getInt("user_id"));
-              
-              // THAY ĐỔI: Set tên người yêu cầu từ fullname (ưu tiên fullname > username > "Unknown User")
-              String requesterName = detailRs.getString("requester_name");
-              request.setRequesterName(requesterName);
-              
-              request.setStatus(detailRs.getString("status"));
-              request.setReason(detailRs.getString("reason"));
-              request.setDayRequest(detailRs.getDate("day_request"));
-              request.setRole(detailRs.getString("role"));
-              
-              // Set other optional fields
-              try {
-                  request.setDepartment(detailRs.getString("department"));
-              } catch (SQLException e) {
-                  request.setDepartment(null);
-              }
-              
-              try {
-                  request.setRecipientName(detailRs.getString("recipient_name"));
-              } catch (SQLException e) {
-                  request.setRecipientName(null);
-              }
-              
-              try {
-                  request.setRecipientPhone(detailRs.getString("recipient_phone"));
-              } catch (SQLException e) {
-                  request.setRecipientPhone(null);
-              }
-              
-              try {
-                  request.setRecipientEmail(detailRs.getString("recipient_email"));
-              } catch (SQLException e) {
-                  request.setRecipientEmail(null);
-              }
-              
-              try {
-                  request.setApproveBy(detailRs.getString("approve_by"));
-              } catch (SQLException e) {
-                  request.setApproveBy(null);
-              }
-              
-              try {
-                  request.setWarehouse(detailRs.getString("warehouse"));
-              } catch (SQLException e) {
-                  request.setWarehouse(null);
-              }
-              
-              request.setItems(new ArrayList<>());
-              
-              requestMap.put(requestId, request);
-              requests.add(request);
-          }
-          detailRs.close();
-          detailPs.close();
-          
-          System.out.println("Found " + requests.size() + " export requests");
-// BƯỚC 3: Lấy items cho mỗi request (không thay đổi)
-          if (!requestIds.isEmpty()) {
-              String itemsSql = "SELECT * FROM export_request_items WHERE export_request_id IN (" + 
-                               String.join(",", Collections.nCopies(requestIds.size(), "?")) + ")";
-              
-              System.out.println("=== STEP 3: Get Export Request Items ===");
-              System.out.println("SQL: " + itemsSql);
-              
-              PreparedStatement itemsPs = conn.prepareStatement(itemsSql);
-              for (int i = 0; i < requestIds.size(); i++) {
-                  itemsPs.setString(i + 1, requestIds.get(i));
-              }
-              
-              ResultSet itemsRs = itemsPs.executeQuery();
-              int itemCount = 0;
-              
-              while (itemsRs.next()) {
-                  String requestId = itemsRs.getString("export_request_id");
-                  ExportRequest request = requestMap.get(requestId);
-                  
-                  if (request != null) {
-                      ExportRequestItem item = new ExportRequestItem();
-                      
-                      item.setExportRequestId(requestId);
-                      item.setProductCode(itemsRs.getString("product_code"));
-                      item.setProductName(itemsRs.getString("product_name"));
-                      item.setQuantity(itemsRs.getDouble("quantity"));
-                      item.setUnit(itemsRs.getString("unit"));
-                      item.setNote(itemsRs.getString("note"));
-                      
-                      try {
-                          item.setId(itemsRs.getInt("id"));
-                      } catch (SQLException e) {
-                          item.setId(0);
-                      }
-                      
-                      try {
-                          item.setReasonDetail(itemsRs.getString("reason_detail"));
-                      } catch (SQLException e) {
-                          item.setReasonDetail(null);
-                      }
-                      
-                      try {
-                          item.setProductId(itemsRs.getInt("product_id"));
-                      } catch (SQLException e) {
-                          item.setProductId(0);
-                      }
-                      
-                      try {
-                          item.setExportedQty(itemsRs.getDouble("exported_qty"));
-                      } catch (SQLException e) {
-                          item.setExportedQty(0.0);
-                      }
-                      
-                      request.getItems().add(item);
-                      itemCount++;
-                  }
-              }
-              itemsRs.close();
-              itemsPs.close();
-              
-              System.out.println("Found " + itemCount + " items total");
-          }
-          
-      } catch (Exception e) {
-System.err.println("Error in getFilteredExportRequests: " + e.getMessage());
-          e.printStackTrace();
-      }
-      
-      return requests;
-  }
+  public List<ExportRequest> getFilteredExportRequests(java.sql.Date startDate, java.sql.Date endDate,
+                                                     String status, String role,
+                                                     int page, int pageSize,
+                                                     String requestIdFilter) {
+    List<ExportRequest> requests = new ArrayList<>();
+
+    try (Connection conn = Context.getJDBCConnection()) {
+        if (conn == null) {
+            System.err.println("Cannot get database connection!");
+            return requests;
+        }
+
+        // BƯỚC 1: Lấy danh sách export request IDs với filter (có join với users)
+        String sql = buildExportRequestQuery(startDate, endDate, status, role, requestIdFilter, true);
+        System.out.println("=== STEP 1: Get Export Request IDs ===");
+        System.out.println("SQL: " + sql);
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+        int paramIndex = setQueryParameters(ps, startDate, endDate, status, role, requestIdFilter, 1);
+
+        // Set pagination
+        ps.setInt(paramIndex++, pageSize);
+        ps.setInt(paramIndex, (page - 1) * pageSize);
+
+        ResultSet rs = ps.executeQuery();
+        List<String> requestIds = new ArrayList<>();
+
+        while (rs.next()) {
+            requestIds.add(rs.getString("id"));
+        }
+        rs.close();
+        ps.close();
+
+        if (requestIds.isEmpty()) {
+            return requests;
+        }
+
+        // BƯỚC 2: Get export request details
+        String detailSql = "SELECT er.*, COALESCE(u.fullname, u.username, 'Unknown User') AS requester_name " +
+                "FROM export_request er " +
+                "LEFT JOIN users u ON er.user_id = u.id " +
+                "WHERE er.id IN (" +
+                String.join(",", Collections.nCopies(requestIds.size(), "?")) +
+                ") ORDER BY er.day_request DESC, er.id DESC";
+
+        PreparedStatement detailPs = conn.prepareStatement(detailSql);
+        for (int i = 0; i < requestIds.size(); i++) {
+            detailPs.setString(i + 1, requestIds.get(i));
+        }
+
+        ResultSet detailRs = detailPs.executeQuery();
+        Map<String, ExportRequest> requestMap = new HashMap<>();
+
+        while (detailRs.next()) {
+            ExportRequest request = new ExportRequest();
+            String requestId = detailRs.getString("id");
+
+            request.setId(requestId);
+            request.setUserId(detailRs.getInt("user_id"));
+            request.setRequesterName(detailRs.getString("requester_name"));
+            request.setStatus(detailRs.getString("status"));
+            request.setReason(detailRs.getString("reason"));
+            request.setDayRequest(detailRs.getDate("day_request"));
+            request.setRole(detailRs.getString("role"));
+
+            try { request.setDepartment(detailRs.getString("department")); } catch (SQLException e) {}
+            try { request.setRecipientName(detailRs.getString("recipient_name")); } catch (SQLException e) {}
+            try { request.setRecipientPhone(detailRs.getString("recipient_phone")); } catch (SQLException e) {}
+            try { request.setRecipientEmail(detailRs.getString("recipient_email")); } catch (SQLException e) {}
+            try { request.setApproveBy(detailRs.getString("approve_by")); } catch (SQLException e) {}
+            try { request.setWarehouse(detailRs.getString("warehouse")); } catch (SQLException e) {}
+
+            request.setItems(new ArrayList<>());
+            requestMap.put(requestId, request);
+            requests.add(request);
+        }
+        detailRs.close();
+        detailPs.close();
+
+        // BƯỚC 3: Lấy items
+        String itemsSql = "SELECT * FROM export_request_items WHERE export_request_id IN (" +
+                String.join(",", Collections.nCopies(requestIds.size(), "?")) + ")";
+        PreparedStatement itemsPs = conn.prepareStatement(itemsSql);
+        for (int i = 0; i < requestIds.size(); i++) {
+            itemsPs.setString(i + 1, requestIds.get(i));
+        }
+
+        ResultSet itemsRs = itemsPs.executeQuery();
+        while (itemsRs.next()) {
+            String reqId = itemsRs.getString("export_request_id");
+            ExportRequest req = requestMap.get(reqId);
+            if (req != null) {
+                ExportRequestItem item = new ExportRequestItem();
+                item.setExportRequestId(reqId);
+                item.setProductCode(itemsRs.getString("product_code"));
+                item.setProductName(itemsRs.getString("product_name"));
+                item.setQuantity(itemsRs.getDouble("quantity"));
+                item.setUnit(itemsRs.getString("unit"));
+                item.setNote(itemsRs.getString("note"));
+
+                try { item.setId(itemsRs.getInt("id")); } catch (SQLException e) {}
+                try { item.setReasonDetail(itemsRs.getString("reason_detail")); } catch (SQLException e) {}
+                try { item.setProductId(itemsRs.getInt("product_id")); } catch (SQLException e) {}
+                try { item.setExportedQty(itemsRs.getDouble("exported_qty")); } catch (SQLException e) {}
+
+                req.getItems().add(item);
+            }
+        }
+        itemsRs.close();
+        itemsPs.close();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return requests;
+}
+
   
   /**
    * Đếm tổng số export requests với filter (có join với users)
    */
-public int getTotalFilteredExportRequests(java.sql.Date startDate, java.sql.Date endDate, String status, String role) {
+public int getTotalFilteredExportRequests(java.sql.Date startDate, java.sql.Date endDate,
+                                          String status, String role,
+                                          String requestIdFilter) {
     try (Connection conn = Context.getJDBCConnection()) {
-        if (conn == null) {
-            System.err.println("Cannot get database connection!");
-            return 0;
-        }
-        
-        String sql = "SELECT COUNT(DISTINCT er.id) as total " +
-                    "FROM export_request er " +
-                    "LEFT JOIN users u ON er.user_id = u.id " +
-                    "WHERE 1=1";
-        
-        if (startDate != null) {
-            sql += " AND er.day_request >= ?";
-        }
-        if (endDate != null) {
-            sql += " AND er.day_request <= ?";
-        }
-        
-        // Xử lý filter trạng thái
+        if (conn == null) return 0;
+
+        String sql = "SELECT COUNT(DISTINCT er.id) AS total " +
+                "FROM export_request er " +
+                "LEFT JOIN users u ON er.user_id = u.id " +
+                "WHERE 1=1";
+
+        if (startDate != null) sql += " AND er.day_request >= ?";
+        if (endDate != null) sql += " AND er.day_request <= ?";
         if (status != null && !status.trim().isEmpty()) {
             if ("approved".equals(status)) {
                 sql += " AND er.status NOT IN ('pending', 'rejected')";
@@ -243,92 +153,77 @@ public int getTotalFilteredExportRequests(java.sql.Date startDate, java.sql.Date
                 sql += " AND er.status = ?";
             }
         }
-        
         if (role != null && !role.trim().isEmpty()) {
             sql += " AND er.role = ?";
         }
-        
-        PreparedStatement ps = conn.prepareStatement(sql);
-        setQueryParameters(ps, startDate, endDate, status, role, 1);
-        
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            return rs.getInt("total");
+        if (requestIdFilter != null && !requestIdFilter.trim().isEmpty()) {
+            sql += " AND er.id LIKE ?";
         }
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+        setQueryParameters(ps, startDate, endDate, status, role, requestIdFilter, 1);
+
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) return rs.getInt("total");
+
     } catch (Exception e) {
-        System.err.println("Error in getTotalFilteredExportRequests: " + e.getMessage());
         e.printStackTrace();
     }
     return 0;
 }
 
+
   
   /**
  * Xây dựng câu query cho export requests với xử lý trạng thái approved
  */
-private String buildExportRequestQuery(java.sql.Date startDate, java.sql.Date endDate, String status, String role, boolean withPagination) {
+private String buildExportRequestQuery(java.sql.Date startDate, java.sql.Date endDate, String status, String role,
+                                       String requestIdFilter, boolean withPagination) {
     String sql = "SELECT DISTINCT er.id, er.day_request " +
-                "FROM export_request er " +
-                "LEFT JOIN users u ON er.user_id = u.id " +
-                "WHERE 1=1";
-    
-    if (startDate != null) {
-        sql += " AND er.day_request >= ?";
-    }
-    if (endDate != null) {
-        sql += " AND er.day_request <= ?";
-    }
-    
-    // Xử lý filter trạng thái đặc biệt
+            "FROM export_request er " +
+            "LEFT JOIN users u ON er.user_id = u.id " +
+            "WHERE 1=1";
+
+    if (startDate != null) sql += " AND er.day_request >= ?";
+    if (endDate != null) sql += " AND er.day_request <= ?";
     if (status != null && !status.trim().isEmpty()) {
         if ("approved".equals(status)) {
-            // Approved = tất cả trạng thái trừ pending và rejected
             sql += " AND er.status NOT IN ('pending', 'rejected')";
         } else {
-            // Pending hoặc rejected
             sql += " AND er.status = ?";
         }
     }
-    
-    if (role != null && !role.trim().isEmpty()) {
-        sql += " AND er.role = ?";
-    }
-    
+    if (role != null && !role.trim().isEmpty()) sql += " AND er.role = ?";
+    if (requestIdFilter != null && !requestIdFilter.trim().isEmpty()) sql += " AND er.id LIKE ?";
+
     sql += " ORDER BY er.day_request DESC, er.id DESC";
-    
-    if (withPagination) {
-sql += " LIMIT ? OFFSET ?";
-    }
-    
+
+    if (withPagination) sql += " LIMIT ? OFFSET ?";
+
     return sql;
 }
+
 
 /**
  * Set parameters cho PreparedStatement với xử lý trạng thái approved
  */
-private int setQueryParameters(PreparedStatement ps, java.sql.Date startDate, java.sql.Date endDate, 
-                              String status, String role, int startIndex) throws SQLException {
+private int setQueryParameters(PreparedStatement ps, java.sql.Date startDate, java.sql.Date endDate,
+                               String status, String role, String requestIdFilter, int startIndex) throws SQLException {
     int paramIndex = startIndex;
-    
-    if (startDate != null) {
-        ps.setDate(paramIndex++, startDate);
+
+    if (startDate != null) ps.setDate(paramIndex++, startDate);
+    if (endDate != null) ps.setDate(paramIndex++, endDate);
+    if (status != null && !status.trim().isEmpty() && !"approved".equals(status)) {
+        ps.setString(paramIndex++, status);
     }
-    if (endDate != null) {
-        ps.setDate(paramIndex++, endDate);
+    if (role != null && !role.trim().isEmpty()) ps.setString(paramIndex++, role);
+    if (requestIdFilter != null && !requestIdFilter.trim().isEmpty()) {
+        ps.setString(paramIndex++, "%" + requestIdFilter.trim() + "%");
     }
-    if (status != null && !status.trim().isEmpty()) {
-        // Chỉ set parameter cho pending và rejected
-        // Approved được xử lý bằng NOT IN trong SQL
-        if (!"approved".equals(status)) {
-            ps.setString(paramIndex++, status);
-        }
-    }
-    if (role != null && !role.trim().isEmpty()) {
-        ps.setString(paramIndex++, role);
-    }
-    
+
     return paramIndex;
 }
+
 
   /**
  * Cập nhật trạng thái export request và thông tin người phê duyệt

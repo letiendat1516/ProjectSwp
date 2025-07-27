@@ -158,124 +158,129 @@ public class PurchaseOrderDAO {
      * Lấy danh sách ID của Purchase Orders với filter và phân trang
      */
     private List<String> getPurchaseOrderIds(int page, String startDate, String endDate, String status, String searchId) {
-        List<String> ids = new ArrayList<>();
+    List<String> ids = new ArrayList<>();
+    List<Object> params = new ArrayList<>();
 
-        StringBuilder sqlIds = new StringBuilder("SELECT DISTINCT po.id FROM purchase_order_info po WHERE 1=1");
-        List<Object> params = new ArrayList<>();
+    int pageSize = 10;
+    int totalRecords = getTotalFilteredPurchaseOrders(startDate, endDate, status, searchId);
 
-        // Thêm các điều kiện filter
-        if (startDate != null && !startDate.trim().isEmpty()) {
-            sqlIds.append(" AND po.day_purchase >= ?");
-            params.add(Date.valueOf(startDate));
-        }
+    int offset = (page - 1) * pageSize;
+    int limit = pageSize;
 
-        if (endDate != null && !endDate.trim().isEmpty()) {
-            sqlIds.append(" AND po.day_purchase <= ?");
-            params.add(Date.valueOf(endDate));
-        }
+    if (offset >= totalRecords) {
+        return ids; // Không còn dữ liệu cho trang này
+    }
 
-        if (status != null && !status.trim().isEmpty()) {
-            if ("approved".equals(status)) {
-            // Khi chọn "Đã hoàn thành", lọc cả 3 status
+    if (offset + limit > totalRecords) {
+        limit = totalRecords - offset;
+    }
+
+    StringBuilder sqlIds = new StringBuilder("SELECT DISTINCT po.id FROM purchase_order_info po WHERE 1=1");
+
+    if (startDate != null && !startDate.trim().isEmpty()) {
+        sqlIds.append(" AND po.day_purchase >= ?");
+        params.add(Date.valueOf(startDate));
+    }
+
+    if (endDate != null && !endDate.trim().isEmpty()) {
+        sqlIds.append(" AND po.day_purchase <= ?");
+        params.add(Date.valueOf(endDate));
+    }
+
+    if (status != null && !status.trim().isEmpty()) {
+        if ("approved".equals(status)) {
             sqlIds.append(" AND po.status IN ('approved', 'completed', 'rejected', 'done')");
         } else {
-            // Các status khác thì filter bình thường
             sqlIds.append(" AND po.status = ?");
             params.add(status);
         }
-        }
-
-        if (searchId != null && !searchId.trim().isEmpty()) {
-            sqlIds.append(" AND po.id LIKE ?");
-            params.add("%" + searchId + "%");
-        }
-
-        sqlIds.append(" ORDER BY po.id");
-
-        // Thêm phân trang
-        int limit = 10;
-        int offset = (page - 1) * limit;
-        sqlIds.append(" LIMIT ? OFFSET ?");
-        params.add(limit);
-        params.add(offset);
-
-        System.out.println("SQL: " + sqlIds.toString());
-        System.out.println("Params: " + params);
-
-        try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sqlIds.toString())) {
-
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    ids.add(rs.getString("id"));
-                }
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error getting purchase order IDs: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return ids;
     }
+
+    if (searchId != null && !searchId.trim().isEmpty()) {
+        sqlIds.append(" AND po.id LIKE ?");
+        params.add("%" + searchId + "%");
+    }
+
+    // Sắp xếp giảm dần để hiện đơn mới trước
+    sqlIds.append(" ORDER BY po.id DESC LIMIT ? OFFSET ?");
+    params.add(limit);
+    params.add(offset);
+
+    System.out.println("SQL: " + sqlIds.toString());
+    System.out.println("Params: " + params);
+
+    try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sqlIds.toString())) {
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
+
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                ids.add(rs.getString("id"));
+            }
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Error getting purchase order IDs: " + e.getMessage());
+        e.printStackTrace();
+    }
+
+    return ids;
+}
+
+
 
     /**
      * Lấy thông tin chi tiết Purchase Orders theo danh sách IDs
      */
     private List<PurchaseOrderInfo> getPurchaseOrdersByIds(List<String> ids) {
-        List<PurchaseOrderInfo> purchaseOrders = new ArrayList<>();
+    List<PurchaseOrderInfo> purchaseOrders = new ArrayList<>();
 
-        if (ids.isEmpty()) {
-            return purchaseOrders;
-        }
-
-        String placeholders = String.join(",", ids.stream().map(id -> "?").toArray(String[]::new));
-
-        String sql = "SELECT po.id, po.fullname, po.day_purchase, po.day_quote, po.status, "
-                + "po.reason, po.supplier, po.address, po.phone, po.email, po.summary "
-                + "FROM purchase_order_info po "
-                + "WHERE po.id IN (" + placeholders + ") "
-                + "ORDER BY po.id";
-
-        System.out.println("SQL for details: " + sql);
-        System.out.println("IDs: " + ids);
-
-        try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
-            for (int i = 0; i < ids.size(); i++) {
-                ps.setString(i + 1, ids.get(i));
-            }
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    PurchaseOrderInfo po = new PurchaseOrderInfo();
-                    po.setId(rs.getString("id"));
-                    po.setFullname(rs.getString("fullname"));
-                    po.setDayPurchase(rs.getDate("day_purchase"));
-                    po.setDayQuote(rs.getDate("day_quote"));
-                    po.setStatus(rs.getString("status"));
-                    po.setReason(rs.getString("reason"));
-                    po.setSupplier(rs.getString("supplier"));
-                    po.setAddress(rs.getString("address"));
-                    po.setPhone(rs.getString("phone"));
-                    po.setEmail(rs.getString("email"));
-                    po.setSummary(rs.getString("summary"));
-
-                    purchaseOrders.add(po);
-                    System.out.println("Loaded purchase order: " + po.getId());
-                }
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error getting purchase order details: " + e.getMessage());
-            e.printStackTrace();
-        }
-
+    if (ids.isEmpty()) {
         return purchaseOrders;
     }
+
+    String placeholders = String.join(",", ids.stream().map(id -> "?").toArray(String[]::new));
+
+    String sql = "SELECT po.id, po.fullname, po.day_purchase, po.day_quote, po.status, "
+            + "po.reason, po.supplier, po.address, po.phone, po.email, po.summary "
+            + "FROM purchase_order_info po "
+            + "WHERE po.id IN (" + placeholders + ") "
+            + "ORDER BY FIELD(po.id, " + placeholders + ")";
+
+    try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        for (int i = 0; i < ids.size(); i++) {
+            ps.setString(i + 1, ids.get(i)); // Lần 1: cho WHERE IN
+        }
+        for (int i = 0; i < ids.size(); i++) {
+            ps.setString(ids.size() + i + 1, ids.get(i)); // Lần 2: cho ORDER BY FIELD
+        }
+
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                PurchaseOrderInfo po = new PurchaseOrderInfo();
+                po.setId(rs.getString("id"));
+                po.setFullname(rs.getString("fullname"));
+                po.setDayPurchase(rs.getDate("day_purchase"));
+                po.setDayQuote(rs.getDate("day_quote"));
+                po.setStatus(rs.getString("status"));
+                po.setReason(rs.getString("reason"));
+                po.setSupplier(rs.getString("supplier"));
+                po.setAddress(rs.getString("address"));
+                po.setPhone(rs.getString("phone"));
+                po.setEmail(rs.getString("email"));
+                po.setSummary(rs.getString("summary"));
+                purchaseOrders.add(po);
+            }
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return purchaseOrders;
+}
+
 
     /**
      * Lấy danh sách items của một Purchase Order
@@ -848,56 +853,92 @@ public class PurchaseOrderDAO {
      * Cập nhật stock cho một đơn cụ thể (helper method)
      */
     private boolean updateStockForSpecificOrder(Connection con, String purchaseOrderId) throws SQLException {
-        // Lấy các items của đơn này
-        String getItemsSql = "SELECT product_code, quantity FROM purchase_order_items WHERE purchase_id = ?";
-        PreparedStatement getItemsPs = con.prepareStatement(getItemsSql);
-        getItemsPs.setString(1, purchaseOrderId);
-        ResultSet itemsRs = getItemsPs.executeQuery();
-        
-        int updatedCount = 0;
-        int notFoundCount = 0;
-        
-        while (itemsRs.next()) {
-            String productCode = itemsRs.getString("product_code");
-            BigDecimal quantity = itemsRs.getBigDecimal("quantity");
-            
-            // Tìm product_id từ product_info
-            String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
-            PreparedStatement getProductIdPs = con.prepareStatement(getProductIdSql);
-            getProductIdPs.setString(1, productCode);
-            ResultSet productRs = getProductIdPs.executeQuery();
-            
-            if (productRs.next()) {
-                String productId = productRs.getString("id");
-                
-                // Cập nhật qty trong product_in_stock
-                String updateStockSql = "UPDATE product_in_stock SET qty = qty + ? WHERE product_id = ?";
-                PreparedStatement updateStockPs = con.prepareStatement(updateStockSql);
-                updateStockPs.setBigDecimal(1, quantity);
-                updateStockPs.setString(2, productId);
-                
-                int rowsAffected = updateStockPs.executeUpdate();
-                if (rowsAffected > 0) {
-                    System.out.println("  ✅ Đã cộng " + quantity + " vào stock cho sản phẩm " + productCode + " (ID: " + productId + ")");
-                    updatedCount++;
-                } else {
-                    System.out.println("  ⚠️ Không tìm thấy sản phẩm " + productCode + " trong product_in_stock");
-                    notFoundCount++;
+    // Lấy bản ghi nhập gần nhất của mỗi product_code trong đơn hàng
+    String getLatestImportSql = """
+        SELECT h.product_code, h.quantity_imported
+        FROM warehouse_import_history h
+        INNER JOIN (
+            SELECT product_code, MAX(created_at) AS latest_time
+            FROM warehouse_import_history
+            WHERE purchase_id = ?
+            GROUP BY product_code
+        ) latest ON h.product_code = latest.product_code AND h.created_at = latest.latest_time
+        WHERE h.purchase_id = ?
+    """;
+
+    try (PreparedStatement getLatestImportPs = con.prepareStatement(getLatestImportSql)) {
+        getLatestImportPs.setString(1, purchaseOrderId);
+        getLatestImportPs.setString(2, purchaseOrderId);
+
+        try (ResultSet rs = getLatestImportPs.executeQuery()) {
+            int updatedCount = 0;
+            int insertedCount = 0;
+            int notFoundCount = 0;
+
+            while (rs.next()) {
+                String productCode = rs.getString("product_code");
+                BigDecimal quantity = rs.getBigDecimal("quantity_imported");
+
+                // Lấy product_id từ product_info
+                String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
+                try (PreparedStatement getProductIdPs = con.prepareStatement(getProductIdSql)) {
+                    getProductIdPs.setString(1, productCode);
+                    try (ResultSet productRs = getProductIdPs.executeQuery()) {
+                        if (productRs.next()) {
+                            String productId = productRs.getString("id");
+
+                            // Kiểm tra xem tồn tại trong product_in_stock chưa
+                            String checkStockSql = "SELECT qty FROM product_in_stock WHERE product_id = ?";
+                            try (PreparedStatement checkStockPs = con.prepareStatement(checkStockSql)) {
+                                checkStockPs.setString(1, productId);
+                                try (ResultSet stockRs = checkStockPs.executeQuery()) {
+                                    if (stockRs.next()) {
+                                        // Đã có → UPDATE
+                                        String updateStockSql = "UPDATE product_in_stock SET qty = qty + ? WHERE product_id = ?";
+                                        try (PreparedStatement updateStockPs = con.prepareStatement(updateStockSql)) {
+                                            updateStockPs.setBigDecimal(1, quantity);
+                                            updateStockPs.setString(2, productId);
+                                            int rowsAffected = updateStockPs.executeUpdate();
+                                            if (rowsAffected > 0) {
+                                                System.out.println("  ✅ Cộng " + quantity + " vào stock sản phẩm " + productCode + " (ID: " + productId + ")");
+                                                updatedCount++;
+                                            }
+                                        }
+                                    } else {
+                                        // Chưa có → INSERT
+                                        String insertStockSql = "INSERT INTO product_in_stock (product_id, qty) VALUES (?, ?)";
+                                        try (PreparedStatement insertStockPs = con.prepareStatement(insertStockSql)) {
+                                            insertStockPs.setString(1, productId);
+                                            insertStockPs.setBigDecimal(2, quantity);
+                                            int inserted = insertStockPs.executeUpdate();
+                                            if (inserted > 0) {
+                                                System.out.println("  🆕 Tạo mới và cộng " + quantity + " vào stock sản phẩm " + productCode + " (ID: " + productId + ")");
+                                                insertedCount++;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        } else {
+                            System.out.println("  ⚠️ Không tìm thấy product_id cho code: " + productCode);
+                            notFoundCount++;
+                        }
+                    }
                 }
-                
-                updateStockPs.close();
-            } else {
-                System.out.println("  ⚠️ Không tìm thấy product_id cho code: " + productCode);
-                notFoundCount++;
             }
-            
-            productRs.close();
-            getProductIdPs.close();
+
+            System.out.println("📦 Đơn " + purchaseOrderId + " | Cập nhật stock: "
+                    + updatedCount + " cập nhật, "
+                    + insertedCount + " thêm mới, "
+                    + notFoundCount + " lỗi mã sản phẩm");
         }
-        
-        System.out.println("📦 Cập nhật stock cho đơn " + purchaseOrderId + ": " + updatedCount + " thành công, " + notFoundCount + " không tìm thấy");
-        return true; // Trả về true ngay cả khi có một số item không tìm thấy
     }
+
+    return true;
+}
+
+
 }
 
                 

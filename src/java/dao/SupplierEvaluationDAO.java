@@ -174,7 +174,7 @@ public class SupplierEvaluationDAO {
             ps.setInt(3, tr);
             ps.setInt(4, sq);
             ps.setString(5, comment);
-            float avg_rate = (dt + mpc + tr + sq) / 4.0f;
+            float avg_rate = (dt*3 + mpc*2 + tr + sq) / 7.0f;
             ps.setFloat(6, avg_rate);
             ps.setInt(7, 1);
             ps.setInt(8, seid);
@@ -209,7 +209,7 @@ public class SupplierEvaluationDAO {
             ps.setInt(6, tr);
             ps.setInt(7, sq);
             ps.setString(8, comment);
-            float avg_rate = (dt + pq + mpc + tr + sq) / 4.0f;
+            float avg_rate = (dt*3 + pq + mpc*2 + tr + sq) / 7.0f;
             ps.setFloat(9, avg_rate);
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -263,9 +263,9 @@ public class SupplierEvaluationDAO {
 
     public static void main(String[] args) {
         SupplierEvaluationDAO sed = new SupplierEvaluationDAO();
-        List<Supplier> list = sed.staticRated("desc");
+        List<Supplier> list = sed.staticExpectedDelivery("desc");
         for(int i=0;i<list.size();i++){
-            System.out.println(list.get(i).getName());
+            System.out.println(list.get(i).getSupplierID());
         }
         
     }

@@ -366,7 +366,7 @@
                             <option value="pending_quote" ${param.statusFilter == 'pending_quote' ? 'selected' : ''}>Chờ báo giá</option>
                             <option value="quoted" ${param.statusFilter == 'quoted' ? 'selected' : ''}>Đã báo giá</option>                    
                             <option value="re-quote" ${param.statusFilter == 're-quote' ? 'selected' : ''}>Báo giá lại</option>
-                            <option value="approved" ${param.statusFilter == 'approved' || param.statusFilter == 'rejected' || param.statusFilter == 'completed' ? 'selected' : ''}>Đã hoàn thành</option>
+                            <option value="approved" ${param.statusFilter == 'approved' || param.statusFilter == 'rejected' || param.statusFilter == 'completed'||param.statusFilter == 'done'||param.statusFilter ==  'partial_imported' ? 'selected' : ''}>Đã hoàn thành</option>
 
                         </select>
                     </div>
@@ -413,7 +413,9 @@
                                             <c:set var="status" value="Báo giá lại" />
                                             <c:set var="rowClass" value="status-re-quote" />
                                         </c:when>
-                                        <c:when test="${po.status == 'approved' || po.status == 'completed' || po.status == 'rejected'}">
+
+                                        <c:when test="${po.status == 'approved' || po.status == 'completed' || po.status == 'rejected'|| po.status == 'done' || po.status == 'partial_imported'}">
+
                                             <c:set var="status" value="Đã hoàn thành" />
                                             <c:set var="rowClass" value="status-completed" />
                                         </c:when>
@@ -439,7 +441,7 @@
 
                                                 <!-- ✅ LOGIC HIỂN THỊ NÚT BÁO GIÁ THEO STATUS -->
                                                 <c:choose>
-                                                    <c:when test="${po.status == 'completed' || po.status == 'quoted' || po.status == 'approved'|| po.status == 'rejected'}">
+                                                    <c:when test="${po.status == 'completed' || po.status == 'quoted' || po.status == 'approved'|| po.status == 'rejected' || po.status == 'done' || po.status == 'partial_imported'}">
                                                         <!-- Đã hoàn thành/Đã báo giá/Đã duyệt: Không hiển thị nút báo giá -->
                                                     </c:when>
                                                     <c:when test="${po.status == 're-quote'}">
@@ -494,46 +496,50 @@
                                                 </thead>
                                                 <tbody>
                                                     <c:choose>
-                                                        <c:when test="${not empty po.purchaseItems}">
-                                                            <c:forEach var="item" items="${po.purchaseItems}">
-                                                                <tr>
-                                                                    <td>${item.productCode}</td>
-                                                                    <td>${item.productName}</td>
+    <c:when test="${not empty po.purchaseItems}">
+        <c:forEach var="item" items="${po.purchaseItems}">
+            <tr>
+                <td>${item.productCode}</td>
+                <td>${item.productName}</td>
+                <td>${item.unit}</td>
+                <td><fmt:formatNumber value="${item.quantity}" pattern="#,##0.##" /></td>
+                <td>
+                    <c:choose>
+                        <c:when test="${not empty item.pricePerUnit}">
+                            <fmt:formatNumber value="${item.pricePerUnit}" pattern="#,##0" /> VNĐ
+                        </c:when>
+                        <c:otherwise>Chưa có giá</c:otherwise>
+                    </c:choose>
+                </td>
+                <td>
+                    <c:choose>
+                        <c:when test="${not empty item.totalPrice}">
+                            <fmt:formatNumber value="${item.totalPrice}" pattern="#,##0" /> VNĐ
+                        </c:when>
+                        <c:otherwise>Chưa có giá</c:otherwise>
+                    </c:choose>
+                </td>
+                <td>${item.note}</td>
+            </tr>
+        </c:forEach>
 
-                                                                    <td>${item.unit}</td>
-                                                                    <td>
-                                                                        <fmt:formatNumber value="${item.quantity}" pattern="#,##0.##" />
-                                                                    </td>
-                                                                    <td>
-                                                                        <c:choose>
-                                                                            <c:when test="${not empty item.pricePerUnit}">
-                                                                                <fmt:formatNumber value="${item.pricePerUnit}" pattern="#,##0" /> VNĐ
-                                                                            </c:when>
-                                                                            <c:otherwise>Chưa có giá</c:otherwise>
-                                                                        </c:choose>
-                                                                    </td>
-                                                                    <td>
-                                                                        <c:choose>
-                                                                            <c:when test="${not empty item.totalPrice}">
-                                                                                <fmt:formatNumber value="${item.totalPrice}" pattern="#,##0" /> VNĐ
-                                                                            </c:when>
-                                                                            <c:otherwise>Chưa có giá</c:otherwise>
-                                                                        </c:choose>
-                                                                    </td>
-                                                                    <td>${item.note}</td>
-                                                                </tr>
+        <!-- ✅ Đặt div này ngoài vòng lặp -->
+        <tr>
+            <td colspan="7">
+                <div style="margin-top: 10px;">
+                    <strong>Tổng kết báo giá:</strong> ${empty po.summary ? 'Chưa có' : po.summary}<br>
+                </div>
+            </td>
+        </tr>
+    </c:when>
 
-                                                            </c:forEach>
-                                                        <div style="margin-bottom: 10px;">
-                                                            <strong>Tổng kết báo giá:</strong> ${empty po.summary ? 'Chưa có' : po.summary}<br>
-                                                        </div>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <tr>
-                                                            <td colspan="7">Không có dữ liệu chi tiết</td>
-                                                        </tr>
-                                                    </c:otherwise>
-                                                </c:choose>
+    <c:otherwise>
+        <tr>
+            <td colspan="7">Không có dữ liệu chi tiết</td>
+        </tr>
+    </c:otherwise>
+</c:choose>
+
                                 </tbody>
                             </table>
                             </td>

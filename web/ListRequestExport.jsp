@@ -726,12 +726,12 @@
                     <div class="card-body">
                         <!-- Tab Navigation -->
                         <div class="tab-nav">
-                            <a href="?tab=approved" class="tab-button ${currentTab == 'approved' || empty currentTab ? 'active' : ''}">
+                            <a href="${pageContext.request.contextPath}/exportList?tab=approved" class="tab-button ${currentTab == 'approved' || empty currentTab ? 'active' : ''}">
                                 <i class="fas fa-clock"></i>
                                 Yêu cầu đã duyệt
                                 <span class="tab-badge">${approvedCount != null ? approvedCount : 0}</span>
                             </a>
-                            <a href="?tab=history" class="tab-button ${currentTab == 'history' ? 'active' : ''}">
+                            <a href="${pageContext.request.contextPath}/exportList?tab=history" class="tab-button ${currentTab == 'history' ? 'active' : ''}">
                                 <i class="fas fa-history"></i>
                                 Lịch sử xuất kho
                                 <span class="tab-badge">${historyCount != null ? historyCount : 0}</span>
@@ -746,8 +746,7 @@
                                     <div class="filter-title">
                                         <i class="fas fa-search"></i> Tìm kiếm yêu cầu đã duyệt
                                     </div>
-                                    <form method="get" action="exportRequest">
-                                        <input type="hidden" name="action" value="list">
+                                    <form method="get" action="${pageContext.request.contextPath}/exportList">
                                         <input type="hidden" name="tab" value="approved">
                                         <div class="filter-row">
                                             <div class="filter-item">
@@ -769,7 +768,7 @@
                                                     <button type="submit" class="btn btn-primary btn-icon">
                                                         <i class="fas fa-search"></i> Tìm kiếm
                                                     </button>
-                                                    <a href="?action=list&tab=approved" class="btn btn-secondary btn-icon">
+                                                    <a href="${pageContext.request.contextPath}/exportList?tab=approved" class="btn btn-secondary btn-icon">
                                                         <i class="fas fa-times"></i> Xóa
                                                     </a>
                                                 </div>
@@ -907,7 +906,7 @@
                                     <div class="pagination">
                                         <c:if test="${approvedPage > 1}">
                                             <div class="page-item">
-                                                <a class="page-link" href="?action=list&tab=approved&page=${approvedPage - 1}&searchType=${searchType}&searchValue=${searchValue}">
+                                                <a class="page-link" href="${pageContext.request.contextPath}/exportList?tab=approved&page=${approvedPage - 1}&searchType=${searchType}&searchValue=${searchValue}">
                                                     <i class="fas fa-chevron-left"></i>
                                                 </a>
                                             </div>
@@ -915,13 +914,13 @@
 
                                         <c:forEach begin="1" end="${approvedPages}" var="i">
                                             <div class="page-item ${approvedPage == i ? 'active' : ''}">
-                                                <a class="page-link" href="?action=list&tab=approved&page=${i}&searchType=${searchType}&searchValue=${searchValue}">${i}</a>
+                                                <a class="page-link" href="${pageContext.request.contextPath}/exportList?tab=approved&page=${i}&searchType=${searchType}&searchValue=${searchValue}">${i}</a>
                                             </div>
                                         </c:forEach>
 
                                         <c:if test="${approvedPage < approvedPages}">
                                             <div class="page-item">
-                                                <a class="page-link" href="?action=list&tab=approved&page=${approvedPage + 1}&searchType=${searchType}&searchValue=${searchValue}">
+                                                <a class="page-link" href="${pageContext.request.contextPath}/exportList?tab=approved&page=${approvedPage + 1}&searchType=${searchType}&searchValue=${searchValue}">
                                                     <i class="fas fa-chevron-right"></i>
                                                 </a>
                                             </div>
@@ -939,8 +938,7 @@
                                     <div class="filter-title">
                                         <i class="fas fa-search"></i> Tìm kiếm lịch sử xuất kho
                                     </div>
-                                    <form method="get" action="exportRequest">
-                                        <input type="hidden" name="action" value="list">
+                                    <form method="get" action="${pageContext.request.contextPath}/exportList">
                                         <input type="hidden" name="tab" value="history">
                                         <div class="filter-row">
                                             <div class="filter-item">
@@ -962,7 +960,7 @@
                                                     <button type="submit" class="btn btn-primary btn-icon">
                                                         <i class="fas fa-search"></i> Tìm kiếm
                                                     </button>
-                                                    <a href="?action=list&tab=history" class="btn btn-secondary btn-icon">
+                                                    <a href="${pageContext.request.contextPath}/exportList?tab=history" class="btn btn-secondary btn-icon">
                                                         <i class="fas fa-times"></i> Xóa
                                                     </a>
                                                 </div>
@@ -1134,7 +1132,7 @@
                                     <div class="pagination">
                                         <c:if test="${historyPage > 1}">
                                             <div class="page-item">
-                                                <a class="page-link" href="?action=list&tab=history&page=${historyPage - 1}&historySearchType=${historySearchType}&historySearchValue=${historySearchValue}">
+                                                <a class="page-link" href="${pageContext.request.contextPath}/exportList?tab=history&page=${historyPage - 1}&historySearchType=${historySearchType}&historySearchValue=${historySearchValue}">
                                                     <i class="fas fa-chevron-left"></i>
                                                 </a>
                                             </div>
@@ -1142,13 +1140,13 @@
 
                                         <c:forEach begin="1" end="${historyPages}" var="i">
                                             <div class="page-item ${historyPage == i ? 'active' : ''}">
-                                                <a class="page-link" href="?action=list&tab=history&page=${i}&historySearchType=${historySearchType}&historySearchValue=${historySearchValue}">${i}</a>
+                                                <a class="page-link" href="${pageContext.request.contextPath}/exportList?tab=history&page=${i}&historySearchType=${historySearchType}&historySearchValue=${historySearchValue}">${i}</a>
                                             </div>
                                         </c:forEach>
 
                                         <c:if test="${historyPage < historyPages}">
                                             <div class="page-item">
-                                                <a class="page-link" href="?action=list&tab=history&page=${historyPage + 1}&historySearchType=${historySearchType}&historySearchValue=${historySearchValue}">
+                                                <a class="page-link" href="${pageContext.request.contextPath}/exportList?tab=history&page=${historyPage + 1}&historySearchType=${historySearchType}&historySearchValue=${historySearchValue}">
                                                     <i class="fas fa-chevron-right"></i>
                                                 </a>
                                             </div>
@@ -1198,7 +1196,7 @@
                     cells.forEach(cell => {
                         const cellText = cell.textContent || cell.innerText;
                         if (cellText.toLowerCase().includes(searchValue.toLowerCase())) {
-                            const regex = new RegExp(`(${searchValue})`, 'gi');
+                            const regex = new RegExp(`($searchValue.replace(/[.*+?^$}()|[\]\\]/g, '\\$&')})`, 'gi');
                             cell.innerHTML = cell.innerHTML.replace(regex, '<mark style="background-color: #fef08a; padding: 0.1rem 0.2rem; border-radius: 0.25rem;">$1</mark>');
                         }
                     });
@@ -1260,20 +1258,44 @@
                     }
                 });
 
-                // Auto refresh every 30 seconds if no search is active
-                if (!searchValue || searchValue.trim() === '') {
-                    setInterval(function () {
-                        // Only refresh if user is not actively searching
-                        const activeInput = document.activeElement;
-                        if (!activeInput || activeInput.tagName !== 'INPUT') {
-                            // Soft refresh - just reload the current page
-                            const currentUrl = window.location.href;
-                            if (!currentUrl.includes('searchValue=') && !currentUrl.includes('historySearchValue=')) {
-                                window.location.reload();
-                            }
+                // Enhanced search functionality
+                const searchInputsEnhanced = document.querySelectorAll('input[type="text"]');
+                searchInputsEnhanced.forEach(input => {
+                    let searchTimeout;
+
+                    input.addEventListener('input', function () {
+                        clearTimeout(searchTimeout);
+
+                        // Add search icon animation
+                        const form = this.closest('form');
+                        const submitBtn = form.querySelector('button[type="submit"]');
+                        const icon = submitBtn.querySelector('i');
+
+                        if (this.value.length > 0) {
+                            icon.className = 'fas fa-search fa-pulse';
+                            submitBtn.style.background = 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)';
+                        } else {
+                            icon.className = 'fas fa-search';
+                            submitBtn.style.background = '';
                         }
-                    }, 30000); // 30 seconds
-                }
+
+                        // Auto-search after 1 second of inactivity
+                        if (this.value.length >= 2) {
+                            searchTimeout = setTimeout(() => {
+                                form.submit();
+                            }, 1000);
+                        }
+                    });
+
+                    // Enter key to search immediately
+                    input.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            clearTimeout(searchTimeout);
+                            this.closest('form').submit();
+                        }
+                    });
+                });
 
                 // Show loading state for action buttons
                 const actionButtons = document.querySelectorAll('a[href*="export"]');
@@ -1325,36 +1347,6 @@
                     });
                 });
 
-                // Enhanced search functionality
-                const searchInputsEnhanced = document.querySelectorAll('input[type="text"]');
-                searchInputsEnhanced.forEach(input => {
-                    let searchTimeout;
-
-                    input.addEventListener('input', function () {
-                        clearTimeout(searchTimeout);
-
-                        // Add search icon animation
-                        const form = this.closest('form');
-                        const submitBtn = form.querySelector('button[type="submit"]');
-                        const icon = submitBtn.querySelector('i');
-
-                        if (this.value.length > 0) {
-                            icon.className = 'fas fa-search fa-pulse';
-                            submitBtn.style.background = 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)';
-                        } else {
-                            icon.className = 'fas fa-search';
-                            submitBtn.style.background = '';
-                        }
-
-                        // Auto-search after 1 second of inactivity
-                        if (this.value.length >= 3) {
-                            searchTimeout = setTimeout(() => {
-                                form.submit();
-                            }, 1000);
-                        }
-                    });
-                });
-
                 // Add keyboard navigation for tables
                 document.addEventListener('keydown', function (e) {
                     if (e.altKey && e.key === 'ArrowUp') {
@@ -1376,13 +1368,13 @@
                     if (e.altKey && e.key === '1') {
                         e.preventDefault();
                         // Switch to approved tab
-                        window.location.href = '?action=list&tab=approved';
+                        window.location.href = '${pageContext.request.contextPath}/exportList?tab=approved';
                     }
 
                     if (e.altKey && e.key === '2') {
                         e.preventDefault();
                         // Switch to history tab
-                        window.location.href = '?action=list&tab=history';
+                        window.location.href = '${pageContext.request.contextPath}/exportList?tab=history';
                     }
                 });
 
@@ -1478,7 +1470,7 @@
                     });
                 });
 
-                console.log('ExportList.jsp loaded successfully - Full export mode enabled!');
+                console.log('ExportList.jsp loaded successfully - Search functionality enabled!');
             });
         </script>
     </body>

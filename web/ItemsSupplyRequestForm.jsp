@@ -502,7 +502,9 @@
         </style>
     </head>
     <body>
-        <div class="container">
+            <div class="layout-container">
+            <jsp:include page="/include/sidebar.jsp" />
+            <div class="main-content">
             <!-- Header - Tên đơn ở giữa trên cùng -->
             <div class="header-section">
                 <h1>Đơn Yêu Cầu Mua Hàng</h1>
@@ -539,7 +541,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Vai trò <span class="required">*</span></label>
+                        <label>Phòng Ban <span class="required">*</span></label>
                         <!-- Thay select thành input readonly -->
                         <input type="text" name="role" value="${sessionScope.currentUserDepartment}" readonly>
                     </div>
@@ -608,13 +610,15 @@
                                     </td>
 
                                     <td>
-                                        <textarea name="quantity" rows="1" 
+                                        <textarea name="quantity" rows="1"
                                                   class="quantity-input"
-                                                  style="resize: none; text-align: center;" 
+                                                  style="resize: none; text-align: center;"
                                                   oninput="validateQuantity(this); autoResize(this)"
                                                   onblur="formatQuantity(this)"
                                                   onkeypress="return isNumberKey(event)"
-                                                  placeholder="0"></textarea>
+                                                  placeholder="0"
+                                                  required></textarea>
+
                                     </td>
 
                                     <td><textarea name="note" rows="1" style="resize: none;" oninput="autoResize(this)" placeholder="Ghi chú..."></textarea></td>
@@ -647,7 +651,7 @@
                     </a>
                 </div>
             </form>
-        </div>
+            </div>
 
         <!-- Hidden data for JavaScript -->
         <script type="text/javascript">
@@ -976,6 +980,23 @@
             document.querySelector('form').addEventListener('submit', function (e) {
             const requiredFields = this.querySelectorAll('[required]');
             let isValid = true;
+            const quantityTextareas = this.querySelectorAll('textarea[name="quantity"]');
+            let quantityValid = true;
+            quantityTextareas.forEach(q => {
+            const rawValue = q.value.replace(/\./g, '').replace(',', '.').trim();
+            const num = parseFloat(rawValue);
+            if (!Number.isInteger(num) || num <= 0) {
+            quantityValid = false;
+            q.style.borderColor = '#dc3545';
+            } else {
+            q.style.borderColor = '#28a745';
+            }
+            });
+            if (!quantityValid) {
+            isValid = false;
+            alert('Vui lòng nhập số lượng hợp lệ (số nguyên dương) cho tất cả sản phẩm!');
+            }
+
             requiredFields.forEach(field => {
             if (!field.value.trim()) {
             isValid = false;

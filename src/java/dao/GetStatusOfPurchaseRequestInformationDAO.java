@@ -56,7 +56,7 @@ public class GetStatusOfPurchaseRequestInformationDAO {
             }
 
             // Thêm phân trang: 10 records per page
-            sqlIds.append("ORDER BY r.id LIMIT ? OFFSET ?");
+            sqlIds.append("ORDER BY r.id DESC LIMIT ? OFFSET ?");
             params.add(10); // LIMIT 10 requests
             params.add((index - 1) * 10); // OFFSET
 
@@ -102,7 +102,7 @@ public class GetStatusOfPurchaseRequestInformationDAO {
                 }
                 sqlDetails.append("?");
             }
-            sqlDetails.append(") ORDER BY r.id, ri.id");
+            sqlDetails.append(") ORDER BY r.id DESC, ri.id");
 
             System.out.println("=== STEP 2: Get Request Details ===");
             System.out.println("SQL: " + sqlDetails.toString());
@@ -121,36 +121,6 @@ public class GetStatusOfPurchaseRequestInformationDAO {
                     while (rs.next()) {
                         String requestId = rs.getString("request_id");
 
-<<<<<<< HEAD
-                      // Tạo request object mới khi gặp request_id khác
-                      if (currentRequest == null || !currentRequest.getId().equals(requestId)) {
-                          currentRequest = new Request();
-                          currentRequest.setId(requestId);
-                          currentRequest.setFullname(rs.getString("fullname"));
-                          currentRequest.setRole(rs.getString("role"));
-                          currentRequest.setDay_request(rs.getDate("day_request"));
-                          currentRequest.setStatus(rs.getString("status"));
-                          currentRequest.setReason(rs.getString("reason"));
-                          currentRequest.setItems(new ArrayList<>());
-                          allRequests.add(currentRequest);
-                      }
-
-                      // Thêm item vào request hiện tại (nếu có)
-                      if (rs.getObject("item_id") != null) {
-                          RequestItem item = new RequestItem();
-                          item.setId(rs.getInt("item_id"));
-                          item.setRequestId(requestId);
-                          item.setProductName(rs.getString("product_name"));
-                          item.setProductCode(rs.getString("product_code"));
-                          item.setUnit(rs.getString("unit"));
-                          item.setQuantity(rs.getDouble("quantity"));
-                          item.setNote(rs.getString("note") != null ? rs.getString("note") : "");
-                          currentRequest.getItems().add(item);
-                      }
-                  }
-              }
-          }
-=======
                         // Tạo request object mới khi gặp request_id khác
                         if (currentRequest == null || !currentRequest.getId().equals(requestId)) {
                             currentRequest = new Request();
@@ -179,7 +149,6 @@ public class GetStatusOfPurchaseRequestInformationDAO {
                     }
                 }
             }
->>>>>>> fa762af737b06f7bad2f50ac83eff6970e72fed2
 
             System.out.println("Final result: " + allRequests.size() + " requests");
             System.out.println("=== END DAO ===");

@@ -1,17 +1,15 @@
 package controller;
 
 import dao.ListRequestExportDAO;
-import dao.ExportDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.ArrayList;
 import model.ExportRequestItem;
-import model.Users;
 
 public class ListRequestExportController extends HttpServlet {
 
@@ -26,6 +24,12 @@ public class ListRequestExportController extends HttpServlet {
 
         try {
             ListRequestExportDAO dao = new ListRequestExportDAO();
+
+            // Lấy tham số action (mặc định là list)
+            String action = request.getParameter("action");
+            if (action == null || action.isEmpty()) {
+                action = "list";
+            }
 
             // Lấy tham số tab
             String tab = request.getParameter("tab");
@@ -57,6 +61,8 @@ public class ListRequestExportController extends HttpServlet {
             List<ExportRequestItem> historyItems = new ArrayList<>();
             int approvedPages = 0;
             int historyPages = 0;
+            int approvedTotal = 0;
+            int historyTotal = 0;
 
             // Lấy tổng số để hiển thị thống kê
             int totalApproved = dao.countApprovedExportItems(null, null);
@@ -67,8 +73,21 @@ public class ListRequestExportController extends HttpServlet {
                 String searchType = request.getParameter("searchType");
                 String searchValue = request.getParameter("searchValue");
 
+                // Validate searchType
+                if (searchType == null || searchType.isEmpty()) {
+                    searchType = "requestId";
+                }
+
+                // Trim searchValue
+                if (searchValue != null) {
+                    searchValue = searchValue.trim();
+                    if (searchValue.isEmpty()) {
+                        searchValue = null;
+                    }
+                }
+
                 approvedItems = dao.getApprovedExportItems(searchType, searchValue, approvedPage, PAGE_SIZE);
-                int approvedTotal = dao.countApprovedExportItems(searchType, searchValue);
+                approvedTotal = dao.countApprovedExportItems(searchType, searchValue);
                 approvedPages = (int) Math.ceil((double) approvedTotal / PAGE_SIZE);
 
                 // Set search parameters
@@ -81,8 +100,21 @@ public class ListRequestExportController extends HttpServlet {
                 String historySearchType = request.getParameter("historySearchType");
                 String historySearchValue = request.getParameter("historySearchValue");
 
+                // Validate historySearchType
+                if (historySearchType == null || historySearchType.isEmpty()) {
+                    historySearchType = "requestId";
+                }
+
+                // Trim historySearchValue
+                if (historySearchValue != null) {
+                    historySearchValue = historySearchValue.trim();
+                    if (historySearchValue.isEmpty()) {
+                        historySearchValue = null;
+                    }
+                }
+
                 historyItems = dao.getCompletedExportItems(historySearchType, historySearchValue, historyPage, PAGE_SIZE);
-                int historyTotal = dao.countCompletedExportItems(historySearchType, historySearchValue);
+                historyTotal = dao.countCompletedExportItems(historySearchType, historySearchValue);
                 historyPages = (int) Math.ceil((double) historyTotal / PAGE_SIZE);
 
                 // Set search parameters
@@ -92,6 +124,7 @@ public class ListRequestExportController extends HttpServlet {
             }
 
             // Set attributes
+            request.setAttribute("action", action);
             request.setAttribute("approvedItems", approvedItems);
             request.setAttribute("historyItems", historyItems);
             request.setAttribute("currentTab", tab);
@@ -107,12 +140,17 @@ public class ListRequestExportController extends HttpServlet {
 
             request.setAttribute("pageSize", PAGE_SIZE);
 
+            // Debug log
+            System.out.println("Tab: " + tab);
+            System.out.println("Approved items: " + approvedItems.size());
+            System.out.println("History items: " + historyItems.size());
+
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("Error in ListRequestExportController: " + e.getMessage());
             e.printStackTrace();
             request.setAttribute("approvedItems", new ArrayList<>());
             request.setAttribute("historyItems", new ArrayList<>());
-            request.setAttribute("error", "Có lỗi xảy ra khi tải dữ liệu");
+            request.setAttribute("error", "Có lỗi xảy ra khi tải dữ liệu: " + e.getMessage());
         }
 
         request.getRequestDispatcher("/ListRequestExport.jsp").forward(request, response);
@@ -123,7 +161,6 @@ public class ListRequestExportController extends HttpServlet {
             throws ServletException, IOException {
         
         // Redirect tất cả POST requests về GET để tránh xung đột
-        // Các thao tác export sẽ được xử lý bởi ExportConfirmController
         doGet(request, response);
     }
 }

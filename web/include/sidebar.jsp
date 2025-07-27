@@ -124,5 +124,5 @@ Description: Reusable sidebar compon<div class="sidebar">
     <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="nav-item">Giao dịch</a>
     <a href="${pageContext.request.contextPath}/profile" class="nav-item">Thông tin cá nhân</a>
     <a href="${pageContext.request.contextPath}/Admin.jsp" class="nav-item">Trang chủ (Chỉ Admin)</a>
-    <a href="${pageContext.request.contextPath}/StatisticSupplierEvaluation.jsp" class="nav-item">Thống kê</a>
+    <a href="${pageContext.request.contextPath}/StatisticSupplierEvaluation.jsp?luaChonValue=first" class="nav-item">Thống kê</a>
 </div>

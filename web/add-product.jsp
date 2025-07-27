@@ -329,20 +329,6 @@
                             <option value="inactive" ${formData.status[0] == 'inactive' ? 'selected' : ''}>Ngưng hoạt động</option>
                         </select>
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="stockQuantity">Số Lượng Tồn Kho</label>
-                        <input type="number" id="stockQuantity" name="stockQuantity" class="form-control" 
-                               value="${formData.stockQuantity[0]}" min="0" step="0.01" placeholder="0">
-                        <div class="form-help">Số lượng hiện có trong kho (tùy chọn)</div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="minStockThreshold">Ngưỡng Cảnh Báo Tồn Kho</label>
-                        <input type="number" id="minStockThreshold" name="minStockThreshold" class="form-control" 
-                               value="${formData.minStockThreshold[0]}" min="0" step="0.01" placeholder="10">
-                        <div class="form-help">Số lượng tối thiểu để cảnh báo sắp hết hàng (mặc định: 10)</div>
-                    </div>
                 </div>
                 
                 <!-- Additional Information -->

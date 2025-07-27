@@ -74,8 +74,7 @@ public class LoadingRequestServlet extends HttpServlet {
 
         // Lấy ID yêu cầu tiếp theo
         String nextID = requestInfo.getNextRequestId();
-
-        // Lấy danh sách sản phẩm với đơn vị đo
+// Lấy danh sách sản phẩm với đơn vị đo
         List<ProductInfo> products_list = product.getAllProductsWithUnitSymbols();
         MaterialUnitDAO unitDAO = new MaterialUnitDAO();
         List<MaterialUnit> unit_list = unitDAO.getAllMaterialUnits();
@@ -140,7 +139,7 @@ public class LoadingRequestServlet extends HttpServlet {
 
         // Khởi tạo DAO để lưu vào database
         RequestItemsDAO requestitemsDAO = new RequestItemsDAO();
-        RequestInformationDAO requestInformationDAO = new RequestInformationDAO();
+RequestInformationDAO requestInformationDAO = new RequestInformationDAO();
 
         // Lưu thông tin yêu cầu chính và lấy request_id
         String request_id = requestInformationDAO.addRequestInformationIntoDB(user_name, role, dayRequest, "pending", reason);

@@ -48,33 +48,30 @@ public class RolePermissionServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
         List<Role> allRoles = dao.getAllRoles();
-        List<Role> nonAdminRoles = allRoles.stream()
-                .filter(r -> !r.getRoleName().equalsIgnoreCase("admin"))
-                .collect(Collectors.toList());
-
         List<Permission> permissions = dao.getAllPermissions();
 
-        // Tìm kiếm theo key
+        // Gộp tìm kiếm theo keyword (tên quyền và mã quyền)
         String keyword = request.getParameter("keyword");
         if (keyword != null && !keyword.trim().isEmpty()) {
             String lowerKeyword = keyword.trim().toLowerCase();
             permissions = permissions.stream()
-                    .filter(p -> p.getName().toLowerCase().contains(lowerKeyword)
-                    || p.getCode().toLowerCase().contains(lowerKeyword))
+                    .filter(p -> p.getName().toLowerCase().contains(lowerKeyword) || 
+                                 p.getCode().toLowerCase().contains(lowerKeyword))
                     .collect(Collectors.toList());
         }
 
         // Lọc theo vai trò
         String roleIdStr = request.getParameter("role");
         Integer filterRoleId = null;
-        List<Role> filteredRoles = nonAdminRoles;
-
+        List<Role> filteredRoles = allRoles;
+        
         if (roleIdStr != null && !roleIdStr.isEmpty()) {
             try {
                 filterRoleId = Integer.parseInt(roleIdStr);
                 final Integer selectedRoleId = filterRoleId;
-                filteredRoles = nonAdminRoles.stream()
+                filteredRoles = allRoles.stream()
                         .filter(r -> r.getId() == selectedRoleId)
                         .collect(Collectors.toList());
             } catch (NumberFormatException e) {
@@ -84,12 +81,13 @@ public class RolePermissionServlet extends HttpServlet {
 
         // Map roleId -> List<permissionId>
         Map<Integer, List<Integer>> rolePermissions = new HashMap<>();
-        for (Role role : nonAdminRoles) {
+        for (Role role : allRoles) {
             List<Integer> perms = dao.getPermissionIdsByRoleId(role.getId());
             rolePermissions.put(role.getId(), perms);
         }
 
-        request.setAttribute("allRoles", nonAdminRoles);
+        // Set attributes
+        request.setAttribute("allRoles", allRoles);
         request.setAttribute("roles", filteredRoles);
         request.setAttribute("permissions", permissions);
         request.setAttribute("rolePermissions", rolePermissions);
@@ -102,17 +100,18 @@ public class RolePermissionServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        
         String action = request.getParameter("action");
         String keyword = request.getParameter("keyword");
         String role = request.getParameter("role");
 
         try {
             if ("reset".equals(action)) {
+                // Reset toàn bộ phân quyền
                 handleResetAll();
                 redirectWithMessage(response, keyword, role, "reset=1");
             } else {
-                // Lưu phân quyền
+                // Lưu phân quyền (action = "save" hoặc null)
                 handleSavePermissions(request, keyword, role);
                 redirectWithMessage(response, keyword, role, "success=1");
             }
@@ -123,35 +122,28 @@ public class RolePermissionServlet extends HttpServlet {
     }
 
     private void handleResetAll() {
-        List<Role> allRoles = dao.getAllRoles();
-        List<Role> nonAdminRoles = allRoles.stream()
-                .filter(r -> !r.getRoleName().equalsIgnoreCase("Admin"))
-                .collect(Collectors.toList());
-        for (Role role : nonAdminRoles) {
-            dao.deleteAllPermissionsOfRole(role.getId());
-        }
-    }
+    boolean success = dao.deleteAllRolePermissions();
+    System.out.println("Reset all permissions result: " + success);
+}
 
     private void handleSavePermissions(HttpServletRequest request, String keyword, String role) {
         List<Role> allRoles = dao.getAllRoles();
-        // LỌC ADMIN
-        List<Role> nonAdminRoles = allRoles.stream()
-                .filter(r -> !r.getRoleName().equalsIgnoreCase("admin"))
-                .collect(Collectors.toList());
-
         List<Permission> allPermissions = dao.getAllPermissions();
-        List<Permission> filteredPermissions = allPermissions;
 
+        // Áp dụng filter để lấy permissions hiện tại
+        List<Permission> filteredPermissions = allPermissions;
+        
         if (keyword != null && !keyword.trim().isEmpty()) {
             String lowerKeyword = keyword.trim().toLowerCase();
             filteredPermissions = filteredPermissions.stream()
-                    .filter(p -> p.getName().toLowerCase().contains(lowerKeyword)
-                    || p.getCode().toLowerCase().contains(lowerKeyword))
+                    .filter(p -> p.getName().toLowerCase().contains(lowerKeyword) || 
+                                 p.getCode().toLowerCase().contains(lowerKeyword))
                     .collect(Collectors.toList());
         }
 
-        // Chỉ duyệt qua các role KHÔNG PHẢI ADMIN
-        for (Role roleObj : nonAdminRoles) {
+        // Xử lý cho từng role
+        for (Role roleObj : allRoles) {
+            // Lấy danh sách quyền được check
             List<Integer> checkedPerms = new ArrayList<>();
             for (Permission perm : filteredPermissions) {
                 String param = "perm_" + perm.getId() + "_role_" + roleObj.getId();
@@ -159,22 +151,28 @@ public class RolePermissionServlet extends HttpServlet {
                     checkedPerms.add(perm.getId());
                 }
             }
+            
+            // Lấy danh sách ID của permissions hiện tại
             List<Integer> currentPermIds = filteredPermissions.stream()
                     .map(Permission::getId)
                     .collect(Collectors.toList());
+            
+            // Xóa các quyền hiện tại cho vai trò đó
             if (!currentPermIds.isEmpty()) {
                 dao.deletePermissionsOfRoleForPermissions(roleObj.getId(), currentPermIds);
             }
+            
+            // Thêm các quyền được chọn
             if (!checkedPerms.isEmpty()) {
                 dao.addPermissionsToRole(roleObj.getId(), checkedPerms);
             }
         }
     }
 
-    private void redirectWithMessage(HttpServletResponse response, String keyword, String role,
-            String message) throws IOException {
+    private void redirectWithMessage(HttpServletResponse response, String keyword, String role, 
+                                     String message) throws IOException {
         StringBuilder sb = new StringBuilder("role-permission?" + message);
-
+        
         if (keyword != null && !keyword.trim().isEmpty()) {
             sb.append("&keyword=").append(java.net.URLEncoder.encode(keyword, "UTF-8"));
         }

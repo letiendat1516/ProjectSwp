@@ -41,7 +41,7 @@ public class ListPurchaseOrderServlet extends HttpServlet {
           System.out.println("endDate: " + endDate);
           System.out.println("requestIdFilter: " + requestIdFilter);
           
-          // Phân trang - sử dụng 'page' thay vì 'index' để phù hợp với JSP
+          // Phân trang
           int currentPage = 1;
           try {
               if (request.getParameter("page") != null && !request.getParameter("page").isEmpty()) {

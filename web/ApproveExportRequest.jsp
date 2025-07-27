@@ -538,17 +538,17 @@
                                       <!-- THAY ĐỔI: Hiển thị requester_name thay vì user_id -->
                                       <td class="requester-name">
                                           <c:choose>
-                                              <c:when test="${req.requester_name == 'Unknown User'}">
-                                                  <span class="unknown-user">${req.requester_name}</span>
+                                              <c:when test="${req.requesterName == 'Unknown User'}">
+                                                  <span class="unknown-user">${req.requesterName}</span>
                                               </c:when>
                                               <c:otherwise>
-                                                  <span title="User ID: ${req.user_id}">${req.requester_name}</span>
+                                                  <span title="User ID: ${req.userId}">${req.requesterName}</span>
                                               </c:otherwise>
                                           </c:choose>
                                       </td>
                                       <td>
-                                          <c:if test="${not empty req.day_request}">
-                                              <fmt:formatDate value="${req.day_request}" pattern="dd/MM/yyyy" />
+                                          <c:if test="${not empty req.dayRequest}">
+                                              <fmt:formatDate value="${req.dayRequest}" pattern="dd/MM/yyyy" />
                                           </c:if>
                                       </td>
                                       <td>${status}</td>
@@ -593,8 +593,8 @@
                                                         <c:when test="${not empty req.items}">
                                                             <c:forEach var="item" items="${req.items}">
                                                                 <tr>
-                                                                    <td>${item.product_code}</td>
-                                                                    <td>${item.product_name}</td>
+                                                                    <td>${item.productCode}</td>
+                                                                    <td>${item.productName}</td>
                                                                     <td>${item.unit}</td>
                                                                     <td>${item.quantity}</td>
                                                                     <td>${item.note}</td>

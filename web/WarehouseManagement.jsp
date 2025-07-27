@@ -877,11 +877,6 @@
                                                     <i class="fas fa-user"></i> ${sessionScope.user.fullname != null ? sessionScope.user.fullname : sessionScope.user.username}
                                                 </div>
                                             </div>
-                                            <div class="info-item" style="grid-column: 1 / -1;">
-                                                <label class="info-label">Ghi chú bổ sung</label>
-                                                <input type="text" name="additionalNote" class="form-input editable" 
-                                                       placeholder="Nhập ghi chú thêm (nếu có)">
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1175,4 +1170,3 @@
         </script>
     </body>
 </html>
-
