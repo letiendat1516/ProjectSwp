@@ -16,18 +16,19 @@ public class MaterialUnit {
     private String name;
     private String symbol;
     private String description;
-    private String type;
+    private int status; // Changed from String type to int status
+    private boolean canDelete; // New property to check if unit can be deleted
     private Timestamp createdAt;
     
     public MaterialUnit() {
     }
     
-    public MaterialUnit(int id, String name, String symbol, String description, String type, Timestamp createdAt) {
+    public MaterialUnit(int id, String name, String symbol, String description, int status, Timestamp createdAt) {
         this.id = id;
         this.name = name;
         this.symbol = symbol;
         this.description = description;
-        this.type = type;
+        this.status = status;
         this.createdAt = createdAt;
     }
     
@@ -64,12 +65,20 @@ public class MaterialUnit {
         this.description = description;
     }
     
-    public String getType() {
-        return type;
+    public int getStatus() {
+        return status;
     }
     
-    public void setType(String type) {
-        this.type = type;
+    public void setStatus(int status) {
+        this.status = status;
+    }
+    
+    public boolean isCanDelete() {
+        return canDelete;
+    }
+    
+    public void setCanDelete(boolean canDelete) {
+        this.canDelete = canDelete;
     }
     
     public Timestamp getCreatedAt() {

@@ -11,7 +11,6 @@ public class ProductStock {
     private String code; // Code of the product
     private int cateId; // Category ID the product belongs to
     private int unitId; // Unit ID for the product
-    private BigDecimal price; // Price of the product
     private String status; // Status of the product (e.g., available, discontinued)
     private String description; // Description of the product
     private BigDecimal stockQuantity; // Quantity of the product in stock
@@ -22,6 +21,7 @@ public class ProductStock {
     private Date expirationDate; // Expiration date of the product
     private boolean isLowStock; // Flag indicating if the stock is low
     private boolean isNearExpiration; // Flag indicating if the product is near expiration
+    private BigDecimal minStockThreshold; // Minimum stock threshold for low stock warning
 
     public ProductStock() {
     }    public ProductStock(int id, String name, String code, BigDecimal stockQuantity) {
@@ -70,14 +70,6 @@ public class ProductStock {
 
     public void setUnitId(int unitId) {
         this.unitId = unitId;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
     }
 
     public String getStatus() {
@@ -160,18 +152,35 @@ public class ProductStock {
         isNearExpiration = nearExpiration;
     }
 
-    // Helper method to check if stock is low (less than 10 units)
-    public void checkLowStock() {
-        this.isLowStock = stockQuantity != null && stockQuantity.compareTo(new BigDecimal("10")) < 0;
+    public BigDecimal getMinStockThreshold() {
+        return minStockThreshold;
     }
 
-    // Helper method to check if product is near expiration (within 30 days)
+    public void setMinStockThreshold(BigDecimal minStockThreshold) {
+        this.minStockThreshold = minStockThreshold;
+    }
+
+    // Method to check if stock is low based on custom threshold
+    public void checkLowStock() {
+        if (stockQuantity != null && minStockThreshold != null) {
+            this.isLowStock = stockQuantity.compareTo(minStockThreshold) <= 0;
+        } else if (stockQuantity != null) {
+            // Fallback to default threshold of 10 if no custom threshold is set
+            this.isLowStock = stockQuantity.compareTo(new BigDecimal("10")) <= 0;
+        } else {
+            this.isLowStock = false;
+        }
+    }
+
+    // Method to check if product is near expiration (within 30 days)
     public void checkNearExpiration() {
         if (expirationDate != null) {
-            Date now = new Date();
-            long diffTime = expirationDate.getTime() - now.getTime();
-            long diffDays = diffTime / (1000 * 60 * 60 * 24);
-            this.isNearExpiration = diffDays <= 30 && diffDays >= 0;
+            Date currentDate = new Date(System.currentTimeMillis());
+            long diffInMillies = expirationDate.getTime() - currentDate.getTime();
+            long diffInDays = diffInMillies / (24 * 60 * 60 * 1000);
+            this.isNearExpiration = diffInDays <= 30 && diffInDays >= 0;
+        } else {
+            this.isNearExpiration = false;
         }
     }
 }

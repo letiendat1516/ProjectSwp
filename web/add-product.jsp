@@ -42,11 +42,13 @@
             font-size: 2.5rem;
             margin-bottom: 10px;
             font-weight: 300;
+            color: black;
         }
 
         .header p {
             font-size: 1.1rem;
             opacity: 0.9;
+            color: black;
         }
 
         .nav-buttons {
@@ -249,7 +251,7 @@
             <jsp:include page="/include/sidebar.jsp" />
             <div class="main-content">
         <div class="header">
-            <h1>➕ Thêm Sản Phẩm Mới</h1>
+            <h1>Thêm Sản Phẩm Mới</h1>
             <p>Nhập thông tin chi tiết để thêm sản phẩm vào hệ thống kho</p>
         </div>        <div class="nav-buttons">
             <a href="product-list" class="btn btn-primary">← Quay lại Danh Sách</a>
@@ -258,13 +260,13 @@
         <!-- Error/Success Messages -->
         <c:if test="${not empty error}">
             <div class="error-message">
-                <strong>❌ Lỗi:</strong> ${error}
+                <strong>Lỗi:</strong> ${error}
             </div>
         </c:if>
 
         <c:if test="${not empty success}">
             <div class="success-message">
-                <strong>✅ Thành công:</strong> ${success}
+                <strong>Thành công:</strong> ${success}
             </div>
         </c:if>
 
@@ -275,7 +277,7 @@
                 </div>
 
                 <!-- Basic Information -->
-                <div class="section-title">📝 Thông Tin Cơ Bản</div>
+                <div class="section-title">Thông Tin Cơ Bản</div>
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label required" for="name">Tên Sản Phẩm</label>
@@ -317,12 +319,7 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label required" for="price">Giá (VNĐ)</label>
-                        <input type="number" id="price" name="price" class="form-control" 
-                               value="${formData.price[0]}" min="0" step="0.01" required>
-                        <div class="form-help">Nhập giá bằng VNĐ</div>
-                    </div>
+
 
                     <div class="form-group">
                         <label class="form-label required" for="status">Trạng Thái</label>
@@ -332,17 +329,10 @@
                             <option value="inactive" ${formData.status[0] == 'inactive' ? 'selected' : ''}>Ngưng hoạt động</option>
                         </select>
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="stockQuantity">Số Lượng Tồn Kho</label>
-                        <input type="number" id="stockQuantity" name="stockQuantity" class="form-control" 
-                               value="${formData.stockQuantity[0]}" min="0" step="0.01" placeholder="0">
-                        <div class="form-help">Số lượng hiện có trong kho (tùy chọn)</div>
-                    </div>
                 </div>
                 
                 <!-- Additional Information -->
-                <div class="section-title">📦 Thông Tin Bổ Sung</div>
+                <div class="section-title">Thông Tin Bổ Sung</div>
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label" for="supplierId">Nhà Cung Cấp</label>
@@ -381,10 +371,10 @@
                 <!-- Submit Buttons -->
                 <div style="text-align: center; margin-top: 30px;">
                     <button type="submit" class="btn btn-success" style="padding: 15px 30px; font-size: 16px;">
-                        ✅ Thêm Sản Phẩm
+                        Thêm Sản Phẩm
                     </button>
                     <a href="product-list" class="btn btn-secondary" style="padding: 15px 30px; font-size: 16px; margin-left: 15px;">
-                        ❌ Hủy Bỏ
+                        Hủy Bỏ
                     </a>
                 </div>
             </form>

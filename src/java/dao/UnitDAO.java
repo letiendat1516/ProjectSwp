@@ -29,7 +29,7 @@ public class UnitDAO {
     public List<Unit> getAllUnits() {
         List<Unit> units = new ArrayList<>();
         try {
-            String sql = "SELECT * FROM unit ORDER BY name";
+            String sql = "SELECT id, name, symbol, status FROM unit WHERE status = 1 ORDER BY name";
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
 
@@ -38,6 +38,7 @@ public class UnitDAO {
                 unit.setId(rs.getInt("id"));
                 unit.setName(rs.getString("name"));
                 unit.setSymbol(rs.getString("symbol"));
+                unit.setStatus(rs.getInt("status"));
                 units.add(unit);
             }
         } catch (SQLException e) {
@@ -66,7 +67,7 @@ public class UnitDAO {
 // Sửa method getUnitById() trong UnitDAO.java
     public Unit getUnitById(int id) {
         try {
-            String sql = "SELECT * FROM unit WHERE id = ?";
+            String sql = "SELECT id, name, symbol, status FROM unit WHERE id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -76,6 +77,7 @@ public class UnitDAO {
                 unit.setId(rs.getInt("id"));
                 unit.setName(rs.getString("name"));
                 unit.setSymbol(rs.getString("symbol")); // THÊM DÒNG NÀY
+                unit.setStatus(rs.getInt("status"));
                 return unit;
             }
         } catch (SQLException e) {

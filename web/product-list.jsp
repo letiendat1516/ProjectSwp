@@ -61,6 +61,7 @@
         .header p {
             font-size: 1.1rem;
             opacity: 0.9;
+            color: black;
         }
 
         .back-btn {
@@ -256,6 +257,30 @@
             background: #f8f9fa;
         }
 
+        /* Product Detail Links */
+        .table td a {
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin: -4px -8px;
+        }
+
+        .table td a:hover {
+            background: rgba(102, 126, 234, 0.1);
+            text-decoration: none !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .table td a[href*="product-detail"] {
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .table td a[href*="product-detail"]:hover {
+            color: #5a6fd8 !important;
+        }
+
         .badge {
             padding: 4px 8px;
             border-radius: 12px;
@@ -279,12 +304,41 @@
             color: #721c24;
         }
 
-        .highlight-low-stock {
-            background: rgba(220, 53, 69, 0.1) !important;
+        .btn-edit {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            text-align: center;
+            min-width: 60px;
         }
 
-        .highlight-expiring {
-            background: rgba(255, 193, 7, 0.1) !important;
+        .btn-edit:hover {
+            background: #0056b3;
+            text-decoration: none;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Action column specific styling */
+        .action-column {
+            width: 150px;
+            min-width: 150px;
+            white-space: nowrap;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            flex-wrap: nowrap;
         }
 
         .pagination {
@@ -379,6 +433,23 @@
             .table {
                 min-width: 800px;
             }
+            
+            /* Responsive action buttons */
+            .action-buttons {
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .action-column {
+                width: 120px;
+                min-width: 120px;
+            }
+            
+            .btn-edit {
+                font-size: 0.75rem;
+                padding: 4px 8px;
+                min-width: 50px;
+            }
         }
         .layout-container {
                 display: flex;
@@ -400,7 +471,7 @@
                 align-items: center;
             }
             .label {
-                color: #888;
+                color: black;
                 width: 120px;
             }
             .logout-btn {
@@ -429,8 +500,8 @@
             <div class="main-content">
         
                 <div class="header">
-                    <h1 class="page-title">📦 Danh Sách Sản Phẩm</h1>
-                    <p>Quản lý và theo dõi tồn kho sản phẩm</p>
+                    <h1 class="page-title">Quản Lý Sản Phẩm</h1>
+                    <p>Quản lý thông tin cơ bản của sản phẩm trong hệ thống</p>
                     <div class="header-user">
                         <label class="label"><%= user.getFullname()%></label>
                         <a href="logout" class="logout-btn">Đăng xuất</a>
@@ -439,19 +510,20 @@
 
         <div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
             <a href="categoriesforward.jsp" class="back-btn">← Quay lại Trang trước</a>
-            <a href="add-product" class="add-product-btn">➕ Thêm Sản Phẩm Mới</a>
-            <a href="deleted-products" class="add-product-btn" style="background: #ffc107; color: #333;">🗑️ Sản Phẩm Đã Xóa</a>
+            <a href="add-product" class="add-product-btn">Thêm Sản Phẩm Mới</a>
+            <a href="product-stock/list" class="add-product-btn" style="background: #28a745; color: white;">Quản Lý Tồn Kho</a>
+            <a href="inventory-statistics" class="add-product-btn" style="background: #17a2b8; color: white;">Thống Kê Kho Hàng</a>
         </div>        <!-- Success Message -->
         <c:if test="${not empty param.success}">
             <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #c3e6cb;">
-                <strong>✅ Thành công:</strong> ${param.success}
+                <strong>Thành công:</strong> ${param.success}
             </div>
         </c:if>
         
         <!-- Error Message -->
         <c:if test="${not empty param.error}">
             <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #f5c6cb;">
-                <strong>❌ Lỗi:</strong> ${param.error}
+                <strong>Lỗi:</strong> ${param.error}
             </div>
         </c:if>
 
@@ -472,24 +544,6 @@
                         </select>
                     </div>
                     
-                    <div class="sort-box">
-                        <select name="sortBy" onchange="this.form.submit()">
-                            <option value="">Sắp xếp theo</option>
-                            <option value="name" ${sortBy == 'name' ? 'selected' : ''}>Tên sản phẩm</option>
-                            <option value="code" ${sortBy == 'code' ? 'selected' : ''}>Mã sản phẩm</option>
-                            <option value="price" ${sortBy == 'price' ? 'selected' : ''}>Giá</option>
-                            <option value="stock" ${sortBy == 'stock' ? 'selected' : ''}>Số lượng tồn</option>
-                            <option value="category" ${sortBy == 'category' ? 'selected' : ''}>Danh mục</option>
-                        </select>
-                    </div>
-                    
-                    <div class="sort-box">
-                        <select name="sortOrder" onchange="this.form.submit()">
-                            <option value="asc" ${sortOrder == 'asc' ? 'selected' : ''}>Tăng dần</option>
-                            <option value="desc" ${sortOrder == 'desc' ? 'selected' : ''}>Giảm dần</option>
-                        </select>
-                    </div>
-                    
                     <button type="submit" class="btn btn-primary">Tìm kiếm</button>
                 </div>
                 
@@ -498,28 +552,12 @@
             </form>
         </div>
 
-        <!-- Statistics -->
-        <div class="stats">
-            <div class="stat-card stat-total">
-                <div class="stat-number">${totalProducts}</div>
-                <div class="stat-label">Tổng sản phẩm</div>
-            </div>
-            <div class="stat-card stat-low">
-                <div class="stat-number">${lowStockCount}</div>
-                <div class="stat-label">Sắp hết hàng</div>
-            </div>
-            <div class="stat-card stat-expiring">
-                <div class="stat-number">${nearExpirationCount}</div>
-                <div class="stat-label">Sắp hết hạn</div>
-            </div>
-        </div>
-
         <!-- Products Table -->
         <div class="table-container">
             <c:choose>
                 <c:when test="${empty products}">
                     <div class="no-data">
-                        <i>📦</i>
+                        <i></i>
                         <h3>Không tìm thấy sản phẩm nào</h3>
                         <p>Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc</p>
                     </div>
@@ -536,76 +574,70 @@
                                     Tên sản phẩm
                                     <span class="sort-icon ${sortBy == 'name' ? (sortOrder == 'asc' ? 'sort-asc' : 'sort-desc') : ''}"></span>
                                 </th>
+                                <th class="sortable" onclick="sortTable('status')">
+                                    Trạng thái
+                                    <span class="sort-icon ${sortBy == 'status' ? (sortOrder == 'asc' ? 'sort-asc' : 'sort-desc') : ''}"></span>
+                                </th>
                                 <th class="sortable" onclick="sortTable('category')">
                                     Danh mục
                                     <span class="sort-icon ${sortBy == 'category' ? (sortOrder == 'asc' ? 'sort-asc' : 'sort-desc') : ''}"></span>
                                 </th>
-                                <th class="sortable" onclick="sortTable('price')">
-                                    Giá
-                                    <span class="sort-icon ${sortBy == 'price' ? (sortOrder == 'asc' ? 'sort-asc' : 'sort-desc') : ''}"></span>
-                                </th>
-                                <th class="sortable" onclick="sortTable('stock')">
-                                    Số lượng tồn
-                                    <span class="sort-icon ${sortBy == 'stock' ? (sortOrder == 'asc' ? 'sort-asc' : 'sort-desc') : ''}"></span>
-                                </th>                                <th>Đơn vị</th>
-                                <th>Trạng thái</th>
-                                <th>Cảnh báo</th>
-                                <th>Thao tác</th>
+                                <th>Đơn vị</th>
+                                <th class="action-column">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:forEach var="product" items="${products}">
-                                <tr class="${product.lowStock ? 'highlight-low-stock' : ''} ${product.nearExpiration ? 'highlight-expiring' : ''}">
-                                    <td><strong>${product.code}</strong></td>
-                                    <td>${product.name}</td>
-                                    <td>${product.categoryName != null ? product.categoryName : 'Chưa phân loại'}</td>
-                                    <td>
-                                        <c:if test="${product.price != null}">
-                                            <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="₫" />
-                                        </c:if>
-                                    </td>
+                                <tr>
                                     <td>
                                         <strong>
-                                            <fmt:formatNumber value="${product.stockQuantity}" type="number" maxFractionDigits="2" />
+                                            <a href="product-detail?id=${product.id}" style="color: #667eea; text-decoration: none; font-weight: bold;">
+                                                ${product.code}
+                                            </a>
                                         </strong>
                                     </td>
-                                    <td>${product.unitSymbol != null ? product.unitSymbol : product.unitName}</td>
                                     <td>
+                                        <a href="product-detail?id=${product.id}" style="color: #333; text-decoration: none; font-weight: 500;">
+                                            ${product.name}
+                                        </a>
+                                    </td>
+                                    <td style="font-weight: bold;">
                                         <c:choose>
                                             <c:when test="${product.status == 'active' || product.status == 'Hoạt động'}">
-                                                <span class="badge badge-success">Hoạt động</span>
+                                                <span class="badge badge-success" style="font-size: 0.9rem; padding: 6px 12px;">Hoạt động</span>
                                             </c:when>
                                             <c:when test="${product.status == 'inactive' || product.status == 'Ngưng hoạt động'}">
-                                                <span class="badge badge-warning">Ngưng hoạt động</span>
-                                            </c:when>
-                                            <c:when test="${product.status == 'deleted'}">
-                                                <span class="badge badge-danger">Đã xóa</span>
+                                                <span class="badge badge-warning" style="font-size: 0.9rem; padding: 6px 12px;">Ngưng hoạt động</span>
                                             </c:when>
                                             <c:otherwise>
-                                                <span class="badge badge-warning">${product.status}</span>
+                                                <span class="badge badge-warning" style="font-size: 0.9rem; padding: 6px 12px;">${product.status}</span>
                                             </c:otherwise>
                                         </c:choose>
-                                    </td>                                    <td>
-                                        <c:if test="${product.lowStock}">
-                                            <span class="badge badge-danger">Sắp hết hàng</span>
-                                        </c:if>
-                                        <c:if test="${product.nearExpiration}">
-                                            <span class="badge badge-warning">Sắp hết hạn</span>
-                                        </c:if>
                                     </td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${product.status == 'deleted'}">
-                                                <a href="recover-product?id=${product.id}" class="btn-edit" style="background: #ffc107; color: #333;" title="Khôi phục sản phẩm">
-                                                    ♻️ Khôi phục
-                                                </a>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <a href="update-product?id=${product.id}" class="btn-edit" title="Chỉnh sửa sản phẩm">
-                                                    ✏️ Sửa
-                                                </a>
-                                            </c:otherwise>
-                                        </c:choose>
+                                    <td>${product.additionalNotes}</td>
+                                    <td>${product.unitSymbol != null ? product.unitSymbol : 'N/A'}</td>
+                                    <td class="action-column">
+                                        <div class="action-buttons">
+                                            <a href="update-product?id=${product.id}" class="btn-edit" title="Chỉnh sửa sản phẩm">
+                                                Sửa
+                                            </a>
+                                            <c:choose>
+                                                <c:when test="${product.status == 'active' || product.status == 'Hoạt động'}">
+                                                    <a href="change-product-status?id=${product.id}&status=inactive" class="btn-edit" 
+                                                       style="background: #ffc107; color: #333;" title="Ngưng hoạt động sản phẩm"
+                                                       onclick="return confirm('Bạn có chắc muốn ngưng hoạt động sản phẩm này?')">
+                                                        Ngưng
+                                                    </a>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <a href="change-product-status?id=${product.id}&status=active" class="btn-edit" 
+                                                       style="background: #28a745; color: white;" title="Kích hoạt sản phẩm"
+                                                       onclick="return confirm('Bạn có chắc muốn kích hoạt sản phẩm này?')">
+                                                        Kích hoạt
+                                                    </a>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
                                     </td>
                                 </tr>
                             </c:forEach>

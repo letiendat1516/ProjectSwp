@@ -16,56 +16,76 @@ import DBContext.Context;
 
 public class DepartmentStatisticDAO {
 
-    /**
-     * Get overview statistics of all departments
-     */
-    public Map<String, Object> getOverviewStatistics() {
-        Map<String, Object> stats = new HashMap<>();
+ /**
+ * Get overview statistics of all departments
+ */
+public Map<String, Object> getOverviewStatistics() {
+    Map<String, Object> stats = new HashMap<>();
+    
+    String sql = """
+        SELECT 
+            COUNT(DISTINCT d.id) as total_departments,
+            COUNT(DISTINCT CASE WHEN d.active_flag = 1 THEN d.id END) as active_departments,
+            COUNT(DISTINCT CASE WHEN d.active_flag = 0 THEN d.id END) as inactive_departments,
+            COUNT(DISTINCT CASE WHEN d.manager_id IS NOT NULL THEN d.id END) as departments_with_manager,
+            COUNT(DISTINCT CASE WHEN d.manager_id IS NULL THEN d.id END) as departments_without_manager,
+            -- ✨ THÊM: Thống kê chi tiết hơn
+            COUNT(DISTINCT CASE WHEN d.active_flag = 1 AND d.manager_id IS NOT NULL THEN d.id END) as active_with_manager,
+            COUNT(DISTINCT CASE WHEN d.active_flag = 1 AND d.manager_id IS NULL THEN d.id END) as active_without_manager,
+            COUNT(DISTINCT CASE WHEN d.active_flag = 0 AND d.manager_id IS NOT NULL THEN d.id END) as inactive_with_manager,
+            COUNT(DISTINCT CASE WHEN d.active_flag = 0 AND d.manager_id IS NULL THEN d.id END) as inactive_without_manager,
+            COUNT(DISTINCT u.id) as total_employees,
+            COUNT(DISTINCT CASE WHEN u.active_flag = 1 THEN u.id END) as active_employees,
+            COUNT(DISTINCT CASE WHEN d.active_flag = 1 THEN u.id END) as employees_in_active_depts,
+            COUNT(DISTINCT CASE WHEN d.active_flag = 0 THEN u.id END) as employees_in_inactive_depts
+        FROM department d
+        LEFT JOIN users u ON d.id = u.department_id
+        """;
+    
+    try (Connection conn = new Context().getJDBCConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
         
-        String sql = """
-            SELECT 
-                COUNT(DISTINCT d.id) as total_departments,
-                COUNT(DISTINCT CASE WHEN d.active_flag = 1 THEN d.id END) as active_departments,
-                COUNT(DISTINCT CASE WHEN d.active_flag = 0 THEN d.id END) as inactive_departments,
-                COUNT(DISTINCT CASE WHEN d.manager_id IS NOT NULL THEN d.id END) as departments_with_manager,
-                COUNT(DISTINCT CASE WHEN d.manager_id IS NULL THEN d.id END) as departments_without_manager,
-                COUNT(DISTINCT u.id) as total_employees,
-                COUNT(DISTINCT CASE WHEN u.active_flag = 1 THEN u.id END) as active_employees
-            FROM department d
-            LEFT JOIN users u ON d.id = u.department_id
-            """;
-        
-        try (Connection conn = new Context().getJDBCConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) {
+            // ✅ Thống kê cơ bản
+            stats.put("totalDepartments", rs.getInt("total_departments"));
+            stats.put("activeDepartments", rs.getInt("active_departments"));
+            stats.put("inactiveDepartments", rs.getInt("inactive_departments")); // ✨ ĐÃ CÓ
+            stats.put("departmentsWithManager", rs.getInt("departments_with_manager"));
+            stats.put("departmentsWithoutManager", rs.getInt("departments_without_manager"));
             
-            if (rs.next()) {
-                stats.put("totalDepartments", rs.getInt("total_departments"));
-                stats.put("activeDepartments", rs.getInt("active_departments"));
-                stats.put("inactiveDepartments", rs.getInt("inactive_departments"));
-                stats.put("departmentsWithManager", rs.getInt("departments_with_manager"));
-                stats.put("departmentsWithoutManager", rs.getInt("departments_without_manager"));
-                stats.put("totalEmployees", rs.getInt("total_employees"));
-                stats.put("activeEmployees", rs.getInt("active_employees"));
-                
-                // Calculate percentages
-                int total = rs.getInt("total_departments");
-                if (total > 0) {
-                    stats.put("activePercentage", (rs.getInt("active_departments") * 100.0) / total);
-                    stats.put("managerCoveragePercentage", (rs.getInt("departments_with_manager") * 100.0) / total);
-                } else {
-                    stats.put("activePercentage", 0.0);
-                    stats.put("managerCoveragePercentage", 0.0);
-                }
+            // ✨ THÊM: Thống kê chi tiết
+            stats.put("activeWithManager", rs.getInt("active_with_manager"));
+            stats.put("activeWithoutManager", rs.getInt("active_without_manager"));
+            stats.put("inactiveWithManager", rs.getInt("inactive_with_manager"));
+            stats.put("inactiveWithoutManager", rs.getInt("inactive_without_manager"));
+            
+            // ✅ Thống kê nhân viên
+            stats.put("totalEmployees", rs.getInt("total_employees"));
+            stats.put("activeEmployees", rs.getInt("active_employees"));
+            stats.put("employeesInActiveDepts", rs.getInt("employees_in_active_depts"));
+            stats.put("employeesInInactiveDepts", rs.getInt("employees_in_inactive_depts"));
+            
+            // ✅ Tính phần trăm
+            int total = rs.getInt("total_departments");
+            if (total > 0) {
+                stats.put("activePercentage", (rs.getInt("active_departments") * 100.0) / total);
+                stats.put("inactivePercentage", (rs.getInt("inactive_departments") * 100.0) / total); // ✨ THÊM
+                stats.put("managerCoveragePercentage", (rs.getInt("departments_with_manager") * 100.0) / total);
+            } else {
+                stats.put("activePercentage", 0.0);
+                stats.put("inactivePercentage", 0.0); // ✨ THÊM
+                stats.put("managerCoveragePercentage", 0.0);
             }
-        } catch (SQLException e) {
-            System.out.println("Error in getOverviewStatistics: " + e.getMessage());
-            e.printStackTrace();
         }
-        
-        return stats;
+    } catch (SQLException e) {
+        System.out.println("Error in getOverviewStatistics: " + e.getMessage());
+        e.printStackTrace();
     }
     
+    return stats;
+}
+
     /**
      * Get employee distribution by department
      */
@@ -519,4 +539,5 @@ public class DepartmentStatisticDAO {
         
         return comparison;
     }
+
 }

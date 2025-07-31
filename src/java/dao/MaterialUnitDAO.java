@@ -32,7 +32,8 @@ public class MaterialUnitDAO {
                 unit.setName(resultSet.getString("name"));
                 unit.setSymbol(resultSet.getString("symbol"));
                 unit.setDescription(resultSet.getString("description"));
-                unit.setType(resultSet.getString("type"));
+                unit.setStatus(resultSet.getInt("status"));
+                unit.setCanDelete(checkIfUnitCanBeDeleted(unit.getId()));
                 materialUnits.add(unit);
             }
             
@@ -62,7 +63,8 @@ public class MaterialUnitDAO {
                     unit.setName(rs.getString("name"));
                     unit.setSymbol(rs.getString("symbol"));
                     unit.setDescription(rs.getString("description"));
-                    unit.setType(rs.getString("type"));
+                    unit.setStatus(rs.getInt("status"));
+                    unit.setCanDelete(checkIfUnitCanBeDeleted(unit.getId()));
                     units.add(unit);
                 }
             }
@@ -88,7 +90,8 @@ public class MaterialUnitDAO {
                     unit.setName(rs.getString("name"));
                     unit.setSymbol(rs.getString("symbol"));
                     unit.setDescription(rs.getString("description"));
-                    unit.setType(rs.getString("type"));
+                    unit.setStatus(rs.getInt("status"));
+                    unit.setCanDelete(checkIfUnitCanBeDeleted(unit.getId()));
                 }
             }
         } catch (SQLException e) {
@@ -99,13 +102,13 @@ public class MaterialUnitDAO {
     }
     //Thêm unit mới
     public boolean addMaterialUnit(MaterialUnit unit) {
-        String sql = "INSERT INTO unit (name, symbol, description, type) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO unit (name, symbol, description, status) VALUES (?, ?, ?, ?)";
         try (Connection conn = Context.getJDBCConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, unit.getName());
             pstmt.setString(2, unit.getSymbol());
             pstmt.setString(3, unit.getDescription());
-            pstmt.setString(4, unit.getType());
+            pstmt.setInt(4, unit.getStatus());
             int affectedRows = pstmt.executeUpdate();
             System.out.println("addMaterialUnit: Added unit, name=" + unit.getName() + ", affectedRows=" + affectedRows);
             return affectedRows > 0;
@@ -117,7 +120,7 @@ public class MaterialUnitDAO {
     }
     //Update unit có từ trước
     public boolean updateMaterialUnit(MaterialUnit unit) {
-        String sql = "UPDATE unit SET name = ?, symbol = ?, description = ?, type = ? WHERE id = ?";
+        String sql = "UPDATE unit SET name = ?, symbol = ?, description = ?, status = ? WHERE id = ?";
         
         try (Connection conn = Context.getJDBCConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -125,7 +128,7 @@ public class MaterialUnitDAO {
             pstmt.setString(1, unit.getName());
             pstmt.setString(2, unit.getSymbol());
             pstmt.setString(3, unit.getDescription());
-            pstmt.setString(4, unit.getType());
+            pstmt.setInt(4, unit.getStatus());
             pstmt.setInt(5, unit.getId());
             
             int affectedRows = pstmt.executeUpdate();
@@ -188,7 +191,8 @@ public class MaterialUnitDAO {
                     unit.setName(rs.getString("name"));
                     unit.setSymbol(rs.getString("symbol"));
                     unit.setDescription(rs.getString("description"));
-                    unit.setType(rs.getString("type"));
+                    unit.setStatus(rs.getInt("status"));
+                    unit.setCanDelete(checkIfUnitCanBeDeleted(unit.getId()));
                     units.add(unit);
                 }
             }
@@ -227,7 +231,8 @@ public class MaterialUnitDAO {
                 unit.setName(rs.getString("name"));
                 unit.setSymbol(rs.getString("symbol"));
                 unit.setDescription(rs.getString("description"));
-                unit.setType(rs.getString("type"));
+                unit.setStatus(rs.getInt("status"));
+                unit.setCanDelete(checkIfUnitCanBeDeleted(unit.getId()));
                 units.add(unit);
             }
             System.out.println("searchMaterialUnitsWithPaging: Fetched " + units.size() + " units for searchTerm='" + searchTerm + "', offset=" + offset + ", limit=" + recordsPerPage);
@@ -319,5 +324,50 @@ public class MaterialUnitDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    //Kiểm tra xem unit có thể xóa được không (không được sử dụng bởi product nào)
+    public boolean checkIfUnitCanBeDeleted(int unitId) {
+        String sql = "SELECT COUNT(*) FROM product_info WHERE unit_id = ?";
+        try (Connection conn = Context.getJDBCConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, unitId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) == 0; // Trả về true nếu không có product nào sử dụng unit này
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    //Kích hoạt unit
+    public boolean activateMaterialUnit(int id) {
+        String sql = "UPDATE unit SET status = 1 WHERE id = ?";
+        try (Connection conn = Context.getJDBCConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //Ngừng hoạt động unit
+    public boolean deactivateMaterialUnit(int id) {
+        String sql = "UPDATE unit SET status = 0 WHERE id = ?";
+        try (Connection conn = Context.getJDBCConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

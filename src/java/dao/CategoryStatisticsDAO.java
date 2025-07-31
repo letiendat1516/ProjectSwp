@@ -411,11 +411,10 @@ public class CategoryStatisticsDAO {
                     "c.create_date, c.active_flag, " +
                     "COUNT(DISTINCT p.id) as product_count, " +
                     "COUNT(DISTINCT CASE WHEN p.active_flag = 1 THEN p.id END) as active_products, " +
-                    "COALESCE(SUM(ps.qty), 0) as total_stock " +
+                    "COALESCE(SUM(p.qty), 0) as total_stock " +
                     "FROM category c " +
                     "LEFT JOIN category parent_c ON c.parent_id = parent_c.id " +
                     "LEFT JOIN product_info p ON c.id = p.cate_id " +
-                    "LEFT JOIN product_in_stock ps ON p.id = ps.product_id " +
                     "GROUP BY c.id, c.name, parent_c.name, c.create_date, c.active_flag " +
                     "ORDER BY c.create_date DESC " +
                     "LIMIT ?";

@@ -2,7 +2,15 @@
 Document   : sidebar
 Created on : [Date]
 Author     : [Your name]
-Description: Reusable sidebar component - extracted from Dashboard.jsp
+Description: Reusable sidebar compon<div class="sidebar">
+    <h2>Warehouse Manager</h2>
+    <a href="${pageContext.request.contextPath}/categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
+    <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="nav-item">Giao dịch</a>
+    <a href="${pageContext.request.contextPath}/profile" class="nav-item">Thông tin cá nhân</a>
+    <a href="${pageContext.request.contextPath}/Admin.jsp" class="nav-item">Trang chủ (Chỉ Admin)</a>
+    <a href="${pageContext.request.contextPath}/inventory-statistics" class="nav-item">Thống kê kho hàng</a>
+    <a href="${pageContext.request.contextPath}/StatisticSupplierEvaluation.jsp" class="nav-item">Thống kê nhà cung cấp</a>
+</div>tracted from Dashboard.jsp
 --%>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -111,10 +119,11 @@ Description: Reusable sidebar component - extracted from Dashboard.jsp
 </style>
 
 <div class="sidebar">
-    <h2>Warehouse Manager</h2>
+    <h2>Warehouse Management</h2>
     <a href="${pageContext.request.contextPath}/categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
     <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="nav-item">Giao dịch</a>
-    <a href="Profile.jsp" class="nav-item">Thông tin cá nhân</a>
-    <a href="Admin.jsp" class="nav-item">Trang chủ (Chỉ Admin)</a>
-    <a href="StatisticSupplierEvaluation.jsp" class="nav-item">Thống kê</a>
+    <a href="${pageContext.request.contextPath}/department/list" class="nav-item">Quản lý phòng ban</a>
+    <a href="${pageContext.request.contextPath}/profile" class="nav-item">Thông tin cá nhân</a>
+    <a href="${pageContext.request.contextPath}/Admin.jsp" class="nav-item">Trang chủ (Chỉ Admin)</a>
+    <a href="${pageContext.request.contextPath}/StatisticSupplierEvaluation.jsp" class="nav-item">Thống kê</a>
 </div>

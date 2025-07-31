@@ -13,7 +13,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import model.Users;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
@@ -53,60 +55,75 @@ public class LoginServlet extends HttpServlet {
         request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+    String username = request.getParameter("username");
+    String password = request.getParameter("password");
 
-        UserDAO userDAO = new UserDAO();
-        Users user = userDAO.login(username, password);
+    UserDAO userDAO = new UserDAO();
+    Users user = userDAO.findByUsername(username);
 
-        if (user != null) {
+    if (user != null) {
+        String pwFromDB = user.getPassword();
+        boolean loginSuccess = false;
+
+        if (pwFromDB != null && pwFromDB.startsWith("$2a$")) {
+            // Đã là BCrypt hash
+            if (BCrypt.checkpw(password, pwFromDB)) {
+                loginSuccess = true;
+            }
+        } else {
+            // Là plain text (tài khoản cũ)
+            if (password.equals(pwFromDB)) {
+                // Migrate mật khẩu sang BCrypt
+                String newHash = BCrypt.hashpw(password, BCrypt.gensalt());
+                userDAO.updatePasswordHash(user.getId(), newHash);
+                loginSuccess = true;
+            }
+        }
+
+        if (loginSuccess) {
+            // Đăng nhập thành công: set session, phân quyền, chuyển trang
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
 
+            int userId = user.getId();
+            List<String> userPermissions = userDAO.getUserPermissions(userId);
+            session.setAttribute("userPermissions", userPermissions);
 
-            switch (user.getRoleName()) {
-            case "Admin":
-                response.sendRedirect("Admin.jsp");
-                break;
-            case "Nhân viên kho":
-                response.sendRedirect("categoriesforward.jsp");
-                break;
-            case "Nhân viên công ty":
-                response.sendRedirect("RequestForward.jsp");
-                break;
-            case "Giám đốc":
-                response.sendRedirect("ApproveListForward.jsp");
-                break;
-            
-            default:
+            String roleName = user.getRoleName();
+            if (roleName != null) {
+                switch (roleName) {
+                    case "Admin":
+                        response.sendRedirect("Admin.jsp");
+                        break;
+                    case "Nhân viên kho":
+                        response.sendRedirect("categoriesforward.jsp");
+                        break;
+                    case "Nhân viên công ty":
+                        response.sendRedirect("RequestForward.jsp");
+                        break;
+                    case "Giám đốc":
+                        response.sendRedirect("ApproveListForward.jsp");
+                        break;
+                    default:
+                        response.sendRedirect("homepage.jsp");
+                }
+            } else {
+                // Handle case where roleName is null
                 response.sendRedirect("homepage.jsp");
+            }
+            return;
         }
-
-            
-        } else {
-            request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng.");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
-        }
-
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
+    // Nếu không đúng, trả lại trang login + báo lỗi
+    request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng.");
+    request.getRequestDispatcher("login.jsp").forward(request, response);
+}
+
     @Override
     public String getServletInfo() {
         return "Short description";

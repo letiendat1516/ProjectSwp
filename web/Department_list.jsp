@@ -11,7 +11,7 @@
 <%@page import="model.Users"%>
 <%
     Users user = (Users) session.getAttribute("user");
-    if (user == null || (!"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName()))) {
+    if (user == null) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -902,54 +902,71 @@
 
             // Toggle department status function
             function toggleDepartmentStatus(departmentId) {
-                const statusBadge = document.getElementById('status-' + departmentId);
-                const toggleBtn = document.getElementById('toggle-' + departmentId);
-                const currentStatus = statusBadge.textContent.trim();
+    const statusBadge = document.getElementById('status-' + departmentId);
+    const toggleBtn = document.getElementById('toggle-' + departmentId);
+    const currentStatus = statusBadge.textContent.trim();
 
-                const departmentName = findDepartmentNameById(departmentId);
+    const departmentName = findDepartmentNameById(departmentId);
 
-                let confirmMessage;
-                if (currentStatus === 'Hoạt động') {
-                    confirmMessage = `Bạn có chắc chắn muốn VÔ HIỆU HÓA phòng ban`;
-                } else {
-                    confirmMessage = `Bạn có chắc chắn muốn KÍCH HOẠT phòng ban`;
+    // ✨ THÊM: Nếu đang deactivate, kiểm tra employees trước
+    if (currentStatus === 'Hoạt động') {
+        // Gọi API để check employees
+        fetch('${pageContext.request.contextPath}/department/check-employees?id=' + departmentId)
+            .then(response => response.json())
+            .then(data => {
+                let confirmMessage = `Bạn có chắc chắn muốn VÔ HIỆU HÓA phòng ban`;
+                
+                if (data.employeeCount > 0) {
+                    confirmMessage = `⚠️ CẢNH BÁO: Phòng ban "${departmentName}" hiện có ${data.employeeCount} nhân viên.\n\n` +
+                                   `Vô hiệu hóa sẽ:\n` +
+                                   `• Loại bỏ TẤT CẢ nhân viên khỏi phòng ban này\n` +
+                                   `• Nhân viên sẽ không thuộc phòng ban nào\n\n` +
+                                   `Bạn có chắc chắn muốn tiếp tục?`;
                 }
-
-                if (!confirm(confirmMessage)) {
-                    return;
+                
+                if (confirm(confirmMessage)) {
+                    performToggle(departmentId, statusBadge, toggleBtn);
                 }
+            })
+            .catch(error => {
+                console.error('Error checking employees:', error);
+                // Nếu lỗi API, vẫn cho phép toggle với confirm đơn giản
+                if (confirm(`Bạn có chắc chắn muốn VÔ HIỆU HÓA phòng ban`)) {
+                    performToggle(departmentId, statusBadge, toggleBtn);
+                }
+            });
+    } else {
+        // Activate - không cần check employees
+        const confirmMessage = `Bạn có chắc chắn muốn KÍCH HOẠT phòng ban`;
+        if (confirm(confirmMessage)) {
+            performToggle(departmentId, statusBadge, toggleBtn);
+        }
+    }
+}
 
-                addLoadingEffect(toggleBtn);
+function performToggle(departmentId, statusBadge, toggleBtn) {
+    addLoadingEffect(toggleBtn);
 
-                fetch('${pageContext.request.contextPath}/department/toggle-status?id=' + departmentId, {
-                    method: 'GET'
-                })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                statusBadge.textContent = data.newStatus;
-                                statusBadge.className = 'badge ' + data.statusClass;
-
-                                toggleBtn.textContent = data.buttonText;
-                                toggleBtn.className = 'btn ' + data.buttonClass + ' btn-sm';
-                                toggleBtn.title = data.newStatus === 'Hoạt động' ? 'Vô hiệu hóa' : 'Kích hoạt';
-
-                                showSuccessMessage(data.newStatus === 'Hoạt động' ?
-                                        `Đã kích hoạt phòng ban thành công!` :
-                                        `Đã vô hiệu hóa phòng ban thành công!`
-                                        );
-                            } else {
-                                showErrorMessage(data.message || 'Có lỗi xảy ra khi thay đổi trạng thái phòng ban.');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            showErrorMessage('Có lỗi xảy ra khi kết nối đến server. Vui lòng thử lại.');
-                        })
-                        .finally(() => {
-                            removeLoadingEffect(toggleBtn);
-                        });
-            }
+    fetch('${pageContext.request.contextPath}/department/toggle-status?id=' + departmentId, {
+        method: 'GET'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // ✨ Reload ngay lập tức với message trong URL
+            const message = data.newStatus === 'Hoạt động' ? 'activate_success' : 'deactivate_success';
+            window.location.href = '${pageContext.request.contextPath}/department/list?message=' + message;
+        } else {
+            showErrorMessage(data.message || 'Có lỗi xảy ra khi thay đổi trạng thái phòng ban.');
+            removeLoadingEffect(toggleBtn);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showErrorMessage('Có lỗi xảy ra khi kết nối đến server. Vui lòng thử lại.');
+        removeLoadingEffect(toggleBtn);
+    });
+}
 
             // ĐÃ SỬA: Show employee list modal - lấy data từ button element
             function showEmployeeList(button) {

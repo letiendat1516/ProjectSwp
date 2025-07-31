@@ -27,13 +27,13 @@ CREATE TABLE `unit` (
   `name` varchar(50) NOT NULL,
   `symbol` varchar(10) NOT NULL,
   `description` text,
-  `type` enum('Khối lượng','Độ dài','Số lượng') NOT NULL,
+  `status` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
-  UNIQUE KEY `symbol` (`symbol`),
+  UNIQUE KEY `symbol_UNIQUE` (`symbol`),
   UNIQUE KEY `uk_symbol` (`symbol`),
   UNIQUE KEY `uk_name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -45,4 +45,4 @@ CREATE TABLE `unit` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-23 22:51:53
+-- Dump completed on 2025-07-22 13:38:33

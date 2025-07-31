@@ -15,10 +15,9 @@
     response.setDateHeader("Expires", 0); // Proxies
 %>
 
-<%@page import="model.Users"%>
 <%
     Users user = (Users) session.getAttribute("user");
-    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
+    if (user == null) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -140,9 +139,11 @@
     <body>
         <div class="container">
             <div class="sidebar">
-                <h2>Warehouse Manager</h2>
+                <h2>Warehouse Management</h2>
                 <a href="usermanager" class="nav-item">Quản lý người dùng</a>
-                <a href="roleAssignment" class="nav-item">Phân quyền người dùng</a>
+                
+    <a href="${pageContext.request.contextPath}/department/list" class="nav-item">Quản lý phòng ban</a>
+                <a href="role-permission" class="nav-item">Phân quyền người dùng</a>
                 <a href="categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
                 <a href="passwordrequest" class="nav-item">Reset mật khẩu</a>
                 <a href="ApproveListForward.jsp" class="nav-item">Đơn từ</a>

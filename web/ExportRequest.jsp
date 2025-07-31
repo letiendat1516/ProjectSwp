@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -106,7 +107,7 @@
 
             .information-user .form-group {
                 flex: 1;
-                min-width: 150px;
+                min-width: 200px;
             }
 
             .information-items {
@@ -285,6 +286,19 @@
                 padding: 20px;
                 background: #f5f5f5;
             }
+
+            .alert {
+                padding: 15px;
+                margin-bottom: 20px;
+                border: 1px solid transparent;
+                border-radius: 4px;
+            }
+
+            .alert-danger {
+                color: #721c24;
+                background-color: #f8d7da;
+                border-color: #f5c6cb;
+            }
         </style>
     </head>
     <body>
@@ -292,68 +306,48 @@
             <jsp:include page="/include/sidebar.jsp" />
             <div class="main-content">
                 <h1>ĐƠN YÊU CẦU XUẤT KHO</h1>
+
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger">
+                        ${error}
+                    </div>
+                </c:if>
+
                 <form id="exportForm" action="exportRequest" method="post">
                     <h3>Thông tin người yêu cầu</h3>
                     <div class="information-user">
                         <div class="form-group">
                             <label>Người dùng</label>
-                            <input type="text" value="${sessionScope.currentUser}" readonly> 
+                            <input type="text" value="${currentUser}" readonly> 
                         </div>
                         <div class="form-group">
-                            <label>Tuổi</label>
-                            <input type="text" value="${age}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Ngày tháng năm sinh</label>
-                            <input type="text" value="${sessionScope.DoB}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Vai trò</label>
+                            <label>Vai trò <span style="color: red;">*</span></label>
                             <select name="role" required>
                                 <option value="" disabled selected>-- Chọn vai trò --</option>
                                 <option value="Nhân viên">Nhân viên</option>
+                                <option value="Trưởng phòng">Trưởng phòng</option>
                                 <option value="Giám đốc">Giám đốc</option>
+                                <option value="Kế toán">Kế toán</option>
+                                <option value="Kho">Kho</option>
                                 <option value="Admin">Admin</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Ngày yêu cầu</label>
-                            <input type="date" name="day_request" required>
+                            <input type="text" value="<fmt:formatDate value='<%=new java.util.Date()%>' pattern='dd/MM/yyyy'/>" readonly>
                         </div>
                     </div>
+
                     <h3>Chi tiết xuất kho</h3>
                     <div class="information-items">
                         <div class="row">
                             <div class="form-group">
                                 <label>ID</label>
-                                <textarea rows="1" name="export_request_id" style="width: 100%; resize: none;overflow: hidden;background-color: #f8f9fa; cursor: not-allowed;" oninput="autoResize(this)" readonly>${requestScope.nextExportID}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Mục đích</label>
-                                <textarea rows="1" name="reason" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Bộ phận yêu cầu</label>
-                                <textarea rows="1" name="department" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group">
-                                <label>Người nhận</label>
-                                <textarea rows="1" name="recipient_name" style="width: 100%; resize: none;overflow: hidden;" oninput="autoResize(this)" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Điện thoại người nhận</label>
-                                <textarea rows="1" name="recipient_phone" id="recipient_phone" style="width: 100%; resize: none;overflow: hidden;" oninput="validatePhone(this)" required></textarea>
-                                <div class="error-message" id="phone_error">Số điện thoại phải có 10-11 chữ số</div>
-                            </div>
-                            <div class="form-group">
-                                <label>Email người nhận</label>
-                                <textarea rows="1" name="recipient_email" id="recipient_email" style="width: 100%; resize: none;overflow: hidden;" oninput="validateEmail(this)" required></textarea>
-                                <div class="error-message" id="email_error">Email không đúng định dạng</div>
+                                <textarea rows="1" name="export_request_id" style="width: 100%; resize: none;overflow: hidden;background-color: #f8f9fa; cursor: not-allowed;" oninput="autoResize(this)" readonly>${nextExportID}</textarea>
                             </div>
                         </div>
                     </div>
+
                     <div class="items-table">
                         <label>Vui lòng nhập chi tiết mặt hàng xuất kho</label>
                         <button type="button" class="add-row-btn" onclick="addRow()">Thêm hàng</button>
@@ -361,10 +355,10 @@
                             <thead>
                                 <tr>
                                     <th style="width: 60px;">STT</th>
-                                    <th>Tên mặt hàng</th>
+                                    <th>Tên mặt hàng <span style="color: red;">*</span></th>
                                     <th>Code</th>
                                     <th>Đơn vị</th>
-                                    <th>Số lượng</th>
+                                    <th>Số lượng <span style="color: red;">*</span></th>
                                     <th>Ghi chú</th>
                                     <th>Thao tác</th>
                                 </tr>
@@ -373,37 +367,35 @@
                                 <tr>
                                     <td class="stt-cell">1</td>
                                     <td>
-                                        <select name="product_name" onchange="updateProductInfo(this)" style="width: 100%;">
+                                        <select name="product_id" onchange="updateProductInfo(this)" style="width: 100%;" required>
                                             <option value="" disabled selected>-- Chọn sản phẩm --</option>
-                                            <c:forEach var="p" items="${products_list}">
+                                            <c:forEach var="product" items="${productsList}">
                                                 <option 
-                                                    value="${p.id}" 
-                                                    data-code="${p.code}" 
-                                                    data-unit="${p.unit_id}">
-                                                    ${p.name}
+                                                    value="${product.id}" 
+                                                    data-code="${product.code}" 
+                                                    data-unit="${product.unit_id}"
+                                                    data-name="${product.name}">
+                                                    ${product.name}
                                                 </option>
                                             </c:forEach>
                                         </select>
+                                        <input type="hidden" name="product_name" />
                                     </td>
                                     <td><input type="text" name="product_code" readonly style="width: 100%;" /></td>
                                     <td>
                                         <select name="unit" style="width: 100%;" disabled>
                                             <option value="">-- Chọn đơn vị --</option>
-                                            <c:forEach var="u" items="${units_list}">
-                                                <option value="${u.id}">${u.symbol} - ${u.name}</option>
+                                            <c:forEach var="unit" items="${unitsList}">
+                                                <option value="${unit.symbol}" data-id="${unit.id}">${unit.symbol} - ${unit.name}</option>
                                             </c:forEach>
                                         </select>
                                     </td>
-                                    <td><input type="text" name="quantity" class="quantity-input" style="width: 100%; text-align: center;" oninput="validateNumberInput(this)" /></td>
-                                    <td><textarea name="note" rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)"></textarea></td>
+                                    <td><input type="number" name="quantity" class="quantity-input" style="width: 100%; text-align: center;" min="0.01" step="0.01" placeholder="0" required /></td>
+                                    <td><textarea name="note" rows="1" style="width: 100%; box-sizing: border-box; overflow: hidden; resize: none;" oninput="autoResize(this)" placeholder="Ghi chú..."></textarea></td>
                                     <td><button type="button" class="delete-row-btn" onclick="deleteRow(this)" style="display: none;">Xóa</button></td>
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="form-group">
-                            <label>Lý do chi tiết</label>
-                            <textarea rows="3" name="reason_detail" style="width: 100%; border: 1px solid #ddd; resize: none;" oninput="autoResize(this)" required></textarea>
-                        </div>
                     </div>
                     <div class="button-container">
                         <button type="submit" class="submit-btn">Gửi yêu cầu</button>
@@ -412,215 +404,161 @@
                 </form>
             </div>
         </div>
+
         <script>
             let rowCounter = 1;
-
+            // Tạo dữ liệu products và units từ server
+            const productsData = [
+            <c:forEach var="product" items="${productsList}" varStatus="status">
+            {
+            id: '${product.id}',
+                    name: '${product.name}',
+                    code: '${product.code}',
+                    unit_id: '${product.unit_id}'
+            }<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+            ];
+            const unitsData = [
+            <c:forEach var="unit" items="${unitsList}" varStatus="status">
+            {
+            id: '${unit.id}',
+                    name: '${unit.name}',
+                    symbol: '${unit.symbol}'
+            }<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+            ];
             function autoResize(textarea) {
-                textarea.style.height = 'auto';
-                textarea.style.height = textarea.scrollHeight + 'px';
-            }
-
-            function validateNumberInput(input) {
-                // Chỉ cho phép số và dấu thập phân
-                let value = input.value;
-                // Loại bỏ tất cả ký tự không phải số và dấu thập phân
-                value = value.replace(/[^0-9.]/g, '');
-
-                // Đảm bảo chỉ có một dấu thập phân
-                let parts = value.split('.');
-                if (parts.length > 2) {
-                    value = parts[0] + '.' + parts.slice(1).join('');
-                }
-
-                input.value = value;
-            }
-
-            // Validate số điện thoại (10-11 số)
-            function validatePhone(input) {
-                autoResize(input);
-                const phoneValue = input.value.trim();
-                const phoneRegex = /^[0-9]{10,11}$/;
-                const errorElement = document.getElementById('phone_error');
-                
-                if (phoneValue === '') {
-                    input.classList.remove('error', 'valid');
-                    errorElement.classList.remove('show');
-                    return;
-                }
-                
-                if (phoneRegex.test(phoneValue)) {
-                    input.classList.remove('error');
-                    input.classList.add('valid');
-                    errorElement.classList.remove('show');
-                } else {
-                    input.classList.remove('valid');
-                    input.classList.add('error');
-                    errorElement.classList.add('show');
-                }
-            }
-
-            // Validate email
-            function validateEmail(input) {
-                autoResize(input);
-                const emailValue = input.value.trim();
-                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                const errorElement = document.getElementById('email_error');
-                
-                if (emailValue === '') {
-                    input.classList.remove('error', 'valid');
-                    errorElement.classList.remove('show');
-                    return;
-                }
-                
-                if (emailRegex.test(emailValue)) {
-                    input.classList.remove('error');
-                    input.classList.add('valid');
-                    errorElement.classList.remove('show');
-                } else {
-                    input.classList.remove('valid');
-                    input.classList.add('error');
-                    errorElement.classList.add('show');
-                }
-            }
-
-            // Validate form trước khi submit
-            function validateForm() {
-                const phoneInput = document.getElementById('recipient_phone');
-                const emailInput = document.getElementById('recipient_email');
-                
-                const phoneValue = phoneInput.value.trim();
-                const emailValue = emailInput.value.trim();
-                
-                const phoneRegex = /^[0-9]{10,11}$/;
-                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                
-                let isValid = true;
-                
-                // Validate phone
-                if (!phoneRegex.test(phoneValue)) {
-                    phoneInput.classList.add('error');
-                    document.getElementById('phone_error').classList.add('show');
-                    isValid = false;
-                }
-                
-                // Validate email
-                if (!emailRegex.test(emailValue)) {
-                    emailInput.classList.add('error');
-                    document.getElementById('email_error').classList.add('show');
-                    isValid = false;
-                }
-                
-                if (!isValid) {
-                    alert('Vui lòng kiểm tra lại thông tin điện thoại và email!');
-                }
-                
-                return isValid;
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
             }
 
             function addRow() {
-                rowCounter++;
-                const tbody = document.getElementById('itemsTableBody');
-                const newRow = document.createElement('tr');
-
-                newRow.innerHTML = `
-                    <td class="stt-cell">${rowCounter}</td>
-                    <td>
-                        <select name="product_name" onchange="updateProductInfo(this)" style="width: 100%;">
-                            <option value="" disabled selected>-- Chọn sản phẩm --</option>
-            <c:forEach var="p" items="${products_list}">
-                                <option 
-                                    value="${p.id}" 
-                                    data-code="${p.code}" 
-                                    data-unit="${p.unit_id}">
-                ${p.name}
-                                </option>
-            </c:forEach>
-                        </select>
-                    </td>
-                    <td><input type="text" name="product_code" readonly style="width: 100%;" /></td>
-                    <td>
-                        <select name="unit" style="width: 100%;" disabled>
-                            <option value="">-- Chọn đơn vị --</option>
-            <c:forEach var="u" items="${units_list}">
-                                <option value="${u.id}">${u.symbol} - ${u.name}</option>
-            </c:forEach>
-                        </select>
-                    </td>
-                    <td><input type="text" name="quantity" class="quantity-input" style="width: 100%; text-align: center;" oninput="validateNumberInput(this)" /></td>
-                    <td><textarea name="note" rows="1" style="width: 100%; resize: none;" oninput="autoResize(this)"></textarea></td>
-                    <td><button type="button" class="delete-row-btn" onclick="deleteRow(this)">Xóa</button></td>
-                `;
-
-                tbody.appendChild(newRow);
-                updateDeleteButtons(); // Cập nhật hiển thị nút xóa
+            rowCounter++;
+            const tbody = document.getElementById('itemsTableBody');
+            const newRow = document.createElement('tr');
+            // Tạo options cho sản phẩm
+            let productOptions = '<option value="" disabled selected>-- Chọn sản phẩm --</option>';
+            productsData.forEach(product => {
+            productOptions += `<option value="${product.id}" data-code="${product.code}" data-unit="${product.unit_id}" data-name="${product.name}">${product.name}</option>`;
+            });
+            // Tạo options cho đơn vị
+            let unitOptions = '<option value="">-- Chọn đơn vị --</option>';
+            unitsData.forEach(unit => {
+            unitOptions += `<option value="${unit.symbol}" data-id="${unit.id}">${unit.symbol} - ${unit.name}</option>`;
+            });
+            newRow.innerHTML = `
+                  <td class="stt-cell">${rowCounter}</td>
+                  <td>
+                      <select name="product_id" onchange="updateProductInfo(this)" style="width: 100%;" required>
+            ${productOptions}
+                      </select>
+                      <input type="hidden" name="product_name" />
+                  </td>
+                  <td><input type="text" name="product_code" readonly style="width: 100%;" /></td>
+                  <td>
+                      <select name="unit" style="width: 100%;" disabled>
+            ${unitOptions}
+                      </select>
+                  </td>
+                  <td><input type="number" name="quantity" class="quantity-input" style="width: 100%; text-align: center;" min="0.01" step="0.01" placeholder="0" required /></td>
+                  <td><textarea name="note" rows="1" style="width: 100%; resize: none;" oninput="autoResize(this)" placeholder="Ghi chú..."></textarea></td>
+                  <td><button type="button" class="delete-row-btn" onclick="deleteRow(this)">Xóa</button></td>
+              `;
+            tbody.appendChild(newRow);
+            updateDeleteButtons();
             }
 
             function deleteRow(button) {
-                const row = button.closest('tr');
-                row.remove();
-                updateRowNumbers(); // Cập nhật lại số thứ tự
-                updateDeleteButtons(); // Cập nhật hiển thị nút xóa
+            const row = button.closest('tr');
+            row.remove();
+            updateRowNumbers();
+            updateDeleteButtons();
             }
 
             function updateRowNumbers() {
-                const tbody = document.getElementById('itemsTableBody');
-                const rows = tbody.querySelectorAll('tr');
-
-                rows.forEach((row, index) => {
-                    const sttCell = row.querySelector('.stt-cell');
-                    if (sttCell) {
-                        sttCell.textContent = index + 1;
-                    }
-                });
-
-                // Cập nhật rowCounter để phù hợp với số hàng hiện tại
-                rowCounter = rows.length;
+            const tbody = document.getElementById('itemsTableBody');
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+            const sttCell = row.querySelector('.stt-cell');
+            if (sttCell) {
+            sttCell.textContent = index + 1;
+            }
+            });
+            rowCounter = rows.length;
             }
 
             function updateDeleteButtons() {
-                const tbody = document.getElementById('itemsTableBody');
-                const rows = tbody.querySelectorAll('tr');
-                const deleteButtons = tbody.querySelectorAll('.delete-row-btn');
-
-                // Hiển thị nút xóa nếu có nhiều hơn 1 hàng
-                deleteButtons.forEach(button => {
-                    if (rows.length > 1) {
-                        button.style.display = 'inline-block';
-                    } else {
-                        button.style.display = 'none';
-                    }
-                });
+            const tbody = document.getElementById('itemsTableBody');
+            const rows = tbody.querySelectorAll('tr');
+            const deleteButtons = tbody.querySelectorAll('.delete-row-btn');
+            deleteButtons.forEach(button => {
+            if (rows.length > 1) {
+            button.style.display = 'inline-block';
+            } else {
+            button.style.display = 'none';
+            }
+            });
             }
 
             function updateProductInfo(selectElement) {
-                const selectedOption = selectElement.options[selectElement.selectedIndex];
-                const code = selectedOption.getAttribute("data-code");
-                const unitId = selectedOption.getAttribute("data-unit");
-
-                const row = selectElement.closest("tr");
-                row.querySelector("input[name='product_code']").value = code || "";
-
-                // Cập nhật dropdown đơn vị
-                const unitSelect = row.querySelector("select[name='unit']");
-                if (unitId) {
-                    unitSelect.disabled = false;
-                    unitSelect.value = unitId;
-                } else {
-                    unitSelect.disabled = true;
-                    unitSelect.value = "";
-                }
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const code = selectedOption.getAttribute("data-code");
+            const unitId = selectedOption.getAttribute("data-unit");
+            const productName = selectedOption.getAttribute("data-name");
+            console.log('Selected product:', productName, 'Unit ID:', unitId);
+            const row = selectElement.closest("tr");
+            // Cập nhật product code
+            row.querySelector("input[name='product_code']").value = code || "";
+            // Cập nhật hidden product name
+            row.querySelector("input[name='product_name']").value = productName || "";
+            // Cập nhật dropdown đơn vị
+            const unitSelect = row.querySelector("select[name='unit']");
+            if (unitId && unitId !== 'null' && unitId !== '') {
+            unitSelect.disabled = false;
+            // Reset selection trước
+            unitSelect.selectedIndex = 0;
+            // Tìm và chọn option có data-id tương ứng với unit_id của sản phẩm
+            const unitOptions = unitSelect.querySelectorAll('option');
+            let found = false;
+            unitOptions.forEach(option => {
+            if (option.getAttribute('data-id') === unitId) {
+            option.selected = true;
+            found = true;
+            console.log('Đã chọn unit:', option.text, 'cho sản phẩm:', productName);
+            }
+            });
+            if (!found) {
+            console.log('Không tìm thấy unit với ID:', unitId);
+            }
+            } else {
+            unitSelect.disabled = true;
+            unitSelect.selectedIndex = 0;
+            console.log('Sản phẩm không có unit_id');
+            }
             }
 
+            // Validate form trước khi submit
+            document.getElementById('exportForm').addEventListener('submit', function(e) {
+            const rows = document.querySelectorAll('#itemsTableBody tr');
+            let hasValidItem = false;
+            rows.forEach(row => {
+            const productSelect = row.querySelector('select[name="product_id"]');
+            const quantityInput = row.querySelector('input[name="quantity"]');
+            if (productSelect.value && quantityInput.value && parseFloat(quantityInput.value) > 0) {
+            hasValidItem = true;
+            }
+            });
+            if (!hasValidItem) {
+            e.preventDefault();
+            alert('Vui lòng thêm ít nhất một sản phẩm với số lượng hợp lệ!');
+            return false;
+            }
+            });
             // Khởi tạo khi trang load
             document.addEventListener('DOMContentLoaded', function () {
-                updateDeleteButtons(); // Ẩn nút xóa cho hàng đầu tiên nếu chỉ có 1 hàng
-                
-                // Thêm event listener cho form submit
-                document.getElementById('exportForm').addEventListener('submit', function(e) {
-                    if (!validateForm()) {
-                        e.preventDefault(); // Ngăn form submit nếu validation fail
-                    }
-                });
+            console.log('Products data:', productsData);
+            console.log('Units data:', unitsData);
+            updateDeleteButtons();
             });
         </script>
     </body>

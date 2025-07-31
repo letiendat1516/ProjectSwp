@@ -485,45 +485,8 @@
                         </div>
                     </div>
 
-                    <div class="export-buttons">
-                        <button class="btn-export btn-excel" onclick="exportToExcel()">📊 Xuất Excel</button>
-                    </div>
                 </div>
 
-                <!-- Recently Added Categories with Enhanced Info -->
-                <div class="recent-container">
-                    <h3>Loại sản phẩm được thêm gần đây</h3>
-                    <ul class="recent-list">
-                        <c:forEach items="${recentCategories}" var="category">
-                            <li class="recent-item">
-                                <div>
-                                    <strong>${category.name}</strong>
-                                    <span class="category-badge">${category.parentName}</span>
-                                    <span style="color: #666; font-size: 14px;"> - ${category.productCount} sản phẩm</span>
-                                    <c:if test="${not empty category.activeProducts}">
-                                        <span style="color: #28a745; font-size: 12px;"> (${category.activeProducts} hoạt động)</span>
-                                    </c:if>
-                                    <span class="status-badge ${category.activeFlag ? 'active' : 'inactive'}">
-                                        ${category.activeFlag ? 'Đang hoạt động' : 'Ngừng hoạt động'}
-                                    </span>
-                                </div>
-                                <div class="recent-date">
-                                    <c:if test="${category.createDate != null}">
-                                        ${category.createDate.format(dateFormatter)}
-                                        <c:if test="${not empty category.daysSinceCreated}">
-                                            <br/><small>${category.daysSinceCreated} ngày trước</small>
-                                        </c:if>
-                                    </c:if>
-                                </div>
-                            </li>
-                        </c:forEach>
-                        <c:if test="${empty recentCategories}">
-                            <li class="recent-item">
-                                <span style="color: #999;">Chưa có danh mục loại sản phẩm nào được thêm gần đây</span>
-                            </li>
-                        </c:if>
-                    </ul>
-                </div>
 
             </div>
         </div>
