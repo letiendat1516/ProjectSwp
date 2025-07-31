@@ -56,7 +56,7 @@ public class GetStatusOfPurchaseRequestInformationDAO {
           }
 
           // Thêm phân trang: 10 records per page
-          sqlIds.append("ORDER BY r.id LIMIT ? OFFSET ?");
+          sqlIds.append("ORDER BY r.id DESC LIMIT ? OFFSET ?");
           params.add(10); // LIMIT 10 requests
           params.add((index - 1) * 10); // OFFSET
 
@@ -103,7 +103,7 @@ public class GetStatusOfPurchaseRequestInformationDAO {
               }
               sqlDetails.append("?");
           }
-          sqlDetails.append(") ORDER BY r.id, ri.id");
+          sqlDetails.append(") ORDER BY r.id DESC, ri.id");
 
           System.out.println("=== STEP 2: Get Request Details ===");
           System.out.println("SQL: " + sqlDetails.toString());

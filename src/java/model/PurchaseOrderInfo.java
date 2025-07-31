@@ -17,15 +17,13 @@ public class PurchaseOrderInfo {
     private String phone;
     private String email;
     private String summary;
+    private String rejectReason2;
     private List<PurchaseOrderItems> purchaseItems;
 
     public PurchaseOrderInfo() {
     }
 
-    public PurchaseOrderInfo(String id, String fullname, Date dayPurchase, Date dayQuote,
-            String status, String reason, String rejectReason, String supplier,
-            String address, String phone, String email, String summary,
-            List<PurchaseOrderItems> purchaseItems) {
+    public PurchaseOrderInfo(String id, String fullname, Date dayPurchase, Date dayQuote, String status, String reason, String rejectReason, String supplier, String address, String phone, String email, String summary, String rejectReason2, List<PurchaseOrderItems> purchaseItems) {
         this.id = id;
         this.fullname = fullname;
         this.dayPurchase = dayPurchase;
@@ -38,10 +36,10 @@ public class PurchaseOrderInfo {
         this.phone = phone;
         this.email = email;
         this.summary = summary;
+        this.rejectReason2 = rejectReason2;
         this.purchaseItems = purchaseItems;
     }
 
-    // Getters và Setters
     public String getId() {
         return id;
     }
@@ -90,7 +88,6 @@ public class PurchaseOrderInfo {
         this.reason = reason;
     }
 
-    // Getter và Setter cho rejectReason
     public String getRejectReason() {
         return rejectReason;
     }
@@ -139,6 +136,14 @@ public class PurchaseOrderInfo {
         this.summary = summary;
     }
 
+    public String getRejectReason2() {
+        return rejectReason2;
+    }
+
+    public void setRejectReason2(String rejectReason2) {
+        this.rejectReason2 = rejectReason2;
+    }
+
     public List<PurchaseOrderItems> getPurchaseItems() {
         return purchaseItems;
     }
@@ -146,4 +151,6 @@ public class PurchaseOrderInfo {
     public void setPurchaseItems(List<PurchaseOrderItems> purchaseItems) {
         this.purchaseItems = purchaseItems;
     }
+
+   
 }

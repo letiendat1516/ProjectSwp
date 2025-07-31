@@ -474,7 +474,7 @@
           <div class="items-section">
               <div class="alert alert-info">
                   <i class="fas fa-info-circle"></i>
-                  Vui lòng nhập giá cho từng sản phẩm để hoàn thành báo giá
+                  Vui lòng nhập giá cho từng sản phẩm để hoàn thành báo giá (chỉ nhập số nguyên, không có thập phân)
               </div>
 
               <div class="items-table">
@@ -486,8 +486,8 @@
                               <th>Tên mặt hàng</th>
                               <th>Đơn vị</th>
                               <th>Số lượng</th>
-                              <th>Giá trên 1 đơn vị</th>
-                              <th>Thành tiền</th>
+                              <th>Giá trên 1 đơn vị (VNĐ)</th>
+                              <th>Thành tiền (VNĐ)</th>
                               <th>Ghi chú</th>
                           </tr>
                       </thead>
@@ -525,14 +525,14 @@
                                                         style="text-align: center; resize: none; overflow: hidden;">${item.quantity}</textarea>
                                           </td>
                                           <td>
-                                              <!-- Input giá - có thể chỉnh sửa, required -->
+                                              <!-- Input giá - chỉ số nguyên -->
                                               <textarea name="pricePerUnit" rows="1" 
                                                         class="price-input"
                                                         placeholder="Nhập giá" 
                                                         required 
-                                                        oninput="validatePrice(this); calculateTotal(this); autoResize(this)"
-                                                        onblur="formatPrice(this)"
-                                                        onkeypress="return isNumberKey(event)"
+                                                        oninput="validateIntegerPrice(this); calculateTotal(this); autoResize(this)"
+                                                        onblur="formatIntegerPrice(this)"
+                                                        onkeypress="return isIntegerKey(event)"
                                                         style="text-align: center; resize: none; overflow: hidden;"></textarea>
                                           </td>
                                           <td>
@@ -576,12 +576,12 @@
 
   <script>
       // Set ngày hiện tại cho input date và làm readonly
-            document.addEventListener('DOMContentLoaded', function () {
-                const dateInput = document.querySelector('input[name="quote_date"]');
-                const today = new Date().toISOString().split('T')[0];
-                dateInput.value = today;
-            });
-            
+      document.addEventListener('DOMContentLoaded', function () {
+          const dateInput = document.querySelector('input[name="quote_date"]');
+          const today = new Date().toISOString().split('T')[0];
+          dateInput.value = today;
+      });
+      
       function autoResize(textarea) {
           textarea.style.height = 'auto';
           textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
@@ -594,74 +594,54 @@
           const totalPriceElement = row.querySelector('input[name="totalPrice"], textarea[name="totalPrice"]');
           
           if (quantityElement && priceElement && totalPriceElement) {
-              const quantity = parseFloat(quantityElement.value.replace(/,/g, '').replace(',', '.')) || 0;
-              const pricePerUnit = parseFloat(priceElement.value.replace(/,/g, '').replace(',', '.')) || 0;
+              // Lấy số lượng (loại bỏ dấu phẩy nếu có)
+              const quantity = parseInt(quantityElement.value.replace(/,/g, '')) || 0;
+              // Lấy giá (loại bỏ dấu chấm phân cách hàng nghìn)
+              const pricePerUnit = parseInt(priceElement.value.replace(/\./g, '')) || 0;
               const totalPrice = quantity * pricePerUnit;
               
-              totalPriceElement.value = totalPrice.toLocaleString('vi-VN', {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2
-              });
+              // Format thành tiền với dấu chấm phân cách hàng nghìn
+              totalPriceElement.value = totalPrice.toLocaleString('vi-VN');
           }
       }
 
-      function isNumberKey(evt) {
+      // Chỉ cho phép nhập số nguyên
+      function isIntegerKey(evt) {
           var charCode = (evt.which) ? evt.which : evt.keyCode;
-          var inputValue = evt.target.value;
           
+          // Cho phép: backspace, delete, tab, escape, enter, home, end, left, right, up, down
           if ([8, 9, 27, 13, 37, 38, 39, 40, 46].indexOf(charCode) !== -1) {
               return true;
           }
-
-          if (charCode == 46) {
-              if (inputValue.indexOf('.') !== -1) {
-                  return false;
-              }
-              return true;
-          }
-
-          if (charCode == 44) {
-              if (inputValue.indexOf(',') !== -1 || inputValue.indexOf('.') !== -1) {
-                  return false;
-              }
-              return true;
-          }
-
+          
+          // Chỉ cho phép số từ 0-9
           if (charCode < 48 || charCode > 57) {
               return false;
           }
-
+          
           return true;
       }
 
-      function validatePrice(textarea) {
+      // Validate chỉ số nguyên
+      function validateIntegerPrice(textarea) {
           let value = textarea.value;
-          if (value.includes(',')) {
-              value = value.replace(',', '.');
-              textarea.value = value;
-          }
-
-          const parts = value.split('.');
-          if (parts.length > 2) {
-              textarea.value = parts[0] + '.' + parts[1];
-          } else if (parts.length === 2 && parts[1].length > 2) {
-              textarea.value = parts[0] + '.' + parts[1].substring(0, 2);
-          }
+          // Loại bỏ tất cả ký tự không phải số
+          value = value.replace(/[^0-9]/g, '');
+          textarea.value = value;
       }
 
-      // Format giá theo định dạng Việt Nam khi blur
-      function formatPrice(textarea) {
+      // Format giá số nguyên với dấu chấm phân cách hàng nghìn
+      function formatIntegerPrice(textarea) {
           let value = textarea.value.trim();
           if (value === '') return;
           
-          value = value.replace(/,/g, '').replace(',', '.');
-          const numValue = parseFloat(value);
+          // Loại bỏ tất cả dấu chấm cũ
+          value = value.replace(/\./g, '');
+          const numValue = parseInt(value);
           
           if (!isNaN(numValue) && numValue >= 0 && numValue <= Number.MAX_SAFE_INTEGER) {
-              textarea.value = numValue.toLocaleString('vi-VN', {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2
-              });
+              // Format với dấu chấm phân cách hàng nghìn (không có thập phân)
+              textarea.value = numValue.toLocaleString('vi-VN');
           } else if (numValue > Number.MAX_SAFE_INTEGER) {
               alert('Giá trị quá lớn! Vui lòng nhập số nhỏ hơn.');
               textarea.value = '';

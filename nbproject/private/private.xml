@@ -3,21 +3,18 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/UserDAO.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ListPurchaseOrderServlet.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ActivateMaterialUnitServlet.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/LoadingRequestServlet.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/GetStatusOfPurchaseRequestInformationDAO.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category-statistics.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/ApprovePurchaseRequest.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/ItemsSupplyRequestForm.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ApprovePurchaseRequestServlet.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/PurchaseOrderDAO.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/EdituserServlet.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/AdduserServlet.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/AddUser.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/ProductInfoDAO.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/EditUser.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/DBContext/Context.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/ApprovePurchaseQuotedServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/RequoteFormServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/RequoteForm.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/PurchaseOrderForm.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/SubmitPurchaseOrderServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ApprovePurchaseQuoted.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/web/ListPurchaseOrder.jsp</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/SubmitRequoteFormServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/controller/ListPurchaseOrderServlet.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/model/PurchaseOrderInfo.java</file>
+            <file>file:/D:/Study/Ki5/2.%20SWP391/ProjectSWP/ProjectSwp/src/java/dao/PurchaseOrderDAO.java</file>
         </group>
     </open-files>
 </project-private>
