@@ -34,11 +34,19 @@ public class ExportDAO {
     }
 
     /**
-     * Lấy thông tin export request theo ID (chỉ approved)
+     * Lấy thông tin export request theo ID (chỉ approved) với thông tin người
+     * yêu cầu
      */
     public ExportRequest getExportRequestById(String id) {
         ExportRequest request = null;
-        String sql = "SELECT * FROM export_request WHERE id = ? AND status = 'approved'";
+        String sql = """
+            SELECT er.*, 
+                   u.username as requester_username,
+                   u.fullname as requester_fullname
+            FROM export_request er
+            LEFT JOIN users u ON er.user_id = u.id
+            WHERE er.id = ? AND er.status = 'approved'
+            """;
 
         try {
             conn = Context.getJDBCConnection();
@@ -55,12 +63,17 @@ public class ExportDAO {
                 request.setRole(rs.getString("role"));
                 request.setReason(rs.getString("reason"));
                 request.setRejectReason(rs.getString("reject_reason"));
-                request.setRecipient(rs.getString("recipient")); // Added recipient
+                request.setRecipient(rs.getString("recipient"));
                 request.setApproveBy(rs.getString("approve_by"));
                 request.setCreatedAt(rs.getTimestamp("created_at"));
                 request.setExportAt(rs.getTimestamp("export_at"));
 
+                // Set thông tin người yêu cầu
+                request.setRequesterName(rs.getString("requester_username"));
+                request.setRequesterFullName(rs.getString("requester_fullname"));
+
                 System.out.println("✅ Found export request: " + id + " with status: " + request.getStatus());
+                System.out.println("   Requester: " + request.getRequesterDisplayName());
             } else {
                 System.err.println("❌ Export request not found or not approved: " + id);
             }

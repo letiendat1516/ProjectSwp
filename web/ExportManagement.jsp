@@ -1,3 +1,4 @@
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
@@ -611,7 +612,7 @@
                                         <div class="info-item">
                                             <label class="info-label">Người yêu cầu</label>
                                             <div class="info-value">
-                                                <i class="fas fa-user"></i> User ID: ${exportRequest.userId}
+                                                <i class="fas fa-user"></i> ${exportRequest.requesterDisplayName}
                                             </div>
                                         </div>
                                         <div class="info-item">
@@ -907,8 +908,10 @@
                         }, 500);
                     }, 10000);
                 });
+
+                // Debug log for requester name
+                console.log('🔍 DEBUG - JSP loaded with requester name:', '${exportRequest.requesterDisplayName}');
             });
         </script>
     </body>
 </html>
-

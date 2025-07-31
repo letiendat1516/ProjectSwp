@@ -36,7 +36,7 @@ public class ExportConfirmController extends HttpServlet {
             return;
         }
 
-        // Lấy thông tin đơn hàng
+        // Lấy thông tin đơn hàng (đã bao gồm thông tin người yêu cầu)
         ExportRequest exportRequest = dao.getExportRequestById(requestId);
         if (exportRequest == null) {
             response.sendRedirect("exportList?error=order_not_found");
@@ -54,6 +54,12 @@ public class ExportConfirmController extends HttpServlet {
         request.setAttribute("exportRequest", exportRequest);
         request.setAttribute("itemList", itemList);
         request.setAttribute("currentDate", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+
+        // Debug log
+        System.out.println("🔍 DEBUG - ExportConfirmController GET:");
+        System.out.println("   Request ID: " + requestId);
+        System.out.println("   Requester Display Name: " + exportRequest.getRequesterDisplayName());
+        System.out.println("   Items count: " + itemList.size());
 
         // Forward to JSP
         request.getRequestDispatcher("ExportManagement.jsp").forward(request, response);

@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package model;
 
 import java.sql.Date;
@@ -25,7 +29,8 @@ public class ExportRequest {
     private String approveBy;
     private String warehouse;
     private ArrayList<ExportRequestItem> items;
-    private String requesterName;
+    private String requesterName; // Tên người yêu cầu
+    private String requesterFullName; // Họ tên đầy đủ người yêu cầu
     private Timestamp createdAt;
     private Timestamp exportAt;
     private Date exportDate;
@@ -54,8 +59,9 @@ public class ExportRequest {
                         String reason, String rejectReason, String recipient, String department, 
                         String recipientName, String recipientPhone, String recipientEmail, 
                         String approveBy, String warehouse, ArrayList<ExportRequestItem> items, 
-                        String requesterName, Timestamp createdAt, Timestamp exportAt, 
-                        Date exportDate, String exportedBy, String exportNote, Timestamp updatedAt) {
+                        String requesterName, String requesterFullName, Timestamp createdAt, 
+                        Timestamp exportAt, Date exportDate, String exportedBy, String exportNote, 
+                        Timestamp updatedAt) {
         this.id = id;
         this.userId = userId;
         this.role = role;
@@ -72,6 +78,7 @@ public class ExportRequest {
         this.warehouse = warehouse;
         this.items = items;
         this.requesterName = requesterName;
+        this.requesterFullName = requesterFullName;
         this.createdAt = createdAt;
         this.exportAt = exportAt;
         this.exportDate = exportDate;
@@ -209,6 +216,14 @@ public class ExportRequest {
         this.requesterName = requesterName;
     }
 
+    public String getRequesterFullName() {
+        return requesterFullName;
+    }
+
+    public void setRequesterFullName(String requesterFullName) {
+        this.requesterFullName = requesterFullName;
+    }
+
     public Timestamp getCreatedAt() {
         return createdAt;
     }
@@ -278,6 +293,17 @@ public class ExportRequest {
         return isApproved();
     }
 
+    // Method để lấy tên hiển thị của người yêu cầu
+    public String getRequesterDisplayName() {
+        if (requesterFullName != null && !requesterFullName.trim().isEmpty()) {
+            return requesterFullName;
+        } else if (requesterName != null && !requesterName.trim().isEmpty()) {
+            return requesterName;
+        } else {
+            return "User ID: " + userId;
+        }
+    }
+
     @Override
     public String toString() {
         return "ExportRequest{" +
@@ -301,6 +327,7 @@ public class ExportRequest {
                 ", exportNote='" + exportNote + '\'' +
                 ", items=" + items +
                 ", requesterName='" + requesterName + '\'' +
+                ", requesterFullName='" + requesterFullName + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
