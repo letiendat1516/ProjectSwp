@@ -60,99 +60,134 @@ public class DepartmentDAO {
     }
     
     /**
-     * Get departments with pagination and filtering
+     * ✅ FIXED: Get departments with pagination and filtering
      */
     public List<Department> getDepartments(String searchKeyword, String status, 
                                          String hasManager, String sortField, 
                                          String sortDir, int page, int pageSize) {
         List<Department> departments = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("""
-            SELECT d.id, d.dept_code, d.dept_name, d.description, d.manager_id, 
-                   d.phone, d.email, d.active_flag, d.created_by, d.create_date, 
-                   d.updated_by, d.update_date,
-                   manager.fullname as manager_name,
-                   manager.email as manager_email,
-                   manager.phone as manager_phone,
-                   creator.fullname as created_by_name,
-                   updater.fullname as updated_by_name,
-                   COUNT(DISTINCT CASE WHEN u.active_flag = 1 THEN u.id END) as employee_count
-            FROM department d
-            LEFT JOIN users manager ON d.manager_id = manager.id
-            LEFT JOIN users creator ON d.created_by = creator.id
-            LEFT JOIN users updater ON d.updated_by = updater.id
-            LEFT JOIN users u ON d.id = u.department_id
-            WHERE 1=1
-            """);
         
-        List<Object> params = new ArrayList<>();
+        // 1. Build base query
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT d.id, d.dept_code, d.dept_name, d.description, d.manager_id, ");
+        sql.append("d.phone, d.email, d.active_flag, d.created_by, d.create_date, ");
+        sql.append("d.updated_by, d.update_date, ");
+        sql.append("manager.fullname as manager_name, ");
+        sql.append("manager.email as manager_email, ");
+        sql.append("manager.phone as manager_phone, ");
+        sql.append("creator.fullname as created_by_name, ");
+        sql.append("updater.fullname as updated_by_name, ");
+        sql.append("COUNT(DISTINCT CASE WHEN u.active_flag = 1 THEN u.id END) as employee_count ");
+        sql.append("FROM department d ");
+        sql.append("LEFT JOIN users manager ON d.manager_id = manager.id ");
+        sql.append("LEFT JOIN users creator ON d.created_by = creator.id ");
+        sql.append("LEFT JOIN users updater ON d.updated_by = updater.id ");
+        sql.append("LEFT JOIN users u ON d.id = u.department_id ");
         
-        // Add search condition
+        // 2. Build WHERE conditions
+        List<String> conditions = new ArrayList<>();
+        List<Object> parameters = new ArrayList<>();
+        
+        // Search condition
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            sql.append(" AND (d.dept_name LIKE ? OR d.dept_code LIKE ?)");
+            conditions.add("(d.dept_code LIKE ? OR d.dept_name LIKE ? OR d.description LIKE ?)");
             String searchPattern = "%" + searchKeyword.trim() + "%";
-            params.add(searchPattern);
-            params.add(searchPattern);
+            parameters.add(searchPattern);
+            parameters.add(searchPattern);
+            parameters.add(searchPattern);
         }
         
-        // Add status condition
-        if (status != null && !status.isEmpty()) {
-            sql.append(" AND d.active_flag = ?");
-            params.add("1".equals(status));
+        // Status condition
+        if (status != null && ("0".equals(status) || "1".equals(status))) {
+            conditions.add("d.active_flag = ?");
+            parameters.add("1".equals(status));
         }
         
-        // Add manager condition
-        if (hasManager != null && !hasManager.isEmpty()) {
+        // Manager condition
+        if (hasManager != null && ("0".equals(hasManager) || "1".equals(hasManager))) {
             if ("1".equals(hasManager)) {
-                sql.append(" AND d.manager_id IS NOT NULL");
+                conditions.add("d.manager_id IS NOT NULL");
             } else {
-                sql.append(" AND d.manager_id IS NULL");
+                conditions.add("d.manager_id IS NULL");
             }
         }
         
-        sql.append("""
-            GROUP BY d.id, d.dept_code, d.dept_name, d.description, d.manager_id, 
-                     d.phone, d.email, d.active_flag, d.created_by, d.create_date, 
-                     d.updated_by, d.update_date, manager.fullname, manager.email, 
-                     manager.phone, creator.fullname, updater.fullname
-            """);
+        // Add WHERE clause if there are conditions
+        if (!conditions.isEmpty()) {
+            sql.append("WHERE ");
+            sql.append(String.join(" AND ", conditions));
+            sql.append(" ");
+        }
         
-        // Add sorting
-        if (sortField != null && !sortField.isEmpty()) {
-            String direction = "desc".equalsIgnoreCase(sortDir) ? "DESC" : "ASC";
+        // 3. Add GROUP BY clause
+        sql.append("GROUP BY d.id, d.dept_code, d.dept_name, d.description, d.manager_id, ");
+        sql.append("d.phone, d.email, d.active_flag, d.created_by, d.create_date, ");
+        sql.append("d.updated_by, d.update_date, manager.fullname, manager.email, ");
+        sql.append("manager.phone, creator.fullname, updater.fullname ");
+        
+        // 4. ✅ FIX: Add ORDER BY clause (đây là chỗ bị thiếu)
+        if (sortField != null && !sortField.trim().isEmpty()) {
+            sql.append("ORDER BY ");
+            
+            // Map sort field to actual column
             switch (sortField.toLowerCase()) {
                 case "id":
-                    sql.append(" ORDER BY d.id ").append(direction);
+                    sql.append("d.id");
                     break;
                 case "dept_code":
-                    sql.append(" ORDER BY d.dept_code ").append(direction);
+                    sql.append("d.dept_code");
                     break;
                 case "dept_name":
-                    sql.append(" ORDER BY d.dept_name ").append(direction);
+                    sql.append("d.dept_name");
                     break;
                 case "active_flag":
-                    sql.append(" ORDER BY d.active_flag ").append(direction);
+                    sql.append("d.active_flag");
                     break;
                 case "create_date":
-                    sql.append(" ORDER BY d.create_date ").append(direction);
+                    sql.append("d.create_date");
+                    break;
+                case "update_date":
+                    sql.append("d.update_date");
                     break;
                 default:
-                    sql.append(" ORDER BY d.dept_name ASC");
+                    sql.append("d.dept_name"); // Default sort
             }
+            
+            // Add sort direction
+            if ("desc".equalsIgnoreCase(sortDir)) {
+                sql.append(" DESC");
+            } else {
+                sql.append(" ASC");
+            }
+            sql.append(" ");
         } else {
-            sql.append(" ORDER BY d.dept_name ASC");
+            // Default sorting
+            sql.append("ORDER BY d.dept_name ASC ");
         }
         
-        // Add pagination
-        sql.append(" LIMIT ? OFFSET ?");
-        params.add(pageSize);
-        params.add((page - 1) * pageSize);
+        // 5. Add LIMIT for pagination
+        sql.append("LIMIT ? OFFSET ?");
+        parameters.add(pageSize);
+        parameters.add((page - 1) * pageSize);
         
+        System.out.println("=== Final SQL Query ===");
+        System.out.println(sql.toString());
+        System.out.println("Parameters: " + parameters);
+        
+        // 6. Execute query
         try (Connection conn = new Context().getJDBCConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             
             // Set parameters
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
+            for (int i = 0; i < parameters.size(); i++) {
+                Object param = parameters.get(i);
+                if (param instanceof String) {
+                    ps.setString(i + 1, (String) param);
+                } else if (param instanceof Boolean) {
+                    ps.setBoolean(i + 1, (Boolean) param);
+                } else if (param instanceof Integer) {
+                    ps.setInt(i + 1, (Integer) param);
+                }
             }
             
             try (ResultSet rs = ps.executeQuery()) {
@@ -169,54 +204,81 @@ public class DepartmentDAO {
     }
     
     /**
-     * Count departments with filter conditions
+     * ✅ FIXED: Count departments with filter conditions
      */
     public int countDepartments(String searchKeyword, String status, String hasManager) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(DISTINCT d.id) FROM department d WHERE 1=1");
-        List<Object> params = new ArrayList<>();
+        int count = 0;
         
-        // Add search condition
-        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            sql.append(" AND (d.dept_name LIKE ? OR d.dept_code LIKE ?)");
-            String searchPattern = "%" + searchKeyword.trim() + "%";
-            params.add(searchPattern);
-            params.add(searchPattern);
-        }
-        
-        // Add status condition
-        if (status != null && !status.isEmpty()) {
-            sql.append(" AND d.active_flag = ?");
-            params.add("1".equals(status));
-        }
-        
-        // Add manager condition
-        if (hasManager != null && !hasManager.isEmpty()) {
-            if ("1".equals(hasManager)) {
-                sql.append(" AND d.manager_id IS NOT NULL");
-            } else {
-                sql.append(" AND d.manager_id IS NULL");
-            }
-        }
-        
-        try (Connection conn = new Context().getJDBCConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        try {
+            // 1. Build base query
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT COUNT(DISTINCT d.id) FROM department d ");
             
-            // Set parameters
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
+            // 2. Build WHERE conditions
+            List<String> conditions = new ArrayList<>();
+            List<Object> parameters = new ArrayList<>();
+            
+            // Search condition
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                conditions.add("(d.dept_code LIKE ? OR d.dept_name LIKE ? OR d.description LIKE ?)");
+                String searchPattern = "%" + searchKeyword.trim() + "%";
+                parameters.add(searchPattern);
+                parameters.add(searchPattern);
+                parameters.add(searchPattern);
             }
             
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
+            // Status condition
+            if (status != null && ("0".equals(status) || "1".equals(status))) {
+                conditions.add("d.active_flag = ?");
+                parameters.add("1".equals(status));
+            }
+            
+            // Manager condition
+            if (hasManager != null && ("0".equals(hasManager) || "1".equals(hasManager))) {
+                if ("1".equals(hasManager)) {
+                    conditions.add("d.manager_id IS NOT NULL");
+                } else {
+                    conditions.add("d.manager_id IS NULL");
                 }
             }
+            
+            // Add WHERE clause if there are conditions
+            if (!conditions.isEmpty()) {
+                sql.append("WHERE ");
+                sql.append(String.join(" AND ", conditions));
+            }
+            
+            System.out.println("=== Count SQL Query ===");
+            System.out.println(sql.toString());
+            System.out.println("Parameters: " + parameters);
+            
+            // 3. Execute query
+            try (Connection conn = new Context().getJDBCConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+                
+                // Set parameters
+                for (int i = 0; i < parameters.size(); i++) {
+                    Object param = parameters.get(i);
+                    if (param instanceof String) {
+                        ps.setString(i + 1, (String) param);
+                    } else if (param instanceof Boolean) {
+                        ps.setBoolean(i + 1, (Boolean) param);
+                    }
+                }
+                
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        count = rs.getInt(1);
+                    }
+                }
+            }
+            
         } catch (SQLException e) {
             System.out.println("Error in countDepartments: " + e.getMessage());
             e.printStackTrace();
         }
         
-        return 0;
+        return count;
     }
     
     /**
@@ -408,78 +470,77 @@ public class DepartmentDAO {
         return false;
     }
     
-/**
- * Toggle department status với xử lý clear employees
- */
-public boolean toggleDepartmentStatus(int id, int updatedBy) {
-    Connection conn = null;
-    try {
-        conn = new Context().getJDBCConnection();
-        conn.setAutoCommit(false);
-        
-        // Kiểm tra trạng thái hiện tại
-        String checkSql = "SELECT active_flag FROM department WHERE id = ?";
-        boolean currentStatus = false;
-        try (PreparedStatement ps = conn.prepareStatement(checkSql)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    currentStatus = rs.getBoolean("active_flag");
+    /**
+     * Toggle department status với xử lý clear employees
+     */
+    public boolean toggleDepartmentStatus(int id, int updatedBy) {
+        Connection conn = null;
+        try {
+            conn = new Context().getJDBCConnection();
+            conn.setAutoCommit(false);
+            
+            // Kiểm tra trạng thái hiện tại
+            String checkSql = "SELECT active_flag FROM department WHERE id = ?";
+            boolean currentStatus = false;
+            try (PreparedStatement ps = conn.prepareStatement(checkSql)) {
+                ps.setInt(1, id);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        currentStatus = rs.getBoolean("active_flag");
+                    }
                 }
             }
-        }
-        
-        if (currentStatus) {
-            // Đang active -> deactive: clear employees trước
-            String clearEmployeesSql = "UPDATE users SET department_id = NULL WHERE department_id = ?";
-            try (PreparedStatement ps = conn.prepareStatement(clearEmployeesSql)) {
-                ps.setInt(1, id);
+            
+            if (currentStatus) {
+                // Đang active -> deactive: clear employees trước
+                String clearEmployeesSql = "UPDATE users SET department_id = NULL WHERE department_id = ?";
+                try (PreparedStatement ps = conn.prepareStatement(clearEmployeesSql)) {
+                    ps.setInt(1, id);
+                    ps.executeUpdate();
+                }
+            }
+            
+            // Toggle status
+            String toggleSql = "UPDATE department SET active_flag = ?, manager_id = ?, updated_by = ?, update_date = ? WHERE id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(toggleSql)) {
+                ps.setBoolean(1, !currentStatus);
+                ps.setObject(2, currentStatus ? null : null); // Clear manager khi deactive
+                ps.setInt(3, updatedBy);
+                ps.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+                ps.setInt(5, id);
                 ps.executeUpdate();
             }
-        }
-        
-        // Toggle status
-        String toggleSql = "UPDATE department SET active_flag = ?, manager_id = ?, updated_by = ?, update_date = ? WHERE id = ?";
-        try (PreparedStatement ps = conn.prepareStatement(toggleSql)) {
-            ps.setBoolean(1, !currentStatus);
-            ps.setObject(2, currentStatus ? null : null); // Clear manager khi deactive
-            ps.setInt(3, updatedBy);
-            ps.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
-            ps.setInt(5, id);
-            ps.executeUpdate();
-        }
-        
-        conn.commit();
-        return true;
-        
-    } catch (SQLException e) {
-        if (conn != null) try { conn.rollback(); } catch (SQLException ex) {}
-        System.out.println("Error: " + e.getMessage());
-        return false;
-    } finally {
-        if (conn != null) {
-            try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) {}
+            
+            conn.commit();
+            return true;
+            
+        } catch (SQLException e) {
+            if (conn != null) try { conn.rollback(); } catch (SQLException ex) {}
+            System.out.println("Error: " + e.getMessage());
+            return false;
+        } finally {
+            if (conn != null) {
+                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) {}
+            }
         }
     }
-}
 
-/**
- * Đếm employees trước khi deactive (để cảnh báo)
- */
-public int getEmployeeCountByDepartment(int departmentId) {
-    String sql = "SELECT COUNT(*) FROM users WHERE department_id = ?";
-    try (Connection conn = new Context().getJDBCConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, departmentId);
-        try (ResultSet rs = ps.executeQuery()) {
-            return rs.next() ? rs.getInt(1) : 0;
+    /**
+     * Đếm employees trước khi deactive (để cảnh báo)
+     */
+    public int getEmployeeCountByDepartment(int departmentId) {
+        String sql = "SELECT COUNT(*) FROM users WHERE department_id = ?";
+        try (Connection conn = new Context().getJDBCConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, departmentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            return 0;
         }
-    } catch (SQLException e) {
-        return 0;
     }
-}
 
-    
     /**
      * Assign manager to department (with validation)
      */
@@ -708,7 +769,7 @@ public int getEmployeeCountByDepartment(int departmentId) {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Error in getDepartmentStatus: " + e.getMessage());
+                 System.out.println("Error in getDepartmentStatus: " + e.getMessage());
             e.printStackTrace();
         }
         return false;

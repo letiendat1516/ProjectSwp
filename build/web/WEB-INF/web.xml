@@ -28,7 +28,7 @@
         <servlet-name>EdituserServlet</servlet-name>
         <servlet-class>controller.EdituserServlet</servlet-class>
     </servlet>
-        <servlet>
+    <servlet>
         <servlet-name>UserFilterServlet</servlet-name>
         <servlet-class>controller.UserFilterServlet</servlet-class>
     </servlet>
@@ -160,12 +160,13 @@
     </servlet>
     <servlet>
 
-    <servlet-name>ActivateMaterialUnitServlet</servlet-name>
-    <servlet-class>controller.ActivateMaterialUnitServlet</servlet-class>
-</servlet>    <servlet>
-    <servlet-name>DeactivateMaterialUnitServlet</servlet-name>
-    <servlet-class>controller.DeactivateMaterialUnitServlet</servlet-class>
-</servlet>
+        <servlet-name>ActivateMaterialUnitServlet</servlet-name>
+        <servlet-class>controller.ActivateMaterialUnitServlet</servlet-class>
+    </servlet>    
+    <servlet>
+        <servlet-name>DeactivateMaterialUnitServlet</servlet-name>
+        <servlet-class>controller.DeactivateMaterialUnitServlet</servlet-class>
+    </servlet>
     <!-- Inventory Statistics Servlet -->
     <servlet>
         <servlet-name>InventoryStatisticsController</servlet-name>
@@ -179,7 +180,7 @@
     </servlet>
     <!-- ========== SERVLET MAPPINGS ========== -->
     <!-- Category Mapping -->
-     <servlet>
+    <servlet>
         <servlet-name>ListRequestExportController</servlet-name>
         <servlet-class>controller.ListRequestExportController</servlet-class>
     </servlet>
@@ -217,7 +218,7 @@
         <servlet-name>EdituserServlet</servlet-name>
         <url-pattern>/edituser</url-pattern>
     </servlet-mapping>
-        <servlet-mapping>
+    <servlet-mapping>
         <servlet-name>UserFilterServlet</servlet-name>
         <url-pattern>/userfilter</url-pattern>
     </servlet-mapping>
@@ -389,19 +390,7 @@
     </filter>
     <filter-mapping>
         <filter-name>AuthorizationFilter</filter-name>
-        <url-pattern>/Admin.jsp</url-pattern>
-        <url-pattern>/usermanager</url-pattern>
-        <url-pattern>/UserManager.jsp</url-pattern>
-        <url-pattern>/adduser</url-pattern>
-        <url-pattern>/AddUser.jsp</url-pattern>
-        <url-pattern>/edituser</url-pattern>
-        <url-pattern>/EditUser.jsp</url-pattern>
-        <url-pattern>/role-permission</url-pattern>
-        <url-pattern>/permission.jsp</url-pattern>
-        <url-pattern>/profile</url-pattern>
-        <url-pattern>/Profile.jsp</url-pattern>
-        <url-pattern>/editprofile</url-pattern>
-        <url-pattern>/EditProfile.jsp</url-pattern>
+
         <url-pattern>/categoriesforward.jsp</url-pattern>
         <url-pattern>/category_product/list.jsp</url-pattern>
         <url-pattern>/category/list</url-pattern>
@@ -423,16 +412,6 @@
         <url-pattern>/ViewSupplierEvaluation</url-pattern>
         <url-pattern>/StatisticSupplierEvaluation.jsp</url-pattern>
         <url-pattern>/StatisticSupplierEvaluation</url-pattern>
-        <url-pattern>/Department_list.jsp</url-pattern>
-        <url-pattern>/department/list</url-pattern>
-        <url-pattern>/Department_create.jsp</url-pattern>
-        <url-pattern>/department/create</url-pattern>
-        <url-pattern>/Department_edit.jsp</url-pattern>
-        <url-pattern>/department/edit</url-pattern>
-        <url-pattern>/Department_detail.jsp</url-pattern>
-        <url-pattern>/department/detail</url-pattern>
-        <url-pattern>/Department_list.jsp</url-pattern>
-        <url-pattern>/department/statistics</url-pattern>
         <url-pattern>/material_unit/materialUnit.jsp</url-pattern>
         <url-pattern>/material_unit/materialUnit</url-pattern>
         <url-pattern>/material_unit/createMaterialUnit.jsp</url-pattern>
@@ -440,8 +419,6 @@
         <url-pattern>/material_unit/editMaterialUnit.jsp</url-pattern>
         <url-pattern>/material_unit/editMaterialUnit</url-pattern>
         <url-pattern>/material_unit/deleteMaterialUnit</url-pattern>
-        <url-pattern>/material_unit/activateMaterialUnit</url-pattern>
-        <url-pattern>/material_unit/deactivateMaterialUnit</url-pattern>
         <url-pattern>/product-list.jsp</url-pattern>
         <url-pattern>/product-list</url-pattern>
         <url-pattern>/add-product.jsp</url-pattern>
@@ -451,13 +428,19 @@
         <url-pattern>/deleted-products.jsp</url-pattern>
         <url-pattern>/deleted-products</url-pattern>
         <url-pattern>/recover-product</url-pattern>
-        <url-pattern>/product-detail.jsp</url-pattern>
-        <url-pattern>/product-detail</url-pattern>
+        <url-pattern>/ItemsSupplyRequestForm.jsp</url-pattern>
+        <url-pattern>/RequestForward.jsp</url-pattern>
+        <url-pattern>/ApproveListForward.jsp</url-pattern>
         <url-pattern>/loadingrequest</url-pattern>
-
+        <url-pattern>/ListRequestImport.jsp</url-pattern>
+        <url-pattern>/import</url-pattern>
+        <url-pattern>/ExportRequest.jsp</url-pattern>
+        <url-pattern>/exportRequest</url-pattern>
+        <url-pattern>/ListPurchaseOrder.jsp</url-pattern>
+        <url-pattern>/listpurchaseorder</url-pattern>
     </filter-mapping>
     <!-- ========== SESSION CONFIGURATION ========== -->
-        <!-- Session Configuration -->
+    <!-- Session Configuration -->
     <servlet-mapping>
         <servlet-name>ListRequestExportController</servlet-name>
         <url-pattern>/exportList</url-pattern>
