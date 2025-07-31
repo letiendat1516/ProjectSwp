@@ -30,22 +30,7 @@ public class AuthorizationFilter implements Filter {
     private static final Map<String, String> urlPermissionMap = new HashMap<>();
 
     static {
-        // USERS
-        urlPermissionMap.put("/Admin.jsp", "ADMIN");        
-        urlPermissionMap.put("/usermanager", "USER_VIEW");
-        urlPermissionMap.put("/UserManager.jsp", "USER_VIEW");
-        urlPermissionMap.put("/adduser", "USER_ADD");
-        urlPermissionMap.put("/AddUser.jsp", "USER_ADD");
-        urlPermissionMap.put("/edituser", "USER_EDIT");
-        urlPermissionMap.put("/EditUser.jsp", "USER_EDIT");
-        urlPermissionMap.put("/role-permission", "ROLE_ASSIGN");
-        urlPermissionMap.put("/permission.jsp", "ROLE_ASSIGN");
-        urlPermissionMap.put("/profile", "USER_PROFILE");
-        urlPermissionMap.put("/Profile.jsp", "USER_PROFILE");
-        urlPermissionMap.put("/editprofile", "USER_PROFILE_EDIT");
-        urlPermissionMap.put("/EditProfile.jsp", "USER_PROFILE_EDIT");
-           
-        
+
         // CATEGORY
         urlPermissionMap.put("/categoriesforward.jsp", "CATEGORYFORWARD");
         urlPermissionMap.put("/category_product/list.jsp", "CATEGORY_LIST");
@@ -72,16 +57,6 @@ public class AuthorizationFilter implements Filter {
         urlPermissionMap.put("/StatisticSupplierEvaluation", "SUPPLIER_EVALUATE_STATISTIC");
         
         // DEPARTMENT
-        urlPermissionMap.put("/Department_list.jsp", "DEPARTMENT_VIEW");
-        urlPermissionMap.put("/department/list", "DEPARTMENT_VIEW");
-        urlPermissionMap.put("/Department_create.jsp", "DEPARTMENT_ADD");
-        urlPermissionMap.put("/department/create", "DEPARTMENT_ADD");
-        urlPermissionMap.put("/Department_edit.jsp", "DEPARTMENT_EDIT");
-        urlPermissionMap.put("/department/edit", "DEPARTMENT_EDIT");
-        urlPermissionMap.put("/Department_detail.jsp", "DEPARTMENT_DETAIL");
-        urlPermissionMap.put("/department/detail", "DEPARTMENT_DETAIL");
-        urlPermissionMap.put("/Department_list.jsp", "DEPARTMENT_STATISTIC");
-        urlPermissionMap.put("/department/statistics", "DEPARTMENT_STATISTIC");
         
         
         // MATERIAL_UNIT
@@ -92,8 +67,6 @@ public class AuthorizationFilter implements Filter {
         urlPermissionMap.put("/material_unit/editMaterialUnit.jsp", "UNIT_EDIT");
         urlPermissionMap.put("/material_unit/editMaterialUnit", "UNIT_EDIT");
         urlPermissionMap.put("/material_unit/deleteMaterialUnit", "UNIT_DELETE");
-        urlPermissionMap.put("/material_unit/activateMaterialUnit", "UNIT_EDIT");
-        urlPermissionMap.put("/material_unit/deactivateMaterialUnit", "UNIT_EDIT");
         
         
         // PRODUCT
@@ -131,17 +104,13 @@ public class AuthorizationFilter implements Filter {
 
 
         //APPROVE REQUEST
-        urlPermissionMap.put("/passwordrequest", "PASSWORD_RESPONSE");
-        urlPermissionMap.put("/password_request.jsp", "PASSWORD_RESPONSE");
-        urlPermissionMap.put("/reset_user_password", "PASSWORD_RESET");
-        urlPermissionMap.put("/reset_user_password.jsp", "PASSWORD_RESET");
         urlPermissionMap.put("/ApproveListForward.jsp", "REQUEST_RESPONSE_PAGE"); 
         urlPermissionMap.put("/ApprovePurchaseRequest.jsp", "REQUEST_PURCHASE_APPROVE");        
         urlPermissionMap.put("/approvepurchaserequest", "REQUEST_PURCHASE_APPROVE");
         urlPermissionMap.put("/ApprovePurchaseQuoted.jsp", "QUOTE_APPROVE");
         urlPermissionMap.put("/approvepurchasequoted", "QUOTE_APPROVE");
         
-        // ... bạn có thể bổ sung các chức năng khác theo docx/database
+        // ...các chức năng khác (Nếu có)
     }
 
     @Override
@@ -164,16 +133,6 @@ public class AuthorizationFilter implements Filter {
 
         String path = request.getServletPath();
         String permissionRequired = urlPermissionMap.get(path);
-
-        System.out.println("====== AUTH FILTER DEBUG ======");
-        System.out.println("Session ID: " + (session != null ? session.getId() : "null"));
-        System.out.println("Filter path: " + path);
-        System.out.println("permissionRequired: " + permissionRequired);
-        System.out.println("userPermissions: " + userPermissions);
-
-        if (permissionRequired == null) {
-            System.out.println("WARNING: Chưa mapping quyền cho url: " + path);
-        }
 
         if (permissionRequired != null) {
             if (userPermissions == null || !userPermissions.contains(permissionRequired)) {

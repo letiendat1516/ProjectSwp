@@ -31,6 +31,12 @@ public class DepartmentController extends HttpServlet {
 
     // Constants for pagination
     private static final int DEFAULT_PAGE_SIZE = 10;
+    
+    // ✅ THÊM: Constants for filter validation
+    private static final String STATUS_ACTIVE = "1";
+    private static final String STATUS_INACTIVE = "0";
+    private static final String HAS_MANAGER_YES = "1";
+    private static final String HAS_MANAGER_NO = "0";
 
     // Initialize DAO when servlet is created
     @Override
@@ -135,6 +141,31 @@ public class DepartmentController extends HttpServlet {
         return false;
     }
 
+    // ✅ THÊM: Validate status parameter
+    private boolean isValidStatus(String status) {
+        return STATUS_ACTIVE.equals(status) || STATUS_INACTIVE.equals(status);
+    }
+    
+    // ✅ THÊM: Validate hasManager parameter
+    private boolean isValidHasManager(String hasManager) {
+        return HAS_MANAGER_YES.equals(hasManager) || HAS_MANAGER_NO.equals(hasManager);
+    }
+    
+    // ✅ THÊM: Sanitize filter parameters
+    private String sanitizeFilterParameter(String param, String[] allowedValues) {
+        if (param == null || param.trim().isEmpty()) {
+            return null;
+        }
+        
+        param = param.trim();
+        for (String allowedValue : allowedValues) {
+            if (allowedValue.equals(param)) {
+                return param;
+            }
+        }
+        return null; // Return null for invalid values
+    }
+
     // Display create form
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -147,7 +178,6 @@ public class DepartmentController extends HttpServlet {
 
             request.setAttribute("availableManagers", availableManagers);
 
-            // SỬA PATH: Từ /department/Department_create.jsp thành /Department_create.jsp
             request.getRequestDispatcher("/Department_create.jsp").forward(request, response);
         } catch (Exception e) {
             System.err.println("Error in showCreateForm: " + e.getMessage());
@@ -282,7 +312,7 @@ public class DepartmentController extends HttpServlet {
 
             List<Map<String, Object>> availableManagers = departmentDAO.getAvailableManagers(id);
 
-            // THÊM: Convert LocalDateTime to Date for JSTL
+            // Convert LocalDateTime to Date for JSTL
             if (department.getCreateDate() != null) {
                 java.util.Date createDate = java.sql.Timestamp.valueOf(department.getCreateDate());
                 request.setAttribute("createDate", createDate);
@@ -434,7 +464,6 @@ public class DepartmentController extends HttpServlet {
             request.setAttribute("employees", employees);
             request.setAttribute("dateTimeFormatter", dateTimeFormatter);
 
-            // SỬA PATH: Từ /department/Department_detail.jsp thành /Department_detail.jsp
             request.getRequestDispatcher("/Department_detail.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
@@ -472,6 +501,9 @@ public class DepartmentController extends HttpServlet {
                 case "invalid_data":
                     request.setAttribute("errorMessage", "Dữ liệu không hợp lệ");
                     break;
+                case "invalid_filter":
+                    request.setAttribute("errorMessage", "Tham số lọc không hợp lệ");
+                    break;
                 default:
                     request.setAttribute("errorMessage", "Đã xảy ra lỗi");
             }
@@ -479,7 +511,7 @@ public class DepartmentController extends HttpServlet {
     }
 
     /**
-     * Hiển thị danh sách phòng ban với bộ lọc nâng cao
+     * ✅ FIXED: Hiển thị danh sách phòng ban với bộ lọc nâng cao
      */
     private void showDepartmentListWithFilters(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -493,23 +525,32 @@ public class DepartmentController extends HttpServlet {
                 page = 1;
             }
 
-            // 2. Get filter parameters
+            // 2. Get and validate filter parameters
             String searchKeyword = getStringParameter(request, "search");
             String statusStr = getStringParameter(request, "status");
             String hasManagerStr = getStringParameter(request, "hasManager");
             String sortField = getStringParameter(request, "sortField");
             String sortDir = getStringParameter(request, "sortDir");
 
-            // 3. Validate and set defaults
+            // ✅ THÊM: Validate filter parameters
+            String[] allowedStatusValues = {STATUS_ACTIVE, STATUS_INACTIVE};
+            String[] allowedManagerValues = {HAS_MANAGER_YES, HAS_MANAGER_NO};
+            
+            statusStr = sanitizeFilterParameter(statusStr, allowedStatusValues);
+            hasManagerStr = sanitizeFilterParameter(hasManagerStr, allowedManagerValues);
+
+            // 3. Log filter values for debugging
+            System.out.println("Filter values - Search: " + searchKeyword + 
+                             ", Status: " + statusStr + 
+                             ", HasManager: " + hasManagerStr);
+
+            // 4. Validate and set defaults for sorting
             if (!isValidSortField(sortField)) {
                 sortField = DEFAULT_SORT_FIELD;
             }
             if (!SORT_ASC.equalsIgnoreCase(sortDir) && !SORT_DESC.equalsIgnoreCase(sortDir)) {
                 sortDir = DEFAULT_SORT_DIR;
             }
-
-            // 4. Calculate offset for pagination
-            int offset = (page - 1) * DEFAULT_PAGE_SIZE;
 
             // 5. Get filtered data
             List<Department> departments = departmentDAO.getDepartments(
@@ -528,8 +569,13 @@ public class DepartmentController extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("totalDepartments", totalDepartments);
             request.setAttribute("searchKeyword", searchKeyword);
-            request.setAttribute("status", statusStr);
-            request.setAttribute("hasManager", hasManagerStr);
+            
+            // ✅ THÊM: Set original filter values for form display
+            request.setAttribute("status", request.getParameter("status")); // Original value
+            request.setAttribute("hasManager", request.getParameter("hasManager")); // Original value
+            request.setAttribute("validStatus", statusStr); // Validated value
+            request.setAttribute("validHasManager", hasManagerStr); // Validated value
+            
             request.setAttribute("sortField", sortField);
             request.setAttribute("sortDir", sortDir);
 
@@ -544,7 +590,7 @@ public class DepartmentController extends HttpServlet {
             // 11. Show messages
             showMessage(request);
 
-            // 12. Forward to JSP - SỬA PATH: Từ /department/Department_list.jsp thành /Department_list.jsp
+            // 12. Forward to JSP
             request.getRequestDispatcher("/Department_list.jsp").forward(request, response);
 
         } catch (Exception e) {
@@ -593,7 +639,7 @@ public class DepartmentController extends HttpServlet {
 
         boolean currentStatus = department.isActiveFlag();
 
-        // 3. ✨ THÊM: Kiểm tra employees nếu đang deactivate
+        // 3. Kiểm tra employees nếu đang deactivate
         if (currentStatus) { // Nếu đang active và sẽ deactive
             int employeeCount = departmentDAO.getEmployeeCountByDepartment(departmentId);
             if (employeeCount > 0) {
@@ -617,7 +663,7 @@ public class DepartmentController extends HttpServlet {
             jsonResponse.addProperty("buttonText", newStatus ? "Vô hiệu hóa" : "Kích hoạt");
             jsonResponse.addProperty("buttonClass", newStatus ? "btn-danger" : "btn-success");
             
-            // ✨ THÊM: Message chi tiết hơn
+            // Message chi tiết hơn
             String message = newStatus ? "Đã kích hoạt phòng ban thành công" : "Đã vô hiệu hóa phòng ban thành công";
             if (!newStatus && jsonResponse.has("employeeCount")) {
                 message += ". Đã loại bỏ " + jsonResponse.get("employeeCount").getAsInt() + " nhân viên khỏi phòng ban.";
@@ -763,7 +809,7 @@ public class DepartmentController extends HttpServlet {
     }
 
     /**
-     * Get string parameter, return null if empty
+     * ✅ IMPROVED: Get string parameter, return null if empty
      */
     private String getStringParameter(HttpServletRequest request, String paramName) {
         String param = request.getParameter(paramName);
@@ -790,12 +836,5 @@ public class DepartmentController extends HttpServlet {
 
         request.setAttribute("startPage", startPage);
         request.setAttribute("endPage", endPage);
-    }
-
-    /**
-     * Validate status parameter
-     */
-    private boolean isValidStatus(String status) {
-        return "0".equals(status) || "1".equals(status);
     }
 }
