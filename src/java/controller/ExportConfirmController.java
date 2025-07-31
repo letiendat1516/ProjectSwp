@@ -99,15 +99,23 @@ public class ExportConfirmController extends HttpServlet {
 
                 // Xử lý xác nhận xuất kho
                 String exportDate = request.getParameter("exportDate");
+                String recipient = request.getParameter("recipient");
                 String additionalNote = request.getParameter("additionalNote");
 
                 System.out.println("   Export Date: " + exportDate);
+                System.out.println("   Recipient: " + recipient);
                 System.out.println("   Additional Note: " + additionalNote);
 
                 // Validate required fields
                 if (exportDate == null || exportDate.trim().isEmpty()) {
                     System.err.println("❌ Missing export date");
                     response.sendRedirect("export?id=" + requestId + "&error=missing_required_fields");
+                    return;
+                }
+
+                if (recipient == null || recipient.trim().isEmpty()) {
+                    System.err.println("❌ Missing recipient");
+                    response.sendRedirect("export?id=" + requestId + "&error=recipient_required");
                     return;
                 }
 
@@ -133,8 +141,8 @@ public class ExportConfirmController extends HttpServlet {
                 System.out.println("   Found " + originalItems.size() + " items to export");
 
                 // Xử lý xuất kho hoàn toàn
-                boolean exportSuccess = dao.processCompleteExport(requestId, exportDate.trim(), processor,
-                        additionalNote, originalItems);
+                boolean exportSuccess = dao.processCompleteExport(requestId, exportDate.trim(), 
+                        recipient.trim(), processor, additionalNote, originalItems);
 
                 if (exportSuccess) {
                     System.out.println("✅ Export completed successfully for request: " + requestId);

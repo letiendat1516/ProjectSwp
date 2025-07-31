@@ -55,9 +55,10 @@ public class ExportDAO {
                 request.setRole(rs.getString("role"));
                 request.setReason(rs.getString("reason"));
                 request.setRejectReason(rs.getString("reject_reason"));
+                request.setRecipient(rs.getString("recipient")); // Added recipient
                 request.setApproveBy(rs.getString("approve_by"));
                 request.setCreatedAt(rs.getTimestamp("created_at"));
-                request.setExportAt(rs.getTimestamp("export_at")); // Added export_at
+                request.setExportAt(rs.getTimestamp("export_at"));
 
                 System.out.println("✅ Found export request: " + id + " with status: " + request.getStatus());
             } else {
@@ -128,14 +129,15 @@ public class ExportDAO {
     }
 
     /**
-     * Xử lý xuất kho hoàn toàn (approved → completed)
+     * Xử lý xuất kho hoàn toàn (approved → completed) - Updated with recipient
      */
-    public boolean processCompleteExport(String requestId, String exportDate, String processor,
-            String additionalNote, List<ExportRequestItem> exportItems) {
+    public boolean processCompleteExport(String requestId, String exportDate, String recipient,
+            String processor, String additionalNote, List<ExportRequestItem> exportItems) {
 
         System.out.println("🔍 DEBUG - Starting processCompleteExport:");
         System.out.println("   Request ID: " + requestId);
         System.out.println("   Export Date: " + exportDate);
+        System.out.println("   Recipient: " + recipient);
         System.out.println("   Processor: " + processor);
         System.out.println("   Additional Note: " + additionalNote);
         System.out.println("   Items count: " + exportItems.size());
@@ -188,8 +190,8 @@ public class ExportDAO {
                 System.out.println("   ✅ Successfully processed item: " + item.getProductCode());
             }
 
-            // 4. Cập nhật trạng thái export_request thành completed và ghi export_at
-            if (!updateRequestStatusToCompleted(connection, requestId, processor, additionalNote)) {
+            // 4. Cập nhật trạng thái export_request thành completed và ghi thông tin xuất kho
+            if (!updateRequestStatusToCompleted(connection, requestId, recipient, processor, additionalNote)) {
                 System.err.println("❌ Failed to update request status to completed");
                 connection.rollback();
                 return false;
@@ -252,20 +254,22 @@ public class ExportDAO {
     }
 
     /**
-     * Cập nhật trạng thái export_request thành completed
+     * Cập nhật trạng thái export_request thành completed - Updated with
+     * recipient
      */
     private boolean updateRequestStatusToCompleted(Connection connection, String requestId,
-            String processor, String additionalNote) {
+            String recipient, String processor, String additionalNote) {
 
         System.out.println("🔍 DEBUG - updateRequestStatusToCompleted:");
         System.out.println("   Request ID: " + requestId);
+        System.out.println("   Recipient: " + recipient);
         System.out.println("   Processor: " + processor);
         System.out.println("   Additional Note: " + additionalNote);
 
         // Tạo reason mới bao gồm ghi chú xuất kho
         String newReason = null;
         if (additionalNote != null && !additionalNote.trim().isEmpty()) {
-            newReason = additionalNote.trim();
+            newReason = "Xuất kho thành công | " + additionalNote.trim();
         } else {
             newReason = "Xuất kho thành công";
         }
@@ -273,6 +277,7 @@ public class ExportDAO {
         String sql = """
         UPDATE export_request 
         SET status = 'completed',
+            recipient = ?,
             approve_by = ?,
             reason = CONCAT(COALESCE(reason, ''), ' | ', ?),
             export_at = CURRENT_TIMESTAMP
@@ -280,17 +285,18 @@ public class ExportDAO {
         """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, processor);
-            ps.setString(2, newReason);
-            ps.setString(3, requestId);
+            ps.setString(1, recipient);
+            ps.setString(2, processor);
+            ps.setString(3, newReason);
+            ps.setString(4, requestId);
 
-            System.out.println("   Executing SQL with newReason: " + newReason);
+            System.out.println("   Executing SQL with recipient: " + recipient + ", newReason: " + newReason);
 
             int updatedRows = ps.executeUpdate();
             System.out.println("   Rows affected: " + updatedRows);
 
             if (updatedRows > 0) {
-                System.out.println("   ✅ Updated export_request status to completed with reason and export_at");
+                System.out.println("   ✅ Updated export_request status to completed with recipient and export_at");
                 return true;
             } else {
                 System.err.println("❌ No rows updated - request may not exist or not in approved status");

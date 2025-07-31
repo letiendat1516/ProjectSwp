@@ -54,7 +54,7 @@ public class ImportDAO {
                 order.setDayQuote(rs.getDate("day_quote"));
                 order.setStatus(rs.getString("status"));
                 order.setReason(rs.getString("reason"));
-                order.setRejectReason(rs.getString("reject_reason")); // Thêm dòng này
+                order.setRejectReason(rs.getString("reject_reason"));
                 order.setSupplier(rs.getString("supplier"));
                 order.setAddress(rs.getString("address"));
                 order.setPhone(rs.getString("phone"));
@@ -368,8 +368,10 @@ public class ImportDAO {
         }
         return history;
     }
-    // Thêm vào ImportDAO
 
+    /**
+     * Kiểm tra xem đơn hàng đã được nhập kho đầy đủ chưa
+     */
     public boolean isOrderFullyImported(String purchaseOrderId) {
         try (Connection con = Context.getJDBCConnection()) {
             String sql = "SELECT COUNT(*) as total_items, "
@@ -395,5 +397,105 @@ public class ImportDAO {
         }
 
         return false;
+    }
+
+    /**
+     * Sau khi nhập kho, cập nhật tồn kho từ bản ghi gần nhất trong
+     * warehouse_import_history
+     */
+    public boolean updateStockFromLatestHistory(String purchaseOrderId) {
+        Connection con = null;
+        try {
+            con = Context.getJDBCConnection();
+            con.setAutoCommit(false);
+
+            String getLatestImportSql = """
+            SELECT h.product_code, h.quantity_imported
+            FROM warehouse_import_history h
+            INNER JOIN (
+                SELECT product_code, MAX(created_at) AS latest_time
+                FROM warehouse_import_history
+                WHERE purchase_id = ?
+                GROUP BY product_code
+            ) latest ON h.product_code = latest.product_code AND h.created_at = latest.latest_time
+            WHERE h.purchase_id = ?
+        """;
+
+            try (PreparedStatement ps = con.prepareStatement(getLatestImportSql)) {
+                ps.setString(1, purchaseOrderId);
+                ps.setString(2, purchaseOrderId);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String productCode = rs.getString("product_code");
+                        BigDecimal quantity = rs.getBigDecimal("quantity_imported");
+
+                        // Lấy product_id từ product_info
+                        String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
+                        try (PreparedStatement getProductIdPs = con.prepareStatement(getProductIdSql)) {
+                            getProductIdPs.setString(1, productCode);
+                            try (ResultSet productRs = getProductIdPs.executeQuery()) {
+                                if (productRs.next()) {
+                                    String productId = productRs.getString("id");
+
+                                    // Kiểm tra stock tồn tại chưa
+                                    String checkStockSql = "SELECT qty FROM product_in_stock WHERE product_id = ?";
+                                    try (PreparedStatement checkStockPs = con.prepareStatement(checkStockSql)) {
+                                        checkStockPs.setString(1, productId);
+                                        try (ResultSet stockRs = checkStockPs.executeQuery()) {
+                                            if (stockRs.next()) {
+                                                // UPDATE stock
+                                                String updateSql = "UPDATE product_in_stock SET qty = qty + ? WHERE product_id = ?";
+                                                try (PreparedStatement updatePs = con.prepareStatement(updateSql)) {
+                                                    updatePs.setBigDecimal(1, quantity);
+                                                    updatePs.setString(2, productId);
+                                                    updatePs.executeUpdate();
+                                                    System.out.println("  ✅ Cộng " + quantity + " vào " + productCode);
+                                                }
+                                            } else {
+                                                // INSERT stock
+                                                String insertSql = "INSERT INTO product_in_stock (product_id, qty) VALUES (?, ?)";
+                                                try (PreparedStatement insertPs = con.prepareStatement(insertSql)) {
+                                                    insertPs.setString(1, productId);
+                                                    insertPs.setBigDecimal(2, quantity);
+                                                    insertPs.executeUpdate();
+                                                    System.out.println("  🆕 Tạo mới và cộng " + quantity + " vào " + productCode);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                } else {
+                                    System.err.println("⚠️ Không tìm thấy sản phẩm cho mã: " + productCode);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            con.commit();
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try {
+                if (con != null) {
+                    con.rollback();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            return false;
+        } finally {
+            try {
+                if (con != null) {
+                    con.setAutoCommit(true);
+                    con.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

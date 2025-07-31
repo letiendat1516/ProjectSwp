@@ -249,6 +249,10 @@
                 box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
             }
 
+            .form-input.required {
+                border-color: var(--danger);
+            }
+
             .quantity-display {
                 text-align: center;
                 font-weight: 600;
@@ -480,6 +484,11 @@
                 box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
             }
 
+            .required-field {
+                color: var(--danger);
+                font-weight: 500;
+            }
+
             @media (max-width: 768px) {
                 .main-content {
                     padding: 1rem;
@@ -541,6 +550,9 @@
                                     <c:choose>
                                         <c:when test="${param.error == 'missing_required_fields'}">
                                             <strong>Lỗi:</strong> Vui lòng điền đầy đủ thông tin bắt buộc!
+                                        </c:when>
+                                        <c:when test="${param.error == 'recipient_required'}">
+                                            <strong>Lỗi:</strong> Vui lòng nhập thông tin người nhận!
                                         </c:when>
                                         <c:when test="${param.error == 'insufficient_inventory'}">
                                             <strong>Lỗi:</strong> Không đủ tồn kho cho sản phẩm ${param.product}!
@@ -680,9 +692,16 @@
                                 <div class="section-body">
                                     <div class="info-grid">
                                         <div class="info-item">
-                                            <label class="info-label">Ngày xuất kho *</label>
-                                            <input type="date" name="exportDate" class="form-input editable" 
+                                            <label class="info-label">Ngày xuất kho <span class="required-field">*</span></label>
+                                            <input type="date" name="exportDate" class="form-input editable required" 
                                                    value="${currentDate}" required>
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Người nhận <span class="required-field">*</span></label>
+                                            <input type="text" name="recipient" class="form-input editable required" 
+                                                   placeholder="Nhập tên người nhận hàng" 
+                                                   value="${exportRequest.recipient != null ? exportRequest.recipient : ''}" 
+                                                   required>
                                         </div>
                                         <div class="info-item">
                                             <label class="info-label">Người xử lý</label>
@@ -746,15 +765,27 @@
             function confirmExport() {
                 const form = document.getElementById('exportForm');
                 const exportDate = form.exportDate.value;
+                const recipient = form.recipient.value.trim();
 
                 if (!exportDate) {
                     alert('Vui lòng chọn ngày xuất kho!');
+                    form.exportDate.focus();
+                    return;
+                }
+
+                if (!recipient) {
+                    alert('Vui lòng nhập tên người nhận!');
+                    form.recipient.focus();
                     return;
                 }
 
                 document.getElementById('modalTitle').textContent = 'Xác nhận xuất kho';
                 document.getElementById('modalIcon').innerHTML = '<i class="fas fa-check-circle" style="color: var(--danger);"></i>';
-                document.getElementById('modalMessage').textContent = 'Bạn có chắc chắn muốn xuất kho với số lượng đã hiển thị? Đơn hàng sẽ được chuyển thành trạng thái hoàn thành và tồn kho sẽ được cập nhật.';
+                document.getElementById('modalMessage').innerHTML =
+                        'Bạn có chắc chắn muốn xuất kho với số lượng đã hiển thị?<br>' +
+                        '<strong>Người nhận:</strong> ' + recipient + '<br>' +
+                        '<strong>Ngày xuất:</strong> ' + exportDate + '<br><br>' +
+                        'Đơn hàng sẽ được chuyển thành trạng thái hoàn thành và tồn kho sẽ được cập nhật.';
                 document.getElementById('rejectReasonContainer').style.display = 'none';
 
                 const confirmBtn = document.getElementById('confirmButton');
@@ -781,6 +812,25 @@
 
             function submitForm(action) {
                 const form = document.getElementById('exportForm');
+
+                if (action === 'confirm') {
+                    const exportDate = form.exportDate.value;
+                    const recipient = form.recipient.value.trim();
+
+                    if (!exportDate) {
+                        alert('Vui lòng chọn ngày xuất kho!');
+                        closeModal();
+                        form.exportDate.focus();
+                        return;
+                    }
+
+                    if (!recipient) {
+                        alert('Vui lòng nhập tên người nhận!');
+                        closeModal();
+                        form.recipient.focus();
+                        return;
+                    }
+                }
 
                 if (action === 'reject') {
                     const rejectReason = document.getElementById('rejectReason').value.trim();
@@ -816,6 +866,18 @@
 
             // Event listeners
             document.addEventListener('DOMContentLoaded', function () {
+                // Validate required fields on input
+                const requiredFields = document.querySelectorAll('.form-input.required');
+                requiredFields.forEach(field => {
+                    field.addEventListener('input', function () {
+                        if (this.value.trim()) {
+                            this.style.borderColor = 'var(--success)';
+                        } else {
+                            this.style.borderColor = 'var(--danger)';
+                        }
+                    });
+                });
+
                 window.onclick = function (event) {
                     const modal = document.getElementById('confirmModal');
                     if (event.target === modal) {
@@ -849,3 +911,4 @@
         </script>
     </body>
 </html>
+

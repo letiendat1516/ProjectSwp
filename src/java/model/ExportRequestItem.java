@@ -20,6 +20,7 @@ public class ExportRequestItem {
     private String rejectReason;
     private double exportedQty; // Số lượng đã xuất (cho lịch sử)
     private double quantityExported; // Alias cho exportedQty
+    private String recipient; // Thêm field recipient
 
     // Constructors
     public ExportRequestItem() {}
@@ -145,6 +146,15 @@ public class ExportRequestItem {
         this.quantityExported = quantityExported;
     }
 
+    // Getter và Setter cho recipient
+    public String getRecipient() {
+        return recipient;
+    }
+
+    public void setRecipient(String recipient) {
+        this.recipient = recipient;
+    }
+
     // Utility methods
     public boolean isApproved() {
         return "approved".equals(this.status);
@@ -167,6 +177,7 @@ public class ExportRequestItem {
                 ", productCode='" + productCode + '\'' +
                 ", status='" + status + '\'' +
                 ", quantity=" + quantity +
+                ", recipient='" + recipient + '\'' +
                 '}';
     }
 }

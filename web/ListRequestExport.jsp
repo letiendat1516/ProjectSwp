@@ -531,6 +531,25 @@
                 border: 1px solid #86efac;
             }
 
+            /* Recipient Cell */
+            .recipient-cell {
+                max-width: 150px;
+                position: relative;
+            }
+
+            .recipient-content {
+                padding: 0.375rem 0.5rem;
+                border-radius: 0.25rem;
+                font-size: 0.75rem;
+                line-height: 1.3;
+                background: #f0f9ff;
+                color: #0c4a6e;
+                border: 1px solid #bae6fd;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
             /* Pagination */
             .pagination {
                 display: flex;
@@ -726,12 +745,12 @@
                     <div class="card-body">
                         <!-- Tab Navigation -->
                         <div class="tab-nav">
-                            <a href="?tab=approved" class="tab-button ${currentTab == 'approved' || empty currentTab ? 'active' : ''}">
+                            <a href="${pageContext.request.contextPath}/exportList?tab=approved" class="tab-button ${currentTab == 'approved' || empty currentTab ? 'active' : ''}">
                                 <i class="fas fa-clock"></i>
                                 Yêu cầu đã duyệt
                                 <span class="tab-badge">${approvedCount != null ? approvedCount : 0}</span>
                             </a>
-                            <a href="?tab=history" class="tab-button ${currentTab == 'history' ? 'active' : ''}">
+                            <a href="${pageContext.request.contextPath}/exportList?tab=history" class="tab-button ${currentTab == 'history' ? 'active' : ''}">
                                 <i class="fas fa-history"></i>
                                 Lịch sử xuất kho
                                 <span class="tab-badge">${historyCount != null ? historyCount : 0}</span>
@@ -746,8 +765,7 @@
                                     <div class="filter-title">
                                         <i class="fas fa-search"></i> Tìm kiếm yêu cầu đã duyệt
                                     </div>
-                                    <form method="get" action="exportRequest">
-                                        <input type="hidden" name="action" value="list">
+                                    <form method="get" action="${pageContext.request.contextPath}/exportList">
                                         <input type="hidden" name="tab" value="approved">
                                         <div class="filter-row">
                                             <div class="filter-item">
@@ -769,7 +787,7 @@
                                                     <button type="submit" class="btn btn-primary btn-icon">
                                                         <i class="fas fa-search"></i> Tìm kiếm
                                                     </button>
-                                                    <a href="?action=list&tab=approved" class="btn btn-secondary btn-icon">
+                                                    <a href="${pageContext.request.contextPath}/exportList?tab=approved" class="btn btn-secondary btn-icon">
                                                         <i class="fas fa-times"></i> Xóa
                                                     </a>
                                                 </div>
@@ -907,7 +925,7 @@
                                     <div class="pagination">
                                         <c:if test="${approvedPage > 1}">
                                             <div class="page-item">
-                                                <a class="page-link" href="?action=list&tab=approved&page=${approvedPage - 1}&searchType=${searchType}&searchValue=${searchValue}">
+                                                <a class="page-link" href="${pageContext.request.contextPath}/exportList?tab=approved&page=${approvedPage - 1}&searchType=${searchType}&searchValue=${searchValue}">
                                                     <i class="fas fa-chevron-left"></i>
                                                 </a>
                                             </div>
@@ -915,13 +933,13 @@
 
                                         <c:forEach begin="1" end="${approvedPages}" var="i">
                                             <div class="page-item ${approvedPage == i ? 'active' : ''}">
-                                                <a class="page-link" href="?action=list&tab=approved&page=${i}&searchType=${searchType}&searchValue=${searchValue}">${i}</a>
+                                                <a class="page-link" href="${pageContext.request.contextPath}/exportList?tab=approved&page=${i}&searchType=${searchType}&searchValue=${searchValue}">${i}</a>
                                             </div>
                                         </c:forEach>
 
                                         <c:if test="${approvedPage < approvedPages}">
                                             <div class="page-item">
-                                                <a class="page-link" href="?action=list&tab=approved&page=${approvedPage + 1}&searchType=${searchType}&searchValue=${searchValue}">
+                                                <a class="page-link" href="${pageContext.request.contextPath}/exportList?tab=approved&page=${approvedPage + 1}&searchType=${searchType}&searchValue=${searchValue}">
                                                     <i class="fas fa-chevron-right"></i>
                                                 </a>
                                             </div>
@@ -939,8 +957,7 @@
                                     <div class="filter-title">
                                         <i class="fas fa-search"></i> Tìm kiếm lịch sử xuất kho
                                     </div>
-                                    <form method="get" action="exportRequest">
-                                        <input type="hidden" name="action" value="list">
+                                    <form method="get" action="${pageContext.request.contextPath}/exportList">
                                         <input type="hidden" name="tab" value="history">
                                         <div class="filter-row">
                                             <div class="filter-item">
@@ -962,7 +979,7 @@
                                                     <button type="submit" class="btn btn-primary btn-icon">
                                                         <i class="fas fa-search"></i> Tìm kiếm
                                                     </button>
-                                                    <a href="?action=list&tab=history" class="btn btn-secondary btn-icon">
+                                                    <a href="${pageContext.request.contextPath}/exportList?tab=history" class="btn btn-secondary btn-icon">
                                                         <i class="fas fa-times"></i> Xóa
                                                     </a>
                                                 </div>
@@ -1008,6 +1025,7 @@
                                                 <th>SL Xuất</th>
                                                 <th>Đơn vị</th>
                                                 <th>Trạng thái</th>
+                                                <th>Người nhận</th>
                                                 <th>Lý do</th>
                                             </tr>
                                         </thead>
@@ -1015,7 +1033,7 @@
                                             <c:choose>
                                                 <c:when test="${empty historyItems}">
                                                     <tr>
-                                                        <td colspan="10" class="text-center" style="padding: 2rem;">
+                                                        <td colspan="11" class="text-center" style="padding: 2rem;">
                                                             <div style="color: var(--gray-400);">
                                                                 <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i>
                                                                 <p>Không có lịch sử xuất kho nào để hiển thị.</p>
@@ -1094,6 +1112,21 @@
                                                                     </c:otherwise>
                                                                 </c:choose>
                                                             </td>
+                                                            <td class="recipient-cell">
+                                                                <c:choose>
+                                                                    <c:when test="${not empty item.recipient}">
+                                                                        <div class="recipient-content" title="Người nhận: ${item.recipient}">
+                                                                            <i class="fas fa-user"></i>
+                                                                            ${item.recipient}
+                                                                        </div>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="text-muted">
+                                                                            <i class="fas fa-user-slash"></i> Chưa xác định
+                                                                        </span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </td>
                                                             <td class="reason-cell">
                                                                 <c:choose>
                                                                     <c:when test="${item.status == 'rejected' && not empty item.rejectReason}">
@@ -1134,7 +1167,7 @@
                                     <div class="pagination">
                                         <c:if test="${historyPage > 1}">
                                             <div class="page-item">
-                                                <a class="page-link" href="?action=list&tab=history&page=${historyPage - 1}&historySearchType=${historySearchType}&historySearchValue=${historySearchValue}">
+                                                <a class="page-link" href="${pageContext.request.contextPath}/exportList?tab=history&page=${historyPage - 1}&historySearchType=${historySearchType}&historySearchValue=${historySearchValue}">
                                                     <i class="fas fa-chevron-left"></i>
                                                 </a>
                                             </div>
@@ -1142,13 +1175,13 @@
 
                                         <c:forEach begin="1" end="${historyPages}" var="i">
                                             <div class="page-item ${historyPage == i ? 'active' : ''}">
-                                                <a class="page-link" href="?action=list&tab=history&page=${i}&historySearchType=${historySearchType}&historySearchValue=${historySearchValue}">${i}</a>
+                                                <a class="page-link" href="${pageContext.request.contextPath}/exportList?tab=history&page=${i}&historySearchType=${historySearchType}&historySearchValue=${historySearchValue}">${i}</a>
                                             </div>
                                         </c:forEach>
 
                                         <c:if test="${historyPage < historyPages}">
                                             <div class="page-item">
-                                                <a class="page-link" href="?action=list&tab=history&page=${historyPage + 1}&historySearchType=${historySearchType}&historySearchValue=${historySearchValue}">
+                                                <a class="page-link" href="${pageContext.request.contextPath}/exportList?tab=history&page=${historyPage + 1}&historySearchType=${historySearchType}&historySearchValue=${historySearchValue}">
                                                     <i class="fas fa-chevron-right"></i>
                                                 </a>
                                             </div>
@@ -1171,7 +1204,7 @@
                                     </c:otherwise>
                                 </c:choose>
                             </div>
-                            <a href="${pageContext.request.contextPath}/Admin.jsp" class="btn btn-primary btn-icon">
+                            <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="btn btn-primary btn-icon">
                                 <i class="fas fa-arrow-left"></i> Quay lại
                             </a>
                         </div>
@@ -1182,7 +1215,7 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Auto-focus search input
+                // Auto-focus search input when there's a search value
                 const searchInputs = document.querySelectorAll('input[name="searchValue"], input[name="historySearchValue"]');
                 searchInputs.forEach(input => {
                     if (input.value) {
@@ -1198,13 +1231,13 @@
                     cells.forEach(cell => {
                         const cellText = cell.textContent || cell.innerText;
                         if (cellText.toLowerCase().includes(searchValue.toLowerCase())) {
-                            const regex = new RegExp(`(${searchValue})`, 'gi');
+                            const regex = new RegExp(`($searchValue.replace(/[.*+?^$}()|[\]\\]/g, '\\$&')})`, 'gi');
                             cell.innerHTML = cell.innerHTML.replace(regex, '<mark style="background-color: #fef08a; padding: 0.1rem 0.2rem; border-radius: 0.25rem;">$1</mark>');
                         }
                     });
                 }
 
-                // Loading effect on form submit
+                // Form submit loading effect
                 const forms = document.querySelectorAll('form');
                 forms.forEach(form => {
                     form.addEventListener('submit', function () {
@@ -1213,7 +1246,8 @@
                             const originalContent = submitBtn.innerHTML;
                             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tìm...';
                             submitBtn.disabled = true;
-                            // Reset button after 5 seconds in case of error
+
+                            // Reset after 5 seconds if still loading
                             setTimeout(() => {
                                 submitBtn.innerHTML = originalContent;
                                 submitBtn.disabled = false;
@@ -1233,254 +1267,33 @@
                             activeSearchInput.select();
                         }
                     }
-
-                    // Escape to clear search
-                    if (e.key === 'Escape') {
-                        const activeSearchInput = document.querySelector('.tab-content.active input[type="text"]');
-                        if (activeSearchInput && activeSearchInput.value) {
-                            activeSearchInput.value = '';
-                            activeSearchInput.focus();
-                        }
-                    }
                 });
 
-                // Tooltip for truncated text
-                const reasonCells = document.querySelectorAll('.reason-content');
-                reasonCells.forEach(cell => {
-                    if (cell.scrollWidth > cell.clientWidth) {
-                        cell.style.cursor = 'help';
-                        cell.addEventListener('mouseenter', function () {
-                            this.style.whiteSpace = 'normal';
-                            this.style.webkitLineClamp = 'unset';
-                        });
-                        cell.addEventListener('mouseleave', function () {
-                            this.style.whiteSpace = '';
-                            this.style.webkitLineClamp = '2';
-                        });
-                    }
-                });
-
-                // Auto refresh every 30 seconds if no search is active
-                if (!searchValue || searchValue.trim() === '') {
-                    setInterval(function () {
-                        // Only refresh if user is not actively searching
-                        const activeInput = document.activeElement;
-                        if (!activeInput || activeInput.tagName !== 'INPUT') {
-                            // Soft refresh - just reload the current page
-                            const currentUrl = window.location.href;
-                            if (!currentUrl.includes('searchValue=') && !currentUrl.includes('historySearchValue=')) {
-                                window.location.reload();
-                            }
-                        }
-                    }, 30000); // 30 seconds
-                }
-
-                // Show loading state for action buttons
-                const actionButtons = document.querySelectorAll('a[href*="export"]');
-                actionButtons.forEach(button => {
-                    button.addEventListener('click', function (e) {
-                        const icon = this.querySelector('i');
-                        const originalText = this.innerHTML;
-
-                        if (icon) {
-                            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải...';
-                        }
-
-                        // Disable button to prevent double click
-                        this.style.pointerEvents = 'none';
-                        this.style.opacity = '0.7';
-
-                        // Re-enable after 3 seconds in case of error
-                        setTimeout(() => {
-                            this.innerHTML = originalText;
-                            this.style.pointerEvents = '';
-                            this.style.opacity = '';
-                        }, 3000);
-                    });
-                });
-
-                // Auto-dismiss alerts after 10 seconds
+                // Auto-dismiss alerts after 8 seconds
                 const alerts = document.querySelectorAll('.alert');
                 alerts.forEach(alert => {
-                    setTimeout(() => {
-                        alert.style.opacity = '0';
-                        alert.style.transform = 'translateY(-20px)';
-                        alert.style.transition = 'all 0.5s ease';
-                        setTimeout(() => {
-                            alert.remove();
-                        }, 500);
-                    }, 10000);
-                });
-
-                // Add click to dismiss alerts
-                alerts.forEach(alert => {
+                    // Add click to dismiss
                     alert.style.cursor = 'pointer';
                     alert.addEventListener('click', function () {
                         this.style.opacity = '0';
-                        this.style.transform = 'translateY(-20px)';
+                        this.style.transform = 'translateY(-10px)';
                         this.style.transition = 'all 0.3s ease';
-                        setTimeout(() => {
-                            this.remove();
-                        }, 300);
+                        setTimeout(() => this.remove(), 300);
                     });
-                });
 
-                // Enhanced search functionality
-                const searchInputsEnhanced = document.querySelectorAll('input[type="text"]');
-                searchInputsEnhanced.forEach(input => {
-                    let searchTimeout;
-
-                    input.addEventListener('input', function () {
-                        clearTimeout(searchTimeout);
-
-                        // Add search icon animation
-                        const form = this.closest('form');
-                        const submitBtn = form.querySelector('button[type="submit"]');
-                        const icon = submitBtn.querySelector('i');
-
-                        if (this.value.length > 0) {
-                            icon.className = 'fas fa-search fa-pulse';
-                            submitBtn.style.background = 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)';
-                        } else {
-                            icon.className = 'fas fa-search';
-                            submitBtn.style.background = '';
-                        }
-
-                        // Auto-search after 1 second of inactivity
-                        if (this.value.length >= 3) {
-                            searchTimeout = setTimeout(() => {
-                                form.submit();
-                            }, 1000);
-                        }
-                    });
-                });
-
-                // Add keyboard navigation for tables
-                document.addEventListener('keydown', function (e) {
-                    if (e.altKey && e.key === 'ArrowUp') {
-                        e.preventDefault();
-                        // Navigate to previous page
-                        const prevLink = document.querySelector('.pagination .page-item:not(.disabled) .page-link[href*="page=' + (parseInt('${currentTab == "approved" ? approvedPage : historyPage}') - 1) + '"]');
-                        if (prevLink)
-                            prevLink.click();
-                    }
-
-                    if (e.altKey && e.key === 'ArrowDown') {
-                        e.preventDefault();
-                        // Navigate to next page
-                        const nextLink = document.querySelector('.pagination .page-item:not(.disabled) .page-link[href*="page=' + (parseInt('${currentTab == "approved" ? approvedPage : historyPage}') + 1) + '"]');
-                        if (nextLink)
-                            nextLink.click();
-                    }
-
-                    if (e.altKey && e.key === '1') {
-                        e.preventDefault();
-                        // Switch to approved tab
-                        window.location.href = '?action=list&tab=approved';
-                    }
-
-                    if (e.altKey && e.key === '2') {
-                        e.preventDefault();
-                        // Switch to history tab
-                        window.location.href = '?action=list&tab=history';
-                    }
-                });
-
-                // Add tooltips for action buttons
-                const actionButtonsTooltip = document.querySelectorAll('.btn');
-                actionButtonsTooltip.forEach(btn => {
-                    if (btn.classList.contains('btn-success')) {
-                        btn.title = 'Bắt đầu xử lý xuất kho toàn bộ đơn hàng';
-                    }
-                });
-
-                // Add visual feedback for successful operations
-                const urlParams = new URLSearchParams(window.location.search);
-                const message = urlParams.get('message');
-
-                if (message) {
-                    // Add confetti effect for successful operations
-                    if (message === 'export_completed') {
-                        // Simple confetti effect
-                        setTimeout(() => {
-                            for (let i = 0; i < 50; i++) {
-                                createConfetti();
-                            }
-                        }, 500);
-                    }
-                }
-
-                function createConfetti() {
-                    const confetti = document.createElement('div');
-                    confetti.style.position = 'fixed';
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.top = '-10px';
-                    confetti.style.width = '10px';
-                    confetti.style.height = '10px';
-                    confetti.style.backgroundColor = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7'][Math.floor(Math.random() * 5)];
-                    confetti.style.borderRadius = '50%';
-                    confetti.style.pointerEvents = 'none';
-                    confetti.style.zIndex = '9999';
-                    confetti.style.animation = 'fall 3s linear forwards';
-
-                    document.body.appendChild(confetti);
-
+                    // Auto dismiss
                     setTimeout(() => {
-                        confetti.remove();
-                    }, 3000);
-                }
-
-                // Add fall animation for confetti
-                const style = document.createElement('style');
-                style.textContent = `
-                    @keyframes fall {
-                        to {
-                            transform: translateY(100vh) rotate(360deg);
+                        if (alert.parentNode) {
+                            alert.style.opacity = '0';
+                            alert.style.transform = 'translateY(-10px)';
+                            alert.style.transition = 'all 0.5s ease';
+                            setTimeout(() => alert.remove(), 500);
                         }
-                    }
-                `;
-                document.head.appendChild(style);
-
-                // Performance optimization: Lazy load images if any
-                const images = document.querySelectorAll('img[data-src]');
-                const imageObserver = new IntersectionObserver((entries, observer) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const img = entry.target;
-                            img.src = img.dataset.src;
-                            img.removeAttribute('data-src');
-                            imageObserver.unobserve(img);
-                        }
-                    });
+                    }, 8000);
                 });
 
-                images.forEach(img => imageObserver.observe(img));
-
-                // Add print functionality
-                document.addEventListener('keydown', function (e) {
-                    if (e.ctrlKey && e.key === 'p') {
-                        e.preventDefault();
-                        window.print();
-                    }
-                });
-
-                // Enhanced accessibility
-                const focusableElements = document.querySelectorAll('a, button, input, select, textarea');
-                focusableElements.forEach((element, index) => {
-                    element.addEventListener('focus', function () {
-                        this.style.outline = '2px solid var(--primary)';
-                        this.style.outlineOffset = '2px';
-                    });
-
-                    element.addEventListener('blur', function () {
-                        this.style.outline = '';
-                        this.style.outlineOffset = '';
-                    });
-                });
-
-                console.log('ExportList.jsp loaded successfully - Full export mode enabled!');
+                console.log('ExportList.jsp loaded successfully!');
             });
         </script>
     </body>
 </html>
-

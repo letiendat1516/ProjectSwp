@@ -17,6 +17,7 @@ public class ExportRequest {
     private String status; // pending, approved, rejected, completed
     private String reason;
     private String rejectReason;
+    private String recipient; // Added recipient field
     private String department;
     private String recipientName;
     private String recipientPhone;
@@ -26,7 +27,7 @@ public class ExportRequest {
     private ArrayList<ExportRequestItem> items;
     private String requesterName;
     private Timestamp createdAt;
-    private Timestamp exportAt; // Added export_at
+    private Timestamp exportAt;
     private Date exportDate;
     private String exportedBy;
     private String exportNote;
@@ -48,13 +49,13 @@ public class ExportRequest {
         this.reason = reason;
     }
 
-    // Full constructor with all parameters
+    // Full constructor with all parameters including recipient
     public ExportRequest(String id, int userId, String role, Date dayRequest, String status, 
-                        String reason, String rejectReason, String department, String recipientName, 
-                        String recipientPhone, String recipientEmail, String approveBy, 
-                        String warehouse, ArrayList<ExportRequestItem> items, String requesterName, 
-                        Timestamp createdAt, Timestamp exportAt, Date exportDate, String exportedBy, 
-                        String exportNote, Timestamp updatedAt) {
+                        String reason, String rejectReason, String recipient, String department, 
+                        String recipientName, String recipientPhone, String recipientEmail, 
+                        String approveBy, String warehouse, ArrayList<ExportRequestItem> items, 
+                        String requesterName, Timestamp createdAt, Timestamp exportAt, 
+                        Date exportDate, String exportedBy, String exportNote, Timestamp updatedAt) {
         this.id = id;
         this.userId = userId;
         this.role = role;
@@ -62,6 +63,7 @@ public class ExportRequest {
         this.status = status;
         this.reason = reason;
         this.rejectReason = rejectReason;
+        this.recipient = recipient;
         this.department = department;
         this.recipientName = recipientName;
         this.recipientPhone = recipientPhone;
@@ -133,6 +135,14 @@ public class ExportRequest {
 
     public void setRejectReason(String rejectReason) {
         this.rejectReason = rejectReason;
+    }
+
+    public String getRecipient() {
+        return recipient;
+    }
+
+    public void setRecipient(String recipient) {
+        this.recipient = recipient;
     }
 
     public String getDepartment() {
@@ -278,6 +288,7 @@ public class ExportRequest {
                 ", status='" + status + '\'' +
                 ", reason='" + reason + '\'' +
                 ", rejectReason='" + rejectReason + '\'' +
+                ", recipient='" + recipient + '\'' +
                 ", department='" + department + '\'' +
                 ", recipientName='" + recipientName + '\'' +
                 ", recipientPhone='" + recipientPhone + '\'' +
