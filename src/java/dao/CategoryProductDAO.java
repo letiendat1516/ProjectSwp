@@ -563,10 +563,13 @@ public List<CategoryProduct> getAllCategoriesForDropdown() {
                 return false;
             }
 
-            // 3. Nếu đang inactive (newStatus = false), cập nhật tất cả danh mục con
+            // 3. Nếu đang inactive (newStatus = false), cập nhật tất cả danh mục con và sản phẩm
             if (!newStatus) {
                 // Đệ quy cập nhật tất cả danh mục con và cháu
                 updateChildCategoriesStatus(conn, categoryId, false);
+                
+                // Vô hiệu hóa tất cả sản phẩm trong danh mục này và danh mục con
+                deactivateProductsInCategory(conn, categoryId);
             }
 
             conn.commit(); // Commit transaction
@@ -666,6 +669,9 @@ public List<CategoryProduct> getAllCategoriesForDropdown() {
 
             // Đệ quy vô hiệu hóa tất cả danh mục con
             updateChildCategoriesStatus(conn, parentId, false);
+            
+            // Vô hiệu hóa tất cả sản phẩm trong danh mục này và các danh mục con
+            deactivateProductsInCategory(conn, parentId);
 
             conn.commit();
             return true;
@@ -687,6 +693,34 @@ public List<CategoryProduct> getAllCategoriesForDropdown() {
                     conn.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * Vô hiệu hóa tất cả sản phẩm trong một danh mục và các danh mục con
+     * @param conn Database connection
+     * @param categoryId ID của danh mục
+     * @throws SQLException
+     */
+    private void deactivateProductsInCategory(Connection conn, int categoryId) throws SQLException {
+        // 1. Vô hiệu hóa tất cả sản phẩm trong danh mục hiện tại
+        String updateProductsSql = "UPDATE product_info SET status = 'Ngưng hoạt động' WHERE cate_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(updateProductsSql)) {
+            ps.setInt(1, categoryId);
+            ps.executeUpdate();
+        }
+        
+        // 2. Lấy danh sách tất cả danh mục con và vô hiệu hóa sản phẩm trong các danh mục đó
+        String selectChildrenSql = "SELECT id FROM category WHERE parent_id = ?";
+        try (PreparedStatement selectPs = conn.prepareStatement(selectChildrenSql)) {
+            selectPs.setInt(1, categoryId);
+            try (ResultSet rs = selectPs.executeQuery()) {
+                while (rs.next()) {
+                    int childCategoryId = rs.getInt("id");
+                    // Đệ quy vô hiệu hóa sản phẩm trong danh mục con
+                    deactivateProductsInCategory(conn, childCategoryId);
                 }
             }
         }

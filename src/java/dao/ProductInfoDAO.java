@@ -133,7 +133,7 @@ public class ProductInfoDAO {
       sql.append("LEFT JOIN product_in_stock s ON p.id = s.product_id ");
       sql.append("LEFT JOIN category c ON p.cate_id = c.id ");
       sql.append("LEFT JOIN unit u ON p.unit_id = u.id ");
-      sql.append("WHERE p.active_flag = 1 AND p.status != 'deleted' ");
+      sql.append("WHERE p.status IN ('active', 'Hoạt động') AND p.status != 'deleted' ");
       
       if (search != null && !search.trim().isEmpty()) {
           sql.append("AND (p.name LIKE ? OR p.code LIKE ? OR c.name LIKE ?) ");
@@ -179,6 +179,8 @@ public class ProductInfoDAO {
               product.setStatus(rs.getString(COL_STATUS));
               product.setDescription(rs.getString(COL_DESCRIPTION));
               product.setStockQuantity(rs.getBigDecimal("stock_qty"));
+              // Stock status is controlled by product status
+              product.setStockStatus(rs.getString(COL_STATUS));
               product.setCategoryName(rs.getString("category_name"));
               product.setUnitName(rs.getString("unit_name"));
               product.setUnitSymbol(rs.getString("unit_symbol"));
@@ -209,8 +211,9 @@ public class ProductInfoDAO {
   public int getTotalProductCount(String search) {
       StringBuilder sql = new StringBuilder();
       sql.append("SELECT COUNT(*) FROM product_info p ");
+      sql.append("LEFT JOIN product_in_stock s ON p.id = s.product_id ");
       sql.append("LEFT JOIN category c ON p.cate_id = c.id ");
-      sql.append("WHERE p.active_flag = 1 AND p.status != 'deleted' ");
+      sql.append("WHERE p.status IN ('active', 'Hoạt động') AND p.status != 'deleted' ");
       
       if (search != null && !search.trim().isEmpty()) {
           sql.append("AND (p.name LIKE ? OR p.code LIKE ? OR c.name LIKE ?) ");
@@ -509,6 +512,38 @@ public class ProductInfoDAO {
           e.printStackTrace();
       }
       return false;
+  }
+  
+  /**
+   * Check if a category is active
+   * @param categoryId The category ID to check
+   * @return true if category is active, false if inactive or doesn't exist
+   */
+  public boolean isCategoryActive(int categoryId) {
+      String sql = "SELECT active_flag FROM category WHERE id = ?";
+      
+      try (Connection con = Context.getJDBCConnection(); 
+           PreparedStatement stmt = con.prepareStatement(sql)) {
+          
+          stmt.setInt(1, categoryId);
+          ResultSet rs = stmt.executeQuery();
+          
+          if (rs.next()) {
+              return rs.getBoolean("active_flag");
+          }
+      } catch (SQLException e) {
+          e.printStackTrace();
+      }
+      return false;
+  }
+  
+  /**
+   * Check if products in a category can be reactivated (category must be active)
+   * @param categoryId The category ID to check
+   * @return true if category is active, false otherwise
+   */
+  public boolean canReactivateProductsInCategory(int categoryId) {
+      return isCategoryActive(categoryId);
   }
   
   /**

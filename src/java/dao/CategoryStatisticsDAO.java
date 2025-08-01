@@ -357,7 +357,7 @@ public class CategoryStatisticsDAO {
         
         String sql = "SELECT c.id, c.name, parent_c.name as parent_name, " +
                     "COUNT(p.id) as product_count, " +
-                    "COUNT(DISTINCT CASE WHEN p.active_flag = 1 THEN p.id END) as active_product_count " +
+                    "COUNT(DISTINCT CASE WHEN p.status IN ('active', 'Hoạt động') THEN p.id END) as active_product_count " +
                     "FROM category c " +
                     "LEFT JOIN category parent_c ON c.parent_id = parent_c.id " +
                     "LEFT JOIN product_info p ON c.id = p.cate_id " +
@@ -410,7 +410,7 @@ public class CategoryStatisticsDAO {
         String sql = "SELECT c.id, c.name, parent_c.name as parent_name, " +
                     "c.create_date, c.active_flag, " +
                     "COUNT(DISTINCT p.id) as product_count, " +
-                    "COUNT(DISTINCT CASE WHEN p.active_flag = 1 THEN p.id END) as active_products, " +
+                    "COUNT(DISTINCT CASE WHEN p.status IN ('active', 'Hoạt động') THEN p.id END) as active_products, " +
                     "COALESCE(SUM(p.qty), 0) as total_stock " +
                     "FROM category c " +
                     "LEFT JOIN category parent_c ON c.parent_id = parent_c.id " +

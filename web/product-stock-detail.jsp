@@ -422,7 +422,7 @@
                                     <div class="stock-metrics">
                                         <div class="metric-card">
                                             <div class="metric-value metric-current">
-                                                <fmt:formatNumber value="${stock.qty}" type="number" maxFractionDigits="2"/>
+                                                <fmt:formatNumber value="${stock.qty}" type="number" maxFractionDigits="0"/>
                                             </div>
                                             <div class="metric-label">Số lượng hiện tại</div>
                                         </div>
@@ -431,7 +431,7 @@
                                             <div class="metric-value metric-threshold">
                                                 <c:choose>
                                                     <c:when test="${stock.minStockThreshold != null and stock.minStockThreshold > 0}">
-                                                        <fmt:formatNumber value="${stock.minStockThreshold}" type="number" maxFractionDigits="2"/>
+                                                        <fmt:formatNumber value="${stock.minStockThreshold}" type="number" maxFractionDigits="0"/>
                                                     </c:when>
                                                     <c:otherwise>
                                                         <span style="font-size: 1.2rem; color: #6c757d;">Chưa thiết lập</span>
@@ -467,9 +467,9 @@
                                                     <span class="material-icons alert-icon">warning</span>
                                                     <span class="alert-text">
                                                         <strong>CẢNH BÁO TỒN KHO THẤP!</strong> 
-                                                        Số lượng hiện tại (<fmt:formatNumber value="${stock.qty}" type="number" maxFractionDigits="2"/>) 
+                                                        Số lượng hiện tại (<fmt:formatNumber value="${stock.qty}" type="number" maxFractionDigits="0"/>) 
                                                         đã đạt hoặc thấp hơn ngưỡng cảnh báo 
-                                                        (<fmt:formatNumber value="${stock.minStockThreshold}" type="number" maxFractionDigits="2"/>). 
+                                                        (<fmt:formatNumber value="${stock.minStockThreshold}" type="number" maxFractionDigits="0"/>). 
                                                         Nên nhập thêm hàng.
                                                     </span>
                                                 </div>

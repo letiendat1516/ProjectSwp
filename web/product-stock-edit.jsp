@@ -383,7 +383,7 @@
                     <div class="current-stock-grid">
                         <div class="stock-item">
                             <div class="stock-value" style="color: #2196f3;">
-                                <fmt:formatNumber value="${stock.qty}" type="number" maxFractionDigits="2"/>
+                                <fmt:formatNumber value="${stock.qty}" type="number" maxFractionDigits="0"/>
                             </div>
                             <div class="stock-label">Số lượng tồn kho</div>
                         </div>
@@ -391,7 +391,7 @@
                             <div class="stock-value" style="color: #ff9800;">
                                 <c:choose>
                                     <c:when test="${stock.minStockThreshold != null}">
-                                        <fmt:formatNumber value="${stock.minStockThreshold}" type="number" maxFractionDigits="2"/>
+                                        <fmt:formatNumber value="${stock.minStockThreshold}" type="number" maxFractionDigits="0"/>
                                     </c:when>
                                     <c:otherwise>
                                         Chưa thiết lập
@@ -426,7 +426,7 @@
                         <div class="form-group">
                             <label class="form-label required" for="qty">Số lượng tồn kho</label>
                             <input type="number" id="qty" name="qty" class="form-control" 
-                                   value="${stock.qty}" min="0" step="0.01" required placeholder="0">
+                                   value="${stock.qty}" min="0" step="1" required placeholder="0">
                             <div class="form-help">Nhập số lượng hiện có trong kho</div>
                         </div>
 
@@ -434,7 +434,7 @@
                         <div class="form-group">
                             <label class="form-label" for="minThreshold">Ngưỡng cảnh báo</label>
                             <input type="number" id="minThreshold" name="minThreshold" class="form-control" 
-                                   value="${stock.minStockThreshold}" min="0" step="0.01" placeholder="10">
+                                   value="${stock.minStockThreshold}" min="0" step="1" placeholder="10">
                             <div class="form-help">Ngưỡng tối thiểu để cảnh báo sắp hết hàng (tùy chọn)</div>
                         </div>
                     </div>
