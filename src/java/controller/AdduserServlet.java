@@ -65,7 +65,6 @@ public class AdduserServlet extends HttpServlet {
         String fullname = request.getParameter("fullname");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
-        String dobStr = request.getParameter("dob");
         int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
         int roleId = Integer.parseInt(request.getParameter("role"));
         String departmentIdStr = request.getParameter("departmentId");
@@ -87,31 +86,6 @@ public class AdduserServlet extends HttpServlet {
         user.setFullname(fullname);
         user.setEmail(email);
         user.setPhone(phone);
-
-        // Xử lý ngày sinh
-        java.sql.Date dob = null;
-        try {
-            if (dobStr != null && !dobStr.trim().isEmpty()) {
-                dob = java.sql.Date.valueOf(dobStr); // Format: yyyy-MM-dd
-            }
-        } catch (IllegalArgumentException e) {
-            request.setAttribute("error", "Ngày sinh không hợp lệ!");
-            request.getRequestDispatcher("AddUser.jsp").forward(request, response);
-            return;
-        }
-        user.setDob(dob); // Đặt giá trị ngày sinh
-        if (dob != null) {
-            java.time.LocalDate birthDate = dob.toLocalDate();
-            java.time.LocalDate today = java.time.LocalDate.now();
-            int age = java.time.Period.between(birthDate, today).getYears();
-
-            if (age < 18 || age > 60) {
-                request.setAttribute("error", "Tuổi người dùng phải từ 18 đến 60!");
-                request.getRequestDispatcher("AddUser.jsp").forward(request, response);
-                return;
-            }
-        }
-
         user.setDepartmentId(departmentId);
         user.setActiveFlag(activeFlag);
 

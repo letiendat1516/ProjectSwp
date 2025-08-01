@@ -69,8 +69,8 @@
         <servlet-class>controller.PasswordRequestServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ResetUserPasswordServlet</servlet-name>
-        <servlet-class>controller.ResetUserPasswordServlet</servlet-class>
+        <servlet-name>ChangeUserPasswordServlet</servlet-name>
+        <servlet-class>controller.ChangePasswordServlet</servlet-class>
     </servlet>
     <!-- Material Unit Management Servlets -->
     <servlet>
@@ -159,10 +159,9 @@
         <servlet-class>controller.CategoryStatisticsController</servlet-class>
     </servlet>
     <servlet>
-
         <servlet-name>ActivateMaterialUnitServlet</servlet-name>
         <servlet-class>controller.ActivateMaterialUnitServlet</servlet-class>
-    </servlet>    
+    </servlet>
     <servlet>
         <servlet-name>DeactivateMaterialUnitServlet</servlet-name>
         <servlet-class>controller.DeactivateMaterialUnitServlet</servlet-class>
@@ -176,7 +175,6 @@
     <servlet>
         <servlet-name>UnitStatisticsController</servlet-name>
         <servlet-class>controller.UnitStatisticsController</servlet-class>
-
     </servlet>
     <!-- ========== SERVLET MAPPINGS ========== -->
     <!-- Category Mapping -->
@@ -191,6 +189,14 @@
     <servlet>
         <servlet-name>ApproveExportRequestServlet</servlet-name>
         <servlet-class>controller.ApproveExportRequestServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HistoryPurchaseRequestServlet</servlet-name>
+        <servlet-class>controller.HistoryPurchaseRequestServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HistoryExportRequestServlet</servlet-name>
+        <servlet-class>controller.HistoryExportRequestServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>CategoryServlet</servlet-name>
@@ -259,8 +265,8 @@
         <url-pattern>/passwordrequest</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ResetUserPasswordServlet</servlet-name>
-        <url-pattern>/reset-user-password</url-pattern>
+        <servlet-name>ChangeUserPasswordServlet</servlet-name>
+        <url-pattern>/change-password</url-pattern>
     </servlet-mapping>
     <!-- Material Unit Management Mappings -->
     <servlet-mapping>
@@ -390,7 +396,6 @@
     </filter>
     <filter-mapping>
         <filter-name>AuthorizationFilter</filter-name>
-
         <url-pattern>/categoriesforward.jsp</url-pattern>
         <url-pattern>/category_product/list.jsp</url-pattern>
         <url-pattern>/category/list</url-pattern>
@@ -438,6 +443,8 @@
         <url-pattern>/exportRequest</url-pattern>
         <url-pattern>/ListPurchaseOrder.jsp</url-pattern>
         <url-pattern>/listpurchaseorder</url-pattern>
+        <url-pattern>/PurchaseOrderForm.jsp</url-pattern>
+        <url-pattern>/purchaseorderform</url-pattern>
     </filter-mapping>
     <!-- ========== SESSION CONFIGURATION ========== -->
     <!-- Session Configuration -->
@@ -452,6 +459,14 @@
     <servlet-mapping>
         <servlet-name>ApproveExportRequestServlet</servlet-name>
         <url-pattern>/approveexportrequest</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HistoryPurchaseRequestServlet</servlet-name>
+        <url-pattern>/historypurchaserequest</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HistoryExportRequestServlet</servlet-name>
+        <url-pattern>/historyexportrequest</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>15</session-timeout>

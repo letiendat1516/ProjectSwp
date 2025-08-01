@@ -60,7 +60,7 @@ public class PasswordRequestServlet extends HttpServlet {
             response.sendRedirect("login.jsp");
             return;
         }
-        // Đảm bảo chỉ admin mới vào được (nếu cần)
+
         model.Users user = (model.Users) session.getAttribute("user");
         if (!"Admin".equalsIgnoreCase(user.getRoleName())) {
             response.sendRedirect("login.jsp");
@@ -72,11 +72,8 @@ public class PasswordRequestServlet extends HttpServlet {
         session.removeAttribute("msg");
         request.setAttribute("msg", msg);
         request.setAttribute("requests", requests);
-        System.out.println("Số lượng đơn yêu cầu: " + requests.size());
-
         RequestDispatcher rd = request.getRequestDispatcher("password_request.jsp");
         rd.forward(request, response);
-
     }
 
     @Override
@@ -91,12 +88,15 @@ public class PasswordRequestServlet extends HttpServlet {
             response.sendRedirect("login.jsp");
             return;
         }
-        int adminId = user.getId();
 
+        int adminId = user.getId();
         boolean success = dao.updateRequestStatus(reqId, adminId,
                 "approve".equals(action) ? "approved" : "rejected");
-        session.setAttribute("msg", success ? "Xử lý yêu cầu thành công!" : "Có lỗi, vui lòng thử lại!");
+
+        session.setAttribute("msg", success
+                ? ("approve".equals(action) ? "Đã duyệt yêu cầu thành công!" : "Đã từ chối yêu cầu!")
+                : "Có lỗi, vui lòng thử lại!");
+
         response.sendRedirect("passwordrequest");
     }
-
 }

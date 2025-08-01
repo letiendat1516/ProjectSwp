@@ -77,11 +77,9 @@ public class EdituserServlet extends HttpServlet {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             String username = request.getParameter("username");
-            String password = request.getParameter("password");
             String fullname = request.getParameter("fullname");
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
-            String dobStr = request.getParameter("dob");
             int activeFlag = Integer.parseInt(request.getParameter("activeFlag"));
             int roleId = Integer.parseInt(request.getParameter("role"));
             String departmentIdStr = request.getParameter("departmentId");
@@ -90,53 +88,24 @@ public class EdituserServlet extends HttpServlet {
 
             UserDAO userDAO = new UserDAO();
 
-            // Xử lý mật khẩu: nếu không đổi thì lấy lại mật khẩu cũ
-            String hashedPassword;
-            if (password != null && !password.trim().isEmpty()) {
-                hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-            } else {
-                hashedPassword = userDAO.getUserById(id).getPassword();
-            }
 
             // Build user object
             Users user = new Users();
             user.setId(id);
             user.setUsername(username);
-            user.setPassword(hashedPassword);
             user.setFullname(fullname);
             user.setEmail(email);
             user.setPhone(phone);
             user.setDepartmentId(departmentId);
 
-            // Xử lý ngày sinh và validate tuổi
-            java.sql.Date dob = null;
-            if (dobStr != null && !dobStr.trim().isEmpty()) {
-                try {
-                    dob = java.sql.Date.valueOf(dobStr);
-                } catch (IllegalArgumentException e) {
-                    returnEditWithError(request, response, id, "Ngày sinh không hợp lệ!");
-                    return;
-                }
-            }
-            user.setDob(dob);
-            if (dob != null) {
-                int age = java.time.Period.between(dob.toLocalDate(), java.time.LocalDate.now()).getYears();
-                if (age < 18 || age > 60) {
-                    returnEditWithError(request, response, id, "Tuổi người dùng phải từ 18 đến 60!");
-                    return;
-                }
-            }
-
             user.setActiveFlag(activeFlag);
 
             userDAO.updateUser(user, roleId);
 
-            // Thành công
             HttpSession session = request.getSession();
             session.setAttribute("message", "Cập nhật người dùng thành công!");
             response.sendRedirect("usermanager");
         } catch (Exception e) {
-            // Gặp lỗi thì lấy lại dữ liệu, forward về form và báo lỗi
             try {
                 int id = Integer.parseInt(request.getParameter("id"));
                 returnEditWithError(request, response, id, "Không thể cập nhật người dùng!");
@@ -146,7 +115,7 @@ public class EdituserServlet extends HttpServlet {
         }
     }
 
-// Hàm phụ: forward về EditUser.jsp với dữ liệu và lỗi
+// Hàm forward về EditUser.jsp với dữ liệu và lỗi
     private void returnEditWithError(HttpServletRequest request, HttpServletResponse response, int userId, String errorMsg)
             throws ServletException, IOException {
         UserDAO userDAO = new UserDAO();

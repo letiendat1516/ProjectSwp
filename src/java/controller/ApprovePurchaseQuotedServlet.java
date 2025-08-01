@@ -10,7 +10,7 @@ import dao.PurchaseOrderDAO;
 import model.PurchaseOrderInfo;
 
 /**
- * List Purchase Order Servlet
+ * Approve Purchase Order Servlet
  * @author Admin
  */
 public class ApprovePurchaseQuotedServlet extends HttpServlet {
@@ -135,14 +135,26 @@ public class ApprovePurchaseQuotedServlet extends HttpServlet {
               }
               
           } else if ("reject".equals(action)) {
-              // Từ chối đơn mua hàng
-              success = dao.updatePurchaseOrderStatus(purchaseOrderId, "re-quote");
-              if (success) {
-                  message = "Đã từ chối đơn mua hàng " + purchaseOrderId + ". Đơn sẽ được báo giá lại.";
-                  System.out.println("✅ Rejected purchase order: " + purchaseOrderId);
+              // Lấy lý do từ chối từ request
+              String rejectReason = request.getParameter("rejectReason");
+              
+              // Validation lý do từ chối
+              if (rejectReason == null || rejectReason.trim().isEmpty()) {
+                  message = "Lý do từ chối không được để trống!";
+                  success = false;
+              } else if (rejectReason.trim().length() < 10) {
+                  message = "Lý do từ chối phải có ít nhất 10 ký tự!";
+                  success = false;
               } else {
-                  message = "Có lỗi xảy ra khi từ chối đơn mua hàng " + purchaseOrderId;
-                  System.out.println("❌ Failed to reject purchase order: " + purchaseOrderId);
+                  // Từ chối đơn mua hàng với lý do
+                  success = dao.rejectPurchaseOrderWithReason(purchaseOrderId, rejectReason.trim());
+                  if (success) {
+                      message = "Đã từ chối đơn mua hàng " + purchaseOrderId + ". Đơn sẽ được báo giá lại.";
+                      System.out.println("✅ Rejected purchase order: " + purchaseOrderId + " with reason: " + rejectReason);
+                  } else {
+                      message = "Có lỗi xảy ra khi từ chối đơn mua hàng " + purchaseOrderId;
+                      System.out.println("❌ Failed to reject purchase order: " + purchaseOrderId);
+                  }
               }
           }
           
@@ -190,6 +202,6 @@ public class ApprovePurchaseQuotedServlet extends HttpServlet {
 
   @Override
   public String getServletInfo() {
-      return "List Purchase Order Servlet - Hiển thị danh sách đơn mua hàng với phân trang và filter";
+      return "Approve Purchase Order Servlet - Xử lý phê duyệt và từ chối đơn mua hàng";
   }
 }

@@ -413,11 +413,7 @@
                                             <c:set var="status" value="Báo giá lại" />
                                             <c:set var="rowClass" value="status-re-quote" />
                                         </c:when>
-<<<<<<< HEAD
-                                        <c:when test="${po.status == 'approved' || po.status == 'completed' || po.status == 'rejected'||po.status == 'done'}">
-=======
                                         <c:when test="${po.status == 'approved' || po.status == 'completed' || po.status == 'rejected'|| po.status == 'done'}">
->>>>>>> 35ae551 (fix)
                                             <c:set var="status" value="Đã hoàn thành" />
                                             <c:set var="rowClass" value="status-completed" />
                                         </c:when>
@@ -480,7 +476,18 @@
                                                 <strong>Nhà cung cấp:</strong> ${empty po.supplier ? 'Chưa có' : po.supplier}<br>
                                                 <strong>Địa chỉ:</strong> ${empty po.address ? 'Chưa có' : po.address}<br>
                                                 <strong>SĐT:</strong> ${empty po.phone ? 'Chưa có' : po.phone}<br>
-                                                <strong>Email:</strong> ${empty po.email ? 'Chưa có' : po.email}
+                                                <strong>Email:</strong> ${empty po.email ? 'Chưa có' : po.email}<br>
+
+                                                <!-- ✅ THÊM phần hiển thị lý do từ chối cho đơn re-quote -->
+                                                <c:if test="${po.status == 're-quote' && not empty po.rejectReason2}">
+                                                    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                                                        <strong style="color: #856404;">
+                                                            <i class="material-icons" style="font-size: 16px; vertical-align: middle;">warning</i>
+                                                            Lý do từ chối:
+                                                        </strong><br>
+                                                        <span style="color: #856404; font-style: italic;">${po.rejectReason2}</span>
+                                                    </div>
+                                                </c:if>
                                             </div>
 
                                             <table class="detail-table">

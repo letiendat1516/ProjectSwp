@@ -9,8 +9,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /**
- * Model class for Export Request
- * Represents a warehouse export request with all necessary information
+ * Model class for Export Request Represents a warehouse export request with all
+ * necessary information
  */
 public class ExportRequest {
 
@@ -36,32 +36,14 @@ public class ExportRequest {
     private Date exportDate;
     private String exportedBy;
     private String exportNote;
+    private String rejectReason2;
     private Timestamp updatedAt;
 
     // Default constructor
     public ExportRequest() {
     }
 
-    // Constructor with basic parameters
-    public ExportRequest(String id, int userId, Date dayRequest, String status, 
-                        String approveBy, String role, String reason) {
-        this.id = id;
-        this.userId = userId;
-        this.dayRequest = dayRequest;
-        this.status = status;
-        this.approveBy = approveBy;
-        this.role = role;
-        this.reason = reason;
-    }
-
-    // Full constructor with all parameters including recipient
-    public ExportRequest(String id, int userId, String role, Date dayRequest, String status, 
-                        String reason, String rejectReason, String recipient, String department, 
-                        String recipientName, String recipientPhone, String recipientEmail, 
-                        String approveBy, String warehouse, ArrayList<ExportRequestItem> items, 
-                        String requesterName, String requesterFullName, Timestamp createdAt, 
-                        Timestamp exportAt, Date exportDate, String exportedBy, String exportNote, 
-                        Timestamp updatedAt) {
+    public ExportRequest(String id, int userId, String role, Date dayRequest, String status, String reason, String rejectReason, String recipient, String department, String recipientName, String recipientPhone, String recipientEmail, String approveBy, String warehouse, ArrayList<ExportRequestItem> items, String requesterName, String requesterFullName, Timestamp createdAt, Timestamp exportAt, Date exportDate, String exportedBy, String exportNote, String rejectReason2, Timestamp updatedAt) {
         this.id = id;
         this.userId = userId;
         this.role = role;
@@ -84,6 +66,7 @@ public class ExportRequest {
         this.exportDate = exportDate;
         this.exportedBy = exportedBy;
         this.exportNote = exportNote;
+        this.rejectReason2 = rejectReason2;
         this.updatedAt = updatedAt;
     }
 
@@ -264,6 +247,14 @@ public class ExportRequest {
         this.exportNote = exportNote;
     }
 
+    public String getRejectReason2() {
+        return rejectReason2;
+    }
+
+    public void setRejectReason2(String rejectReason2) {
+        this.rejectReason2 = rejectReason2;
+    }
+
     public Timestamp getUpdatedAt() {
         return updatedAt;
     }
@@ -306,30 +297,30 @@ public class ExportRequest {
 
     @Override
     public String toString() {
-        return "ExportRequest{" +
-                "id='" + id + '\'' +
-                ", userId=" + userId +
-                ", role='" + role + '\'' +
-                ", dayRequest=" + dayRequest +
-                ", status='" + status + '\'' +
-                ", reason='" + reason + '\'' +
-                ", rejectReason='" + rejectReason + '\'' +
-                ", recipient='" + recipient + '\'' +
-                ", department='" + department + '\'' +
-                ", recipientName='" + recipientName + '\'' +
-                ", recipientPhone='" + recipientPhone + '\'' +
-                ", recipientEmail='" + recipientEmail + '\'' +
-                ", approveBy='" + approveBy + '\'' +
-                ", warehouse='" + warehouse + '\'' +
-                ", exportAt=" + exportAt +
-                ", exportDate=" + exportDate +
-                ", exportedBy='" + exportedBy + '\'' +
-                ", exportNote='" + exportNote + '\'' +
-                ", items=" + items +
-                ", requesterName='" + requesterName + '\'' +
-                ", requesterFullName='" + requesterFullName + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+        return "ExportRequest{"
+                + "id='" + id + '\''
+                + ", userId=" + userId
+                + ", role='" + role + '\''
+                + ", dayRequest=" + dayRequest
+                + ", status='" + status + '\''
+                + ", reason='" + reason + '\''
+                + ", rejectReason='" + rejectReason + '\''
+                + ", recipient='" + recipient + '\''
+                + ", department='" + department + '\''
+                + ", recipientName='" + recipientName + '\''
+                + ", recipientPhone='" + recipientPhone + '\''
+                + ", recipientEmail='" + recipientEmail + '\''
+                + ", approveBy='" + approveBy + '\''
+                + ", warehouse='" + warehouse + '\''
+                + ", exportAt=" + exportAt
+                + ", exportDate=" + exportDate
+                + ", exportedBy='" + exportedBy + '\''
+                + ", exportNote='" + exportNote + '\''
+                + ", items=" + items
+                + ", requesterName='" + requesterName + '\''
+                + ", requesterFullName='" + requesterFullName + '\''
+                + ", createdAt=" + createdAt
+                + ", updatedAt=" + updatedAt
+                + '}';
     }
 }

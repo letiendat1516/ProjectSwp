@@ -112,6 +112,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
                 request.setAttribute("items", poInfo.getPurchaseItems());
                 request.setAttribute("action", action);
                 request.setAttribute("poInfo", poInfo); // Toàn bộ thông tin PO
+                request.setAttribute("rejectReason2", poInfo.getRejectReason2());
                 
                 System.out.println("✅ Loaded data - ID: " + poInfo.getId());
                 System.out.println("✅ Loaded data - Reason: " + poInfo.getReason());

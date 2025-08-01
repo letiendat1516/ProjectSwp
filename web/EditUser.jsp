@@ -240,13 +240,7 @@ if (user == null || !"Admin".equals(user.getRoleName())) {
                             <label class="form-simple-label" for="username">Username:</label>
                             <input type="text" id="username" name="username" class="form-simple-input" value="${editUser.username}" required>
                         </div>
-                        <div>
-                            <label class="form-simple-label" for="password">Mật khẩu:</label>
-                            <input type="password" id="password" name="password" 
-                                   class="form-simple-input" 
-                                   pattern="^[a-zA-Z0-9]{7,}$" 
-                                   placeholder="Để trống nếu không đổi mật khẩu">
-                        </div>
+                        
                         <div>
                             <label class="form-simple-label" for="fullname">Họ và Tên:</label>
                             <input type="text" id="fullname" name="fullname" class="form-simple-input" value="${editUser.fullname}" required>

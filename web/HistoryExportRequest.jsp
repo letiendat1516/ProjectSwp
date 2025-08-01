@@ -11,7 +11,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <!-- Material Icons -->
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-      <title>Phê Duyệt Yêu Cầu Xuất Kho</title>
+      <title>Lịch Sử Yêu Cầu Xuất Kho</title>
       <style>
           * {
               margin: 0;
@@ -138,24 +138,6 @@
               transform: translateY(-1px);
           }
 
-          /* Nút phê duyệt và từ chối */
-          .approve-btn {
-              background: #28a745;
-              color: #fff !important;
-          }
-          .approve-btn:hover {
-              background: #218838;
-              transform: translateY(-1px);
-          }
-          .reject-btn {
-              background: #dc3545;
-              color: #fff !important;
-          }
-          .reject-btn:hover {
-              background: #c82333;
-              transform: translateY(-1px);
-          }
-
           .action-btn .material-icons {
               font-size: 16px;
           }
@@ -171,8 +153,14 @@
               color: #155724 !important;
               font-weight: bold !important;
           }
+          .status-pending {
+              background-color: #fff3cd !important;
+              border-left: 4px solid #ffc107 !important;
+              color: #856404 !important;
+              font-weight: bold !important;
+          }
 
-          /* CẬP NHẬT: Điều chỉnh độ rộng cột cho phù hợp với "Người Yêu Cầu" */
+          /* Điều chỉnh độ rộng cột */
           .requests-table th:nth-child(1),
           .requests-table td:nth-child(1) {
               width: 1cm;
@@ -183,7 +171,7 @@
           }
           .requests-table th:nth-child(3),
           .requests-table td:nth-child(3) {
-              width: 3cm; /* Tăng độ rộng cho cột "Người Yêu Cầu" */
+              width: 3cm;
           }
           .requests-table th:nth-child(4),
           .requests-table td:nth-child(4) {
@@ -199,15 +187,7 @@
           }
           .requests-table th:nth-child(7),
           .requests-table td:nth-child(7) {
-              width: 4cm;
-          }
-          .action-buttons-cell {
-              display: flex;
-              gap: 5px;
-              justify-content: center;
-              align-items: center;
-              flex-wrap: wrap;
-              padding: 8px;
+              width: 2cm;
           }
 
           .detail-row {
@@ -244,19 +224,7 @@
           .detail-table th:nth-child(5), .detail-table td:nth-child(5) {
               width: 8cm;
           }
-          .action-buttons {
-              margin-top: 10px;
-              text-align: center;
-              display: flex;
-              justify-content: center;
-              gap: 10px;
-          }
-          .status-message {
-              color: #555;
-              font-style: italic;
-              text-align: center;
-              margin-top: 10px;
-          }
+          
           .pagination {
               display: flex;
               justify-content: center;
@@ -336,92 +304,6 @@
               margin-right: 5px;
           }
 
-          /* Modal styles */
-          .modal {
-              display: none;
-              position: fixed;
-              z-index: 1000;
-              left: 0;
-              top: 0;
-              width: 100%;
-              height: 100%;
-              background-color: rgba(0,0,0,0.5);
-          }
-          .modal-content {
-              background-color: #fefefe;
-              margin: 10% auto;
-              padding: 20px;
-              border: none;
-              border-radius: 10px;
-              width: 500px;
-              max-width: 90%;
-              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          }
-          .modal-header {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 20px;
-          }
-          .modal-title {
-              margin: 0;
-              color: #333;
-          }
-          .close {
-              color: #aaa;
-              font-size: 28px;
-              font-weight: bold;
-              cursor: pointer;
-          }
-          .close:hover {
-              color: #000;
-          }
-          .modal-buttons {
-              display: flex;
-              justify-content: flex-end;
-              gap: 10px;
-              margin-top: 20px;
-          }
-          .modal-btn {
-              padding: 8px 16px;
-              border: none;
-              border-radius: 5px;
-              cursor: pointer;
-              font-size: 14px;
-          }
-          .modal-btn-confirm {
-              background-color: #dc3545;
-              color: white;
-          }
-          .modal-btn-cancel {
-              background-color: #6c757d;
-              color: white;
-          }
-
-          /* Textarea styles */
-          .modal-content textarea {
-              font-size: 14px;
-              line-height: 1.4;
-              border: 2px solid #ddd;
-              transition: border-color 0.3s;
-              font-family: inherit;
-          }
-          .modal-content textarea:focus {
-              outline: none;
-              border-color: #007bff;
-              box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-          }
-          .modal-content textarea::placeholder {
-              color: #999;
-              font-style: italic;
-          }
-          .char-counter {
-              font-size: 12px;
-              color: #666;
-              text-align: right;
-              margin-top: 5px;
-          }
-
           /* Reject reason display styles */
           .reject-reason-display {
               background-color: #fff3cd;
@@ -497,15 +379,13 @@
       <div class="layout-container">
           <jsp:include page="/include/sidebar.jsp" />
           <div class="main-content">
-              <h1>PHÊ DUYỆT YÊU CẦU XUẤT KHO</h1>
+              <h1>LỊCH SỬ YÊU CẦU XUẤT KHO</h1>
 
               <!-- Hiển thị thông báo -->
-              <!-- ✅ Hiển thị message từ session -->
               <c:if test="${not empty sessionScope.successMessage}">
                   <div class="message success">
                       ${sessionScope.successMessage}
                   </div>
-                  <!-- Xóa message sau khi hiển thị -->
                   <c:remove var="successMessage" scope="session" />
               </c:if>
 
@@ -513,26 +393,23 @@
                   <div class="message error">
                       ${sessionScope.errorMessage}
                   </div>
-                  <!-- Xóa message sau khi hiển thị -->
                   <c:remove var="errorMessage" scope="session" />
               </c:if>
 
-              <!-- Giữ nguyên phần message từ URL parameter -->
               <c:if test="${not empty param.message}">
                   <div class="message success">
                       ${param.message}
                   </div>
               </c:if>
 
-              <!-- Hiển thị thông báo lỗi -->
               <c:if test="${not empty requestScope.errorMessage}">
                   <div class="message error">
                       ${requestScope.errorMessage}
                   </div>
               </c:if>
 
-
-              <form action="approveexportrequest" method="post" class="filter-section" id="filterForm">
+              <!-- Form lọc -->
+              <form action="historyexportrequest" method="get" class="filter-section" id="filterForm">
                   <div class="filter-item">
                       <label for="startDate">Từ ngày:</label>
                       <input type="date" id="startDate" name="startDate" value="${param.startDate}">
@@ -545,13 +422,11 @@
                       <label for="statusFilter">Trạng thái:</label>
                       <select id="statusFilter" name="statusFilter">
                           <option value="" ${empty param.statusFilter ? 'selected' : ''}>Tất cả</option>
-                          <option value="approved" ${param.statusFilter == 'approved' || param.statusFilter == 'completed'||param.statusFilter == 'partial_exported'|| param.statusFilter == 'rejected' ? 'selected' : ''}>Đã duyệt</option>
-                          <!-- ✅ THAY ĐỔI: Cập nhật điều kiện filter cho rejected -->
-                          <option value="rejected" ${ param.statusFilter == 'rejected_request' ? 'selected' : ''}>Đã từ chối</option>
+                          <option value="approved" ${param.statusFilter == 'approved' ? 'selected' : ''}>Đã duyệt</option>
+                          <option value="rejected" ${param.statusFilter == 'rejected' ? 'selected' : ''}>Đã từ chối</option>
                           <option value="pending" ${param.statusFilter == 'pending' ? 'selected' : ''}>Đang chờ</option>
                       </select>
                   </div>
-
                   <div class="filter-item">
                       <label for="requestIdFilter">ID:</label>
                       <input type="text" id="requestIdFilter" name="requestIdFilter" value="${param.requestIdFilter}" placeholder="Nhập ID">
@@ -563,6 +438,8 @@
                       <span class="material-icons">clear</span> Xóa
                   </button>
               </form>
+
+              <!-- Bảng danh sách -->
               <table class="requests-table">
                   <thead>
                       <tr>
@@ -577,19 +454,19 @@
                   </thead>
                   <tbody id="requestsTableBody">
                       <c:choose>
-                          <c:when test="${not empty pendingExportRequests}">
-                              <c:forEach var="req" items="${pendingExportRequests}" varStatus="loop">
+                          <c:when test="${not empty exportRequests}">
+                              <c:forEach var="req" items="${exportRequests}" varStatus="loop">
                                   <c:set var="status" value="" />
                                   <c:set var="rowClass" value="" />
                                   <c:choose>
                                       <c:when test="${req.status == 'pending'}">
                                           <c:set var="status" value="Đang chờ" />
+                                          <c:set var="rowClass" value="status-pending" />
                                       </c:when>
-                                      <c:when test="${req.status == 'approved' || req.status == 'completed' || req.status == 'rejected' ||req.status == 'partial_exported'}">
+                                      <c:when test="${req.status == 'approved' || req.status == 'completed' || req.status == 'rejected' || req.status == 'partial_exported'}">
                                           <c:set var="status" value="Đã duyệt" />
                                           <c:set var="rowClass" value="status-approved" />
                                       </c:when>
-                               
                                       <c:when test="${req.status == 'rejected_request'}">
                                           <c:set var="status" value="Đã từ chối" />
                                           <c:set var="rowClass" value="status-rejected" />
@@ -599,7 +476,6 @@
                                   <tr class="${rowClass}">
                                       <td>${loop.count}</td>
                                       <td>${req.id}</td>
-                                      <!-- THAY ĐỔI: Hiển thị requester_name thay vì user_id -->
                                       <td class="requester-name">
                                           <c:choose>
                                               <c:when test="${req.requesterName == 'Unknown User'}">
@@ -619,26 +495,13 @@
                                       <td>${req.reason}</td>
                                       <td>
                                           <div class="action-buttons-cell">
-                                              <!-- Nút xem chi tiết -->
+                                              <!-- Chỉ có nút xem chi tiết -->
                                               <button onclick="toggleDetails(this)" class="action-btn view-btn">
                                                   <span class="material-icons">visibility</span>
                                                   <span>Chi tiết</span>
                                               </button>
-
-                                              <!-- Nút phê duyệt và từ chối chỉ hiển thị khi status = pending -->
-                                              <c:if test="${req.status == 'pending'}">
-                                                  <button onclick="approveExportRequest('${req.id}')" class="action-btn approve-btn">
-                                                      <span class="material-icons">check_circle</span>
-                                                      <span>Phê duyệt</span>
-                                                  </button>
-                                                  <button onclick="rejectExportRequest('${req.id}')" class="action-btn reject-btn">
-                                                      <span class="material-icons">cancel</span>
-                                                      <span>Từ chối</span>
-                                                  </button>
-                                              </c:if>
                                           </div>
                                       </td>
-
                                   </tr>
                                   <tr class="detail-row">
                                       <td colspan="7">
@@ -684,17 +547,6 @@
                                                   </c:choose>
                                               </tbody>
                                           </table>
-
-                                          <!-- Status message cho các trạng thái khác -->
-                                          <!-- Status message cho các trạng thái khác -->
-                                          <c:if test="${req.status == 'approved' || req.status == 'completed' || req.status == 'rejected' ||req.status == 'partial_exported'}">
-                                              <div class="status-message">Bạn đã duyệt yêu cầu xuất kho này</div>
-                                          </c:if>
-                                          <!-- ✅ THAY ĐỔI: Cập nhật điều kiện cho rejected_request -->
-                                          <c:if test="${req.status == 'rejected_request'}">
-                                              <div class="status-message">Bạn đã từ chối yêu cầu xuất kho này</div>
-                                          </c:if>
-
                                       </td>
                                   </tr>
                               </c:forEach>
@@ -735,7 +587,7 @@
                           </button>
                       </c:when>
                       <c:otherwise>
-                          <a href="approveexportrequest?index=${currentPage - 1}${filterParams}" class="pagination-button">
+                          <a href="historyexportrequest?index=${currentPage - 1}${filterParams}" class="pagination-button">
                               <button>
                                   <span class="material-icons">chevron_left</span>
                               </button>
@@ -749,263 +601,66 @@
                               <span class="material-icons">chevron_right</span>
                           </button>
                       </c:when>
-                                              <c:otherwise>
-                            <a href="approveexportrequest?index=${currentPage + 1}${filterParams}" class="pagination-button">
-                                <button>
-                                    <span class="material-icons">chevron_right</span>
-                                </button>
-                            </a>
-                        </c:otherwise>
-                    </c:choose>
-                    <div class="total-pages">Tổng số: ${totalRequests} mục | ${endPage} trang</div>
-                </div>
+                      <c:otherwise>
+                          <a href="historyexportrequest?index=${currentPage + 1}${filterParams}" class="pagination-button">
+                              <button>
+                                  <span class="material-icons">chevron_right</span>
+                              </button>
+                          </a>
+                      </c:otherwise>
+                  </c:choose>
+                  <div class="total-pages">Tổng số: ${totalRequests} mục | ${endPage} trang</div>
+              </div>
 
-                <div class="footer">
-                    <a href="Admin.jsp" class="btn-secondary">
-                        <span class="material-icons back-btn-icon">arrow_back</span> Quay Lại Trang Chủ
-                    </a>
-                </div>
-            </div>
-        </div>
+              <div class="footer">
+                  <a href="Admin.jsp" class="btn-secondary">
+                      <span class="material-icons back-btn-icon">arrow_back</span> Quay Lại Trang Chủ
+                  </a>
+              </div>
+          </div>
+      </div>
 
-        <!-- Modal xác nhận từ chối với textarea -->
-        <div id="rejectModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Xác nhận từ chối</h3>
-                    <span class="close" onclick="closeRejectModal()">&times;</span>
-                </div>
-                <p>Bạn có chắc chắn muốn từ chối yêu cầu xuất kho này không?</p>
-                <p><strong>Yêu cầu sẽ được chuyển về trạng thái "Đã từ chối"</strong></p>
-                
-                <div style="margin: 20px 0;">
-                    <label for="rejectReason" style="display: block; margin-bottom: 8px; font-weight: bold;">
-                        Lý do từ chối: <span style="color: red;">*</span>
-                    </label>
-                    <textarea 
-                        id="rejectReason" 
-                        placeholder="Vui lòng nhập lý do từ chối yêu cầu xuất kho..." 
-                        style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: inherit; resize: vertical; box-sizing: border-box;"
-                        maxlength="500"></textarea>
-                    <div class="char-counter">
-                        <span id="charCount">0</span>/500 ký tự
-                    </div>
-                </div>
-                
-                <div class="modal-buttons">
-                    <button class="modal-btn modal-btn-cancel" onclick="closeRejectModal()">Hủy</button>
-                    <button class="modal-btn modal-btn-confirm" onclick="confirmReject()">Xác nhận từ chối</button>
-                </div>
-            </div>
-        </div>
+      <script>
+          // Hàm toggle chi tiết
+          function toggleDetails(button) {
+              const row = button.closest('tr').nextElementSibling;
+              if (row.classList.contains('detail-row')) {
+                  const isVisible = row.style.display === 'table-row';
+                  row.style.display = isVisible ? 'none' : 'table-row';
 
-        <script>
-            let currentRejectId = null;
+                  // Cập nhật icon và text
+                  const icon = button.querySelector('.material-icons');
+                  const text = button.querySelector('span:last-child');
+                  if (isVisible) {
+                      icon.textContent = 'visibility';
+                      text.textContent = 'Chi tiết';
+                  } else {
+                      icon.textContent = 'visibility_off';
+                      text.textContent = 'Ẩn';
+                  }
+              }
+          }
 
-            // Hàm toggle chi tiết
-            function toggleDetails(button) {
-                const row = button.closest('tr').nextElementSibling;
-                if (row.classList.contains('detail-row')) {
-                    const isVisible = row.style.display === 'table-row';
-                    row.style.display = isVisible ? 'none' : 'table-row';
+          // Hàm xóa bộ lọc
+          function clearFilters() {
+              document.getElementById('startDate').value = '';
+              document.getElementById('endDate').value = '';
+              document.getElementById('statusFilter').value = '';
+              document.getElementById('requestIdFilter').value = '';
+              window.location.href = 'historyexportrequest';
+          }
 
-                    // Cập nhật icon và text
-                    const icon = button.querySelector('.material-icons');
-                    const text = button.querySelector('span:last-child');
-                    if (isVisible) {
-                        icon.textContent = 'visibility';
-                        text.textContent = 'Chi tiết';
-                    } else {
-                        icon.textContent = 'visibility_off';
-                        text.textContent = 'Ẩn';
-                    }
-                }
-            }
+          // Validation form
+          document.getElementById('filterForm').addEventListener('submit', function (e) {
+              const startDate = document.getElementById('startDate').value;
+              const endDate = document.getElementById('endDate').value;
 
-            // Hàm phê duyệt yêu cầu xuất kho
-            function approveExportRequest(requestId) {
-                if (confirm('Bạn có chắc chắn muốn phê duyệt yêu cầu xuất kho này không?')) {
-                    // Tạo form để submit
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = 'approveexportrequest';
-
-                    // Thêm action
-                    const actionInput = document.createElement('input');
-                    actionInput.type = 'hidden';
-                    actionInput.name = 'action';
-                    actionInput.value = 'approve';
-                    form.appendChild(actionInput);
-
-                    // Thêm requestId
-                    const idInput = document.createElement('input');
-                    idInput.type = 'hidden';
-                    idInput.name = 'requestId';
-                    idInput.value = requestId;
-                    form.appendChild(idInput);
-
-                    // Thêm các filter parameters để giữ nguyên trang hiện tại
-                    const currentFilters = ['startDate', 'endDate', 'statusFilter', 'requestIdFilter', 'index'];
-                    currentFilters.forEach(filterName => {
-                        const filterValue = document.querySelector(`[name="${filterName}"]`)?.value ||
-                                new URLSearchParams(window.location.search).get(filterName);
-                        if (filterValue) {
-                            const filterInput = document.createElement('input');
-                            filterInput.type = 'hidden';
-                            filterInput.name = filterName;
-                            filterInput.value = filterValue;
-                            form.appendChild(filterInput);
-                        }
-                    });
-
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            }
-
-            // Hàm từ chối yêu cầu xuất kho
-            function rejectExportRequest(requestId) {
-                currentRejectId = requestId;
-                // Reset textarea và character count
-                document.getElementById('rejectReason').value = '';
-                document.getElementById('charCount').textContent = '0';
-                document.getElementById('rejectModal').style.display = 'block';
-                
-                // Focus vào textarea
-                setTimeout(() => {
-                    document.getElementById('rejectReason').focus();
-                }, 100);
-            }
-
-            // Đóng modal từ chối
-            function closeRejectModal() {
-                document.getElementById('rejectModal').style.display = 'none';
-                currentRejectId = null;
-                document.getElementById('rejectReason').value = '';
-                document.getElementById('charCount').textContent = '0';
-            }
-
-            // Xác nhận từ chối
-            function confirmReject() {
-                const rejectReason = document.getElementById('rejectReason').value.trim();
-                
-                // Kiểm tra lý do từ chối không được để trống
-                if (!rejectReason) {
-                    alert('Vui lòng nhập lý do từ chối!');
-                    document.getElementById('rejectReason').focus();
-                    return;
-                }
-                
-                if (rejectReason.length < 10) {
-                    alert('Lý do từ chối phải có ít nhất 10 ký tự!');
-                    document.getElementById('rejectReason').focus();
-                    return;
-                }
-                
-                if (currentRejectId) {
-                    // Tạo form để submit
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = 'approveexportrequest';
-
-                    // Thêm action
-                    const actionInput = document.createElement('input');
-                    actionInput.type = 'hidden';
-                    actionInput.name = 'action';
-                    actionInput.value = 'reject';
-                    form.appendChild(actionInput);
-
-                    // Thêm requestId
-                    const idInput = document.createElement('input');
-                    idInput.type = 'hidden';
-                    idInput.name = 'requestId';
-                    idInput.value = currentRejectId;
-                    form.appendChild(idInput);
-                    
-                    // Thêm lý do từ chối
-                    const reasonInput = document.createElement('input');
-                    reasonInput.type = 'hidden';
-                    reasonInput.name = 'rejectReason2';
-                    reasonInput.value = rejectReason;
-                    form.appendChild(reasonInput);
-
-                    // Thêm các filter parameters để giữ nguyên trang hiện tại
-                    const currentFilters = ['startDate', 'endDate', 'statusFilter', 'requestIdFilter', 'index'];
-                    currentFilters.forEach(filterName => {
-                        const filterValue = document.querySelector(`[name="${filterName}"]`)?.value ||
-                                new URLSearchParams(window.location.search).get(filterName);
-                        if (filterValue) {
-                            const filterInput = document.createElement('input');
-                            filterInput.type = 'hidden';
-                            filterInput.name = filterName;
-                            filterInput.value = filterValue;
-                            form.appendChild(filterInput);
-                        }
-                    });
-
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-                closeRejectModal();
-            }
-
-            // Character counter cho textarea
-            document.addEventListener('DOMContentLoaded', function() {
-                const rejectReason = document.getElementById('rejectReason');
-                const charCount = document.getElementById('charCount');
-                
-                if (rejectReason && charCount) {
-                    rejectReason.addEventListener('input', function() {
-                        const currentLength = this.value.length;
-                        charCount.textContent = currentLength;
-                        
-                        // Đổi màu khi gần đạt giới hạn
-                        if (currentLength > 450) {
-                            charCount.style.color = '#dc3545';
-                        } else if (currentLength > 400) {
-                            charCount.style.color = '#ffc107';
-                        } else {
-                            charCount.style.color = '#666';
-                        }
-                    });
-                }
-            });
-
-            // Đóng modal khi click bên ngoài
-            window.onclick = function (event) {
-                const modal = document.getElementById('rejectModal');
-                if (event.target == modal) {
-                    closeRejectModal();
-                }
-            }
-
-            // Đóng modal khi nhấn ESC
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape') {
-                    closeRejectModal();
-                }
-            });
-
-            // Hàm xóa bộ lọc
-            function clearFilters() {
-                document.getElementById('startDate').value = '';
-                document.getElementById('endDate').value = '';
-                document.getElementById('statusFilter').value = '';
-                document.getElementById('requestIdFilter').value = '';
-                window.location.href = 'approveexportrequest';
-            }
-
-            // Validation form
-            document.getElementById('filterForm').addEventListener('submit', function (e) {
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-
-                if (startDate && endDate && startDate > endDate) {
-                    e.preventDefault();
-                    alert('Ngày bắt đầu không thể lớn hơn ngày kết thúc!');
-                    return false;
-                }
-            });
-        </script>
-    </body>
+              if (startDate && endDate && startDate > endDate) {
+                  e.preventDefault();
+                  alert('Ngày bắt đầu không thể lớn hơn ngày kết thúc!');
+                  return false;
+              }
+          });
+      </script>
+  </body>
 </html>

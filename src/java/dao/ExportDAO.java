@@ -347,11 +347,11 @@ public class ExportDAO {
     }
 
     /**
-     * Kiểm tra tồn kho trong transaction từ bảng product_in_stock
+     * Kiểm tra tồn kho trong transaction từ bảng product_in_stock - Đã loại bỏ điều kiện status
      */
     private boolean checkInventoryAvailabilityInTransaction(Connection connection, String productCode, double requestedQuantity) {
         String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
-        String checkStockSql = "SELECT SUM(qty) as total_stock FROM product_in_stock WHERE product_id = ? AND status = 'active'";
+        String checkStockSql = "SELECT SUM(qty) as total_stock FROM product_in_stock WHERE product_id = ?";
 
         try (PreparedStatement getIdPs = connection.prepareStatement(getProductIdSql)) {
             getIdPs.setString(1, productCode);
@@ -384,14 +384,14 @@ public class ExportDAO {
     }
 
     /**
-     * Cập nhật tồn kho sau khi xuất từ bảng product_in_stock
+     * Cập nhật tồn kho sau khi xuất từ bảng product_in_stock - Đã loại bỏ điều kiện status
      */
     private boolean updateInventoryAfterExport(Connection connection, String productCode, double exportedQuantity) {
         String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
         String getStockRecordsSql = """
         SELECT id, qty 
         FROM product_in_stock 
-        WHERE product_id = ? AND status = 'active' AND qty > 0 
+        WHERE product_id = ? AND qty > 0 
         ORDER BY id ASC
         """;
         String updateStockSql = "UPDATE product_in_stock SET qty = ? WHERE id = ?";
@@ -518,11 +518,11 @@ public class ExportDAO {
     }
 
     /**
-     * Kiểm tra tồn kho trước khi xuất từ bảng product_in_stock
+     * Kiểm tra tồn kho trước khi xuất từ bảng product_in_stock - Đã loại bỏ điều kiện status
      */
     public boolean checkInventoryAvailability(String productCode, double requestedQuantity) {
         String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
-        String checkStockSql = "SELECT SUM(qty) as total_stock FROM product_in_stock WHERE product_id = ? AND status = 'active'";
+        String checkStockSql = "SELECT SUM(qty) as total_stock FROM product_in_stock WHERE product_id = ?";
 
         try {
             conn = Context.getJDBCConnection();
@@ -558,11 +558,11 @@ public class ExportDAO {
     }
 
     /**
-     * Lấy thông tin tồn kho hiện tại của sản phẩm từ bảng product_in_stock
+     * Lấy thông tin tồn kho hiện tại của sản phẩm từ bảng product_in_stock - Đã loại bỏ điều kiện status
      */
     public double getCurrentStock(String productCode) {
         String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
-        String getStockSql = "SELECT SUM(qty) as total_stock FROM product_in_stock WHERE product_id = ? AND status = 'active'";
+        String getStockSql = "SELECT SUM(qty) as total_stock FROM product_in_stock WHERE product_id = ?";
 
         try {
             conn = Context.getJDBCConnection();
@@ -597,12 +597,12 @@ public class ExportDAO {
     }
 
     /**
-     * Thêm method để lấy chi tiết tồn kho theo từng record
+     * Thêm method để lấy chi tiết tồn kho theo từng record - Đã loại bỏ điều kiện status
      */
     public void getStockDetails(String productCode) {
         String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
         String getDetailsSql = """
-        SELECT id, qty, status 
+        SELECT id, qty 
         FROM product_in_stock 
         WHERE product_id = ? 
         ORDER BY id ASC
@@ -631,17 +631,14 @@ public class ExportDAO {
                 while (rs.next()) {
                     int stockId = rs.getInt("id");
                     double qty = rs.getDouble("qty");
-                    String status = rs.getString("status");
 
-                    System.out.println("   Record ID: " + stockId + ", Qty: " + qty + ", Status: " + status);
+                    System.out.println("   Record ID: " + stockId + ", Qty: " + qty);
 
-                    if ("active".equals(status)) {
-                        totalStock += qty;
-                    }
+                    totalStock += qty;
                     recordCount++;
                 }
 
-                System.out.println("   Total active stock: " + totalStock + " (from " + recordCount + " records)");
+                System.out.println("   Total stock: " + totalStock + " (from " + recordCount + " records)");
             }
         } catch (SQLException e) {
             System.err.println("💥 Error getting stock details: " + e.getMessage());

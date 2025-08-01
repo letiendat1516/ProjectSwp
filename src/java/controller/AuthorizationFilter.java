@@ -99,8 +99,10 @@ public class AuthorizationFilter implements Filter {
         urlPermissionMap.put("/exportRequest", "EXPORT_CREATE");
         
         // QUOTE
-        urlPermissionMap.put("/ListPurchaseOrder.jsp", "QUOTE_CREATE");
-        urlPermissionMap.put("/listpurchaseorder", "QUOTE_CREATE");
+        urlPermissionMap.put("/ListPurchaseOrder.jsp", "QUOTE_VIEW");
+        urlPermissionMap.put("/listpurchaseorder", "QUOTE_VIEW");
+        urlPermissionMap.put("/PurchaseOrderForm.jsp", "QUOTE_CREATE");
+        urlPermissionMap.put("/purchaseorderform", "QUOTE_CREATE");
 
 
         //APPROVE REQUEST

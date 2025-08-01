@@ -16,35 +16,6 @@ import model.Users;
 
 public class UserDAO extends Context {
 
-    public List<Users> getAllUsers() {
-        List<Users> list = new ArrayList<>();
-        String sql = "SELECT u.*, r.role_name "
-                + "FROM users u "
-                + "LEFT JOIN user_role ur ON u.id = ur.user_id "
-                + "LEFT JOIN role r ON ur.role_id = r.id "
-                + "WHERE r.role_name != 'Admin'";
-
-        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                Users user = new Users();
-                user.setId(rs.getInt("id"));
-                user.setUsername(rs.getString("username"));
-                user.setDob(rs.getDate("dob"));
-                user.setPhone(rs.getString("phone"));
-                user.setFullname(rs.getString("fullname"));
-                user.setEmail(rs.getString("email"));
-                user.setActiveFlag(rs.getInt("active_flag"));
-                user.setCreateDate(rs.getTimestamp("create_date"));
-                user.setRoleName(rs.getString("role_name"));
-                list.add(user);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
     public List<Users> getAllUsersExcludeAdmin() {
         List<Users> list = new ArrayList<>();
         String sql = "SELECT u.*, r.role_name "
@@ -143,52 +114,20 @@ public class UserDAO extends Context {
         }
         return codes;
     }
-    
-    // Gán tất cả quyền cho role
-public void assignAllPermissionsToRole(int roleId) {
-    List<Integer> allPermissionIds = getAllPermissionIds();
-    String sql = "INSERT IGNORE INTO role_permission (role_id, permission_id) VALUES (?, ?)";
-    try (Connection conn = getJDBCConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        for (Integer permissionId : allPermissionIds) {
-            ps.setInt(1, roleId);
-            ps.setInt(2, permissionId);
-            ps.addBatch();
-        }
-        ps.executeBatch();
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-}
-
-// Xóa tất cả quyền của role
-public void deleteAllPermissionsOfRole(int roleId) {
-    String sql = "DELETE FROM role_permission WHERE role_id = ?";
-    try (Connection conn = getJDBCConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, roleId);
-        ps.executeUpdate();
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-}
 
 // Lấy toàn bộ permissionId
-public List<Integer> getAllPermissionIds() {
-    List<Integer> ids = new ArrayList<>();
-    String sql = "SELECT id FROM permission";
-    try (Connection conn = getJDBCConnection();
-         PreparedStatement ps = conn.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-        while (rs.next()) {
-            ids.add(rs.getInt("id"));
+    public List<Integer> getAllPermissionIds() {
+        List<Integer> ids = new ArrayList<>();
+        String sql = "SELECT id FROM permission";
+        try (Connection conn = getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                ids.add(rs.getInt("id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return ids;
     }
-    return ids;
-}
-
 
     public void addPermissionsToRole(int roleId, List<Integer> permissionIds) {
         if (permissionIds == null || permissionIds.isEmpty()) {
@@ -207,33 +146,32 @@ public List<Integer> getAllPermissionIds() {
         }
     }
 
-    /**
-     * Xóa toàn bộ phân quyền của một vai trò
-     *
-     * @param roleId ID của vai trò cần xóa phân quyền
-     */
-
-public boolean deleteAllRolePermissions() {
-    String sql = "DELETE FROM role_permission";
-    try (Connection conn = getJDBCConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        int rowsAffected = ps.executeUpdate();
-        System.out.println("Deleted " + rowsAffected + " permissions for all roles");
-        return rowsAffected >= 0;
-    } catch (SQLException e) {
-        System.err.println("Error deleting all role permissions: " + e.getMessage());
-        e.printStackTrace();
-        return false;
+    // Xóa toàn bộ phân quyền
+    public boolean deleteAllRolePermissions() {
+        String sql = "DELETE FROM role_permission";
+        try (Connection conn = getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("Deleted " + rowsAffected + " permissions for all roles");
+            return rowsAffected >= 0;
+        } catch (SQLException e) {
+            System.err.println("Error deleting all role permissions: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 
+    // xóa toàn bộ trừ admin
+    public void deleteAllPermissionsOfRole(int roleId) {
+        String sql = "DELETE FROM role_permission WHERE role_id = ?";
+        try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-    /**
-     * Xóa các quyền cụ thể của một vai trò
-     *
-     * @param roleId ID của vai trò
-     * @param permissionIds Danh sách ID các quyền cần xóa
-     */
+    //Xóa các quyền cụ thể của một vai trò
     public void deletePermissionsOfRoleForPermissions(int roleId, List<Integer> permissionIds) {
         if (permissionIds == null || permissionIds.isEmpty()) {
             return;
@@ -261,24 +199,19 @@ public boolean deleteAllRolePermissions() {
         Connection connection = Context.getJDBCConnection();
         connection.setAutoCommit(false);
         try {
-            String sqlUser = "INSERT INTO users(username, password, email, fullname, phone, dob, active_flag, department_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sqlUser = "INSERT INTO users(username, password, email, fullname, phone, active_flag, department_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement stmtUser = connection.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS)) {
                 stmtUser.setString(1, user.getUsername());
                 stmtUser.setString(2, user.getPassword());
                 stmtUser.setString(3, user.getEmail());
                 stmtUser.setString(4, user.getFullname());
                 stmtUser.setString(5, user.getPhone());
-                if (user.getDob() != null) {
-                    stmtUser.setDate(6, new java.sql.Date(user.getDob().getTime()));
-                } else {
-                    stmtUser.setNull(6, java.sql.Types.DATE);
-                }
-                stmtUser.setInt(7, user.getActiveFlag());
+                stmtUser.setInt(6, user.getActiveFlag());
                 // Bổ sung departmentId
                 if (user.getDepartmentId() != null) {
-                    stmtUser.setInt(8, user.getDepartmentId());
+                    stmtUser.setInt(7, user.getDepartmentId());
                 } else {
-                    stmtUser.setNull(8, java.sql.Types.INTEGER);
+                    stmtUser.setNull(7, java.sql.Types.INTEGER);
                 }
                 stmtUser.executeUpdate();
 
@@ -306,6 +239,63 @@ public boolean deleteAllRolePermissions() {
         }
     }
 
+    /**
+     * Kiểm tra username đã tồn tại chưa
+     */
+    public boolean isUsernameExists(String username) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM users WHERE UPPER(username) = UPPER(?)";
+
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, username.trim());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Kiểm tra email đã tồn tại chưa
+     */
+    public boolean isEmailExists(String email) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM users WHERE UPPER(email) = UPPER(?)";
+
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, email.trim());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Kiểm tra số điện thoại đã tồn tại chưa
+     */
+    public boolean isPhoneExists(String phone) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM users WHERE phone = ?";
+
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, phone.trim());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
     public Users getUserById(int id) {
         String sql = "SELECT u.*, r.role_name, d.dept_name "
                 + "FROM users u "
@@ -321,7 +311,6 @@ public boolean deleteAllRolePermissions() {
                     user.setId(rs.getInt("id"));
                     user.setUsername(rs.getString("username"));
                     user.setPassword(rs.getString("password"));
-                    user.setDob(rs.getDate("dob"));
                     user.setPhone(rs.getString("phone"));
                     user.setFullname(rs.getString("fullname"));
                     user.setEmail(rs.getString("email"));
@@ -343,25 +332,19 @@ public boolean deleteAllRolePermissions() {
         Connection connection = Context.getJDBCConnection();
         connection.setAutoCommit(false);
         try {
-            String sqlUser = "UPDATE users SET username=?, fullname=?, email=?, phone=?, dob=?, active_flag=?, department_id=?, password=? WHERE id=?";
+            String sqlUser = "UPDATE users SET username=?, fullname=?, email=?, phone=?, active_flag=?, department_id=? WHERE id=?";
             try (PreparedStatement stmtUser = connection.prepareStatement(sqlUser)) {
                 stmtUser.setString(1, user.getUsername());
                 stmtUser.setString(2, user.getFullname());
                 stmtUser.setString(3, user.getEmail());
                 stmtUser.setString(4, user.getPhone());
-                if (user.getDob() != null) {
-                    stmtUser.setDate(5, new java.sql.Date(user.getDob().getTime()));
-                } else {
-                    stmtUser.setNull(5, java.sql.Types.DATE);
-                }
-                stmtUser.setInt(6, user.getActiveFlag());
+                stmtUser.setInt(5, user.getActiveFlag());
                 if (user.getDepartmentId() != null) {
-                    stmtUser.setInt(7, user.getDepartmentId());
+                    stmtUser.setInt(6, user.getDepartmentId());
                 } else {
-                    stmtUser.setNull(7, java.sql.Types.INTEGER);
+                    stmtUser.setNull(6, java.sql.Types.INTEGER);
                 }
-                stmtUser.setString(8, user.getPassword()); // Luôn truyền mật khẩu (cũ hoặc mới)
-                stmtUser.setInt(9, user.getId());
+                stmtUser.setInt(7, user.getId());
                 stmtUser.executeUpdate();
             }
 
@@ -387,138 +370,73 @@ public boolean deleteAllRolePermissions() {
         }
     }
 
+    // Kiểm tra username trùng (trừ chính user đang edit)
+    public boolean isUsernameExistsForEdit(String username, int excludeUserId) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE username = ? AND id != ?";
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+            stmt.setInt(2, excludeUserId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+// Kiểm tra email trùng (trừ chính user đang edit)
+    public boolean isEmailExistsForEdit(String email, int excludeUserId) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE email = ? AND id != ?";
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+            stmt.setInt(2, excludeUserId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+//  Kiểm tra phone trùng (trừ chính user đang edit)
+    public boolean isPhoneExistsForEdit(String phone, int excludeUserId) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE phone = ? AND id != ?";
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, phone);
+            stmt.setInt(2, excludeUserId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public void updateProfile(Users user) throws SQLException {
-        String sql = "UPDATE users SET fullname=?, email=?, phone=?, dob=? WHERE id=?";
+        String sql = "UPDATE users SET fullname=?, email=?, phone=? WHERE id=?";
         try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, user.getFullname());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPhone());
-            if (user.getDob() != null) {
-                stmt.setDate(4, new java.sql.Date(user.getDob().getTime()));
-            } else {
-                stmt.setNull(4, java.sql.Types.DATE);
-            }
-            stmt.setInt(5, user.getId());
+
+            stmt.setInt(4, user.getId());
             stmt.executeUpdate();
         }
-    }
-
-    public List<Users> filterUsers(Integer roleId, String status, String keyword, Integer departmentId, boolean includeAdmin) {
-        List<Users> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder(
-                "SELECT u.*, r.role_name, d.dept_name "
-                + "FROM users u "
-                + "LEFT JOIN user_role ur ON u.id = ur.user_id "
-                + "LEFT JOIN role r ON ur.role_id = r.id "
-                + "LEFT JOIN department d ON u.department_id = d.id "
-                + "WHERE 1=1 ");
-
-        if (!includeAdmin) {
-            sql.append(" AND r.role_name != 'Admin' ");
-        }
-
-        if (roleId != null) {
-            sql.append(" AND r.id = ? ");
-        }
-
-        if (status != null && !status.isEmpty()) {
-            if ("active".equalsIgnoreCase(status)) {
-                sql.append(" AND u.active_flag = 1 ");
-            } else if ("inactive".equalsIgnoreCase(status)) {
-                sql.append(" AND u.active_flag = 0 ");
-            }
-        }
-
-        if (departmentId != null) {
-            sql.append(" AND u.department_id = ? ");
-        }
-
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (u.username LIKE ? OR u.fullname LIKE ? OR u.email LIKE ? OR d.dept_name LIKE ? OR d.dept_code LIKE ?) ");
-        }
-
-        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
-            int paramIndex = 1;
-
-            if (roleId != null) {
-                stmt.setInt(paramIndex++, roleId);
-            }
-            if (departmentId != null) {
-                stmt.setInt(paramIndex++, departmentId);
-            }
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                String kw = "%" + keyword.trim() + "%";
-                for (int i = 0; i < 5; i++) {
-                    stmt.setString(paramIndex++, kw);
-                }
-            }
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Users user = new Users();
-                    user.setId(rs.getInt("id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setFullname(rs.getString("fullname"));
-                    user.setEmail(rs.getString("email"));
-                    user.setPhone(rs.getString("phone"));
-                    user.setDob(rs.getDate("dob"));
-                    user.setActiveFlag(rs.getInt("active_flag"));
-                    user.setCreateDate(rs.getTimestamp("create_date"));
-
-                    String roleName = rs.getString("role_name");
-                    if (roleName == null) {
-                        roleName = "No Role";
-                    }
-                    user.setRoleName(roleName);
-
-                    String deptName = rs.getString("dept_name");
-                    user.setDeptName(deptName);
-
-                    list.add(user);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-
-    public List<Users> getUsersByPage(int pageIndex, int pageSize) {
-        List<Users> list = new ArrayList<>();
-        String sql = "SELECT u.*, r.role_name "
-                + "FROM users u "
-                + "LEFT JOIN user_role ur ON u.id = ur.user_id "
-                + "LEFT JOIN role r ON ur.role_id = r.id "
-                + "WHERE r.role_name != 'Admin'"
-                + "ORDER BY u.id "
-                + "LIMIT ? OFFSET ?";
-
-        int offset = (pageIndex - 1) * pageSize;
-
-        try (
-                Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, pageSize);
-            stmt.setInt(2, offset);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Users user = new Users();
-                    user.setId(rs.getInt("id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setFullname(rs.getString("fullname"));
-                    user.setEmail(rs.getString("email"));
-                    user.setPhone(rs.getString("phone"));
-                    user.setDob(rs.getDate("dob"));
-                    user.setActiveFlag(rs.getInt("active_flag"));
-                    user.setCreateDate(rs.getTimestamp("create_date"));
-                    user.setRoleName(rs.getString("role_name"));
-                    list.add(user);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
     }
 
     public int getTotalUserCount() {
@@ -531,6 +449,93 @@ public boolean deleteAllRolePermissions() {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public List<Users> filterUsers(Integer roleId, String status, String fullname,
+            Integer departmentId, boolean includeAdmin) {
+        List<Users> userList = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT DISTINCT u.id, u.username, u.fullname, u.email, u.phone, ");
+        sql.append("u.dob, u.active_flag, u.create_date, u.department_id, ");
+        sql.append("r.role_name, d.dept_name ");
+        sql.append("FROM users u ");
+        sql.append("LEFT JOIN user_role ur ON u.id = ur.user_id ");
+        sql.append("LEFT JOIN role r ON ur.role_id = r.id ");
+        sql.append("LEFT JOIN department d ON u.department_id = d.id ");
+        sql.append("WHERE 1=1 ");
+
+        // Loại bỏ Admin nếu cần
+        if (!includeAdmin) {
+            sql.append("AND (r.role_name IS NULL OR r.role_name != 'Admin') ");
+        }
+
+        // Filter theo vai trò
+        if (roleId != null) {
+            sql.append("AND r.id = ? ");
+        }
+
+        // Filter theo trạng thái
+        if (status != null && !status.trim().isEmpty()) {
+            if ("active".equalsIgnoreCase(status)) {
+                sql.append("AND u.active_flag = 1 ");
+            } else if ("inactive".equalsIgnoreCase(status)) {
+                sql.append("AND u.active_flag = 0 ");
+            }
+        }
+
+        // Filter theo phòng ban
+        if (departmentId != null) {
+            sql.append("AND u.department_id = ? ");
+        }
+
+        // Filter theo tên
+        if (fullname != null && !fullname.trim().isEmpty()) {
+            sql.append("AND u.fullname LIKE ? ");
+        }
+
+        sql.append("ORDER BY u.id DESC ");
+
+        try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+
+            int paramIndex = 1;
+
+            // Set parameters theo đúng thứ tự
+            if (roleId != null) {
+                stmt.setInt(paramIndex++, roleId);
+            }
+
+            if (departmentId != null) {
+                stmt.setInt(paramIndex++, departmentId);
+            }
+
+            if (fullname != null && !fullname.trim().isEmpty()) {
+                stmt.setString(paramIndex++, "%" + fullname.trim() + "%");
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Users user = new Users();
+                    user.setId(rs.getInt("id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setFullname(rs.getString("fullname"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setActiveFlag(rs.getInt("active_flag"));
+                    user.setCreateDate(rs.getTimestamp("create_date"));
+                    user.setDepartmentId(rs.getInt("department_id"));
+                    user.setRoleName(rs.getString("role_name"));
+                    user.setDeptName(rs.getString("dept_name"));
+                    userList.add(user);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error filtering users: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return userList;
     }
 
     public int countFilteredUsers(Integer roleId, String status, String keyword, Integer departmentId, boolean includeAdmin) {
@@ -557,11 +562,14 @@ public boolean deleteAllRolePermissions() {
         if (departmentId != null) {
             sql.append(" AND u.department_id = ? ");
         }
+
+        //TÌM THEO TÊN
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (u.username LIKE ? OR u.fullname LIKE ? OR u.email LIKE ? OR d.dept_name LIKE ? OR d.dept_code LIKE ?) ");
+            sql.append(" AND u.fullname LIKE ? ");
         }
 
         try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+
             int paramIndex = 1;
             if (roleId != null) {
                 stmt.setInt(paramIndex++, roleId);
@@ -569,12 +577,12 @@ public boolean deleteAllRolePermissions() {
             if (departmentId != null) {
                 stmt.setInt(paramIndex++, departmentId);
             }
+
+            //CHỈ 1 PARAMETER
             if (keyword != null && !keyword.trim().isEmpty()) {
-                String kw = "%" + keyword.trim() + "%";
-                for (int i = 0; i < 5; i++) {
-                    stmt.setString(paramIndex++, kw);
-                }
+                stmt.setString(paramIndex++, "%" + keyword.trim() + "%");
             }
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -612,8 +620,10 @@ public boolean deleteAllRolePermissions() {
         if (departmentId != null) {
             sql.append(" AND u.department_id = ? ");
         }
+
+        //TÌM THEO TÊN
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (u.username LIKE ? OR u.fullname LIKE ? OR u.email LIKE ? OR d.dept_name LIKE ? OR d.dept_code LIKE ?) ");
+            sql.append(" AND u.fullname LIKE ? ");
         }
 
         sql.append(" ORDER BY u.id ");
@@ -622,6 +632,7 @@ public boolean deleteAllRolePermissions() {
         int offset = (pageIndex - 1) * pageSize;
 
         try (Connection connection = Context.getJDBCConnection(); PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+
             int paramIndex = 1;
             if (roleId != null) {
                 stmt.setInt(paramIndex++, roleId);
@@ -629,12 +640,11 @@ public boolean deleteAllRolePermissions() {
             if (departmentId != null) {
                 stmt.setInt(paramIndex++, departmentId);
             }
+
             if (keyword != null && !keyword.trim().isEmpty()) {
-                String kw = "%" + keyword.trim() + "%";
-                for (int i = 0; i < 5; i++) {
-                    stmt.setString(paramIndex++, kw);
-                }
+                stmt.setString(paramIndex++, "%" + keyword.trim() + "%");
             }
+
             stmt.setInt(paramIndex++, pageSize);
             stmt.setInt(paramIndex++, offset);
 
@@ -646,7 +656,6 @@ public boolean deleteAllRolePermissions() {
                     user.setFullname(rs.getString("fullname"));
                     user.setEmail(rs.getString("email"));
                     user.setPhone(rs.getString("phone"));
-                    user.setDob(rs.getDate("dob"));
                     user.setActiveFlag(rs.getInt("active_flag"));
                     user.setCreateDate(rs.getTimestamp("create_date"));
                     user.setRoleName(rs.getString("role_name"));
@@ -716,97 +725,83 @@ public boolean deleteAllRolePermissions() {
     }
 
     public List<ForgotPasswordRequest> getAllRequests() {
-        List<ForgotPasswordRequest> requests = new ArrayList<>();
-        String sql = "SELECT prr.id, u.username, u.email, prr.request_time, prr.note, prr.response_time, prr.status "
-                + "FROM password_reset_requests prr "
-                + "LEFT JOIN users u ON prr.user_id = u.id "
-                //+ "WHERE prr.status = 'pending' "
-                + "ORDER BY prr.request_time DESC";
-        try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
+    List<ForgotPasswordRequest> requests = new ArrayList<>();
+    String sql = "SELECT prr.id, u.username, u.email, prr.request_time, prr.note, prr.response_time, prr.status "
+               + "FROM password_reset_requests prr "
+               + "LEFT JOIN users u ON prr.user_id = u.id "
+               + "WHERE prr.status = 'pending' "
+               + "ORDER BY prr.request_time DESC";
+    try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            ForgotPasswordRequest req = new ForgotPasswordRequest();
+            req.setId(rs.getInt("id"));
+            req.setUsername(rs.getString("username"));
+            req.setEmail(rs.getString("email"));
+            req.setRequestTime(rs.getTimestamp("request_time"));
+            req.setNote(rs.getString("note"));
+            req.setResponseTime(rs.getTimestamp("response_time"));
+            req.setStatus(rs.getString("status"));
+            requests.add(req);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return requests;
+}
+    public ForgotPasswordRequest getLatestRequestByUserId(int userId) {
+    String sql = "SELECT prr.*, u.username, u.email " +
+                 "FROM password_reset_requests prr " +
+                 "LEFT JOIN users u ON prr.user_id = u.id " +
+                 "WHERE prr.user_id = ? " +
+                 "ORDER BY prr.request_time DESC LIMIT 1";
+    try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, userId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
                 ForgotPasswordRequest req = new ForgotPasswordRequest();
                 req.setId(rs.getInt("id"));
+                req.setUserId(rs.getInt("user_id"));
                 req.setUsername(rs.getString("username"));
                 req.setEmail(rs.getString("email"));
                 req.setRequestTime(rs.getTimestamp("request_time"));
                 req.setNote(rs.getString("note"));
                 req.setResponseTime(rs.getTimestamp("response_time"));
                 req.setStatus(rs.getString("status"));
-                requests.add(req);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return requests;
-    }
-
-    public boolean approveAndUpdate(
-            int reqId, int userId, String newPassword, int adminId) {
-        Connection conn = null;
-        PreparedStatement psUpdateUser = null;
-        PreparedStatement psUpdateRequest = null;
-        try {
-            conn = Context.getJDBCConnection();
-            conn.setAutoCommit(false); // Đảm bảo atomicity
-
-            // 1. Cập nhật mật khẩu mới cho user
-            String sql1 = "UPDATE users SET password=? WHERE id=?";
-            psUpdateUser = conn.prepareStatement(sql1);
-            psUpdateUser.setString(1, newPassword);
-            psUpdateUser.setInt(2, userId);
-            int updatedRows = psUpdateUser.executeUpdate();
-
-            if (updatedRows == 0) {
-                conn.rollback();
-                return false;
-            }
-
-            // 2. Duyệt (approve) đơn yêu cầu đổi mật khẩu
-            String sql2 = "UPDATE password_reset_requests SET status='approved', admin_id=?, response_time=NOW() WHERE id=?";
-            psUpdateRequest = conn.prepareStatement(sql2);
-            psUpdateRequest.setInt(1, adminId);
-            psUpdateRequest.setInt(2, reqId);
-            int updatedReq = psUpdateRequest.executeUpdate();
-
-            if (updatedReq == 0) {
-                conn.rollback();
-                return false;
-            }
-
-            conn.commit();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (Exception ex) {
-            }
-        } finally {
-            try {
-                if (psUpdateUser != null) {
-                    psUpdateUser.close();
-                }
-            } catch (Exception e) {
-            }
-            try {
-                if (psUpdateRequest != null) {
-                    psUpdateRequest.close();
-                }
-            } catch (Exception e) {
-            }
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (Exception e) {
+                return req;
             }
         }
-        return false;
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+    return null;
+}
 
-    // Từ chối (reject) yêu cầu
+
+    public boolean updateUserPassword(int userId, String hashedPassword) {
+    String sql = "UPDATE users SET password = ? WHERE id = ?";
+    try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, hashedPassword);
+        ps.setInt(2, userId);
+        return ps.executeUpdate() > 0;
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
+    public boolean markRequestUsed(int reqId) {
+    String sql = "UPDATE password_reset_requests SET status = 'used', response_time = NOW() WHERE id = ?";
+    try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, reqId);
+        return ps.executeUpdate() > 0;
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
+
+    // Từ chối yêu cầu
     public boolean updateRequestStatus(int reqId, int adminId, String status) {
         String sql = "UPDATE password_reset_requests SET status=?, admin_id=?, response_time=NOW() WHERE id=?";
         try (Connection conn = Context.getJDBCConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -906,5 +901,11 @@ public boolean deleteAllRolePermissions() {
         }
 
         return dob;
+    }
+    
+    public static void main(String[] args) {
+        UserDAO ud = new UserDAO();
+        Users u = ud.findByUsername("admin");
+        System.out.println(u.getPassword());
     }
 }

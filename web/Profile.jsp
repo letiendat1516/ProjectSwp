@@ -180,6 +180,7 @@
                     <div class="btn-row">
                         <a href="editprofile" class="edit-link">cập nhật thông tin</a>
                         <a href="forgot.jsp" class="pw-link">Yêu cầu đổi mật khẩu</a>
+                        <a href="change-password" class="pw-link">Đổi mật khẩu</a>
                     </div>
                 </div>
             </div>

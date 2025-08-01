@@ -12,6 +12,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import model.ForgotPasswordRequest;
 import model.Users;
 import org.mindrot.jbcrypt.BCrypt;
@@ -20,83 +21,74 @@ import org.mindrot.jbcrypt.BCrypt;
  *
  * @author phucn
  */
-public class ResetUserPasswordServlet extends HttpServlet {
-
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ResetUserPasswordServlet</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ResetUserPasswordServlet at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    } 
-
+//@WebServlet("/change-password")
+public class ChangePasswordServlet extends HttpServlet {
     private UserDAO userDao = new UserDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String reqIdStr = request.getParameter("reqId");
-        ForgotPasswordRequest req = null;
-        Users targetUser = null;
-        if (reqIdStr != null) {
-            try {
-                int reqId = Integer.parseInt(reqIdStr);
-                req = userDao.getPasswordResetRequestById(reqId);
-                if (req != null) {
-                    targetUser = userDao.getUserById(req.getUserId());
-                }
-            } catch (Exception e) {
-                request.setAttribute("msg", "Không tìm thấy yêu cầu đổi mật khẩu!");
-            }
+        HttpSession session = request.getSession(false);
+        Users currentUser = (Users) (session != null ? session.getAttribute("user") : null);
+
+        if (currentUser == null) {
+            response.sendRedirect("login.jsp");
+            return;
         }
+
+        ForgotPasswordRequest req = userDao.getLatestRequestByUserId(currentUser.getId());
+
         request.setAttribute("resetRequest", req);
-        request.setAttribute("targetUser", targetUser);
-        request.getRequestDispatcher("reset_user_password.jsp").forward(request, response);
+        request.setAttribute("targetUser", currentUser);
+        request.getRequestDispatcher("change_password.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String reqIdStr = request.getParameter("reqId");
-        String userIdStr = request.getParameter("userId");
+        HttpSession session = request.getSession(false);
+        Users currentUser = (Users) (session != null ? session.getAttribute("user") : null);
+
         String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
         String msg = null;
 
-        if (newPassword == null || !newPassword.equals(confirmPassword)) {
-            msg = "Mật khẩu xác nhận không khớp!";
-        } else if (newPassword.length() < 6) {
-            msg = "Mật khẩu phải từ 6 ký tự trở lên!";
-        } else {
-            try {
-                int userId = Integer.parseInt(userIdStr);
-                int reqId = Integer.parseInt(reqIdStr);
-                // Hash password trước khi lưu
-                String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt(12));
-                Users admin = (Users) request.getSession().getAttribute("user");
-                boolean updated = userDao.approveAndUpdate(reqId, userId, hashedPassword, admin.getId());
-                if (updated) {
-                    msg = "Cập nhật mật khẩu thành công và đã duyệt yêu cầu!";
-                    response.sendRedirect("passwordrequest?msg=" + java.net.URLEncoder.encode(msg, "UTF-8"));
-                    return;
-                } else {
-                    msg = "Không thể cập nhật mật khẩu!";
-                }
-            } catch (Exception e) {
-                msg = "Có lỗi xảy ra: " + e.getMessage();
-            }
+        ForgotPasswordRequest req = null;
+
+        if (currentUser == null) {
+            response.sendRedirect("login.jsp");
+            return;
         }
 
-        doGet(request, response);
+        try {
+            req = userDao.getLatestRequestByUserId(currentUser.getId());
+
+            if (req == null || !"approved".equalsIgnoreCase(req.getStatus())) {
+                msg = "Bạn không có yêu cầu đổi mật khẩu hợp lệ!";
+            } else if (newPassword == null || !newPassword.equals(confirmPassword)) {
+                msg = "Mật khẩu xác nhận không khớp!";
+            } else if (newPassword.length() < 6) {
+                msg = "Mật khẩu phải từ 6 ký tự trở lên!";
+            } else {
+                String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt(12));
+                boolean updated = userDao.updateUserPassword(currentUser.getId(), hashedPassword);
+                boolean marked = userDao.markRequestUsed(req.getId());
+
+                if (updated && marked) {
+                    msg = "Đổi mật khẩu thành công!";
+                    request.setAttribute("success", true);
+                } else {
+                    msg = "Không thể cập nhật mật khẩu.";
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            msg = "Đã xảy ra lỗi: " + e.getMessage();
+        }
+
         request.setAttribute("msg", msg);
+        request.setAttribute("resetRequest", req);
+        request.setAttribute("targetUser", currentUser);
+        request.getRequestDispatcher("change_password.jsp").forward(request, response);
     }
 }

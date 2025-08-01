@@ -29,7 +29,6 @@
             .pw-layout-container {
                 display: flex;
                 min-height: 100vh;
-                margin-left: 5cm;
             }
             .pw-sidebar {
                 position: fixed;
@@ -157,21 +156,21 @@
                 background: #fff8e1;
                 padding: 3px 9px;
                 border-radius: 5px;
-                font-weight: bold;
+                font-weight: 300;
             }
             .pw-status-approved {
                 color: #27ae60;
                 background: #e9f7ef;
                 padding: 3px 9px;
                 border-radius: 5px;
-                font-weight: bold;
+                font-weight: 300;
             }
             .pw-status-rejected {
                 color: #c0392b;
                 background: #fdecea;
                 padding: 3px 9px;
                 border-radius: 5px;
-                font-weight: bold;
+                font-weight: 300;
             }
             .pw-btn-approve, .pw-btn-reject {
                 border: none;
@@ -231,44 +230,45 @@
                     font-size: 1.15rem;
                 }
             }
-            
-            .pw-table th:nth-child(7),
-.pw-table td:nth-child(7) {
-    min-width: 110px;
-    text-align: center;
-}
-.pw-status-pending,
-.pw-status-approved,
-.pw-status-rejected {
-    white-space: nowrap;
-    padding: 3px 8px !important;
-    font-size: 13px;
-    min-width: 80px;
-    display: inline-block;
-    text-align: center;
-}
 
-/* Nút hành động mỏng và sát nhau hơn */
-.pw-table td.action-buttons {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-.pw-btn-approve, .pw-btn-reject {
-    padding: 4px 10px;
-    font-size: 13px;
-    border-radius: 3px;
-}
+            /* Trạng thái không xuống dòng */
+            .pw-table th:nth-child(7),
+            .pw-table td:nth-child(7) {
+                min-width: 110px;
+                text-align: center;
+            }
+            .pw-status-pending,
+            .pw-status-approved,
+            .pw-status-rejected {
+                white-space: nowrap;
+                padding: 3px 8px !important;
+                font-size: 13px;
+                min-width: 80px;
+                display: inline-block;
+                text-align: center;
+            }
+
+            /* Nút hành động mỏng và sát nhau hơn */
+            .pw-table td.action-buttons {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+            .pw-btn-approve, .pw-btn-reject {
+                padding: 4px 10px;
+                font-size: 13px;
+                border-radius: 3px;
+            }
+
+
         </style>
     </head>
     <body>
         <div class="pw-layout-container">
             <!-- Sidebar -->
             <div class="pw-sidebar">
-                <h2>Warehouse Management</h2>
+                <h2>Warehouse Manager</h2>
                 <a href="usermanager" class="pw-nav-item">Quản lý người dùng</a>
-                <a href="${pageContext.request.contextPath}/department/list" class="pw-nav-item">Quản lý phòng ban</a>
-                <a href="${pageContext.request.contextPath}/LishSupplier" class="pw-nav-item">Quản lý nhà cung cấp</a>
                 <a href="role-permission" class="pw-nav-item">Phân quyền người dùng</a>
                 <a href="categoriesforward.jsp" class="pw-nav-item">Thông tin vật tư</a>
                 <a href="passwordrequest" class="pw-nav-item active">Reset mật khẩu</a>
@@ -342,13 +342,12 @@
                                 </td>
                                 <td class="action-buttons">
                                     <% if (req.getResponseTime() == null) { %>
-                                    <a href="reset-user-password?reqId=<%= req.getId() %>" 
-                                       class="pw-btn-approve">
-                                       Duyệt & Đổi mật khẩu
-                                    </a>
-
-
-
+                                    <form action="passwordrequest" method="post" style="display:inline-block;">
+                                        <input type="hidden" name="reqId" value="<%= req.getId() %>">
+                                        <button class="pw-btn-approve" name="action" value="approve" type="submit">
+                                            Duyệt
+                                        </button>
+                                    </form>
                                     <form action="passwordrequest" method="post" style="display:inline-block;">
                                         <input type="hidden" name="reqId" value="<%= req.getId() %>">
                                         <button class="pw-btn-reject" name="action" value="reject" type="submit"

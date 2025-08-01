@@ -112,7 +112,6 @@ public class PurchaseOrderDAO {
         }
     }
 
-    // ========== CÁC METHOD CŨ (GIỮ NGUYÊN) ==========
     /**
      * Lấy danh sách Purchase Orders với phân trang và filter
      */
@@ -190,7 +189,7 @@ public class PurchaseOrderDAO {
             params.add("%" + searchId + "%");
         }
 
-        sqlIds.append(" ORDER BY po.id");
+        sqlIds.append(" ORDER BY po.id DESC");
 
         // Thêm phân trang
         int limit = 10;
@@ -225,57 +224,106 @@ public class PurchaseOrderDAO {
     /**
      * Lấy thông tin chi tiết Purchase Orders theo danh sách IDs
      */
-    private List<PurchaseOrderInfo> getPurchaseOrdersByIds(List<String> ids) {
-        List<PurchaseOrderInfo> purchaseOrders = new ArrayList<>();
+    // Cập nhật method getPurchaseOrdersByIds
+private List<PurchaseOrderInfo> getPurchaseOrdersByIds(List<String> ids) {
+    List<PurchaseOrderInfo> purchaseOrders = new ArrayList<>();
 
-        if (ids.isEmpty()) {
-            return purchaseOrders;
-        }
-
-        String placeholders = String.join(",", ids.stream().map(id -> "?").toArray(String[]::new));
-
-        String sql = "SELECT po.id, po.fullname, po.day_purchase, po.day_quote, po.status, "
-                + "po.reason, po.supplier, po.address, po.phone, po.email, po.summary "
-                + "FROM purchase_order_info po "
-                + "WHERE po.id IN (" + placeholders + ") "
-                + "ORDER BY po.id";
-
-        System.out.println("SQL for details: " + sql);
-        System.out.println("IDs: " + ids);
-
-        try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
-            for (int i = 0; i < ids.size(); i++) {
-                ps.setString(i + 1, ids.get(i));
-            }
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    PurchaseOrderInfo po = new PurchaseOrderInfo();
-                    po.setId(rs.getString("id"));
-                    po.setFullname(rs.getString("fullname"));
-                    po.setDayPurchase(rs.getDate("day_purchase"));
-                    po.setDayQuote(rs.getDate("day_quote"));
-                    po.setStatus(rs.getString("status"));
-                    po.setReason(rs.getString("reason"));
-                    po.setSupplier(rs.getString("supplier"));
-                    po.setAddress(rs.getString("address"));
-                    po.setPhone(rs.getString("phone"));
-                    po.setEmail(rs.getString("email"));
-                    po.setSummary(rs.getString("summary"));
-
-                    purchaseOrders.add(po);
-                    System.out.println("Loaded purchase order: " + po.getId());
-                }
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error getting purchase order details: " + e.getMessage());
-            e.printStackTrace();
-        }
-
+    if (ids.isEmpty()) {
         return purchaseOrders;
     }
+
+    String placeholders = String.join(",", ids.stream().map(id -> "?").toArray(String[]::new));
+
+    // ✅ THÊM reject_reason_2 vào SELECT
+    String sql = "SELECT po.id, po.fullname, po.day_purchase, po.day_quote, po.status, "
+            + "po.reason, po.supplier, po.address, po.phone, po.email, po.summary, po.reject_reason_2 "
+            + "FROM purchase_order_info po "
+            + "WHERE po.id IN (" + placeholders + ") "
+            + "ORDER BY po.id DESC";
+
+    System.out.println("SQL for details: " + sql);
+    System.out.println("IDs: " + ids);
+
+    try (Connection con = Context.getJDBCConnection(); 
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        for (int i = 0; i < ids.size(); i++) {
+            ps.setString(i + 1, ids.get(i));
+        }
+
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                PurchaseOrderInfo po = new PurchaseOrderInfo();
+                po.setId(rs.getString("id"));
+                po.setFullname(rs.getString("fullname"));
+                po.setDayPurchase(rs.getDate("day_purchase"));
+                po.setDayQuote(rs.getDate("day_quote"));
+                po.setStatus(rs.getString("status"));
+                po.setReason(rs.getString("reason"));
+                po.setSupplier(rs.getString("supplier"));
+                po.setAddress(rs.getString("address"));
+                po.setPhone(rs.getString("phone"));
+                po.setEmail(rs.getString("email"));
+                po.setSummary(rs.getString("summary"));
+                // ✅ THÊM dòng này
+                po.setRejectReason2(rs.getString("reject_reason_2"));
+
+                purchaseOrders.add(po);
+                System.out.println("Loaded purchase order: " + po.getId());
+            }
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Error getting purchase order details: " + e.getMessage());
+        e.printStackTrace();
+    }
+
+    return purchaseOrders;
+}
+// Cập nhật method getPurchaseOrderById
+public PurchaseOrderInfo getPurchaseOrderById(String id) {
+    PurchaseOrderInfo purchaseOrder = null;
+
+    // ✅ THÊM reject_reason_2 vào SELECT
+    String sql = "SELECT po.id, po.fullname, po.day_purchase, po.day_quote, po.status, "
+            + "po.reason, po.supplier, po.address, po.phone, po.email, po.summary, po.reject_reason_2 "
+            + "FROM purchase_order_info po "
+            + "WHERE po.id = ?";
+
+    try (Connection con = Context.getJDBCConnection(); 
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setString(1, id);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                purchaseOrder = new PurchaseOrderInfo();
+                purchaseOrder.setId(rs.getString("id"));
+                purchaseOrder.setFullname(rs.getString("fullname"));
+                purchaseOrder.setDayPurchase(rs.getDate("day_purchase"));
+                purchaseOrder.setDayQuote(rs.getDate("day_quote"));
+                purchaseOrder.setStatus(rs.getString("status"));
+                purchaseOrder.setReason(rs.getString("reason"));
+                purchaseOrder.setSupplier(rs.getString("supplier"));
+                purchaseOrder.setAddress(rs.getString("address"));
+                purchaseOrder.setPhone(rs.getString("phone"));
+                purchaseOrder.setEmail(rs.getString("email"));
+                purchaseOrder.setSummary(rs.getString("summary"));
+                // ✅ THÊM dòng này
+                purchaseOrder.setRejectReason2(rs.getString("reject_reason_2"));
+
+                List<PurchaseOrderItems> items = getPurchaseOrderItems(id);
+                purchaseOrder.setPurchaseItems(items);
+            }
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Error getting purchase order by ID: " + e.getMessage());
+        e.printStackTrace();
+    }
+
+    return purchaseOrder;
+}
 
     /**
      * Lấy danh sách items của một Purchase Order
@@ -315,49 +363,6 @@ public class PurchaseOrderDAO {
         }
 
         return items;
-    }
-
-    /**
-     * Lấy Purchase Order theo ID
-     */
-    public PurchaseOrderInfo getPurchaseOrderById(String id) {
-        PurchaseOrderInfo purchaseOrder = null;
-
-        String sql = "SELECT po.id, po.fullname, po.day_purchase, po.day_quote, po.status, "
-                + "po.reason, po.supplier, po.address, po.phone, po.email, po.summary "
-                + "FROM purchase_order_info po "
-                + "WHERE po.id = ?";
-
-        try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setString(1, id);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    purchaseOrder = new PurchaseOrderInfo();
-                    purchaseOrder.setId(rs.getString("id"));
-                    purchaseOrder.setFullname(rs.getString("fullname"));
-                    purchaseOrder.setDayPurchase(rs.getDate("day_purchase"));
-                    purchaseOrder.setDayQuote(rs.getDate("day_quote"));
-                    purchaseOrder.setStatus(rs.getString("status"));
-                    purchaseOrder.setReason(rs.getString("reason"));
-                    purchaseOrder.setSupplier(rs.getString("supplier"));
-                    purchaseOrder.setAddress(rs.getString("address"));
-                    purchaseOrder.setPhone(rs.getString("phone"));
-                    purchaseOrder.setEmail(rs.getString("email"));
-                    purchaseOrder.setSummary(rs.getString("summary"));
-
-                    List<PurchaseOrderItems> items = getPurchaseOrderItems(id);
-                    purchaseOrder.setPurchaseItems(items);
-                }
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error getting purchase order by ID: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return purchaseOrder;
     }
 
     /**
@@ -572,58 +577,6 @@ public class PurchaseOrderDAO {
     }
 
     /**
-     * Xem trước việc cập nhật stock cho một đơn cụ thể
-     */
-    public void previewStockUpdateForOrder(String purchaseOrderId) {
-        try (Connection con = Context.getJDBCConnection()) {
-            String sql = "SELECT poi.product_code, poi.quantity, " +
-                        "pi.id as product_id, pi.name as product_name, " +
-                        "pis.qty as current_stock " +
-                        "FROM purchase_order_items poi " +
-                        "LEFT JOIN product_info pi ON poi.product_code = pi.code " +
-                        "LEFT JOIN product_in_stock pis ON pi.id = pis.product_id " +
-                        "WHERE poi.purchase_id = ? " +
-                        "ORDER BY poi.product_code";
-            
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, purchaseOrderId);
-            ResultSet rs = ps.executeQuery();
-            
-            System.out.println("📋 PREVIEW - Stock update cho đơn " + purchaseOrderId + ":");
-            System.out.println("=".repeat(80));
-            
-            int count = 0;
-            while (rs.next()) {
-                String productCode = rs.getString("product_code");
-                BigDecimal quantity = rs.getBigDecimal("quantity");
-                String productId = rs.getString("product_id");
-                String productName = rs.getString("product_name");
-                BigDecimal currentStock = rs.getBigDecimal("current_stock");
-                
-                count++;
-                System.out.printf("%-3d | Code: %-15s | Tên: %-30s%n", 
-                                count, productCode, 
-                                productName != null ? productName : "KHÔNG TÌM THẤY");
-                System.out.printf("    | Số lượng nhập: %-10s | Stock hiện tại: %-10s | Stock sau: %-10s%n",
-                                quantity,
-                                currentStock != null ? currentStock : "KHÔNG CÓ",
-                                currentStock != null ? currentStock.add(quantity) : "KHÔNG THỂ TÍNH");
-                System.out.println("-".repeat(80));
-            }
-            
-            if (count == 0) {
-                System.out.println("Không có items nào trong đơn này");
-            } else {
-                System.out.println("Tổng cộng: " + count + " items sẽ được cập nhật");
-            }
-            
-        } catch (SQLException e) {
-            System.out.println("❌ Lỗi preview: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Cập nhật status thành completed và tự động cập nhật stock, sau đó chuyển thành done
      */
     public boolean updateDoneStatus(String purchaseOrderId) {
@@ -701,150 +654,6 @@ public class PurchaseOrderDAO {
     }
 
     /**
-     * Cập nhật stock cho các đơn purchase order có status = completed (chưa được cộng)
-     * Sau khi cộng xong sẽ chuyển status thành 'done'
-     */
-    public boolean updateStockFromCompletedOrders() {
-        Connection con = null;
-        try {
-            con = Context.getJDBCConnection();
-            con.setAutoCommit(false);
-            
-            // Lấy danh sách các đơn completed (chưa được cộng stock)
-            String getCompletedOrdersSql = "SELECT id FROM purchase_order_info WHERE status = 'completed'";
-            PreparedStatement getOrdersPs = con.prepareStatement(getCompletedOrdersSql);
-            ResultSet ordersRs = getOrdersPs.executeQuery();
-            
-            List<String> completedOrderIds = new ArrayList<>();
-            while (ordersRs.next()) {
-                completedOrderIds.add(ordersRs.getString("id"));
-            }
-            
-            if (completedOrderIds.isEmpty()) {
-                System.out.println("ℹ️ Không có đơn nào có status 'completed' (chưa được cộng stock)");
-                return true;
-            }
-            
-            System.out.println("📦 Tìm thấy " + completedOrderIds.size() + " đơn completed chưa được cộng stock: " + completedOrderIds);
-            
-            // Xử lý từng đơn một
-            int successCount = 0;
-            for (String orderId : completedOrderIds) {
-                try {
-                    // Cập nhật stock cho đơn này
-                    boolean stockUpdated = updateStockForSpecificOrder(con, orderId);
-                    if (stockUpdated) {
-                        // Chuyển status thành 'done'
-                        String updateStatusSql = "UPDATE purchase_order_info SET status = 'done' WHERE id = ?";
-                        PreparedStatement updateStatusPs = con.prepareStatement(updateStatusSql);
-                        updateStatusPs.setString(1, orderId);
-                        updateStatusPs.executeUpdate();
-                        updateStatusPs.close();
-                        
-                        System.out.println("✅ Đã xử lý xong đơn " + orderId + " (completed → done)");
-                        successCount++;
-                    } else {
-                        System.out.println("❌ Lỗi xử lý đơn " + orderId);
-                    }
-                } catch (Exception e) {
-                    System.out.println("❌ Lỗi xử lý đơn " + orderId + ": " + e.getMessage());
-                }
-            }
-            
-            con.commit();
-            System.out.println("🎉 Hoàn thành xử lý: " + successCount + "/" + completedOrderIds.size() + " đơn thành công");
-            return successCount > 0;
-            
-        } catch (SQLException e) {
-            System.out.println("❌ Lỗi cập nhật stock: " + e.getMessage());
-            e.printStackTrace();
-            try {
-                if (con != null) {
-                    con.rollback();
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-            return false;
-        } finally {
-            try {
-                if (con != null) {
-                    con.setAutoCommit(true);
-                    con.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Xem các đơn theo status để kiểm tra
-     */
-    public void showOrdersByStatus(String status) {
-        try (Connection con = Context.getJDBCConnection()) {
-            String sql = "SELECT id, fullname, day_purchase, status FROM purchase_order_info WHERE status = ? ORDER BY id";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, status);
-            ResultSet rs = ps.executeQuery();
-            
-            System.out.println("📋 Danh sách đơn có status = '" + status + "':");
-            System.out.println("=".repeat(60));
-            
-            int count = 0;
-            while (rs.next()) {
-                count++;
-                System.out.printf("%-3d | %-10s | %-20s | %-12s | %s%n", 
-                                count,
-                                rs.getString("id"),
-                                rs.getString("fullname"),
-                                rs.getDate("day_purchase"),
-                                rs.getString("status"));
-            }
-            
-            if (count == 0) {
-                System.out.println("Không có đơn nào có status = '" + status + "'");
-            } else {
-                System.out.println("=".repeat(60));
-                System.out.println("Tổng cộng: " + count + " đơn");
-            }
-            
-        } catch (SQLException e) {
-            System.out.println("❌ Lỗi: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Kiểm tra trạng thái các đơn (completed vs done)
-     */
-    public void checkOrdersStatus() {
-        try (Connection con = Context.getJDBCConnection()) {
-            String sql = "SELECT status, COUNT(*) as count FROM purchase_order_info GROUP BY status ORDER BY status";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            
-            System.out.println("📊 THỐNG KÊ STATUS CÁC ĐƠN:");
-            System.out.println("=".repeat(40));
-            
-            while (rs.next()) {
-                String status = rs.getString("status");
-                int count = rs.getInt("count");
-                System.out.printf("%-15s: %d đơn%n", status, count);
-            }
-            
-            System.out.println("=".repeat(40));
-            System.out.println("📝 Giải thích:");
-            System.out.println("  - completed: Đã hoàn thành nhưng CHƯA cộng stock");
-            System.out.println("  - done: Đã hoàn thành và ĐÃ cộng stock rồi");
-            
-        } catch (SQLException e) {
-            System.out.println("❌ Lỗi: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Cập nhật stock cho một đơn cụ thể (helper method)
      */
     private boolean updateStockForSpecificOrder(Connection con, String purchaseOrderId) throws SQLException {
@@ -898,6 +707,74 @@ public class PurchaseOrderDAO {
         System.out.println("📦 Cập nhật stock cho đơn " + purchaseOrderId + ": " + updatedCount + " thành công, " + notFoundCount + " không tìm thấy");
         return true; // Trả về true ngay cả khi có một số item không tìm thấy
     }
+    
+    /**
+ * Từ chối đơn mua hàng với lý do cụ thể
+ */
+public boolean rejectPurchaseOrderWithReason(String purchaseOrderId, String rejectReason) {
+  String sql = "UPDATE purchase_order_info SET status = 're-quote', reject_reason_2 = ? WHERE id = ?";
+
+  try (Connection con = Context.getJDBCConnection(); 
+       PreparedStatement ps = con.prepareStatement(sql)) {
+
+      ps.setString(1, rejectReason);
+      ps.setString(2, purchaseOrderId);
+
+      int rowsAffected = ps.executeUpdate();
+      System.out.println("✅ Updated status to 're-quote' and reject_reason_2 for PO: " + purchaseOrderId + " (" + rowsAffected + " rows)");
+      System.out.println("📝 Reject reason: " + rejectReason);
+      return rowsAffected > 0;
+
+  } catch (SQLException e) {
+      System.out.println("❌ Error rejecting purchase_order with reason: " + e.getMessage());
+      e.printStackTrace();
+      return false;
+  }
+}
+
+/**
+ * Lấy lý do từ chối của một đơn mua hàng
+ */
+public String getRejectReason(String purchaseOrderId) {
+  String sql = "SELECT reject_reason_2 FROM purchase_order_info WHERE id = ?";
+  
+  try (Connection con = Context.getJDBCConnection();
+       PreparedStatement ps = con.prepareStatement(sql)) {
+      
+      ps.setString(1, purchaseOrderId);
+      
+      try (ResultSet rs = ps.executeQuery()) {
+          if (rs.next()) {
+              return rs.getString("reject_reason_2");
+          }
+      }
+      
+  } catch (SQLException e) {
+      System.out.println("❌ Error getting reject reason: " + e.getMessage());
+      e.printStackTrace();
+  }
+  
+  return null;
+}
+// ✅ THÊM method mới để xóa reject_reason_2
+public boolean clearRejectReason(String purchaseOrderId) {
+    String sql = "UPDATE purchase_order_info SET reject_reason_2 = NULL WHERE id = ?";
+
+    try (Connection con = Context.getJDBCConnection(); 
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setString(1, purchaseOrderId);
+
+        int rowsAffected = ps.executeUpdate();
+        System.out.println("✅ Cleared reject_reason_2 for PO: " + purchaseOrderId + " (" + rowsAffected + " rows)");
+        return rowsAffected > 0;
+
+    } catch (SQLException e) {
+        System.out.println("❌ Error clearing reject_reason_2: " + e.getMessage());
+        e.printStackTrace();
+        return false;
+    }
+}
 }
 
                 
