@@ -552,15 +552,15 @@
                                 </td>
                                 <td class="action-column">
                                     <div class="action-buttons">
-                                        <a href="editMaterialUnit?id=${unit.id}" class="btn-edit">✏️ Thay đổi</a>
+                                        <a href="editMaterialUnit?id=${unit.id}" class="btn-edit">Thay đổi</a>
                                         <c:choose>
                                             <c:when test="${unit.status == 1}">
-                                                <button onclick="toggleUnitStatus('${unit.id}', '${unit.status}')" class="btn-edit btn-deactivate">⏸️ Ngừng hoạt động</button>
+                                                <button onclick="toggleUnitStatus('${unit.id}', '${unit.status}')" class="btn-edit btn-deactivate">Ngừng hoạt động</button>
                                             </c:when>
                                             <c:otherwise>
-                                                <button onclick="toggleUnitStatus('${unit.id}', '${unit.status}')" class="btn-edit btn-activate">✅ Kích hoạt</button>
+                                                <button onclick="toggleUnitStatus('${unit.id}', '${unit.status}')" class="btn-edit btn-activate">Kích hoạt</button>
                                                 <!-- Show delete option for inactive units -->
-                                                <button onclick="deleteUnit('${unit.id}', true)" class="btn-edit btn-delete">🗑️ Xóa</button>
+                                                <button onclick="deleteUnit('${unit.id}', true)" class="btn-edit btn-delete">Xóa</button>
                                             </c:otherwise>
                                         </c:choose>
                                     </div>

@@ -21,7 +21,7 @@ public class ProductInStockDAO {
     private static final String COL_ID = "id";
     private static final String COL_PRODUCT_ID = "product_id";
     private static final String COL_QTY = "qty";
-    private static final String COL_STATUS = "status";
+    private static final String COL_MIN_STOCK_THRESHOLD = "min_stock_threshold";
     
     /**
      * Add new stock record for a product
@@ -29,14 +29,15 @@ public class ProductInStockDAO {
      * @return true if addition was successful, false otherwise
      */
     public boolean addProductStock(ProductInStock productInStock) {
-        String sql = "INSERT INTO product_in_stock (product_id, qty, status) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO product_in_stock (product_id, qty, min_stock_threshold) VALUES (?, ?, ?)";
         
         try (Connection con = Context.getJDBCConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             
             stmt.setInt(1, productInStock.getProductId());
             stmt.setBigDecimal(2, productInStock.getQty());
-            stmt.setString(3, productInStock.getStatus());
+            stmt.setBigDecimal(3, productInStock.getMinStockThreshold() != null ? 
+                productInStock.getMinStockThreshold() : BigDecimal.ZERO);
             
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -72,18 +73,18 @@ public class ProductInStockDAO {
     }
     
     /**
-     * Update stock status for a product
+     * Update minimum stock threshold for a product
      * @param productId Product ID
-     * @param newStatus New status
+     * @param newThreshold New minimum stock threshold
      * @return true if update was successful, false otherwise
      */
-    public boolean updateStockStatus(int productId, String newStatus) {
-        String sql = "UPDATE product_in_stock SET status = ? WHERE product_id = ?";
+    public boolean updateMinStockThreshold(int productId, BigDecimal newThreshold) {
+        String sql = "UPDATE product_in_stock SET min_stock_threshold = ? WHERE product_id = ?";
         
         try (Connection con = Context.getJDBCConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             
-            stmt.setString(1, newStatus);
+            stmt.setBigDecimal(1, newThreshold != null ? newThreshold : BigDecimal.ZERO);
             stmt.setInt(2, productId);
             
             int rowsAffected = stmt.executeUpdate();
@@ -101,7 +102,7 @@ public class ProductInStockDAO {
      * @return ProductInStock object or null if not found
      */
     public ProductInStock getStockByProductId(int productId) {
-        String sql = "SELECT id, product_id, qty, status FROM product_in_stock WHERE product_id = ?";
+        String sql = "SELECT id, product_id, qty, min_stock_threshold FROM product_in_stock WHERE product_id = ?";
         
         try (Connection con = Context.getJDBCConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -114,7 +115,7 @@ public class ProductInStockDAO {
                 stock.setId(rs.getInt(COL_ID));
                 stock.setProductId(rs.getInt(COL_PRODUCT_ID));
                 stock.setQty(rs.getBigDecimal(COL_QTY));
-                stock.setStatus(rs.getString(COL_STATUS));
+                stock.setMinStockThreshold(rs.getBigDecimal(COL_MIN_STOCK_THRESHOLD));
                 return stock;
             }
             
@@ -131,7 +132,7 @@ public class ProductInStockDAO {
      */
     public List<ProductInStock> getAllStocks() {
         List<ProductInStock> list = new ArrayList<>();
-        String sql = "SELECT id, product_id, qty, status FROM product_in_stock";
+        String sql = "SELECT id, product_id, qty, min_stock_threshold FROM product_in_stock";
         
         try (Connection con = Context.getJDBCConnection();
              PreparedStatement stmt = con.prepareStatement(sql);
@@ -142,7 +143,7 @@ public class ProductInStockDAO {
                 stock.setId(rs.getInt(COL_ID));
                 stock.setProductId(rs.getInt(COL_PRODUCT_ID));
                 stock.setQty(rs.getBigDecimal(COL_QTY));
-                stock.setStatus(rs.getString(COL_STATUS));
+                stock.setMinStockThreshold(rs.getBigDecimal(COL_MIN_STOCK_THRESHOLD));
                 list.add(stock);
             }
             
@@ -203,16 +204,16 @@ public class ProductInStockDAO {
      * Add or update stock for a product (upsert operation)
      * @param productId Product ID
      * @param quantity Quantity
-     * @param status Status
+     * @param minStockThreshold Minimum stock threshold
      * @return true if operation was successful, false otherwise
      */
-    public boolean upsertStock(int productId, BigDecimal quantity, String status) {
+    public boolean upsertStock(int productId, BigDecimal quantity, BigDecimal minStockThreshold) {
         if (stockExistsForProduct(productId)) {
             // Update existing record
-            return updateStockQuantity(productId, quantity) && updateStockStatus(productId, status);
+            return updateStockQuantity(productId, quantity) && updateMinStockThreshold(productId, minStockThreshold);
         } else {
             // Insert new record
-            ProductInStock newStock = new ProductInStock(productId, quantity, status);
+            ProductInStock newStock = new ProductInStock(productId, quantity, minStockThreshold);
             return addProductStock(newStock);
         }
     }

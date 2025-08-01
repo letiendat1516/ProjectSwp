@@ -4,10 +4,12 @@ import dao.ProductInfoDAO;
 import dao.CategoryProductDAO;
 import dao.UnitDAO;
 import dao.SupplierDAO;
+import dao.ProductInStockDAO;
 import model.ProductInfo;
 import model.CategoryProduct;
 import model.Unit;
 import model.Supplier;
+import model.ProductInStock;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -23,6 +25,7 @@ public class ProductDetailController extends HttpServlet {
     private final transient CategoryProductDAO categoryDAO = new CategoryProductDAO();
     private final transient UnitDAO unitDAO = new UnitDAO();
     private final transient SupplierDAO supplierDAO = new SupplierDAO();
+    private final transient ProductInStockDAO stockDAO = new ProductInStockDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -86,10 +89,12 @@ public class ProductDetailController extends HttpServlet {
             request.setAttribute("unit", unit);
             request.setAttribute("supplier", supplier);
             
-            // Calculate stock status
-            if (product.getStockQuantity() != null && product.getMinStockThreshold() != null) {
-                boolean isLowStock = product.getStockQuantity().compareTo(product.getMinStockThreshold()) <= 0;
+            // Get stock information and calculate stock status
+            ProductInStock stockInfo = stockDAO.getStockByProductId(productId);
+            if (stockInfo != null && product.getStockQuantity() != null && stockInfo.getMinStockThreshold() != null) {
+                boolean isLowStock = product.getStockQuantity().compareTo(stockInfo.getMinStockThreshold()) <= 0;
                 request.setAttribute("isLowStock", isLowStock);
+                request.setAttribute("stockInfo", stockInfo);
             }
             
             // Forward to product detail page

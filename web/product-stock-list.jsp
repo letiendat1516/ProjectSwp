@@ -559,8 +559,8 @@
                                         <td>${product.name}</td>
                                         <td>
                                             <c:choose>
-                                                <c:when test="${not empty categoryMap[product.cate_id]}">
-                                                    ${categoryMap[product.cate_id]}
+                                                <c:when test="${not empty categoryMap[product.cateId]}">
+                                                    ${categoryMap[product.cateId]}
                                                 </c:when>
                                                 <c:otherwise>
                                                     <span class="text-muted">Chưa phân loại</span>

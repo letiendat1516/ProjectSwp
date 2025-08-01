@@ -390,8 +390,8 @@
                         <div class="stock-item">
                             <div class="stock-value" style="color: #ff9800;">
                                 <c:choose>
-                                    <c:when test="${product.minStockThreshold != null}">
-                                        <fmt:formatNumber value="${product.minStockThreshold}" type="number" maxFractionDigits="2"/>
+                                    <c:when test="${stock.minStockThreshold != null}">
+                                        <fmt:formatNumber value="${stock.minStockThreshold}" type="number" maxFractionDigits="2"/>
                                     </c:when>
                                     <c:otherwise>
                                         Chưa thiết lập
@@ -434,7 +434,7 @@
                         <div class="form-group">
                             <label class="form-label" for="minThreshold">Ngưỡng cảnh báo</label>
                             <input type="number" id="minThreshold" name="minThreshold" class="form-control" 
-                                   value="${product.minStockThreshold}" min="0" step="0.01" placeholder="10">
+                                   value="${stock.minStockThreshold}" min="0" step="0.01" placeholder="10">
                             <div class="form-help">Ngưỡng tối thiểu để cảnh báo sắp hết hàng (tùy chọn)</div>
                         </div>
                     </div>

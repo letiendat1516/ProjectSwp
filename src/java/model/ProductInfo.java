@@ -23,7 +23,6 @@ public class ProductInfo {
     private int updatedBy;
     private Date updatedDate;
     private BigDecimal stockQuantity; // Used for temporary storage during operations, actual stock stored in product_in_stock table
-    private BigDecimal minStockThreshold;
     private String stockStatus; // Used for temporary storage during operations, actual stock status stored in product_in_stock table
     private String unitSymbol;
 
@@ -174,14 +173,6 @@ public void setUnitSymbol(String unitSymbol) {
         this.stockQuantity = BigDecimal.valueOf(stockQuantity);
     }
 
-    public BigDecimal getMinStockThreshold() {
-        return minStockThreshold;
-    }
-
-    public void setMinStockThreshold(BigDecimal minStockThreshold) {
-        this.minStockThreshold = minStockThreshold;
-    }
-
     public String getStockStatus() {
         return stockStatus;
     }
@@ -203,7 +194,6 @@ public void setUnitSymbol(String unitSymbol) {
                 ", supplierId=" + supplierId +
                 ", expirationDate=" + expirationDate +
                 ", additionalNotes='" + additionalNotes + '\'' +
-                ", minStockThreshold=" + minStockThreshold +
                 '}';
     }
 }

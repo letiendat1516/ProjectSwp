@@ -4,6 +4,7 @@ import dao.ProductInStockDAO;
 import dao.ProductInfoDAO;
 import model.ProductInStock;
 import model.ProductInfo;
+import model.ProductStock;
 import model.Users;
 
 import jakarta.servlet.ServletException;
@@ -125,16 +126,16 @@ public class ProductStockController extends HttpServlet {
             }
             
             // Get all products with their stock information
-            List<ProductInfo> products = productDAO.getProductsWithStockInfo(page, pageSize, search);
-            int totalProducts = productDAO.getTotalProductCountForStock(search);
+            List<ProductStock> products = productDAO.getProductsWithStock(page, pageSize, search, "id", "asc");
+            int totalProducts = productDAO.getTotalProductCount(search);
             int totalPages = (int) Math.ceil((double) totalProducts / pageSize);
             
             // Create a map of category IDs to category names for JSP
             Map<Integer, String> categoryMap = new HashMap<>();
-            for (ProductInfo product : products) {
-                if (product.getCate_id() > 0 && !categoryMap.containsKey(product.getCate_id())) {
-                    String categoryName = productDAO.getCategoryNameById(product.getCate_id());
-                    categoryMap.put(product.getCate_id(), categoryName != null ? categoryName : "Chưa phân loại");
+            for (ProductStock product : products) {
+                if (product.getCateId() > 0 && !categoryMap.containsKey(product.getCateId())) {
+                    String categoryName = productDAO.getCategoryNameById(product.getCateId());
+                    categoryMap.put(product.getCateId(), categoryName != null ? categoryName : "Chưa phân loại");
                 }
             }
             
@@ -324,21 +325,21 @@ public class ProductStockController extends HttpServlet {
                 return;
             }
             
-            // Create stock record with active status by default
-            ProductInStock stock = new ProductInStock(productId, qty, "active");
+            // Create stock record with minimum threshold
+            BigDecimal minThreshold = BigDecimal.ZERO;
+            if (minThresholdParam != null && !minThresholdParam.trim().isEmpty()) {
+                try {
+                    minThreshold = new BigDecimal(minThresholdParam);
+                } catch (NumberFormatException e) {
+                    // Use default threshold of 0 if parsing fails
+                    minThreshold = BigDecimal.ZERO;
+                }
+            }
+            
+            ProductInStock stock = new ProductInStock(productId, qty, minThreshold);
             boolean success = stockDAO.addProductStock(stock);
             
             if (success) {
-                // Update minimum threshold if provided
-                if (minThresholdParam != null && !minThresholdParam.trim().isEmpty()) {
-                    try {
-                        BigDecimal minThreshold = new BigDecimal(minThresholdParam);
-                        productDAO.updateMinStockThreshold(productId, minThreshold);
-                    } catch (NumberFormatException e) {
-                        // Ignore threshold error, stock was added successfully
-                    }
-                }
-                
                 redirectWithMessage(response, request, "/product-stock/list", "success", "Thêm thông tin tồn kho thành công");
             } else {
                 request.setAttribute("error", "Có lỗi xảy ra khi thêm thông tin tồn kho");
@@ -409,7 +410,7 @@ public class ProductStockController extends HttpServlet {
             if (minThresholdParam != null && !minThresholdParam.trim().isEmpty()) {
                 try {
                     BigDecimal minThreshold = new BigDecimal(minThresholdParam);
-                    thresholdSuccess = productDAO.updateMinStockThreshold(productId, minThreshold);
+                    thresholdSuccess = stockDAO.updateMinStockThreshold(productId, minThreshold);
                 } catch (NumberFormatException e) {
                     thresholdSuccess = false;
                 }
