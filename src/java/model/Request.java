@@ -5,7 +5,7 @@
  */
 package model;
 
-import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.List;
 
@@ -21,18 +21,20 @@ public class Request {
     private Date day_request;
     private String status;
     private String reason;
+    private String reject_reason;
     private List<RequestItem> items;
 
     public Request() {
     }
 
-    public Request(String id, String fullname, String role, Date day_request, String status, String reason, List<RequestItem> items) {
+    public Request(String id, String fullname, String role, Date day_request, String status, String reason, String reject_reason, List<RequestItem> items) {
         this.id = id;
         this.fullname = fullname;
         this.role = role;
         this.day_request = day_request;
         this.status = status;
         this.reason = reason;
+        this.reject_reason = reject_reason;
         this.items = items;
     }
 
@@ -84,6 +86,14 @@ public class Request {
         this.reason = reason;
     }
 
+    public String getReject_reason() {
+        return reject_reason;
+    }
+
+    public void setReject_reason(String reject_reason) {
+        this.reject_reason = reject_reason;
+    }
+
     public List<RequestItem> getItems() {
         return items;
     }
@@ -92,5 +102,6 @@ public class Request {
         this.items = items;
     }
 
+   
    
 }

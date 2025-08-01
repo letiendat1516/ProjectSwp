@@ -439,4 +439,34 @@ public void getUserAndRoleInfo(int userId) {
     }
 }
 
+/**
+ * ✅ THÊM MỚI: Cập nhật trạng thái Export Request với lý do từ chối
+ */
+public boolean updateExportRequestStatusWithReason(String requestId, String status, int approvedBy, String rejectReason2) {
+    String sql = "UPDATE export_requests SET status = ?, approve_by = ?, reject_reason_2 = ? WHERE id = ?";
+    
+    // Sử dụng Context.getJDBCConnection() để lấy connection
+    try (Connection conn = Context.getJDBCConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        ps.setString(1, status);
+        ps.setInt(2, approvedBy);
+        ps.setString(3, rejectReason2);
+        ps.setString(4, requestId);
+        
+        int rowsAffected = ps.executeUpdate();
+        System.out.println("✅ Updated export request " + requestId + " with status: " + status + " and reject reason: " + rejectReason2);
+        return rowsAffected > 0;
+        
+    } catch (SQLException e) {
+        System.err.println("❌ Error updating export request status with reason: " + e.getMessage());
+        e.printStackTrace();
+        return false;
+    }
+}
+
+
+
+
+
 }
