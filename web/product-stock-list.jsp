@@ -583,7 +583,7 @@
                                                     <c:when test="${product.stockQuantity != null}">
                                                         <c:set var="isLowStock" value="${product.minStockThreshold != null and product.stockQuantity <= product.minStockThreshold}"/>
                                                         <span class="stock-quantity ${isLowStock ? 'stock-warning' : ''}">
-                                                            <fmt:formatNumber value="${product.stockQuantity}" type="number" maxFractionDigits="2"/>
+                                                            <fmt:formatNumber value="${product.stockQuantity}" type="number" maxFractionDigits="0"/>
                                                         </span>
                                                     </c:when>
                                                     <c:otherwise>
@@ -596,7 +596,7 @@
                                             <c:choose>
                                                 <c:when test="${product.minStockThreshold != null}">
                                                     <span class="stock-threshold">
-                                                        <fmt:formatNumber value="${product.minStockThreshold}" type="number" maxFractionDigits="2"/>
+                                                        <fmt:formatNumber value="${product.minStockThreshold}" type="number" maxFractionDigits="0"/>
                                                     </span>
                                                 </c:when>
                                                 <c:otherwise>

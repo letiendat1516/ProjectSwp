@@ -23,7 +23,6 @@ public class ProductInfo {
     private int updatedBy;
     private Date updatedDate;
     private BigDecimal stockQuantity; // Used for temporary storage during operations, actual stock stored in product_in_stock table
-    private String stockStatus; // Used for temporary storage during operations, actual stock status stored in product_in_stock table
     private String unitSymbol;
 
     // Default constructor
@@ -171,14 +170,6 @@ public void setUnitSymbol(String unitSymbol) {
     
     public void setStockQuantity(double stockQuantity) {
         this.stockQuantity = BigDecimal.valueOf(stockQuantity);
-    }
-
-    public String getStockStatus() {
-        return stockStatus;
-    }
-
-    public void setStockStatus(String stockStatus) {
-        this.stockStatus = stockStatus;
     }
 
     @Override

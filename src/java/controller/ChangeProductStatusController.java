@@ -14,6 +14,7 @@ import java.io.IOException;
 
 /**
  * Controller for changing product status (active/inactive)
+ * Product status in product_info controls both product and stock visibility
  */
 @WebServlet("/change-product-status")
 public class ChangeProductStatusController extends HttpServlet {
@@ -59,13 +60,21 @@ public class ChangeProductStatusController extends HttpServlet {
                 return;
             }
             
-            // Update product status
+            // Check if trying to reactivate a product whose category is inactive
+            if (newStatus.equals("active")) {
+                if (!productDAO.isCategoryActive(product.getCate_id())) {
+                    response.sendRedirect("product-list?error=" + java.net.URLEncoder.encode("Không thể kích hoạt sản phẩm vì danh mục đang ngừng hoạt động. Vui lòng kích hoạt danh mục trước.", "UTF-8"));
+                    return;
+                }
+            }
+            
+            // Update product status - this controls both product and stock visibility
             String vietnameseStatus = newStatus.equals("active") ? "Hoạt động" : "Ngưng hoạt động";
             product.setStatus(vietnameseStatus);
             
-            boolean success = productDAO.updateProduct(product);
+            boolean productUpdateSuccess = productDAO.updateProduct(product);
             
-            if (success) {
+            if (productUpdateSuccess) {
                 String successMessage = newStatus.equals("active") ? 
                     "Đã kích hoạt sản phẩm thành công" : 
                     "Đã ngưng hoạt động sản phẩm thành công";
