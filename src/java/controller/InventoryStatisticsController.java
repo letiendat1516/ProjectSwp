@@ -615,54 +615,9 @@ public class InventoryStatisticsController extends HttpServlet {
         try {
             System.out.println("Fetching recent product activities from database...");
             
-            // First, let's check what tables are available for product activities
-            // Try multiple approaches to get recent activities
+            // Get recent product activities from available tables
             
-            // Approach 1: Try to get from invoice details (purchases/imports)
-            String importQuery = """
-                SELECT 
-                    'Nhap kho' as activity_type,
-                    id.product_id,
-                    pi.name as product_name,
-                    id.quantity,
-                    i.create_date as activity_date,
-                    u.full_name as user_name,
-                    CONCAT('Nhap kho - Hoa don #', i.id) as description
-                FROM invoice_detail id
-                JOIN invoice i ON id.invoice_id = i.id
-                JOIN product_info pi ON id.product_id = pi.id
-                LEFT JOIN users u ON i.created_by = u.id
-                WHERE i.create_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-                AND i.status = 'approved'
-                ORDER BY i.create_date DESC
-                LIMIT 10
-            """;
-            
-            try {
-                PreparedStatement ps1 = conn.prepareStatement(importQuery);
-                ResultSet rs1 = ps1.executeQuery();
-                
-                while (rs1.next()) {
-                    ProductActivity activity = new ProductActivity();
-                    activity.type = "Import";
-                    activity.productId = rs1.getInt("product_id");
-                    activity.productName = rs1.getString("product_name");
-                    activity.quantity = rs1.getBigDecimal("quantity");
-                    activity.date = rs1.getTimestamp("activity_date");
-                    activity.userName = rs1.getString("user_name");
-                    activity.description = rs1.getString("description");
-                    activities.add(activity);
-                }
-                
-                rs1.close();
-                ps1.close();
-                System.out.println("Retrieved " + activities.size() + " import activities");
-                
-            } catch (SQLException e) {
-                System.out.println("Import query failed, trying alternative: " + e.getMessage());
-            }
-            
-            // Approach 2: Try to get from export requests
+            // Approach 1: Try to get from export requests
             String exportQuery = """
                 SELECT 
                     'Xuat kho' as activity_type,
@@ -708,7 +663,7 @@ public class InventoryStatisticsController extends HttpServlet {
                 System.out.println("Export query failed, trying alternative: " + e.getMessage());
             }
             
-            // Approach 3: Try to get from purchase order items
+            // Approach 2: Try to get from purchase order items
             String purchaseQuery = """
                 SELECT 
                     'Dat hang' as activity_type,

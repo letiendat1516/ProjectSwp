@@ -133,15 +133,15 @@ public class AddProductFromRequestServlet extends HttpServlet {
               try {
                   BigDecimal minStockThreshold = new BigDecimal(minStockThresholdStr.trim());
                   if (minStockThreshold.compareTo(BigDecimal.ZERO) >= 0) {
-                      product.setMinStockThreshold(minStockThreshold);
+                      // Note: min_stock_threshold is now handled in product_in_stock table
                   } else {
-                      product.setMinStockThreshold(BigDecimal.ZERO);
+                      // Note: min_stock_threshold is now handled in product_in_stock table
                   }
               } catch (NumberFormatException e) {
-                  product.setMinStockThreshold(BigDecimal.ZERO);
+                  // Note: min_stock_threshold is now handled in product_in_stock table
               }
           } else {
-              product.setMinStockThreshold(BigDecimal.ZERO);
+              // Note: min_stock_threshold is now handled in product_in_stock table
           }
           
           // Add product to database

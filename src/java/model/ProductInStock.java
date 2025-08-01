@@ -10,25 +10,25 @@ public class ProductInStock {
     private int id;
     private int productId;
     private BigDecimal qty;
-    private String status;
+    private BigDecimal minStockThreshold;
 
     // Default constructor
     public ProductInStock() {
     }
 
     // Constructor with all fields
-    public ProductInStock(int id, int productId, BigDecimal qty, String status) {
+    public ProductInStock(int id, int productId, BigDecimal qty, BigDecimal minStockThreshold) {
         this.id = id;
         this.productId = productId;
         this.qty = qty;
-        this.status = status;
+        this.minStockThreshold = minStockThreshold;
     }
 
     // Constructor without ID (for new records)
-    public ProductInStock(int productId, BigDecimal qty, String status) {
+    public ProductInStock(int productId, BigDecimal qty, BigDecimal minStockThreshold) {
         this.productId = productId;
         this.qty = qty;
-        this.status = status;
+        this.minStockThreshold = minStockThreshold;
     }
 
     // Getters and Setters
@@ -60,12 +60,12 @@ public class ProductInStock {
         this.qty = BigDecimal.valueOf(qty);
     }
 
-    public String getStatus() {
-        return status;
+    public BigDecimal getMinStockThreshold() {
+        return minStockThreshold;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setMinStockThreshold(BigDecimal minStockThreshold) {
+        this.minStockThreshold = minStockThreshold;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class ProductInStock {
                 "id=" + id +
                 ", productId=" + productId +
                 ", qty=" + qty +
-                ", status='" + status + '\'' +
+                ", minStockThreshold=" + minStockThreshold +
                 '}';
     }
 }

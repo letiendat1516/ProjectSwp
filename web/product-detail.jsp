@@ -589,10 +589,10 @@
                                         <div class="stock-label">Số Lượng Hiện Tại</div>
                                     </div>
 
-                                    <c:if test="${product.minStockThreshold != null && product.minStockThreshold > 0}">
+                                    <c:if test="${stockInfo != null && stockInfo.minStockThreshold != null && stockInfo.minStockThreshold > 0}">
                                         <div class="stock-card low">
                                             <div class="stock-number">
-                                                <fmt:formatNumber value="${product.minStockThreshold}" type="number" maxFractionDigits="2" />
+                                                <fmt:formatNumber value="${stockInfo.minStockThreshold}" type="number" maxFractionDigits="2" />
                                             </div>
                                             <div class="stock-label">Ngưỡng Tối Thiểu</div>
                                         </div>
