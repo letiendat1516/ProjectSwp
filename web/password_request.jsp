@@ -29,6 +29,7 @@
             .pw-layout-container {
                 display: flex;
                 min-height: 100vh;
+                margin-left: 5cm;
             }
             .pw-sidebar {
                 position: fixed;
@@ -264,8 +265,10 @@
         <div class="pw-layout-container">
             <!-- Sidebar -->
             <div class="pw-sidebar">
-                <h2>Warehouse Manager</h2>
+                <h2>Warehouse Management</h2>
                 <a href="usermanager" class="pw-nav-item">Quản lý người dùng</a>
+                <a href="${pageContext.request.contextPath}/department/list" class="pw-nav-item">Quản lý phòng ban</a>
+                <a href="${pageContext.request.contextPath}/LishSupplier" class="pw-nav-item">Quản lý nhà cung cấp</a>
                 <a href="role-permission" class="pw-nav-item">Phân quyền người dùng</a>
                 <a href="categoriesforward.jsp" class="pw-nav-item">Thông tin vật tư</a>
                 <a href="passwordrequest" class="pw-nav-item active">Reset mật khẩu</a>

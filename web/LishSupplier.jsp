@@ -467,7 +467,7 @@ if (user == null) {
     </head>
     <body>
         <div class="layout-container">
-            <jsp:include page="/include/sidebar.jsp" />
+            <jsp:include page="/include/sidebaradmin.jsp" />
             <div class="main-content">
                 <c:if test="${(user.roleName == 'Admin')||(user.roleName == 'Nhân viên kho')}"></c:if>
                 <c:set var="currentPage" value="${requestScope.currentPage}"/>
@@ -593,7 +593,7 @@ if (user == null) {
                         </div>
                     </c:if>
                 </c:if>
-                <a class="but" href="categoriesforward.jsp">Back</a>
+                <a class="but" href="Admin.jsp">Back</a>
             </div>
         </div>
     </body>

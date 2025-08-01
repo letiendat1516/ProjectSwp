@@ -11,7 +11,7 @@
 <%@page import="model.Users"%>
 <%
     Users user = (Users) session.getAttribute("user");
-    if (user == null || (!"Admin".equals(user.getRoleName())) {
+    if (user == null || (!"Admin".equals(user.getRoleName()) && !"Nhân viên kho".equals(user.getRoleName()))) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -245,7 +245,7 @@
 </head>
 <body>
     <div class="layout-container">
-        <jsp:include page="/include/sidebar.jsp" />
+        <jsp:include page="/include/sidebaradmin.jsp" />
         <div class="main-content">
             <div class="header">
                 <h1 class="page-title">Thêm phòng ban mới</h1>
@@ -328,7 +328,7 @@
                                        id="phone" 
                                        name="phone" 
                                        value="${phone}" 
-                                       maxlength="20" 
+                                       maxlength="10" 
                                        pattern="[0-9+\-\s()]+"
                                        placeholder="0123456789">
                                 <div class="form-text">Số điện thoại liên hệ của phòng ban</div>

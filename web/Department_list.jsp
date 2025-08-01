@@ -11,7 +11,7 @@
 <%@page import="model.Users"%>
 <%
     Users user = (Users) session.getAttribute("user");
-    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
+    if (user == null  || !"Admin".equals(user.getRoleName())) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -593,7 +593,7 @@
     </head>
     <body>
         <div class="layout-container">
-            <jsp:include page="/include/sidebar.jsp" />
+            <jsp:include page="/include/sidebaradmin.jsp" />
             <div class="main-content">
                 <div class="header">
                     <h1 class="page-title">Quản lý phòng ban</h1>
@@ -605,7 +605,7 @@
 
                 <!-- Navigation Buttons -->
                 <div class="nav-buttons">
-                    <a href="/ProjectWarehouse/categoriesforward.jsp" class="btn btn-info">← Quay lại</a>
+                    <a href="/ProjectWarehouse/Admin.jsp" class="btn btn-info">← Quay lại</a>
                 </div>
 
                 <!-- Thông báo -->

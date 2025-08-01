@@ -16,7 +16,7 @@
 
 <%
     Users user = (Users) session.getAttribute("user");
-    if (user == null || !"Admin".equalsIgnoreCase(user.getRoleName())) {
+    if (user == null || !"Admin".equals(user.getRoleName())) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -249,8 +249,8 @@
             <div class="sidebar">
                 <h2>Warehouse Management</h2>
                 <a href="usermanager" class="nav-item">Quản lý người dùng</a>
-
                 <a href="${pageContext.request.contextPath}/department/list" class="nav-item">Quản lý phòng ban</a>
+                <a href="${pageContext.request.contextPath}/material_unit/materialUnit" class="nav-item">Quản lý nhà cung cấp</a>
                 <a href="role-permission" class="nav-item">Phân quyền người dùng</a>
                 <a href="categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
                 <a href="passwordrequest" class="nav-item">Reset mật khẩu</a>

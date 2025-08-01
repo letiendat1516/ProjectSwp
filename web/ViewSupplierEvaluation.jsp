@@ -633,7 +633,7 @@ if (user == null || (!"Admin".equalsIgnoreCase(user.getRoleName())&&!"Nhân viê
     </head>
     <body>
         <div class="layout-container">
-            <jsp:include page="/include/sidebar.jsp" />
+            <jsp:include page="/include/sidebaradmin.jsp" />
             <div class="main-content">
                 <c:set var="listVSE" value="${requestScope.listSED}"/>
                 <c:set var="supplier" value="${requestScope.supplier}"/>

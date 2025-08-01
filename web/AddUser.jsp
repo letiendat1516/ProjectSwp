@@ -203,8 +203,11 @@
     <body>
         <div class="container">
             <div class="sidebar">
-                <h2>Warehouse Manager</h2>
+                <h2>Warehouse Managemet</h2>
                 <a href="usermanager" class="nav-item">Quản lý người dùng</a>
+                
+                <a href="${pageContext.request.contextPath}/department/list" class="nav-item">Quản lý phòng ban</a>
+                <a href="${pageContext.request.contextPath}/LishSupplier" class="nav-item">Quản lý nhà cung cấp</a>
                 <a href="role-permission" class="nav-item">Phân quyền người dùng</a>
                 <a href="categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
                 <a href="passwordrequest" class="nav-item">Reset mật khẩu</a>

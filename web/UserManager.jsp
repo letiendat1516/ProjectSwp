@@ -14,7 +14,7 @@
 <%@page import="model.Users"%>
 <%
     Users user = (Users) session.getAttribute("user");
-    if (user == null) {
+    if (user == null || !"Admin".equals(user.getRoleName())) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -310,8 +310,9 @@ response.setDateHeader("Expires", 0); // Proxies
             <div class="sidebar">
                 <h2>Warehouse Management</h2>
                 <a href="usermanager" class="nav-item">Quản lý người dùng</a>
-                
-    <a href="${pageContext.request.contextPath}/department/list" class="nav-item">Quản lý phòng ban</a>
+
+                <a href="${pageContext.request.contextPath}/department/list" class="nav-item">Quản lý phòng ban</a>
+                <a href="${pageContext.request.contextPath}/material_unit/materialUnit" class="nav-item">Quản lý nhà cung cấp</a>
                 <a href="role-permission" class="nav-item">Phân quyền người dùng</a>
                 <a href="categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
                 <a href="passwordrequest" class="nav-item">Reset mật khẩu</a>
@@ -449,24 +450,24 @@ response.setDateHeader("Expires", 0); // Proxies
                     </div>
                     <c:if test="${totalPages > 1}">
                         <center>
-                        <div class="pagination">
-                            <c:if test="${currentPage > 1}">
-                                <a href="usermanager?page=${currentPage - 1}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">Trước</a>
-                            </c:if>
-                            <c:forEach begin="1" end="${totalPages}" var="i">
-                                <c:choose>
-                                    <c:when test="${i == currentPage}">
-                                        <button class="active">${i}</button>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <a href="usermanager?page=${i}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">${i}</a>
-                                    </c:otherwise>
-                                </c:choose>
-                            </c:forEach>
-                            <c:if test="${currentPage < totalPages}">
-                                <a href="usermanager?page=${currentPage + 1}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">Sau</a>
-                            </c:if>
-                        </div>
+                            <div class="pagination">
+                                <c:if test="${currentPage > 1}">
+                                    <a href="usermanager?page=${currentPage - 1}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">Trước</a>
+                                </c:if>
+                                <c:forEach begin="1" end="${totalPages}" var="i">
+                                    <c:choose>
+                                        <c:when test="${i == currentPage}">
+                                            <button class="active">${i}</button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="usermanager?page=${i}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">${i}</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
+                                <c:if test="${currentPage < totalPages}">
+                                    <a href="usermanager?page=${currentPage + 1}&role=${param.role}&status=${param.status}&departmentId=${param.departmentId}&keyword=${param.keyword}">Sau</a>
+                                </c:if>
+                            </div>
                         </center>
                     </c:if>
                 </div>

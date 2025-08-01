@@ -92,7 +92,7 @@ Description: Reusable sidebar compon<div class="sidebar">
         color: #214463;
         margin-right: 15px;
     }
-    
+
     .dashboard-content {
         background: #fff;
         padding: 20px;
@@ -120,9 +120,13 @@ Description: Reusable sidebar compon<div class="sidebar">
 
 <div class="sidebar">
     <h2>Warehouse Management</h2>
-    <a href="${pageContext.request.contextPath}/categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
-    <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="nav-item">Giao dịch</a>
-    <a href="${pageContext.request.contextPath}/profile" class="nav-item">Thông tin cá nhân</a>
-    <a href="${pageContext.request.contextPath}/Admin.jsp" class="nav-item">Trang chủ (Chỉ Admin)</a>
-    <a href="${pageContext.request.contextPath}/StatisticSupplierEvaluation.jsp" class="nav-item">Thống kê</a>
+    <a href="usermanager" class="nav-item">Quản lý người dùng</a>
+    <a href="${pageContext.request.contextPath}/department/list" class="nav-item">Quản lý phòng ban</a>
+    <a href="${pageContext.request.contextPath}/LishSupplier" class="nav-item">Quản lý nhà cung cấp</a>
+    <a href="role-permission" class="nav-item">Phân quyền người dùng</a>
+    <a href="categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
+    <a href="passwordrequest" class="nav-item">Reset mật khẩu</a>
+    <a href="ApproveListForward.jsp" class="nav-item">Đơn từ</a>
+    <a href="RequestForward.jsp" class="nav-item">Giao dịch</a>
+    <a href="StatisticSupplierEvaluation.jsp" class="nav-item">Thống kê</a>
 </div>

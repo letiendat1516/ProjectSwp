@@ -365,7 +365,7 @@
     </head>
     <body>
         <div class="layout-container">
-            <jsp:include page="/include/sidebar.jsp" />
+            <jsp:include page="/include/sidebaradmin.jsp" />
             <div class="main-content">
                 <!-- Header -->
                 <div class="header">

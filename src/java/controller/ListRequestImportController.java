@@ -72,7 +72,7 @@ public class ListRequestImportController extends HttpServlet {
 
                 approvedItems = dao.getApprovedRequestItems(searchType, searchValue, approvedPage, PAGE_SIZE);
                 int approvedTotal = dao.countApprovedRequestItems(searchType, searchValue);
-approvedPages = (int) Math.ceil((double) approvedTotal / PAGE_SIZE);
+                approvedPages = (int) Math.ceil((double) approvedTotal / PAGE_SIZE);
 
                 // Set search parameters
                 request.setAttribute("searchType", searchType);

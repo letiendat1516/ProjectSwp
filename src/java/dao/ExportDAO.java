@@ -7,692 +7,676 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.math.BigDecimal;
 
 public class ExportDAO {
 
-  /**
-   * Lấy thông tin export request theo ID
-   */
-  public ExportRequest getExportRequestById(String requestId) {
-      ExportRequest request = null;
-      Connection conn = null;
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-
-      try {
-          String sql = "SELECT * FROM export_request WHERE id = ? AND status IN ('approved', 'partial_exported')";
-          conn = Context.getJDBCConnection();
-          ps = conn.prepareStatement(sql);
-          ps.setString(1, requestId);
-          rs = ps.executeQuery();
-
-          if (rs.next()) {
-              request = mapResultSetToExportRequest(rs);
-          }
-
-      } catch (Exception e) {
-          System.err.println("Error getting export request by ID: " + e.getMessage());
-          e.printStackTrace();
-      } finally {
-          closeResources(conn, ps, rs);
-      }
-
-      return request;
-  }
-
-  /**
-   * Lấy thông tin export request theo ID (bất kể status)
-   */
-  public ExportRequest getExportRequestByIdAnyStatus(String requestId) {
-      ExportRequest request = null;
-      Connection conn = null;
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-
-      try {
-          String sql = "SELECT * FROM export_request WHERE id = ?";
-          conn = Context.getJDBCConnection();
-          ps = conn.prepareStatement(sql);
-          ps.setString(1, requestId);
-          rs = ps.executeQuery();
-
-          if (rs.next()) {
-              request = mapResultSetToExportRequest(rs);
-          }
-
-      } catch (Exception e) {
-          System.err.println("Error getting export request by ID (any status): " + e.getMessage());
-          e.printStackTrace();
-      } finally {
-          closeResources(conn, ps, rs);
-      }
-
-      return request;
-  }
-
-  /**
-   * Kiểm tra export request có thể xử lý không
-   */
-  public boolean isExportRequestProcessable(String requestId) {
-      boolean processable = false;
-      Connection conn = null;
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-
-      try {
-          String sql = "SELECT COUNT(*) FROM export_request WHERE id = ? AND status IN ('approved', 'partial_exported')";
-          conn = Context.getJDBCConnection();
-          ps = conn.prepareStatement(sql);
-          ps.setString(1, requestId);
-          rs = ps.executeQuery();
-
-          if (rs.next()) {
-              processable = rs.getInt(1) > 0;
-          }
-
-      } catch (Exception e) {
-          System.err.println("Error checking if export request is processable: " + e.getMessage());
-          e.printStackTrace();
-      } finally {
-          closeResources(conn, ps, rs);
-      }
-
-      return processable;
-  }
-
-  /**
-   * Lấy danh sách items của export request với thông tin xuất kho
-   */
-  public List<ExportRequestItem> getExportRequestItemsByRequestId(String requestId) {
-      List<ExportRequestItem> items = new ArrayList<>();
-      Connection conn = null;
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-
-      try {
-          // Khởi tạo export_pending_items nếu chưa có
-          initializeExportPendingItems(requestId);
-
-          String sql = "SELECT " +
-                  "epi.id, epi.export_request_id, epi.product_name, epi.product_code, " +
-                  "epi.unit, epi.unit_id, epi.quantity_requested, epi.quantity_exported, " +
-                  "epi.quantity_pending, epi.note, epi.product_id " +
-                  "FROM export_pending_items epi " +
-                  "WHERE epi.export_request_id = ? " +
-                  "ORDER BY epi.product_name ASC";
-
-          conn = Context.getJDBCConnection();
-          ps = conn.prepareStatement(sql);
-          ps.setString(1, requestId);
-          rs = ps.executeQuery();
-
-          while (rs.next()) {
-              ExportRequestItem item = mapResultSetToExportRequestItem(rs);
-              items.add(item);
-          }
-
-      } catch (Exception e) {
-          System.err.println("Error getting export request items: " + e.getMessage());
-          e.printStackTrace();
-      } finally {
-          closeResources(conn, ps, rs);
-      }
-
-      return items;
-  }
-
-  /**
-   * Lấy lịch sử xuất kho của một request
-   */
-  public List<Object[]> getExportHistory(String requestId) {
-      List<Object[]> history = new ArrayList<>();
-      Connection conn = null;
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-
-      try {
-          String sql = "SELECT product_name, product_code, quantity_exported, " +
-                  "DATE_FORMAT(export_date, '%d/%m/%Y %H:%i') as formatted_date, " +
-                  "exported_by, note " +
-                  "FROM warehouse_export_history " +
-                  "WHERE export_request_id = ? " +
-                  "ORDER BY export_date DESC, product_name ASC";
-
-          conn = Context.getJDBCConnection();
-          ps = conn.prepareStatement(sql);
-          ps.setString(1, requestId);
-          rs = ps.executeQuery();
-
-          while (rs.next()) {
-              Object[] record = new Object[6];
-              record[0] = rs.getString("product_name");
-              record[1] = rs.getString("product_code");
-              record[2] = rs.getBigDecimal("quantity_exported");
-              record[3] = rs.getString("formatted_date");
-              record[4] = rs.getString("exported_by");
-              record[5] = rs.getString("note");
-              history.add(record);
-          }
-
-      } catch (Exception e) {
-          System.err.println("Error getting export history: " + e.getMessage());
-          e.printStackTrace();
-      } finally {
-          closeResources(conn, ps, rs);
-      }
-
-      return history;
-  }
-
-  /**
-   * Xử lý xuất kho từng phần
-   */
-  public boolean processPartialExport(String requestId, String exportDate, String processor, 
-                                    String additionalNote, List<ExportRequestItem> exportItems) {
-      Connection conn = null;
-      PreparedStatement psUpdate = null;
-      PreparedStatement psHistory = null;
-      PreparedStatement psStatus = null;
-      PreparedStatement psCheck = null;
-      ResultSet rs = null;
-
-      try {
-          conn = Context.getJDBCConnection();
-          conn.setAutoCommit(false);
-
-          System.out.println("=== PROCESSING PARTIAL EXPORT ===");
-          System.out.println("Request ID: " + requestId);
-          System.out.println("Export Date: " + exportDate);
-          System.out.println("Processor: " + processor);
-          System.out.println("Items to export: " + exportItems.size());
-
-          // 1. Cập nhật export_pending_items
-          String updateSql = "UPDATE export_pending_items SET " +
-                  "quantity_exported = quantity_exported + ?, " +
-                  "quantity_pending = quantity_pending - ? " +
-                  "WHERE export_request_id = ? AND product_code = ? " +
-                  "AND quantity_pending >= ?";
-
-          psUpdate = conn.prepareStatement(updateSql);
-
-          // 2. Thêm vào warehouse_export_history
-          String historySql = "INSERT INTO warehouse_export_history " +
-                  "(export_request_id, product_name, product_code, quantity_exported, " +
-                  "export_date, note, exported_by) " +
-                  "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-          psHistory = conn.prepareStatement(historySql);
-
-          // Xử lý từng item
-          for (ExportRequestItem item : exportItems) {
-              System.out.println("Processing item: " + item.getProductName() + 
-                               ", Code: " + item.getProductCode() + 
-                               ", Quantity: " + item.getQuantity());
-
-              // Validate dữ liệu
-              if (item.getProductCode() == null || item.getProductCode().trim().isEmpty()) {
-                  throw new SQLException("Product code is null or empty for " + item.getProductName());
-              }
-
-              if (item.getQuantity() <= 0) {
-                  throw new SQLException("Invalid quantity for " + item.getProductName());
-              }
-
-              // Cập nhật export_pending_items
-              psUpdate.setBigDecimal(1, BigDecimal.valueOf(item.getQuantity()));
-              psUpdate.setBigDecimal(2, BigDecimal.valueOf(item.getQuantity()));
-              psUpdate.setString(3, requestId);
-              psUpdate.setString(4, item.getProductCode());
-              psUpdate.setBigDecimal(5, BigDecimal.valueOf(item.getQuantity()));
-
-              int updateResult = psUpdate.executeUpdate();
-              System.out.println("Update result for " + item.getProductName() + ": " + updateResult);
-
-              if (updateResult == 0) {
-                  throw new SQLException("Failed to update pending items for " + item.getProductName() + 
-                                       " (Code: " + item.getProductCode() + ")");
-              }
-
-              // Thêm vào lịch sử
-              psHistory.setString(1, requestId);
-              psHistory.setString(2, item.getProductName());
-              psHistory.setString(3, item.getProductCode());
-              psHistory.setBigDecimal(4, BigDecimal.valueOf(item.getQuantity()));
-              psHistory.setDate(5, Date.valueOf(exportDate));
-              psHistory.setString(6, additionalNote);
-              psHistory.setString(7, processor);
-
-              int historyResult = psHistory.executeUpdate();
-              System.out.println("History insert result for " + item.getProductName() + ": " + historyResult);
-
-              if (historyResult == 0) {
-                  throw new SQLException("Failed to insert export history for " + item.getProductName());
-              }
-          }
-
-          // 3. Kiểm tra và cập nhật trạng thái request
-          String checkSql = "SELECT COUNT(*) as pending_count FROM export_pending_items " +
-                  "WHERE export_request_id = ? AND quantity_pending > 0";
-
-          psCheck = conn.prepareStatement(checkSql);
-          psCheck.setString(1, requestId);
-          rs = psCheck.executeQuery();
-
-          String newStatus = "partial_exported";
-          if (rs.next() && rs.getInt("pending_count") == 0) {
-              newStatus = "completed";
-          }
-
-          System.out.println("New status: " + newStatus);
-
-          // Cập nhật trạng thái
-          String statusSql = "UPDATE export_request SET status = ? WHERE id = ?";
-          psStatus = conn.prepareStatement(statusSql);
-          psStatus.setString(1, newStatus);
-          psStatus.setString(2, requestId);
-
-          int statusResult = psStatus.executeUpdate();
-          System.out.println("Status update result: " + statusResult);
-
-          if (statusResult == 0) {
-              throw new SQLException("Failed to update export request status");
-          }
-
-          conn.commit();
-          System.out.println("=== EXPORT COMPLETED SUCCESSFULLY ===");
-          return true;
-
-      } catch (Exception e) {
-          System.err.println("Error processing partial export: " + e.getMessage());
-          e.printStackTrace();
-          try {
-              if (conn != null) {
-                  conn.rollback();
-                  System.out.println("Transaction rolled back");
-              }
-          } catch (SQLException rollbackEx) {
-              System.err.println("Error rolling back transaction: " + rollbackEx.getMessage());
-          }
-          return false;
-      } finally {
-          try {
-              if (conn != null) {
-                  conn.setAutoCommit(true);
-              }
-          } catch (SQLException e) {
-              System.err.println("Error resetting auto commit: " + e.getMessage());
-          }
-          closeResources(conn, psUpdate, rs);
-          closePreparedStatement(psHistory);
-          closePreparedStatement(psStatus);
-          closePreparedStatement(psCheck);
-      }
-  }
-
-  /**
-   * Cập nhật trạng thái export request thành rejected
-   */
-  public boolean updateExportRequestStatusToRejected(String requestId, String rejectReason) {
-      Connection conn = null;
-      PreparedStatement ps = null;
-
-      try {
-          String sql = "UPDATE export_request SET status = 'rejected', reject_reason = ? WHERE id = ?";
-          conn = Context.getJDBCConnection();
-          ps = conn.prepareStatement(sql);
-          ps.setString(1, rejectReason);
-          ps.setString(2, requestId);
-
-          int result = ps.executeUpdate();
-          return result > 0;
-
-      } catch (Exception e) {
-          System.err.println("Error updating export request status to rejected: " + e.getMessage());
-          e.printStackTrace();
-      } finally {
-          closeResources(conn, ps, null);
-      }
-
-      return false;
-  }
-
-  /**
-   * Khởi tạo export_pending_items từ export_request_items
-   */
-  private boolean initializeExportPendingItems(String requestId) {
-      Connection conn = null;
-      PreparedStatement psCheck = null;
-      PreparedStatement psInsert = null;
-      ResultSet rs = null;
-
-      try {
-          conn = Context.getJDBCConnection();
-
-          // Kiểm tra xem đã có pending items chưa
-          String checkSql = "SELECT COUNT(*) FROM export_pending_items WHERE export_request_id = ?";
-          psCheck = conn.prepareStatement(checkSql);
-          psCheck.setString(1, requestId);
-          rs = psCheck.executeQuery();
-
-          if (rs.next() && rs.getInt(1) == 0) {
-              // Chưa có, tạo mới từ export_request_items
-              String insertSql = "INSERT INTO export_pending_items " +
-                      "(export_request_id, product_name, product_code, unit, unit_id, " +
-                      "quantity_requested, quantity_exported, quantity_pending, note, product_id) " +
-                      "SELECT export_request_id, product_name, product_code, unit, unit_id, " +
-                      "quantity, 0, quantity, note, product_id " +
-                      "FROM export_request_items WHERE export_request_id = ?";
-
-              psInsert = conn.prepareStatement(insertSql);
-              psInsert.setString(1, requestId);
-              int result = psInsert.executeUpdate();
-
-              System.out.println("Initialized " + result + " pending items for request: " + requestId);
-              return result > 0;
-          }
-
-          return true; // Đã có rồi
-
-      } catch (Exception e) {
-          System.err.println("Error initializing export pending items: " + e.getMessage());
-          e.printStackTrace();
-      } finally {
-          closeResources(conn, psCheck, rs);
-          closePreparedStatement(psInsert);
-      }
-
-      return false;
-  }
-
-  /**
-   * Map ResultSet to ExportRequest
-   */
-  private ExportRequest mapResultSetToExportRequest(ResultSet rs) throws SQLException {
-      ExportRequest request = new ExportRequest();
-      
-      request.setId(rs.getString("id"));
-      request.setUserId(rs.getInt("user_id"));
-      request.setDayRequest(rs.getDate("day_request"));
-      request.setStatus(rs.getString("status"));
-      request.setApproveBy(rs.getString("approve_by"));
-      request.setRole(rs.getString("role"));
-      request.setReason(rs.getString("reason"));
-      request.setRejectReason(rs.getString("reject_reason"));
-      request.setCreatedAt(rs.getTimestamp("created_at"));
-
-      return request;
-  }
-
-  /**
-   * Map ResultSet to ExportRequestItem
-   */
-  private ExportRequestItem mapResultSetToExportRequestItem(ResultSet rs) throws SQLException {
-      ExportRequestItem item = new ExportRequestItem();
-
-      item.setId(rs.getInt("id"));
-      item.setExportRequestId(rs.getString("export_request_id"));
-      item.setProductName(rs.getString("product_name"));
-      item.setProductCode(rs.getString("product_code"));
-      item.setUnit(rs.getString("unit"));
-      item.setUnitId(rs.getInt("unit_id"));
-      
-      BigDecimal quantityRequested = rs.getBigDecimal("quantity_requested");
-      BigDecimal quantityExported = rs.getBigDecimal("quantity_exported");
-      BigDecimal quantityPending = rs.getBigDecimal("quantity_pending");
-
-      item.setQuantityRequested(quantityRequested != null ? quantityRequested.doubleValue() : 0.0);
-      item.setQuantityExported(quantityExported != null ? quantityExported.doubleValue() : 0.0);
-      item.setQuantityPending(quantityPending != null ? quantityPending.doubleValue() : 0.0);
-      
-      // Set cho compatibility
-      item.setQuantity(item.getQuantityRequested());
-      item.setExportedQty(item.getQuantityExported());
-
-      item.setNote(rs.getString("note"));
-      item.setProductId(rs.getInt("product_id"));
-
-      return item;
-  }
-
-  /**
-   * Đóng resources an toàn
-   */
-  private void closeResources(Connection conn, PreparedStatement ps, ResultSet rs) {
-      try {
-          if (rs != null) rs.close();
-      } catch (SQLException e) {
-          System.err.println("Error closing ResultSet: " + e.getMessage());
-      }
-
-      try {
-          if (ps != null) ps.close();
-      } catch (SQLException e) {
-          System.err.println("Error closing PreparedStatement: " + e.getMessage());
-      }
-
-      try {
-          if (conn != null) conn.close();
-      } catch (SQLException e) {
-          System.err.println("Error closing Connection: " + e.getMessage());
-      }
-  }
-
-  /**
-   * Đóng PreparedStatement an toàn
-   */
-  private void closePreparedStatement(PreparedStatement ps) {
-      try {
-          if (ps != null) ps.close();
-      } catch (SQLException e) {
-          System.err.println("Error closing PreparedStatement: " + e.getMessage());
-      }
-  }
-
-  // ===== ADDITIONAL UTILITY METHODS =====
-
-  /**
-   * Kiểm tra tồn kho trước khi xuất
-   */
-  public boolean checkInventoryAvailability(String productCode, double requestedQuantity) {
-      Connection conn = null;
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-
-      try {
-          String sql = "SELECT SUM(quantity) as available_quantity FROM inventory " +
-                  "WHERE product_code = ? AND quantity > 0";
-          
-          conn = Context.getJDBCConnection();
-          ps = conn.prepareStatement(sql);
-          ps.setString(1, productCode);
-          rs = ps.executeQuery();
-
-          if (rs.next()) {
-              double availableQuantity = rs.getDouble("available_quantity");
-              return availableQuantity >= requestedQuantity;
-          }
-
-      } catch (Exception e) {
-          System.err.println("Error checking inventory availability: " + e.getMessage());
-          e.printStackTrace();
-      } finally {
-          closeResources(conn, ps, rs);
-      }
-
-      return false;
-  }
-
-  /**
-   * Lấy danh sách export requests theo status
-   */
-  public List<ExportRequest> getExportRequestsByStatus(String status) {
-      List<ExportRequest> requests = new ArrayList<>();
-      Connection conn = null;
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-
-      try {
-          String sql = "SELECT * FROM export_request WHERE status = ? ORDER BY created_at DESC";
-          conn = Context.getJDBCConnection();
-          ps = conn.prepareStatement(sql);
-          ps.setString(1, status);
-          rs = ps.executeQuery();
-
-          while (rs.next()) {
-              ExportRequest request = mapResultSetToExportRequest(rs);
-              requests.add(request);
-          }
-
-      } catch (Exception e) {
-          System.err.println("Error getting export requests by status: " + e.getMessage());
-          e.printStackTrace();
-      } finally {
-          closeResources(conn, ps, rs);
-      }
-
-      return requests;
-  }
-
-  /**
-   * Cập nhật ghi chú cho export request
-   */
-  public boolean updateExportRequestNote(String requestId, String note) {
-      Connection conn = null;
-      PreparedStatement ps = null;
-
-      try {
-          String sql = "UPDATE export_request SET reason = ? WHERE id = ?";
-          conn = Context.getJDBCConnection();
-          ps = conn.prepareStatement(sql);
-          ps.setString(1, note);
-          ps.setString(2, requestId);
-
-          int result = ps.executeUpdate();
-          return result > 0;
-
-      } catch (Exception e) {
-          System.err.println("Error updating export request note: " + e.getMessage());
-          e.printStackTrace();
-      } finally {
-          closeResources(conn, ps, null);
-      }
-
-      return false;
-  }
-
-  /**
-   * Lấy tổng số lượng đã xuất của một sản phẩm trong một request
-   */
-  public double getTotalExportedQuantity(String requestId, String productCode) {
-      double totalExported = 0.0;
-      Connection conn = null;
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-
-      try {
-          String sql = "SELECT SUM(quantity_exported) as total_exported " +
-                  "FROM warehouse_export_history " +
-                  "WHERE export_request_id = ? AND product_code = ?";
-          
-          conn = Context.getJDBCConnection();
-          ps = conn.prepareStatement(sql);
-          ps.setString(1, requestId);
-          ps.setString(2, productCode);
-          rs = ps.executeQuery();
-
-          if (rs.next()) {
-              BigDecimal total = rs.getBigDecimal("total_exported");
-              totalExported = total != null ? total.doubleValue() : 0.0;
-          }
-
-      } catch (Exception e) {
-          System.err.println("Error getting total exported quantity: " + e.getMessage());
-          e.printStackTrace();
-      } finally {
-          closeResources(conn, ps, rs);
-      }
-
-      return totalExported;
-  }
-
-  /**
-   * Xóa export request và các items liên quan (chỉ khi status = pending)
-   */
-  public boolean deleteExportRequest(String requestId) {
-      Connection conn = null;
-      PreparedStatement psCheck = null;
-      PreparedStatement psDeleteItems = null;
-      PreparedStatement psDeletePending = null;
-      PreparedStatement psDeleteRequest = null;
-      ResultSet rs = null;
-
-      try {
-          conn = Context.getJDBCConnection();
-          conn.setAutoCommit(false);
-
-          // Kiểm tra status
-          String checkSql = "SELECT status FROM export_request WHERE id = ?";
-          psCheck = conn.prepareStatement(checkSql);
-          psCheck.setString(1, requestId);
-          rs = psCheck.executeQuery();
-
-          if (rs.next()) {
-              String status = rs.getString("status");
-              if (!"pending".equals(status)) {
-                  System.out.println("Cannot delete export request with status: " + status);
-                  return false;
-              }
-          } else {
-              System.out.println("Export request not found: " + requestId);
-              return false;
-          }
-
-          // Xóa export_request_items
-          String deleteItemsSql = "DELETE FROM export_request_items WHERE export_request_id = ?";
-          psDeleteItems = conn.prepareStatement(deleteItemsSql);
-          psDeleteItems.setString(1, requestId);
-          psDeleteItems.executeUpdate();
-
-          // Xóa export_pending_items
-          String deletePendingSql = "DELETE FROM export_pending_items WHERE export_request_id = ?";
-          psDeletePending = conn.prepareStatement(deletePendingSql);
-          psDeletePending.setString(1, requestId);
-          psDeletePending.executeUpdate();
-
-          // Xóa export_request
-          String deleteRequestSql = "DELETE FROM export_request WHERE id = ?";
-          psDeleteRequest = conn.prepareStatement(deleteRequestSql);
-          psDeleteRequest.setString(1, requestId);
-          int result = psDeleteRequest.executeUpdate();
-
-          conn.commit();
-          return result > 0;
-
-      } catch (Exception e) {
-          System.err.println("Error deleting export request: " + e.getMessage());
-          e.printStackTrace();
-          try {
-              if (conn != null) conn.rollback();
-          } catch (SQLException rollbackEx) {
-              System.err.println("Error rolling back deletion: " + rollbackEx.getMessage());
-          }
-      } finally {
-          try {
-              if (conn != null) conn.setAutoCommit(true);
-          } catch (SQLException e) {
-              System.err.println("Error resetting auto commit: " + e.getMessage());
-          }
-          closeResources(conn, psCheck, rs);
-          closePreparedStatement(psDeleteItems);
-          closePreparedStatement(psDeletePending);
-          closePreparedStatement(psDeleteRequest);
-      }
-
-      return false;
-  }
+    private Connection conn = null;
+    private PreparedStatement ps = null;
+    private ResultSet rs = null;
+
+    private void closeResources() {
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Lấy thông tin export request theo ID (chỉ approved) với thông tin người
+     * yêu cầu
+     */
+    public ExportRequest getExportRequestById(String id) {
+        ExportRequest request = null;
+        String sql = """
+            SELECT er.*, 
+                   u.username as requester_username,
+                   u.fullname as requester_fullname
+            FROM export_request er
+            LEFT JOIN users u ON er.user_id = u.id
+            WHERE er.id = ? AND er.status = 'approved'
+            """;
+
+        try {
+            conn = Context.getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, id);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                request = new ExportRequest();
+                request.setId(rs.getString("id"));
+                request.setUserId(rs.getInt("user_id"));
+                request.setDayRequest(rs.getDate("day_request"));
+                request.setStatus(rs.getString("status"));
+                request.setRole(rs.getString("role"));
+                request.setReason(rs.getString("reason"));
+                request.setRejectReason(rs.getString("reject_reason"));
+                request.setRecipient(rs.getString("recipient"));
+                request.setApproveBy(rs.getString("approve_by"));
+                request.setCreatedAt(rs.getTimestamp("created_at"));
+                request.setExportAt(rs.getTimestamp("export_at"));
+
+                // Set thông tin người yêu cầu
+                request.setRequesterName(rs.getString("requester_username"));
+                request.setRequesterFullName(rs.getString("requester_fullname"));
+
+                System.out.println("✅ Found export request: " + id + " with status: " + request.getStatus());
+                System.out.println("   Requester: " + request.getRequesterDisplayName());
+            } else {
+                System.err.println("❌ Export request not found or not approved: " + id);
+            }
+        } catch (SQLException e) {
+            System.err.println("💥 Error getting export request by ID: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeResources();
+        }
+        return request;
+    }
+
+    /**
+     * Lấy danh sách items của export request
+     */
+    public List<ExportRequestItem> getExportRequestItems(String requestId) {
+        List<ExportRequestItem> list = new ArrayList<>();
+        String sql = """
+            SELECT 
+                eri.id,
+                eri.export_request_id,
+                eri.product_name,
+                eri.product_code,
+                eri.unit,
+                eri.quantity,
+                eri.note,
+                eri.product_id,
+                eri.unit_id,
+                eri.exported_qty
+            FROM export_request_items eri
+            WHERE eri.export_request_id = ?
+            ORDER BY eri.id
+            """;
+
+        try {
+            conn = Context.getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, requestId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                ExportRequestItem item = new ExportRequestItem();
+                item.setId(rs.getInt("id"));
+                item.setExportRequestId(rs.getString("export_request_id"));
+                item.setProductName(rs.getString("product_name"));
+                item.setProductCode(rs.getString("product_code"));
+                item.setUnit(rs.getString("unit"));
+                item.setQuantity(rs.getDouble("quantity"));
+                item.setNote(rs.getString("note"));
+                item.setProductId(rs.getInt("product_id"));
+                item.setUnitId(rs.getInt("unit_id"));
+                item.setExportedQty(rs.getDouble("exported_qty"));
+
+                list.add(item);
+                System.out.println("   📦 Item: " + item.getProductCode() + " - Qty: " + item.getQuantity());
+            }
+
+            System.out.println("✅ Found " + list.size() + " items for request: " + requestId);
+        } catch (SQLException e) {
+            System.err.println("💥 Error getting export request items: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeResources();
+        }
+        return list;
+    }
+
+    /**
+     * Xử lý xuất kho hoàn toàn (approved → completed) - Updated with recipient
+     */
+    public boolean processCompleteExport(String requestId, String exportDate, String recipient,
+            String processor, String additionalNote, List<ExportRequestItem> exportItems) {
+
+        System.out.println("🔍 DEBUG - Starting processCompleteExport:");
+        System.out.println("   Request ID: " + requestId);
+        System.out.println("   Export Date: " + exportDate);
+        System.out.println("   Recipient: " + recipient);
+        System.out.println("   Processor: " + processor);
+        System.out.println("   Additional Note: " + additionalNote);
+        System.out.println("   Items count: " + exportItems.size());
+
+        Connection connection = null;
+        try {
+            connection = Context.getJDBCConnection();
+            connection.setAutoCommit(false);
+            System.out.println("   📡 Connection established, auto-commit disabled");
+
+            // 1. Kiểm tra trạng thái đơn hàng trước khi xử lý
+            if (!isOrderProcessableInTransaction(connection, requestId)) {
+                System.err.println("❌ Order is not processable in transaction");
+                connection.rollback();
+                return false;
+            }
+
+            // 2. Kiểm tra tồn kho trước khi xử lý
+            for (ExportRequestItem item : exportItems) {
+                double exportQuantity = item.getQuantity();
+                System.out.println("   🔍 Checking inventory for: " + item.getProductCode() + " - Quantity: " + exportQuantity);
+
+                if (!checkInventoryAvailabilityInTransaction(connection, item.getProductCode(), exportQuantity)) {
+                    System.err.println("❌ Insufficient inventory for: " + item.getProductCode());
+                    connection.rollback();
+                    return false;
+                }
+            }
+
+            // 3. Xử lý từng item - cập nhật tồn kho và exported_qty
+            for (ExportRequestItem item : exportItems) {
+                double exportQuantity = item.getQuantity();
+
+                System.out.println("   🔄 Processing item: " + item.getProductCode() + " - Quantity: " + exportQuantity);
+
+                // Cập nhật tồn kho (trừ đi số lượng xuất)
+                if (!updateInventoryAfterExport(connection, item.getProductCode(), exportQuantity)) {
+                    System.err.println("❌ Failed to update inventory for: " + item.getProductCode());
+                    connection.rollback();
+                    return false;
+                }
+
+                // Cập nhật exported_qty trong export_request_items
+                if (!updateExportedQuantity(connection, item.getId(), exportQuantity)) {
+                    System.err.println("❌ Failed to update exported quantity for item: " + item.getId());
+                    connection.rollback();
+                    return false;
+                }
+
+                System.out.println("   ✅ Successfully processed item: " + item.getProductCode());
+            }
+
+            // 4. Cập nhật trạng thái export_request thành completed và ghi thông tin xuất kho
+            if (!updateRequestStatusToCompleted(connection, requestId, recipient, processor, additionalNote)) {
+                System.err.println("❌ Failed to update request status to completed");
+                connection.rollback();
+                return false;
+            }
+
+            // 5. Commit transaction
+            connection.commit();
+            System.out.println("✅ Export completed successfully for request: " + requestId);
+            return true;
+
+        } catch (SQLException e) {
+            try {
+                if (connection != null) {
+                    connection.rollback();
+                    System.err.println("🔄 Transaction rolled back due to error");
+                }
+            } catch (SQLException ex) {
+                System.err.println("💥 Error rolling back transaction: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+            System.err.println("💥 Error processing complete export: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println("💥 Error closing connection: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Kiểm tra đơn hàng có thể xử lý trong transaction
+     */
+    private boolean isOrderProcessableInTransaction(Connection connection, String requestId) {
+        String sql = "SELECT status FROM export_request WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, requestId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String status = rs.getString("status");
+                    boolean processable = "approved".equals(status);
+                    System.out.println("   📋 Order status check: " + status + " (processable: " + processable + ")");
+                    return processable;
+                } else {
+                    System.err.println("❌ Order not found in transaction: " + requestId);
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("💥 Error checking order status in transaction: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Cập nhật trạng thái export_request thành completed - Updated with
+     * recipient
+     */
+    private boolean updateRequestStatusToCompleted(Connection connection, String requestId,
+            String recipient, String processor, String additionalNote) {
+
+        System.out.println("🔍 DEBUG - updateRequestStatusToCompleted:");
+        System.out.println("   Request ID: " + requestId);
+        System.out.println("   Recipient: " + recipient);
+        System.out.println("   Processor: " + processor);
+        System.out.println("   Additional Note: " + additionalNote);
+
+        // Tạo reason mới bao gồm ghi chú xuất kho
+        String newReason = null;
+        if (additionalNote != null && !additionalNote.trim().isEmpty()) {
+            newReason = "Xuất kho thành công | " + additionalNote.trim();
+        } else {
+            newReason = "Xuất kho thành công";
+        }
+
+        String sql = """
+        UPDATE export_request 
+        SET status = 'completed',
+            recipient = ?,
+            approve_by = ?,
+            reason = CONCAT(COALESCE(reason, ''), ' | ', ?),
+            export_at = CURRENT_TIMESTAMP
+        WHERE id = ? AND status = 'approved'
+        """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, recipient);
+            ps.setString(2, processor);
+            ps.setString(3, newReason);
+            ps.setString(4, requestId);
+
+            System.out.println("   Executing SQL with recipient: " + recipient + ", newReason: " + newReason);
+
+            int updatedRows = ps.executeUpdate();
+            System.out.println("   Rows affected: " + updatedRows);
+
+            if (updatedRows > 0) {
+                System.out.println("   ✅ Updated export_request status to completed with recipient and export_at");
+                return true;
+            } else {
+                System.err.println("❌ No rows updated - request may not exist or not in approved status");
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("💥 SQL Error updating request status: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Cập nhật exported_qty trong export_request_items
+     */
+    private boolean updateExportedQuantity(Connection connection, int itemId, double exportedQuantity) {
+        String sql = "UPDATE export_request_items SET exported_qty = ? WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setDouble(1, exportedQuantity);
+            ps.setInt(2, itemId);
+
+            int rows = ps.executeUpdate();
+            if (rows > 0) {
+                System.out.println("   📊 Updated exported_qty for item ID: " + itemId + " = " + exportedQuantity);
+                return true;
+            } else {
+                System.err.println("❌ Failed to update exported_qty for item ID: " + itemId);
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("💥 Error updating exported quantity: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Kiểm tra tồn kho trong transaction từ bảng product_in_stock
+     */
+    private boolean checkInventoryAvailabilityInTransaction(Connection connection, String productCode, double requestedQuantity) {
+        String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
+        String checkStockSql = "SELECT SUM(qty) as total_stock FROM product_in_stock WHERE product_id = ? AND status = 'active'";
+
+        try (PreparedStatement getIdPs = connection.prepareStatement(getProductIdSql)) {
+            getIdPs.setString(1, productCode);
+            try (ResultSet idRs = getIdPs.executeQuery()) {
+                if (idRs.next()) {
+                    int productId = idRs.getInt("id");
+
+                    try (PreparedStatement stockPs = connection.prepareStatement(checkStockSql)) {
+                        stockPs.setInt(1, productId);
+                        try (ResultSet stockRs = stockPs.executeQuery()) {
+                            if (stockRs.next()) {
+                                double totalStock = stockRs.getDouble("total_stock");
+                                boolean available = totalStock >= requestedQuantity;
+                                System.out.println("   📦 Stock check for " + productCode + " (ID: " + productId + "): " + totalStock + " >= " + requestedQuantity + " = " + available);
+                                return available;
+                            }
+                        }
+                    }
+                } else {
+                    System.err.println("❌ Product not found: " + productCode);
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("💥 Error checking inventory in transaction: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * Cập nhật tồn kho sau khi xuất từ bảng product_in_stock
+     */
+    private boolean updateInventoryAfterExport(Connection connection, String productCode, double exportedQuantity) {
+        String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
+        String getStockRecordsSql = """
+        SELECT id, qty 
+        FROM product_in_stock 
+        WHERE product_id = ? AND status = 'active' AND qty > 0 
+        ORDER BY id ASC
+        """;
+        String updateStockSql = "UPDATE product_in_stock SET qty = ? WHERE id = ?";
+
+        try (PreparedStatement getIdPs = connection.prepareStatement(getProductIdSql)) {
+            getIdPs.setString(1, productCode);
+            try (ResultSet idRs = getIdPs.executeQuery()) {
+                if (idRs.next()) {
+                    int productId = idRs.getInt("id");
+                    double remainingToExport = exportedQuantity;
+
+                    System.out.println("   🔄 Updating inventory for product ID: " + productId + ", export quantity: " + exportedQuantity);
+
+                    try (PreparedStatement getStockPs = connection.prepareStatement(getStockRecordsSql)) {
+                        getStockPs.setInt(1, productId);
+                        try (ResultSet stockRs = getStockPs.executeQuery()) {
+                            while (stockRs.next() && remainingToExport > 0) {
+                                int stockId = stockRs.getInt("id");
+                                double currentQty = stockRs.getDouble("qty");
+
+                                if (currentQty <= remainingToExport) {
+                                    try (PreparedStatement updatePs = connection.prepareStatement(updateStockSql)) {
+                                        updatePs.setDouble(1, 0);
+                                        updatePs.setInt(2, stockId);
+                                        updatePs.executeUpdate();
+                                        remainingToExport -= currentQty;
+                                        System.out.println("     📉 Stock record ID " + stockId + ": " + currentQty + " → 0 (exported: " + currentQty + ")");
+                                    }
+                                } else {
+                                    double newQty = currentQty - remainingToExport;
+                                    try (PreparedStatement updatePs = connection.prepareStatement(updateStockSql)) {
+                                        updatePs.setDouble(1, newQty);
+                                        updatePs.setInt(2, stockId);
+                                        updatePs.executeUpdate();
+                                        System.out.println("     📉 Stock record ID " + stockId + ": " + currentQty + " → " + newQty + " (exported: " + remainingToExport + ")");
+                                        remainingToExport = 0;
+                                    }
+                                }
+                            }
+
+                            if (remainingToExport > 0) {
+                                System.err.println("❌ Insufficient stock to complete export. Remaining: " + remainingToExport);
+                                return false;
+                            }
+
+                            System.out.println("   ✅ Successfully updated inventory for " + productCode + " (exported: " + exportedQuantity + ")");
+                            return true;
+                        }
+                    }
+                } else {
+                    System.err.println("❌ Product not found: " + productCode);
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("💥 Error updating inventory: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Cập nhật trạng thái đơn hàng thành rejected
+     */
+    public boolean updateRequestStatusToRejected(String requestId, String rejectReason) {
+        String sql = """
+            UPDATE export_request 
+            SET status = 'rejected', 
+                reject_reason = ?
+            WHERE id = ? AND status = 'approved'
+            """;
+
+        try {
+            conn = Context.getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, rejectReason);
+            ps.setString(2, requestId);
+
+            int rows = ps.executeUpdate();
+            if (rows > 0) {
+                System.out.println("✅ Request " + requestId + " rejected successfully (rows affected: " + rows + ")");
+                return true;
+            } else {
+                System.err.println("❌ Failed to reject request - may not exist or not in approved status: " + requestId);
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("💥 Error updating request status to rejected: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            closeResources();
+        }
+    }
+
+    /**
+     * Kiểm tra xem đơn hàng có thể xử lý không (chỉ approved)
+     */
+    public boolean isOrderProcessable(String requestId) {
+        String sql = "SELECT status FROM export_request WHERE id = ?";
+
+        try {
+            conn = Context.getJDBCConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, requestId);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String status = rs.getString("status");
+                boolean processable = "approved".equals(status);
+                System.out.println("🔍 Order " + requestId + " status: " + status + " (processable: " + processable + ")");
+                return processable;
+            } else {
+                System.err.println("❌ Order not found: " + requestId);
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("💥 Error checking order processable status: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeResources();
+        }
+        return false;
+    }
+
+    /**
+     * Kiểm tra tồn kho trước khi xuất từ bảng product_in_stock
+     */
+    public boolean checkInventoryAvailability(String productCode, double requestedQuantity) {
+        String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
+        String checkStockSql = "SELECT SUM(qty) as total_stock FROM product_in_stock WHERE product_id = ? AND status = 'active'";
+
+        try {
+            conn = Context.getJDBCConnection();
+            ps = conn.prepareStatement(getProductIdSql);
+            ps.setString(1, productCode);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int productId = rs.getInt("id");
+                rs.close();
+                ps.close();
+
+                ps = conn.prepareStatement(checkStockSql);
+                ps.setInt(1, productId);
+                rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    double totalStock = rs.getDouble("total_stock");
+                    boolean available = totalStock >= requestedQuantity;
+                    System.out.println("📦 Inventory check for " + productCode + " (ID: " + productId + "): " + totalStock + " >= " + requestedQuantity + " = " + available);
+                    return available;
+                }
+            } else {
+                System.err.println("❌ Product not found for inventory check: " + productCode);
+            }
+        } catch (SQLException e) {
+            System.err.println("💥 Error checking inventory availability: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeResources();
+        }
+        return false;
+    }
+
+    /**
+     * Lấy thông tin tồn kho hiện tại của sản phẩm từ bảng product_in_stock
+     */
+    public double getCurrentStock(String productCode) {
+        String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
+        String getStockSql = "SELECT SUM(qty) as total_stock FROM product_in_stock WHERE product_id = ? AND status = 'active'";
+
+        try {
+            conn = Context.getJDBCConnection();
+            ps = conn.prepareStatement(getProductIdSql);
+            ps.setString(1, productCode);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int productId = rs.getInt("id");
+                rs.close();
+                ps.close();
+
+                ps = conn.prepareStatement(getStockSql);
+                ps.setInt(1, productId);
+                rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    double stock = rs.getDouble("total_stock");
+                    System.out.println("📊 Current stock for " + productCode + " (ID: " + productId + "): " + stock);
+                    return stock;
+                }
+            } else {
+                System.err.println("❌ Product not found for stock check: " + productCode);
+            }
+        } catch (SQLException e) {
+            System.err.println("💥 Error getting current stock: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeResources();
+        }
+        return 0;
+    }
+
+    /**
+     * Thêm method để lấy chi tiết tồn kho theo từng record
+     */
+    public void getStockDetails(String productCode) {
+        String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
+        String getDetailsSql = """
+        SELECT id, qty, status 
+        FROM product_in_stock 
+        WHERE product_id = ? 
+        ORDER BY id ASC
+        """;
+
+        try {
+            conn = Context.getJDBCConnection();
+            ps = conn.prepareStatement(getProductIdSql);
+            ps.setString(1, productCode);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int productId = rs.getInt("id");
+                rs.close();
+                ps.close();
+
+                System.out.println("📋 Stock details for " + productCode + " (ID: " + productId + "):");
+
+                ps = conn.prepareStatement(getDetailsSql);
+                ps.setInt(1, productId);
+                rs = ps.executeQuery();
+
+                double totalStock = 0;
+                int recordCount = 0;
+
+                while (rs.next()) {
+                    int stockId = rs.getInt("id");
+                    double qty = rs.getDouble("qty");
+                    String status = rs.getString("status");
+
+                    System.out.println("   Record ID: " + stockId + ", Qty: " + qty + ", Status: " + status);
+
+                    if ("active".equals(status)) {
+                        totalStock += qty;
+                    }
+                    recordCount++;
+                }
+
+                System.out.println("   Total active stock: " + totalStock + " (from " + recordCount + " records)");
+            }
+        } catch (SQLException e) {
+            System.err.println("💥 Error getting stock details: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeResources();
+        }
+    }
+
+    /**
+     * Test database connection
+     */
+    public void testDatabaseConnection() {
+        try {
+            Connection conn = Context.getJDBCConnection();
+            if (conn != null) {
+                System.out.println("✅ Database connection successful");
+                String sql = "SELECT COUNT(*) FROM export_request";
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    System.out.println("✅ Total export requests: " + count);
+                }
+
+                rs.close();
+                ps.close();
+                conn.close();
+            } else {
+                System.err.println("❌ Database connection failed");
+            }
+        } catch (SQLException e) {
+            System.err.println("💥 Database error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

@@ -3,21 +3,19 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/UserDAO.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ListPurchaseOrderServlet.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ActivateMaterialUnitServlet.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/LoadingRequestServlet.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/GetStatusOfPurchaseRequestInformationDAO.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/category-statistics.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/ApprovePurchaseRequest.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/ItemsSupplyRequestForm.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ApprovePurchaseRequestServlet.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/PurchaseOrderDAO.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/EdituserServlet.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/AdduserServlet.java</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/AddUser.jsp</file>
-            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/ProductInfoDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/Department_list.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/Admin.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/dao/DepartmentDAO.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/Department_edit.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/RolePermissionServlet.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/permission.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/DepartmentController.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/WEB-INF/web.xml</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/AuthorizationFilter.java</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/Department_create.jsp</file>
             <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/EditUser.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/web/ExportManagement.jsp</file>
+            <file>file:/D:/PRJ301-DATLT/Practice/ProjectSwp/src/java/controller/ExportConfirmController.java</file>
         </group>
     </open-files>
 </project-private>

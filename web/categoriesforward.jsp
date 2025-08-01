@@ -273,22 +273,6 @@
                         </div>
                     </div>
 
-                    <!-- Categories Supplier -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Danh mục Nhà cung cấp</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="icon-container">
-                                <span class="material-icons">business</span>
-                            </div>
-                            <h4 class="card-title">Quản lý Nhà cung cấp</h4>
-                            <p class="card-text">Thêm, sửa, xóa và xem thông tin về các nhà cung cấp vật liệu.</p>
-                            <a href="LishSupplier" class="btn btn-primary">
-                                Truy cập <span class="material-icons btn-icon">arrow_forward</span>
-                            </a>
-                        </div>
-                    </div>   
 
                     <!-- Product Management -->
                     <div class="card">

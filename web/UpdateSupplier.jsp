@@ -158,7 +158,7 @@
         %>
 
         <div class="layout-container">
-            <jsp:include page="/include/sidebar.jsp" />
+            <jsp:include page="/include/sidebaradmin.jsp" />
             <div class="main-content">
                 <div class="form-container">
                     <h1>Update Supplier</h1>

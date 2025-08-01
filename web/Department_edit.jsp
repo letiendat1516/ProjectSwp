@@ -11,7 +11,7 @@
 <%@page import="model.Users"%>
 <%
     Users user = (Users) session.getAttribute("user");
-    if (user == null || (!"Admin".equals(user.getRoleName())) {
+    if (user == null || !"Admin".equals(user.getRoleName())) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -318,7 +318,7 @@
 </head>
 <body>
     <div class="layout-container">
-        <jsp:include page="/include/sidebar.jsp" />
+        <jsp:include page="/include/sidebaradmin.jsp" />
         <div class="main-content">
             <div class="header">
                 <h1 class="page-title">Chỉnh sửa phòng ban</h1>

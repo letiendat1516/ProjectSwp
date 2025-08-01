@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class Users {
 
-    private int id;
+    public int id;
     private String username;
     private Date dob;
     private String password;
