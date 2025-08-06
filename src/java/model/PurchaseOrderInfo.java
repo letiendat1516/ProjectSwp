@@ -18,12 +18,13 @@ public class PurchaseOrderInfo {
     private String email;
     private String summary;
     private String rejectReason2;
+    private String department;
     private List<PurchaseOrderItems> purchaseItems;
 
     public PurchaseOrderInfo() {
     }
 
-    public PurchaseOrderInfo(String id, String fullname, Date dayPurchase, Date dayQuote, String status, String reason, String rejectReason, String supplier, String address, String phone, String email, String summary, String rejectReason2, List<PurchaseOrderItems> purchaseItems) {
+    public PurchaseOrderInfo(String id, String fullname, Date dayPurchase, Date dayQuote, String status, String reason, String rejectReason, String supplier, String address, String phone, String email, String summary, String rejectReason2, String department, List<PurchaseOrderItems> purchaseItems) {
         this.id = id;
         this.fullname = fullname;
         this.dayPurchase = dayPurchase;
@@ -37,6 +38,7 @@ public class PurchaseOrderInfo {
         this.email = email;
         this.summary = summary;
         this.rejectReason2 = rejectReason2;
+        this.department = department;
         this.purchaseItems = purchaseItems;
     }
 
@@ -142,6 +144,14 @@ public class PurchaseOrderInfo {
 
     public void setRejectReason2(String rejectReason2) {
         this.rejectReason2 = rejectReason2;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     public List<PurchaseOrderItems> getPurchaseItems() {

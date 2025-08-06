@@ -641,7 +641,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-paper-plane"></i> Gửi Yêu Cầu
                     </button>
-                    <a href="RequestForward.jsp" class="btn btn-secondary">
+                    <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Quay Lại
                     </a>
                 </div>

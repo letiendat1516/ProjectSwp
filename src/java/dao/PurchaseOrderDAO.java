@@ -224,7 +224,7 @@ public class PurchaseOrderDAO {
     /**
      * Lấy thông tin chi tiết Purchase Orders theo danh sách IDs
      */
-    // Cập nhật method getPurchaseOrdersByIds
+// ✅ CẬP NHẬT method getPurchaseOrdersByIds
 private List<PurchaseOrderInfo> getPurchaseOrdersByIds(List<String> ids) {
     List<PurchaseOrderInfo> purchaseOrders = new ArrayList<>();
 
@@ -234,9 +234,10 @@ private List<PurchaseOrderInfo> getPurchaseOrdersByIds(List<String> ids) {
 
     String placeholders = String.join(",", ids.stream().map(id -> "?").toArray(String[]::new));
 
-    // ✅ THÊM reject_reason_2 vào SELECT
+    // ✅ THÊM department vào SELECT
     String sql = "SELECT po.id, po.fullname, po.day_purchase, po.day_quote, po.status, "
-            + "po.reason, po.supplier, po.address, po.phone, po.email, po.summary, po.reject_reason_2 "
+            + "po.reason, po.supplier, po.address, po.phone, po.email, po.summary, "
+            + "po.reject_reason_2, po.department "  // ✅ THÊM department
             + "FROM purchase_order_info po "
             + "WHERE po.id IN (" + placeholders + ") "
             + "ORDER BY po.id DESC";
@@ -265,11 +266,12 @@ private List<PurchaseOrderInfo> getPurchaseOrdersByIds(List<String> ids) {
                 po.setPhone(rs.getString("phone"));
                 po.setEmail(rs.getString("email"));
                 po.setSummary(rs.getString("summary"));
-                // ✅ THÊM dòng này
                 po.setRejectReason2(rs.getString("reject_reason_2"));
+                // ✅ THÊM dòng này
+                po.setDepartment(rs.getString("department"));
 
                 purchaseOrders.add(po);
-                System.out.println("Loaded purchase order: " + po.getId());
+                System.out.println("Loaded purchase order: " + po.getId() + " - Department: " + po.getDepartment());
             }
         }
 
@@ -280,6 +282,7 @@ private List<PurchaseOrderInfo> getPurchaseOrdersByIds(List<String> ids) {
 
     return purchaseOrders;
 }
+
 // Cập nhật method getPurchaseOrderById
 public PurchaseOrderInfo getPurchaseOrderById(String id) {
     PurchaseOrderInfo purchaseOrder = null;
@@ -447,9 +450,9 @@ public PurchaseOrderInfo getPurchaseOrderById(String id) {
      */
     public boolean updatePurchaseOrderInfo(String purchaseOrderId, Date quoteDate,
             String supplier, String address, String phone,
-            String email, String summary) {
+            String email, String summary, String department) {
         String sql = "UPDATE purchase_order_info SET "
-                + "day_quote = ?, supplier = ?, address = ?, phone = ?, email = ?, summary = ? "
+                + "day_quote = ?, supplier = ?, address = ?, phone = ?, email = ?, summary = ?, department = ? "
                 + "WHERE id = ?";
 
         try (Connection con = Context.getJDBCConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -460,7 +463,8 @@ public PurchaseOrderInfo getPurchaseOrderById(String id) {
             ps.setString(4, phone);
             ps.setString(5, email);
             ps.setString(6, summary);
-            ps.setString(7, purchaseOrderId);
+            ps.setString(7, department);
+            ps.setString(8, purchaseOrderId);
 
             int rowsAffected = ps.executeUpdate();
             System.out.println("✅ Updated purchase_order_info for ID: " + purchaseOrderId + " (" + rowsAffected + " rows)");
@@ -776,5 +780,3 @@ public boolean clearRejectReason(String purchaseOrderId) {
     }
 }
 }
-
-                

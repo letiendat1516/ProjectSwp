@@ -607,9 +607,9 @@
 
                 <!-- Footer -->
                 <div class="footer">
-                    <a href="Admin.jsp" class="btn-secondary">
+                    <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="btn-secondary">
                         <span class="material-icons back-btn-icon">arrow_back</span>
-                        Quay về Dashboard
+                        Quay về
                     </a>
                 </div>
             </div>

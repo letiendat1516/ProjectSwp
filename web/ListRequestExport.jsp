@@ -1204,7 +1204,7 @@
                                     </c:otherwise>
                                 </c:choose>
                             </div>
-                            <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="btn btn-primary btn-icon">
+                            <a href="${pageContext.request.contextPath}/categoriesforward.jsp" class="btn btn-primary btn-icon">
                                 <i class="fas fa-arrow-left"></i> Quay lại
                             </a>
                         </div>

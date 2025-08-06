@@ -439,8 +439,10 @@
         <url-pattern>/loadingrequest</url-pattern>
         <url-pattern>/ListRequestImport.jsp</url-pattern>
         <url-pattern>/import</url-pattern>
+        <url-pattern>/import-confirm</url-pattern>
         <url-pattern>/ExportRequest.jsp</url-pattern>
         <url-pattern>/exportRequest</url-pattern>
+        <url-pattern>/exportList</url-pattern>
         <url-pattern>/ListPurchaseOrder.jsp</url-pattern>
         <url-pattern>/listpurchaseorder</url-pattern>
         <url-pattern>/PurchaseOrderForm.jsp</url-pattern>

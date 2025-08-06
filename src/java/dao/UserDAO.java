@@ -905,7 +905,9 @@ public class UserDAO extends Context {
     
     public static void main(String[] args) {
         UserDAO ud = new UserDAO();
-        Users u = ud.findByUsername("admin");
+        Users u = ud.findByUsername("sep");
+        System.out.println(u.getFullname());
         System.out.println(u.getPassword());
+        System.out.println(u.getRoleName());
     }
 }

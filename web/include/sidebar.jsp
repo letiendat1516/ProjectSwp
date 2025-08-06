@@ -121,6 +121,7 @@ Description: Reusable sidebar compon<div class="sidebar">
 <div class="sidebar">
     <h2>Warehouse Management</h2>
     <a href="${pageContext.request.contextPath}/categoriesforward.jsp" class="nav-item">Thông tin vật tư</a>
+    <a href="${pageContext.request.contextPath}/ApproveListForward.jsp" class="nav-item">Đơn từ</a>
     <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="nav-item">Giao dịch</a>
     <a href="${pageContext.request.contextPath}/profile" class="nav-item">Thông tin cá nhân</a>
     <a href="${pageContext.request.contextPath}/Admin.jsp" class="nav-item">Trang chủ (Chỉ Admin)</a>

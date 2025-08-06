@@ -71,7 +71,6 @@ public class EditProfileServlet extends HttpServlet {
         String fullname = request.getParameter("fullname");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
-        String dobStr = request.getParameter("dob");
 
         // Validate thông tin đầu vào
         if (fullname == null || fullname.trim().isEmpty()
@@ -82,29 +81,6 @@ public class EditProfileServlet extends HttpServlet {
             return;
         }
 
-        java.sql.Date dob = null;
-        try {
-            if (dobStr != null && !dobStr.trim().isEmpty()) {
-                dob = java.sql.Date.valueOf(dobStr);
-            }
-        } catch (IllegalArgumentException e) {
-            request.setAttribute("error", "Ngày sinh không hợp lệ!");
-            request.setAttribute("user", sessionUser);
-            request.getRequestDispatcher("EditProfile.jsp").forward(request, response);
-            return;
-        }
-
-        if (dob != null) {
-            java.time.LocalDate birth = dob.toLocalDate();
-            java.time.LocalDate now = java.time.LocalDate.now();
-            int age = java.time.Period.between(birth, now).getYears();
-            if (age < 18 || age > 60) {
-                request.setAttribute("error", "Tuổi người dùng phải từ 18 đến 60!");
-                request.setAttribute("user", sessionUser);
-                request.getRequestDispatcher("EditProfile.jsp").forward(request, response);
-                return;
-            }
-        }
 
         // Cập nhật user
         Users updatedUser = new Users();
@@ -112,7 +88,6 @@ public class EditProfileServlet extends HttpServlet {
         updatedUser.setFullname(fullname);
         updatedUser.setEmail(email);
         updatedUser.setPhone(phone);
-        updatedUser.setDob(dob);
 
         try {
             userDAO.updateProfile(updatedUser);

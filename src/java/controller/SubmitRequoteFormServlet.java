@@ -54,60 +54,61 @@ public class SubmitRequoteFormServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        request.setCharacterEncoding("UTF-8");
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    response.setContentType("text/html;charset=UTF-8");
+    request.setCharacterEncoding("UTF-8");
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect("login.jsp");
+    HttpSession session = request.getSession(false);
+    if (session == null || session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    try {
+        // ✅ 1. LẤY THÔNG TIN CƠ BẢN TỪ FORM (THÊM DEPARTMENT)
+        String originalRequestId = request.getParameter("originalRequestId");
+        String quoteDate = request.getParameter("quote_date");
+        String supplier = request.getParameter("supplier_name");
+        String address = request.getParameter("supplier_address");
+        String phone = request.getParameter("supplier_phone");
+        String email = request.getParameter("supplier_email");
+        String quoteSummary = request.getParameter("quote_summary");
+        String department = request.getParameter("department"); // ← THÊM DEPARTMENT
+
+        System.out.println("🔍 Processing quote for ID: " + originalRequestId);
+        System.out.println("🔍 Department: " + department); // ← THÊM LOG
+
+        // ✅ 2. CHUYỂN ĐỔI NGÀY BÁO GIÁ AN TOÀN
+        java.sql.Date sqlQuoteDate = null;
+        if (quoteDate != null && !quoteDate.isEmpty()) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date quoteDateParsed = sdf.parse(quoteDate);
+            sqlQuoteDate = new java.sql.Date(quoteDateParsed.getTime());
+            System.out.println("✅ Converted date successfully: " + sqlQuoteDate);
+        }
+
+        // ✅ 3. CẬP NHẬT THÔNG TIN PURCHASE_ORDER_INFO (THÊM DEPARTMENT)
+        PurchaseOrderDAO dao = new PurchaseOrderDAO();
+        boolean updateInfoSuccess = dao.updatePurchaseOrderInfo(
+                originalRequestId,
+                sqlQuoteDate,
+                supplier,
+                address,
+                phone,
+                email,
+                quoteSummary,
+                department // ← THÊM DEPARTMENT PARAMETER
+        );
+
+        if (!updateInfoSuccess) {
+            System.out.println("❌ Failed to update purchase order info");
+            request.setAttribute("errorMessage", "Không thể cập nhật thông tin báo giá. Vui lòng thử lại.");
+            request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
             return;
         }
 
-        try {
-            // ✅ 1. LẤY THÔNG TIN CƠ BẢN TỪ FORM
-            String originalRequestId = request.getParameter("originalRequestId");
-            String quoteDate = request.getParameter("quote_date");
-            String supplier = request.getParameter("supplier_name");
-            String address = request.getParameter("supplier_address");
-            String phone = request.getParameter("supplier_phone");
-            String email = request.getParameter("supplier_email");
-            String quoteSummary = request.getParameter("quote_summary");
-
-            System.out.println("🔍 Processing quote for ID: " + originalRequestId);
-            System.out.println("🔍 Quote date: " + quoteDate);
-            System.out.println("🔍 Supplier: " + supplier);
-
-            // ✅ 2. CHUYỂN ĐỔI NGÀY BÁO GIÁ AN TOÀN
-            java.sql.Date sqlQuoteDate = null;
-            if (quoteDate != null && !quoteDate.isEmpty()) {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date quoteDateParsed = sdf.parse(quoteDate);
-                sqlQuoteDate = new java.sql.Date(quoteDateParsed.getTime());
-                System.out.println("✅ Converted date successfully: " + sqlQuoteDate);
-            }
-
-            // ✅ 3. CẬP NHẬT THÔNG TIN PURCHASE_ORDER_INFO
-            PurchaseOrderDAO dao = new PurchaseOrderDAO();
-            boolean updateInfoSuccess = dao.updatePurchaseOrderInfo(
-                    originalRequestId,
-                    sqlQuoteDate,
-                    supplier,
-                    address,
-                    phone,
-                    email,
-                    quoteSummary
-            );
-
-            if (!updateInfoSuccess) {
-                System.out.println("❌ Failed to update purchase order info");
-                request.setAttribute("errorMessage", "Không thể cập nhật thông tin báo giá. Vui lòng thử lại.");
-                request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
-                return;
-            }
-
-            System.out.println("✅ Updated purchase order info successfully");
+        System.out.println("✅ Updated purchase order info successfully with department: " + department);
 
             // ✅ 4. CẬP NHẬT GIÁ CHO TỪNG ITEM (CHỈ SỐ NGUYÊN)
             String[] productCodes = request.getParameterValues("product_code");

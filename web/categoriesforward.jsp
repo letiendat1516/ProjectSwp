@@ -290,7 +290,39 @@
                             </a>
                         </div>
                     </div>
+                    <!-- Request list -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Danh sách yêu cầu nhập</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-container">
+                                <span class="material-icons">list</span>
+                            </div>
+                            <h4 class="card-title">Danh sách yêu cầu nhập kho</h4>
+                            <p class="card-text">Xem danh sách các yêu cầu nhập kho.</p>
+                            <a href="import" class="btn btn-primary">
+                                Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
 
+                    <!-- THÊM MỚI: Danh sách yêu cầu xuất kho -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Danh sách yêu cầu xuất</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-container">
+                                <span class="material-icons">inventory_2</span>
+                            </div>
+                            <h4 class="card-title">Danh sách yêu cầu xuất kho</h4>
+                            <p class="card-text">Xem và xử lý các yêu cầu xuất kho đã được duyệt.</p>
+                            <a href="exportList" class="btn btn-primary">
+                                Truy cập <span class="material-icons btn-icon">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
                     <!-- Stock Management -->
                     <div class="card">
                         <div class="card-header">

@@ -13,489 +13,462 @@ import java.math.BigDecimal;
 
 public class ImportDAO {
 
-    private Connection conn = null;
-    private PreparedStatement ps = null;
-    private ResultSet rs = null;
+  private Connection conn = null;
+  private PreparedStatement ps = null;
+  private ResultSet rs = null;
 
-    private void closeResources() {
-        try {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+  private void closeResources() {
+      try {
+          if (rs != null) {
+              rs.close();
+          }
+          if (ps != null) {
+              ps.close();
+          }
+          if (conn != null) {
+              conn.close();
+          }
+      } catch (SQLException e) {
+          e.printStackTrace();
+      }
+  }
 
-    /**
-     * Lấy thông tin purchase order theo ID với thông tin nhập kho
-     */
-    public PurchaseOrderInfo getPurchaseOrderById(String id) {
-        PurchaseOrderInfo order = null;
-        String sql = "SELECT * FROM purchase_order_info WHERE id = ? AND status IN ('approved', 'partial_imported')";
+  /**
+   * Lấy thông tin purchase order theo ID với thông tin nhập kho
+   */
+  public PurchaseOrderInfo getPurchaseOrderById(String id) {
+      PurchaseOrderInfo order = null;
+      String sql = "SELECT * FROM purchase_order_info WHERE id = ? AND status IN ('approved', 'partial_imported')";
 
-        try {
-            conn = Context.getJDBCConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, id);
-            rs = ps.executeQuery();
+      try {
+          conn = Context.getJDBCConnection();
+          ps = conn.prepareStatement(sql);
+          ps.setString(1, id);
+          rs = ps.executeQuery();
 
-            if (rs.next()) {
-                order = new PurchaseOrderInfo();
-                order.setId(rs.getString("id"));
-                order.setFullname(rs.getString("fullname"));
-                order.setDayPurchase(rs.getDate("day_purchase"));
-                order.setDayQuote(rs.getDate("day_quote"));
-                order.setStatus(rs.getString("status"));
-                order.setReason(rs.getString("reason"));
-                order.setRejectReason(rs.getString("reject_reason"));
-                order.setSupplier(rs.getString("supplier"));
-                order.setAddress(rs.getString("address"));
-                order.setPhone(rs.getString("phone"));
-                order.setEmail(rs.getString("email"));
-                order.setSummary(rs.getString("summary"));
-            }
-        } catch (SQLException e) {
-            System.err.println("Error getting purchase order by ID: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            closeResources();
-        }
-        return order;
-    }
+          if (rs.next()) {
+              order = new PurchaseOrderInfo();
+              order.setId(rs.getString("id"));
+              order.setFullname(rs.getString("fullname"));
+              order.setDayPurchase(rs.getDate("day_purchase"));
+              order.setDayQuote(rs.getDate("day_quote"));
+              order.setStatus(rs.getString("status"));
+              order.setReason(rs.getString("reason"));
+              order.setRejectReason(rs.getString("reject_reason"));
+              order.setSupplier(rs.getString("supplier"));
+              order.setAddress(rs.getString("address"));
+              order.setPhone(rs.getString("phone"));
+              order.setEmail(rs.getString("email"));
+              order.setSummary(rs.getString("summary"));
+          }
+      } catch (SQLException e) {
+          System.err.println("Error getting purchase order by ID: " + e.getMessage());
+          e.printStackTrace();
+      } finally {
+          closeResources();
+      }
+      return order;
+  }
 
-    /**
-     * Lấy danh sách items với thông tin nhập kho từng phần
-     */
-    public List<PurchaseOrderItems> getPurchaseOrderItemsByOrderId(String orderId) {
-        List<PurchaseOrderItems> list = new ArrayList<>();
-        String sql = """
-            SELECT 
-                poi.id,
-                poi.purchase_id,
-                poi.product_name,
-                poi.product_code,
-                poi.unit,
-                poi.quantity as quantity_ordered,
-                poi.price_per_unit,
-                poi.total_price,
-                poi.note,
-                COALESCE(wpi.quantity_imported, 0) as quantity_imported,
-                COALESCE(wpi.quantity_pending, poi.quantity) as quantity_pending
-            FROM purchase_order_items poi
-            LEFT JOIN warehouse_pending_items wpi ON poi.purchase_id = wpi.purchase_id 
-                AND poi.product_code = wpi.product_code
-            WHERE poi.purchase_id = ?
-            ORDER BY poi.id
-            """;
+  /**
+   * Lấy danh sách items với thông tin nhập kho từng phần
+   */
+  public List<PurchaseOrderItems> getPurchaseOrderItemsByOrderId(String orderId) {
+      List<PurchaseOrderItems> list = new ArrayList<>();
+      String sql = """
+          SELECT 
+              poi.id,
+              poi.purchase_id,
+              poi.product_name,
+              poi.product_code,
+              poi.unit,
+              poi.quantity as quantity_ordered,
+              poi.price_per_unit,
+              poi.total_price,
+              poi.note,
+              COALESCE(wpi.quantity_imported, 0) as quantity_imported,
+              COALESCE(wpi.quantity_pending, poi.quantity) as quantity_pending
+          FROM purchase_order_items poi
+          LEFT JOIN warehouse_pending_items wpi ON poi.purchase_id = wpi.purchase_id 
+              AND poi.product_code = wpi.product_code
+          WHERE poi.purchase_id = ?
+          ORDER BY poi.id
+          """;
 
-        try {
-            conn = Context.getJDBCConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, orderId);
-            rs = ps.executeQuery();
+      try {
+          conn = Context.getJDBCConnection();
+          ps = conn.prepareStatement(sql);
+          ps.setString(1, orderId);
+          rs = ps.executeQuery();
 
-            while (rs.next()) {
-                PurchaseOrderItems item = new PurchaseOrderItems();
-                item.setId(rs.getInt("id"));
-                item.setPurchaseId(rs.getString("purchase_id"));
-                item.setProductName(rs.getString("product_name"));
-                item.setProductCode(rs.getString("product_code"));
-                item.setUnit(rs.getString("unit"));
+          while (rs.next()) {
+              PurchaseOrderItems item = new PurchaseOrderItems();
+              item.setId(rs.getInt("id"));
+              item.setPurchaseId(rs.getString("purchase_id"));
+              item.setProductName(rs.getString("product_name"));
+              item.setProductCode(rs.getString("product_code"));
+              item.setUnit(rs.getString("unit"));
 
-                BigDecimal quantityOrdered = rs.getBigDecimal("quantity_ordered");
-                item.setQuantity(quantityOrdered);
-                item.setQuantityOrdered(quantityOrdered);
-                item.setQuantityImported(rs.getBigDecimal("quantity_imported"));
-                item.setQuantityPending(rs.getBigDecimal("quantity_pending"));
+              BigDecimal quantityOrdered = rs.getBigDecimal("quantity_ordered");
+              item.setQuantity(quantityOrdered);
+              item.setQuantityOrdered(quantityOrdered);
+              item.setQuantityImported(rs.getBigDecimal("quantity_imported"));
+              item.setQuantityPending(rs.getBigDecimal("quantity_pending"));
 
-                item.setPricePerUnit(rs.getBigDecimal("price_per_unit"));
-                item.setTotalPrice(rs.getBigDecimal("total_price"));
-                item.setNote(rs.getString("note"));
-                list.add(item);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error getting purchase order items: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            closeResources();
-        }
-        return list;
-    }
+              item.setPricePerUnit(rs.getBigDecimal("price_per_unit"));
+              item.setTotalPrice(rs.getBigDecimal("total_price"));
+              item.setNote(rs.getString("note"));
+              list.add(item);
+          }
+      } catch (SQLException e) {
+          System.err.println("Error getting purchase order items: " + e.getMessage());
+          e.printStackTrace();
+      } finally {
+          closeResources();
+      }
+      return list;
+  }
 
-    /**
-     * Xử lý nhập kho từng phần - Cập nhật ghi chú bổ sung vào reason
-     */
-    public boolean processPartialImport(String requestId, String importDate, String processor,
-            String additionalNote, List<PurchaseOrderItems> importItems) {
-        try {
-            conn = Context.getJDBCConnection();
-            conn.setAutoCommit(false);
+  /**
+   * Xử lý nhập kho từng phần - Cập nhật stock ngay sau khi insert history
+   */
+  public boolean processPartialImport(String requestId, String importDate, String processor,
+          String additionalNote, List<PurchaseOrderItems> importItems) {
+      try {
+          conn = Context.getJDBCConnection();
+          conn.setAutoCommit(false);
 
-            // 1. Cập nhật hoặc tạo mới warehouse_pending_items
-            for (PurchaseOrderItems item : importItems) {
-                BigDecimal importQuantity = item.getQuantity(); // Số lượng nhập lần này
-                if (importQuantity != null && importQuantity.compareTo(BigDecimal.ZERO) > 0) {
+          // 1. Cập nhật hoặc tạo mới warehouse_pending_items
+          for (PurchaseOrderItems item : importItems) {
+              BigDecimal importQuantity = item.getQuantity(); // Số lượng nhập lần này
+              if (importQuantity != null && importQuantity.compareTo(BigDecimal.ZERO) > 0) {
 
-                    // Kiểm tra xem item đã tồn tại trong pending chưa
-                    String checkSql = "SELECT quantity_imported, quantity_pending FROM warehouse_pending_items WHERE purchase_id = ? AND product_code = ?";
-                    ps = conn.prepareStatement(checkSql);
-                    ps.setString(1, requestId);
-                    ps.setString(2, item.getProductCode());
-                    rs = ps.executeQuery();
+                  // Kiểm tra xem item đã tồn tại trong pending chưa
+                  String checkSql = "SELECT quantity_imported, quantity_pending FROM warehouse_pending_items WHERE purchase_id = ? AND product_code = ?";
+                  ps = conn.prepareStatement(checkSql);
+                  ps.setString(1, requestId);
+                  ps.setString(2, item.getProductCode());
+                  rs = ps.executeQuery();
 
-                    if (rs.next()) {
-                        // Cập nhật item đã tồn tại
-                        BigDecimal currentImported = rs.getBigDecimal("quantity_imported");
-                        BigDecimal newImported = currentImported.add(importQuantity);
-                        BigDecimal newPending = item.getQuantityOrdered().subtract(newImported);
+                  if (rs.next()) {
+                      // Cập nhật item đã tồn tại
+                      BigDecimal currentImported = rs.getBigDecimal("quantity_imported");
+                      BigDecimal newImported = currentImported.add(importQuantity);
+                      BigDecimal newPending = item.getQuantityOrdered().subtract(newImported);
 
-                        String updateSql = """
-                            UPDATE warehouse_pending_items 
-                            SET quantity_imported = ?, quantity_pending = ?, last_import_date = NOW()
-                            WHERE purchase_id = ? AND product_code = ?
-                            """;
-                        ps = conn.prepareStatement(updateSql);
-                        ps.setBigDecimal(1, newImported);
-                        ps.setBigDecimal(2, newPending);
-                        ps.setString(3, requestId);
-                        ps.setString(4, item.getProductCode());
-                        ps.executeUpdate();
-                    } else {
-                        // Tạo mới item
-                        BigDecimal newPending = item.getQuantityOrdered().subtract(importQuantity);
-                        String insertSql = """
-                            INSERT INTO warehouse_pending_items 
-                            (purchase_id, product_name, product_code, unit, quantity_ordered, 
-                             quantity_imported, quantity_pending, price_per_unit, note)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                            """;
-                        ps = conn.prepareStatement(insertSql);
-                        ps.setString(1, requestId);
-                        ps.setString(2, item.getProductName());
-                        ps.setString(3, item.getProductCode());
-                        ps.setString(4, item.getUnit());
-                        ps.setBigDecimal(5, item.getQuantityOrdered());
-                        ps.setBigDecimal(6, importQuantity);
-                        ps.setBigDecimal(7, newPending);
-                        ps.setBigDecimal(8, item.getPricePerUnit());
-                        ps.setString(9, item.getNote());
-                        ps.executeUpdate();
-                    }
+                      String updateSql = """
+                          UPDATE warehouse_pending_items 
+                          SET quantity_imported = ?, quantity_pending = ?, last_import_date = NOW()
+                          WHERE purchase_id = ? AND product_code = ?
+                          """;
+                      ps = conn.prepareStatement(updateSql);
+                      ps.setBigDecimal(1, newImported);
+                      ps.setBigDecimal(2, newPending);
+                      ps.setString(3, requestId);
+                      ps.setString(4, item.getProductCode());
+                      ps.executeUpdate();
+                  } else {
+                      // Tạo mới item
+                      BigDecimal newPending = item.getQuantityOrdered().subtract(importQuantity);
+                      String insertSql = """
+                          INSERT INTO warehouse_pending_items 
+                          (purchase_id, product_name, product_code, unit, quantity_ordered, 
+                           quantity_imported, quantity_pending, price_per_unit, note)
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                          """;
+                      ps = conn.prepareStatement(insertSql);
+                      ps.setString(1, requestId);
+                      ps.setString(2, item.getProductName());
+                      ps.setString(3, item.getProductCode());
+                      ps.setString(4, item.getUnit());
+                      ps.setBigDecimal(5, item.getQuantityOrdered());
+                      ps.setBigDecimal(6, importQuantity);
+                      ps.setBigDecimal(7, newPending);
+                      ps.setBigDecimal(8, item.getPricePerUnit());
+                      ps.setString(9, item.getNote());
+                      ps.executeUpdate();
+                  }
 
-                    // 2. Lưu lịch sử nhập kho
-                    String historySql = """
-                        INSERT INTO warehouse_import_history 
-                        (purchase_id, product_name, product_code, quantity_imported, 
-                         import_date, processor, note)
-                        VALUES (?, ?, ?, ?, ?, ?, ?)
-                        """;
-                    ps = conn.prepareStatement(historySql);
-                    ps.setString(1, requestId);
-                    ps.setString(2, item.getProductName());
-                    ps.setString(3, item.getProductCode());
-                    ps.setBigDecimal(4, importQuantity);
-                    ps.setString(5, importDate);
-                    ps.setString(6, processor);
-                    ps.setString(7, additionalNote);
-                    ps.executeUpdate();
-                }
-            }
+                  // 2. Lưu lịch sử nhập kho
+                  String historySql = """
+                      INSERT INTO warehouse_import_history 
+                      (purchase_id, product_name, product_code, quantity_imported, 
+                       import_date, processor, note)
+                      VALUES (?, ?, ?, ?, ?, ?, ?)
+                      """;
+                  ps = conn.prepareStatement(historySql);
+                  ps.setString(1, requestId);
+                  ps.setString(2, item.getProductName());
+                  ps.setString(3, item.getProductCode());
+                  ps.setBigDecimal(4, importQuantity);
+                  ps.setString(5, importDate);
+                  ps.setString(6, processor);
+                  ps.setString(7, additionalNote);
+                  ps.executeUpdate();
 
-            // 3. Kiểm tra xem đã nhập đủ hàng chưa
-            boolean isCompleted = checkIfOrderCompleted(requestId);
-            String newStatus = isCompleted ? "completed" : "partial_imported";
+                  // ✅ 3. CẬP NHẬT STOCK NGAY LẬP TỨC
+                  boolean stockUpdated = updateProductStock(conn, item.getProductCode(), importQuantity);
+                  if (!stockUpdated) {
+                      System.err.println("⚠️ Không thể cập nhật stock cho sản phẩm: " + item.getProductCode());
+                      // Có thể tiếp tục hoặc rollback tùy business logic
+                  } else {
+                      System.out.println("✅ Đã cộng " + importQuantity + " " + item.getUnit() + 
+                                       " vào kho cho sản phẩm " + item.getProductCode());
+                  }
+              }
+          }
 
-            // 4. Cập nhật trạng thái đơn hàng và reason (ghi chú bổ sung)
-            String updateOrderSql = "UPDATE purchase_order_info SET status = ?, reason = ?, summary = ? WHERE id = ?";
+          // 4. Kiểm tra xem đã nhập đủ hàng chưa
+          boolean isCompleted = checkIfOrderCompleted(requestId);
+          String newStatus = isCompleted ? "completed" : "partial_imported";
 
-            // Tạo reason từ ghi chú bổ sung
-            String reasonText = null;
-            if (additionalNote != null && !additionalNote.trim().isEmpty()) {
-                reasonText = additionalNote.trim();
-            }
+          // 5. Cập nhật trạng thái đơn hàng và reason (ghi chú bổ sung)
+          String updateOrderSql = "UPDATE purchase_order_info SET status = ?, reason = ?, summary = ? WHERE id = ?";
 
-            // Tạo summary
-            StringBuilder summary = new StringBuilder();
-            summary.append("Ngày nhập: ").append(importDate);
-            summary.append("; Người xử lý: ").append(processor);
-            if (additionalNote != null && !additionalNote.trim().isEmpty()) {
-                summary.append("; Ghi chú: ").append(additionalNote.trim());
-            }
+          // Tạo reason từ ghi chú bổ sung
+          String reasonText = null;
+          if (additionalNote != null && !additionalNote.trim().isEmpty()) {
+              reasonText = additionalNote.trim();
+          }
 
-            ps = conn.prepareStatement(updateOrderSql);
-            ps.setString(1, newStatus);
-            ps.setString(2, reasonText);
-            ps.setString(3, summary.toString());
-            ps.setString(4, requestId);
-            ps.executeUpdate();
+          // Tạo summary
+          StringBuilder summary = new StringBuilder();
+          summary.append("Ngày nhập: ").append(importDate);
+          summary.append("; Người xử lý: ").append(processor);
+          if (additionalNote != null && !additionalNote.trim().isEmpty()) {
+              summary.append("; Ghi chú: ").append(additionalNote.trim());
+          }
 
-            conn.commit();
-            return true;
+          ps = conn.prepareStatement(updateOrderSql);
+          ps.setString(1, newStatus);
+          ps.setString(2, reasonText);
+          ps.setString(3, summary.toString());
+          ps.setString(4, requestId);
+          ps.executeUpdate();
 
-        } catch (SQLException e) {
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-            System.err.println("Error processing partial import: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.setAutoCommit(true);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            closeResources();
-        }
-    }
+          conn.commit();
+          System.out.println("✅ Đã xử lý nhập kho và cập nhật stock cho đơn: " + requestId + " (Status: " + newStatus + ")");
+          return true;
 
-    /**
-     * Kiểm tra xem đơn hàng đã được nhập đủ chưa
-     */
-    private boolean checkIfOrderCompleted(String requestId) {
-        String sql = "SELECT COUNT(*) FROM warehouse_pending_items WHERE purchase_id = ? AND quantity_pending > 0";
-        try {
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, requestId);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) == 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+      } catch (SQLException e) {
+          try {
+              if (conn != null) {
+                  conn.rollback();
+              }
+          } catch (SQLException ex) {
+              ex.printStackTrace();
+          }
+          System.err.println("Error processing partial import: " + e.getMessage());
+          e.printStackTrace();
+          return false;
+      } finally {
+          try {
+              if (conn != null) {
+                  conn.setAutoCommit(true);
+              }
+          } catch (SQLException e) {
+              e.printStackTrace();
+          }
+          closeResources();
+      }
+  }
 
-    /**
-     * Cập nhật trạng thái đơn hàng thành rejected với lý do từ chối riêng
-     */
-    public boolean updateRequestStatusToRejected(String requestId, String rejectReason) {
-        String sql = "UPDATE purchase_order_info SET status = 'rejected', reject_reason = ? WHERE id = ? AND status IN ('approved', 'partial_imported')";
+  /**
+   * ✅ BỔ SUNG: Method cập nhật stock từ product_code và quantity
+   */
+  private boolean updateProductStock(Connection conn, String productCode, BigDecimal quantity) throws SQLException {
+      // 1. Lấy product_id từ product_info
+      String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
+      try (PreparedStatement getProductIdPs = conn.prepareStatement(getProductIdSql)) {
+          getProductIdPs.setString(1, productCode);
+          try (ResultSet productRs = getProductIdPs.executeQuery()) {
+              if (!productRs.next()) {
+                  System.err.println("⚠️ Không tìm thấy sản phẩm với mã: " + productCode);
+                  return false; // Hoặc return true nếu muốn bỏ qua lỗi này
+              }
 
-        try {
-            conn = Context.getJDBCConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, rejectReason);
-            ps.setString(2, requestId);
+              String productId = productRs.getString("id");
 
-            int rows = ps.executeUpdate();
-            return rows > 0;
+              // 2. Kiểm tra xem sản phẩm đã có trong product_in_stock chưa
+              String checkStockSql = "SELECT qty FROM product_in_stock WHERE product_id = ?";
+              try (PreparedStatement checkStockPs = conn.prepareStatement(checkStockSql)) {
+                  checkStockPs.setString(1, productId);
+                  try (ResultSet stockRs = checkStockPs.executeQuery()) {
+                      if (stockRs.next()) {
+                          // ✅ CẬP NHẬT stock hiện có
+                          BigDecimal currentQty = stockRs.getBigDecimal("qty");
+                          String updateStockSql = "UPDATE product_in_stock SET qty = qty + ? WHERE product_id = ?";
+                          try (PreparedStatement updateStockPs = conn.prepareStatement(updateStockSql)) {
+                              updateStockPs.setBigDecimal(1, quantity);
+                              updateStockPs.setString(2, productId);
+                              int rowsUpdated = updateStockPs.executeUpdate();
+                              
+                              System.out.println("  📦 Cộng " + quantity + " vào stock hiện có (" + 
+                                               currentQty + " → " + currentQty.add(quantity) + ") cho " + productCode);
+                              return rowsUpdated > 0;
+                          }
+                      } else {
+                          // ✅ TẠO MỚI stock record
+                          String insertStockSql = "INSERT INTO product_in_stock (product_id, qty, min_stock_threshold) VALUES (?, ?, 0.00)";
+                          try (PreparedStatement insertStockPs = conn.prepareStatement(insertStockSql)) {
+                              insertStockPs.setString(1, productId);
+                              insertStockPs.setBigDecimal(2, quantity);
+                              int rowsInserted = insertStockPs.executeUpdate();
+                              
+                              System.out.println("  🆕 Tạo mới stock với số lượng " + quantity + " cho " + productCode);
+                              return rowsInserted > 0;
+                          }
+                      }
+                  }
+              }
+          }
+      }
+  }
 
-        } catch (SQLException e) {
-            System.err.println("Error updating request status to rejected: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        } finally {
-            closeResources();
-        }
-    }
+  /**
+   * Kiểm tra xem đơn hàng đã được nhập đủ chưa
+   */
+  private boolean checkIfOrderCompleted(String requestId) {
+      String sql = "SELECT COUNT(*) FROM warehouse_pending_items WHERE purchase_id = ? AND quantity_pending > 0";
+      try {
+          ps = conn.prepareStatement(sql);
+          ps.setString(1, requestId);
+          rs = ps.executeQuery();
+          if (rs.next()) {
+              return rs.getInt(1) == 0;
+          }
+      } catch (SQLException e) {
+          e.printStackTrace();
+      }
+      return false;
+  }
 
-    /**
-     * Kiểm tra xem đơn hàng có tồn tại và có thể xử lý không
-     */
-    public boolean isOrderProcessable(String requestId) {
-        String sql = "SELECT status FROM purchase_order_info WHERE id = ?";
+  /**
+   * Cập nhật trạng thái đơn hàng thành rejected với lý do từ chối riêng
+   */
+  public boolean updateRequestStatusToRejected(String requestId, String rejectReason) {
+      String sql = "UPDATE purchase_order_info SET status = 'rejected', reject_reason = ? WHERE id = ? AND status IN ('approved', 'partial_imported')";
 
-        try {
-            conn = Context.getJDBCConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, requestId);
-            rs = ps.executeQuery();
+      try {
+          conn = Context.getJDBCConnection();
+          ps = conn.prepareStatement(sql);
+          ps.setString(1, rejectReason);
+          ps.setString(2, requestId);
 
-            if (rs.next()) {
-                String status = rs.getString("status");
-                return "approved".equals(status) || "partial_imported".equals(status);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error checking order processable status: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            closeResources();
-        }
-        return false;
-    }
+          int rows = ps.executeUpdate();
+          return rows > 0;
 
-    /**
-     * Lấy lịch sử nhập kho của một đơn hàng
-     */
-    public List<Object[]> getImportHistory(String requestId) {
-        List<Object[]> history = new ArrayList<>();
-        String sql = """
-            SELECT product_name, product_code, quantity_imported, 
-                   import_date, processor, note, created_at
-            FROM warehouse_import_history 
-            WHERE purchase_id = ? 
-            ORDER BY created_at DESC
-            """;
+      } catch (SQLException e) {
+          System.err.println("Error updating request status to rejected: " + e.getMessage());
+          e.printStackTrace();
+          return false;
+      } finally {
+          closeResources();
+      }
+  }
 
-        try {
-            conn = Context.getJDBCConnection();
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, requestId);
-            rs = ps.executeQuery();
+  /**
+   * Kiểm tra xem đơn hàng có tồn tại và có thể xử lý không
+   */
+  public boolean isOrderProcessable(String requestId) {
+      String sql = "SELECT status FROM purchase_order_info WHERE id = ?";
 
-            while (rs.next()) {
-                Object[] record = {
-                    rs.getString("product_name"),
-                    rs.getString("product_code"),
-                    rs.getBigDecimal("quantity_imported"),
-                    rs.getDate("import_date"),
-                    rs.getString("processor"),
-                    rs.getString("note"),
-                    rs.getTimestamp("created_at")
-                };
-                history.add(record);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error getting import history: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            closeResources();
-        }
-        return history;
-    }
+      try {
+          conn = Context.getJDBCConnection();
+          ps = conn.prepareStatement(sql);
+          ps.setString(1, requestId);
+          rs = ps.executeQuery();
 
-    /**
-     * Kiểm tra xem đơn hàng đã được nhập kho đầy đủ chưa
-     */
-    public boolean isOrderFullyImported(String purchaseOrderId) {
-        try (Connection con = Context.getJDBCConnection()) {
-            String sql = "SELECT COUNT(*) as total_items, "
-                    + "COUNT(CASE WHEN quantity_imported >= quantity_ordered THEN 1 END) as completed_items "
-                    + "FROM purchase_order_items "
-                    + "WHERE purchase_id = ?";
+          if (rs.next()) {
+              String status = rs.getString("status");
+              return "approved".equals(status) || "partial_imported".equals(status);
+          }
+      } catch (SQLException e) {
+          System.err.println("Error checking order processable status: " + e.getMessage());
+          e.printStackTrace();
+      } finally {
+          closeResources();
+      }
+      return false;
+  }
 
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, purchaseOrderId);
-            ResultSet rs = ps.executeQuery();
+  /**
+   * Lấy lịch sử nhập kho của một đơn hàng
+   */
+  public List<Object[]> getImportHistory(String requestId) {
+      List<Object[]> history = new ArrayList<>();
+      String sql = """
+          SELECT product_name, product_code, quantity_imported, 
+                 import_date, processor, note, created_at
+          FROM warehouse_import_history 
+          WHERE purchase_id = ? 
+          ORDER BY created_at DESC
+          """;
 
-            if (rs.next()) {
-                int totalItems = rs.getInt("total_items");
-                int completedItems = rs.getInt("completed_items");
+      try {
+          conn = Context.getJDBCConnection();
+          ps = conn.prepareStatement(sql);
+          ps.setString(1, requestId);
+          rs = ps.executeQuery();
 
-                System.out.println("📊 Đơn " + purchaseOrderId + ": " + completedItems + "/" + totalItems + " items đã hoàn thành");
-                return totalItems > 0 && totalItems == completedItems;
-            }
+          while (rs.next()) {
+              Object[] record = {
+                  rs.getString("product_name"),
+                  rs.getString("product_code"),
+                  rs.getBigDecimal("quantity_imported"),
+                  rs.getDate("import_date"),
+                  rs.getString("processor"),
+                  rs.getString("note"),
+                  rs.getTimestamp("created_at")
+              };
+              history.add(record);
+          }
+      } catch (SQLException e) {
+          System.err.println("Error getting import history: " + e.getMessage());
+          e.printStackTrace();
+      } finally {
+          closeResources();
+      }
+      return history;
+  }
 
-        } catch (SQLException e) {
-            System.err.println("❌ Lỗi kiểm tra isOrderFullyImported: " + e.getMessage());
-            e.printStackTrace();
-        }
+  /**
+   * Kiểm tra xem đơn hàng đã được nhập kho đầy đủ chưa
+   */
+  public boolean isOrderFullyImported(String purchaseOrderId) {
+      try (Connection con = Context.getJDBCConnection()) {
+          // ✅ SỬA: Sử dụng warehouse_pending_items thay vì purchase_order_items
+          String sql = """
+              SELECT COUNT(*) as pending_items
+              FROM warehouse_pending_items 
+              WHERE purchase_id = ? AND quantity_pending > 0
+              """;
 
-        return false;
-    }
+          PreparedStatement ps = con.prepareStatement(sql);
+          ps.setString(1, purchaseOrderId);
+          ResultSet rs = ps.executeQuery();
 
-    /**
-     * Sau khi nhập kho, cập nhật tồn kho từ bản ghi gần nhất trong
-     * warehouse_import_history
-     */
-    public boolean updateStockFromLatestHistory(String purchaseOrderId) {
-        Connection con = null;
-        try {
-            con = Context.getJDBCConnection();
-            con.setAutoCommit(false);
+          if (rs.next()) {
+              int pendingItems = rs.getInt("pending_items");
+              System.out.println("📊 Đơn " + purchaseOrderId + ": " + pendingItems + " items chưa hoàn thành");
+              return pendingItems == 0; // Nếu không còn item nào pending thì đã hoàn thành
+          }
 
-            String getLatestImportSql = """
-            SELECT h.product_code, h.quantity_imported
-            FROM warehouse_import_history h
-            INNER JOIN (
-                SELECT product_code, MAX(created_at) AS latest_time
-                FROM warehouse_import_history
-                WHERE purchase_id = ?
-                GROUP BY product_code
-            ) latest ON h.product_code = latest.product_code AND h.created_at = latest.latest_time
-            WHERE h.purchase_id = ?
-        """;
+      } catch (SQLException e) {
+          System.err.println("❌ Lỗi kiểm tra isOrderFullyImported: " + e.getMessage());
+          e.printStackTrace();
+      }
 
-            try (PreparedStatement ps = con.prepareStatement(getLatestImportSql)) {
-                ps.setString(1, purchaseOrderId);
-                ps.setString(2, purchaseOrderId);
+      return false;
+  }
 
-                try (ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        String productCode = rs.getString("product_code");
-                        BigDecimal quantity = rs.getBigDecimal("quantity_imported");
-
-                        // Lấy product_id từ product_info
-                        String getProductIdSql = "SELECT id FROM product_info WHERE code = ?";
-                        try (PreparedStatement getProductIdPs = con.prepareStatement(getProductIdSql)) {
-                            getProductIdPs.setString(1, productCode);
-                            try (ResultSet productRs = getProductIdPs.executeQuery()) {
-                                if (productRs.next()) {
-                                    String productId = productRs.getString("id");
-
-                                    // Kiểm tra stock tồn tại chưa
-                                    String checkStockSql = "SELECT qty FROM product_in_stock WHERE product_id = ?";
-                                    try (PreparedStatement checkStockPs = con.prepareStatement(checkStockSql)) {
-                                        checkStockPs.setString(1, productId);
-                                        try (ResultSet stockRs = checkStockPs.executeQuery()) {
-                                            if (stockRs.next()) {
-                                                // UPDATE stock
-                                                String updateSql = "UPDATE product_in_stock SET qty = qty + ? WHERE product_id = ?";
-                                                try (PreparedStatement updatePs = con.prepareStatement(updateSql)) {
-                                                    updatePs.setBigDecimal(1, quantity);
-                                                    updatePs.setString(2, productId);
-                                                    updatePs.executeUpdate();
-                                                    System.out.println("  ✅ Cộng " + quantity + " vào " + productCode);
-                                                }
-                                            } else {
-                                                // INSERT stock
-                                                String insertSql = "INSERT INTO product_in_stock (product_id, qty) VALUES (?, ?)";
-                                                try (PreparedStatement insertPs = con.prepareStatement(insertSql)) {
-                                                    insertPs.setString(1, productId);
-                                                    insertPs.setBigDecimal(2, quantity);
-                                                    insertPs.executeUpdate();
-                                                    System.out.println("  🆕 Tạo mới và cộng " + quantity + " vào " + productCode);
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                } else {
-                                    System.err.println("⚠️ Không tìm thấy sản phẩm cho mã: " + productCode);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            con.commit();
-            return true;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            try {
-                if (con != null) {
-                    con.rollback();
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-            return false;
-        } finally {
-            try {
-                if (con != null) {
-                    con.setAutoCommit(true);
-                    con.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+  /**
+   * ⚠️ DEPRECATED: Method này không cần thiết nữa vì đã cập nhật stock ngay trong processPartialImport
+   * Để lại để tương thích với code cũ
+   */
+  @Deprecated
+  public boolean updateStockFromLatestHistory(String purchaseOrderId) {
+      System.out.println("⚠️ Method updateStockFromLatestHistory đã deprecated. Stock được cập nhật tự động trong processPartialImport.");
+      return true;
+  }
 }

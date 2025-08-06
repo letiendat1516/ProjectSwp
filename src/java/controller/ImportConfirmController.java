@@ -78,7 +78,7 @@ public class ImportConfirmController extends HttpServlet {
         }
 
         // Kiểm tra đơn hàng có thể xử lý không
-if (!dao.isOrderProcessable(requestId)) {
+        if (!dao.isOrderProcessable(requestId)) {
             response.sendRedirect("request/list?error=order_not_processable");
             return;
         }
@@ -133,7 +133,7 @@ if (!dao.isOrderProcessable(requestId)) {
                                 importItem.setId(originalItem.getId());
                                 importItem.setPurchaseId(originalItem.getPurchaseId());
                                 importItem.setProductName(originalItem.getProductName());
-importItem.setProductCode(originalItem.getProductCode());
+                                importItem.setProductCode(originalItem.getProductCode());
                                 importItem.setUnit(originalItem.getUnit());
                                 importItem.setQuantity(importQuantity); // Số lượng nhập lần này (số nguyên)
                                 importItem.setQuantityOrdered(originalItem.getQuantityOrdered());
@@ -161,37 +161,28 @@ importItem.setProductCode(originalItem.getProductCode());
                 boolean importSuccess = dao.processPartialImport(requestId, importDate.trim(), processor,
                         additionalNote, importItems);
 
+                // Trong doPost method, thay thế phần xử lý sau khi import thành công:
                 if (importSuccess) {
-                    System.out.println("✅ Import thành công cho đơn: " + requestId);
-                    
-                    // Kiểm tra xem đơn đã hoàn thành chưa (tất cả items đã được nhập đủ)
+                    System.out.println("✅ Import và cập nhật stock thành công cho đơn: " + requestId);
+
+                    // Kiểm tra xem đơn đã hoàn thành chưa để cập nhật status
                     boolean isFullyImported = dao.isOrderFullyImported(requestId);
-                    
+
                     if (isFullyImported) {
-                        System.out.println("📦 Đơn " + requestId + " đã nhập đủ, bắt đầu cập nhật stock...");
-                        
-                        // Cập nhật status thành 'completed' trước
+                        System.out.println("📦 Đơn " + requestId + " đã nhập đủ, cập nhật status thành 'completed'");
+
+                        // Chỉ cập nhật status thành 'completed', không cần cập nhật stock nữa
                         boolean statusUpdated = purchaseOrderDAO.updatePurchaseOrderStatus(requestId, "completed");
-                        
+
                         if (statusUpdated) {
                             System.out.println("✅ Đã cập nhật status thành 'completed' cho đơn: " + requestId);
-                            
-                            // Sau đó cập nhật stock và chuyển thành 'done'
-                            boolean stockUpdated = purchaseOrderDAO.updateDoneStatus(requestId);
-                            
-                            if (stockUpdated) {
-                                System.out.println("🎉 Hoàn thành: Đã cập nhật stock và chuyển status thành 'done' cho đơn: " + requestId);
-response.sendRedirect("request/list?message=import_and_stock_updated_success");
-                            } else {
-                                System.err.println("❌ Lỗi cập nhật stock cho đơn: " + requestId);
-                                response.sendRedirect("request/list?message=import_success_but_stock_failed");
-                            }
+                            response.sendRedirect("request/list?message=import_completed_success");
                         } else {
-                            System.err.println("❌ Lỗi cập nhật status thành 'completed' cho đơn: " + requestId);
+                            System.err.println("❌ Lỗi cập nhật status cho đơn: " + requestId);
                             response.sendRedirect("request/list?message=import_success_but_status_failed");
                         }
                     } else {
-                        System.out.println("ℹ️ Đơn " + requestId + " chưa nhập đủ, giữ nguyên status để tiếp tục nhập");
+                        System.out.println("ℹ️ Đơn " + requestId + " chưa nhập đủ, tiếp tục với status 'partial_imported'");
                         response.sendRedirect("request/list?message=partial_import_success");
                     }
                 } else {

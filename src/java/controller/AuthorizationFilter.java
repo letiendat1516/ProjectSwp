@@ -85,18 +85,18 @@ public class AuthorizationFilter implements Filter {
         urlPermissionMap.put("/RequestForward.jsp", "REQUEST_PAGE");     
         
         //IMPORT
-        urlPermissionMap.put("/ListRequestImport.jsp", "REQUEST_PURCHASE_VIEW");        
-        urlPermissionMap.put("/import", "REQUEST_PURCHASE_VIEW");
+        //urlPermissionMap.put("/ListRequestImport.jsp", "REQUEST_PURCHASE_VIEW");
+        //urlPermissionMap.put("/import", "REQUEST_PURCHASE_VIEW");
         urlPermissionMap.put("/ItemsSupplyRequestForm.jsp", "REQUEST_PURCHASE_CREATE");        
         urlPermissionMap.put("/loadingrequest", "REQUEST_PURCHASE_CREATE");
 
-        
-//        urlPermissionMap.put("/.jsp", "IMPORT_CONFIRM");
-//        urlPermissionMap.put("/", "IMPORT_CONFIRM");
-        
+        urlPermissionMap.put("/ListRequestImport.jsp", "IMPORT_LIST");
+        urlPermissionMap.put("/import", "IMPORT_LIST");
+        urlPermissionMap.put("/import-confirm", "IMPORT_CONFIRM");
         //EXPORT
         urlPermissionMap.put("/ExportRequest.jsp", "EXPORT_CREATE");
         urlPermissionMap.put("/exportRequest", "EXPORT_CREATE");
+        urlPermissionMap.put("/exportList", "EXPORT_LIST");
         
         // QUOTE
         urlPermissionMap.put("/ListPurchaseOrder.jsp", "QUOTE_VIEW");

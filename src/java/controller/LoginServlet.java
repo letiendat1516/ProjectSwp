@@ -56,73 +56,74 @@ public class LoginServlet extends HttpServlet {
     }
 
     @Override
-protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-    String username = request.getParameter("username");
-    String password = request.getParameter("password");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
 
-    UserDAO userDAO = new UserDAO();
-    Users user = userDAO.findByUsername(username);
+        UserDAO userDAO = new UserDAO();
+        Users user = userDAO.findByUsername(username);
 
-    if (user != null) {
-        String pwFromDB = user.getPassword();
-        boolean loginSuccess = false;
+        if (user != null) {
+            String pwFromDB = user.getPassword();
+            boolean loginSuccess = false;
 
-        if (pwFromDB != null && pwFromDB.startsWith("$2a$")) {
-            // Đã là BCrypt hash
-            if (BCrypt.checkpw(password, pwFromDB)) {
-                loginSuccess = true;
-            }
-        } else {
-            // Là plain text (tài khoản cũ)
-            if (password.equals(pwFromDB)) {
-                // Migrate mật khẩu sang BCrypt
-                String newHash = BCrypt.hashpw(password, BCrypt.gensalt());
-                userDAO.updatePasswordHash(user.getId(), newHash);
-                loginSuccess = true;
-            }
-        }
-
-        if (loginSuccess) {
-            // Đăng nhập thành công: set session, phân quyền, chuyển trang
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user);
-
-            int userId = user.getId();
-            List<String> userPermissions = userDAO.getUserPermissions(userId);
-            session.setAttribute("userPermissions", userPermissions);
-
-            String roleName = user.getRoleName();
-            if (roleName != null) {
-                switch (roleName) {
-                    case "Admin":
-                        response.sendRedirect("Admin.jsp");
-                        break;
-                    case "Nhân viên kho":
-                        response.sendRedirect("categoriesforward.jsp");
-                        break;
-                    case "Nhân viên công ty":
-                        response.sendRedirect("RequestForward.jsp");
-                        break;
-                    case "Giám đốc":
-                        response.sendRedirect("ApproveListForward.jsp");
-                        break;
-                    default:
-                        response.sendRedirect("homepage.jsp");
+            if (pwFromDB != null && pwFromDB.startsWith("$2a$")) {
+                // Đã là BCrypt hash
+                if (BCrypt.checkpw(password, pwFromDB)) {
+                    loginSuccess = true;
                 }
             } else {
-                // Handle case where roleName is null
-                response.sendRedirect("homepage.jsp");
+                // Là plain text (tài khoản cũ)
+                if (password.equals(pwFromDB)) {
+                    // Migrate mật khẩu sang BCrypt
+                    String newHash = BCrypt.hashpw(password, BCrypt.gensalt());
+                    userDAO.updatePasswordHash(user.getId(), newHash);
+                    loginSuccess = true;
+                }
             }
-            return;
-        }
-    }
 
-    // Nếu không đúng, trả lại trang login + báo lỗi
-    request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng.");
-    request.getRequestDispatcher("login.jsp").forward(request, response);
-}
+            if (loginSuccess) {
+                // Đăng nhập thành công: set session, phân quyền, chuyển trang
+                HttpSession session = request.getSession();
+                session.setAttribute("user", user);
+
+                int userId = user.getId();
+                List<String> userPermissions = userDAO.getUserPermissions(userId);
+                session.setAttribute("userPermissions", userPermissions);
+
+                String roleName = user.getRoleName();
+                if (roleName != null) {
+                    switch (roleName) {
+                        case "Admin":
+                            response.sendRedirect("Admin.jsp");
+                            break;
+                        case "Nhân viên kho":
+                            response.sendRedirect("categoriesforward.jsp");
+                            break;
+                        case "Nhân viên công ty":
+                            response.sendRedirect("RequestForward.jsp");
+                            break;
+                        case "Giám đốc":
+                            response.sendRedirect("ApproveListForward.jsp");
+                            break;
+                        default:
+                            response.sendRedirect("login.jsp");
+                    }
+                } else {
+                    // Handle case where roleName is null
+                    request.setAttribute("mess", "null value");
+                    response.sendRedirect("login.jsp");
+                }
+                return;
+            }
+        }
+        request.setAttribute("mess", "null value");
+        // Nếu không đúng, trả lại trang login + báo lỗi
+        request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng.");
+        request.getRequestDispatcher("login.jsp").forward(request, response);
+    }
 
     @Override
     public String getServletInfo() {

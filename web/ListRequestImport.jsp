@@ -1145,7 +1145,7 @@
                             <div class="text-muted">
                                 Tổng: ${totalCount} yêu cầu
                             </div>
-                            <a href="${pageContext.request.contextPath}/Admin.jsp" class="btn btn-primary btn-icon">
+                            <a href="${pageContext.request.contextPath}/categoriesforward.jsp" class="btn btn-primary btn-icon">
                                 <i class="fas fa-arrow-left"></i> Quay lại
                             </a>
                         </div>

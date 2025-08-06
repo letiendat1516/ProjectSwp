@@ -761,8 +761,8 @@
                 </div>
 
                 <div class="footer">
-                    <a href="Admin.jsp" class="btn-secondary">
-                        <span class="material-icons back-btn-icon">arrow_back</span> Quay Lại Trang Chủ
+                    <a href="${pageContext.request.contextPath}/ApproveListForward.jsp" class="btn-secondary">
+                        <span class="material-icons back-btn-icon">arrow_back</span> Quay Lại
                     </a>
                 </div>
             </div>

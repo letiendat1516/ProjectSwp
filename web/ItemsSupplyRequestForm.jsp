@@ -583,7 +583,7 @@
                                 <tr>
                                     <td><textarea name="stt" rows="1" style="resize: none; text-align: center;" oninput="autoResize(this)">1</textarea></td>
 
-                                    <td><input type="text" name="product_code" readonly style="width: 100%; text-align: center;" /></td>
+                                    <td><input type="text" name="product_code" readonly required style="width: 100%; text-align: center;" /></td>
 
                                     <td>
                                         <div class="autocomplete-container">
@@ -602,14 +602,14 @@
 
                                     <td>
                                         <!-- Thay select bằng input readonly -->
-                                        <input type="text" name="unit" readonly style="width: 100%; text-align: center;" />
+                                        <input type="text" name="unit" readonly required style="width: 100%; text-align: center;" />
                                         <!-- Thêm input hidden để lưu giá trị thực sự gửi đi -->
                                         <input type="hidden" name="unit_value" />
                                     </td>
 
                                     <td>
                                         <textarea name="quantity" rows="1" 
-                                                  class="quantity-input"
+                                                  class="quantity-input" required
                                                   style="resize: none; text-align: center;" 
                                                   oninput="validateQuantity(this); autoResize(this)"
                                                   onblur="formatQuantity(this)"
@@ -642,7 +642,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-paper-plane"></i> Gửi Yêu Cầu
                     </button>
-                    <a href="Admin.jsp" class="btn btn-secondary">
+                    <a href="${pageContext.request.contextPath}/RequestForward.jsp" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Quay Lại
                     </a>
                 </div>

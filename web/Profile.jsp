@@ -96,6 +96,7 @@
             }
             td {
                 padding: 10px 6px;
+                padding-left: 70px;
                 font-size: 1.06rem;
             }
             td.label {
@@ -104,7 +105,7 @@
                 width: 34%;
             }
             .edit-link, .pw-link {
-                display: inline-block;
+display: inline-block;
                 margin: 22px 7px 0 0;
                 text-decoration: none;
                 color: #fff;
@@ -159,13 +160,7 @@
                         <tr><td class="label">Username:</td><td>${user.username}</td></tr>
                         <tr><td class="label">Họ và tên:</td><td>${user.fullname}</td></tr>
                         <tr><td class="label">Email:</td><td>${user.email}</td></tr>
-                        <tr><td class="label">SĐT:</td><td>${user.phone}</td></tr>
-                        <tr><td class="label">Ngày sinh:</td><td>
-                                <c:choose>
-                                    <c:when test="${not empty user.dob}">${user.dob}</c:when>
-                                    <c:otherwise>-</c:otherwise>
-                                </c:choose>
-                            </td></tr>
+                        <tr><td class="label">SĐT:</td><td>${user.phone}</td></tr>                     
                         <tr><td class="label">Phòng ban:</td><td>${user.deptName != null ? user.deptName : 'Chưa có'}</td></tr>
                         <tr><td class="label">Chức vụ:</td><td>${user.roleName}</td></tr>
                         <tr><td class="label">Trạng thái:</td>
@@ -174,7 +169,7 @@
                                     <c:when test="${user.activeFlag == 1}">Hoạt động</c:when>
                                     <c:otherwise>Không hoạt động</c:otherwise>
                                 </c:choose>
-                            </td>
+</td>
                         </tr>
                     </table>
                     <div class="btn-row">

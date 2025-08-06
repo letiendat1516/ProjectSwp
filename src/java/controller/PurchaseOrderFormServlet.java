@@ -92,39 +92,62 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         List<Supplier> supplier_list = supplierDao.getLishSupplier();
         request.setAttribute("supplier_list", supplier_list);
 
-        // ✅ 2. NHẬN purchaseOrderId TỪ FORM
+        // ✅ 2. LẤY THÔNG TIN USER VÀ PHÒNG BAN
+        Users currentUser = (Users) session.getAttribute("user");
+        UserDAO userDao = new UserDAO();
+        Users userWithFullInfo = userDao.getUserById(currentUser.getId());
+        String fullname = userWithFullInfo.getFullname();
+        String departmentName = userWithFullInfo.getDeptName(); // ← Lấy phòng ban
+        Date DoB = userDao.getDoB(currentUser.getId());
+
+        // Set thông tin user vào session và request
+        session.setAttribute("currentUser", fullname);
+        session.setAttribute("currentUserDepartment", departmentName); // ← Lưu phòng ban
+        session.setAttribute("DoB", DoB);
+        request.setAttribute("currentUserDepartment", departmentName); // ← Để hiển thị trên form
+
+        // Tính tuổi
+        if (currentUser != null && DoB != null) {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.setTime(DoB);
+            int yearOfBirth = cal.get(java.util.Calendar.YEAR);
+            int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+            int age = currentYear - yearOfBirth;
+            request.setAttribute("age", age);
+        }
+
+        // ✅ 3. NHẬN purchaseOrderId TỪ FORM
         String purchaseOrderId = request.getParameter("purchaseOrderId");
         String action = request.getParameter("action");
         
         System.out.println("🔍 Received purchaseOrderId: " + purchaseOrderId);
         System.out.println("🔍 Received action: " + action);
+        System.out.println("🔍 Current user department: " + departmentName);
 
         if (purchaseOrderId != null && !purchaseOrderId.trim().isEmpty()) {
-            // ✅ 3. LOAD DỮ LIỆU TỪ DATABASE - SỬ DỤNG String thay vì int
+            // ✅ 4. LOAD DỮ LIỆU TỪ DATABASE
             PurchaseOrderDAO poDao = new PurchaseOrderDAO();
-            PurchaseOrderInfo poInfo = poDao.getPurchaseOrderById(purchaseOrderId); // ← String, không phải int
+            PurchaseOrderInfo poInfo = poDao.getPurchaseOrderById(purchaseOrderId);
             
             if (poInfo != null) {
-                // ✅ 4. SET DỮ LIỆU VÀO REQUEST ATTRIBUTES
+                // ✅ 5. SET DỮ LIỆU VÀO REQUEST ATTRIBUTES
                 request.setAttribute("purchaseOrderId", purchaseOrderId);
-                request.setAttribute("requestId", poInfo.getId()); // Sử dụng ID của PO
+                request.setAttribute("requestId", poInfo.getId());
                 request.setAttribute("reason", poInfo.getReason());
                 request.setAttribute("items", poInfo.getPurchaseItems());
                 request.setAttribute("action", action);
-                request.setAttribute("poInfo", poInfo); // Toàn bộ thông tin PO
+                request.setAttribute("poInfo", poInfo);
                 
                 System.out.println("✅ Loaded data - ID: " + poInfo.getId());
                 System.out.println("✅ Loaded data - Reason: " + poInfo.getReason());
                 System.out.println("✅ Loaded data - Items count: " + 
                     (poInfo.getPurchaseItems() != null ? poInfo.getPurchaseItems().size() : 0));
-                System.out.println("✅ Loaded data - Fullname: " + poInfo.getFullname());
-                System.out.println("✅ Loaded data - Status: " + poInfo.getStatus());
             } else {
                 System.out.println("❌ No PO found with ID: " + purchaseOrderId);
                 request.setAttribute("errorMessage", "Không tìm thấy Purchase Order với ID: " + purchaseOrderId);
             }
         } else {
-            // ✅ 5. XỬ LÝ TRƯỜNG HỢP TẠO MỚI (từ form khác)
+            // ✅ 6. XỬ LÝ TRƯỜNG HỢP TẠO MỚI (từ form khác)
             System.out.println("ℹ️ No purchaseOrderId provided - creating new");
             String requestId = request.getParameter("requestId");
             String reason = request.getParameter("reason");
@@ -147,24 +170,6 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
             request.setAttribute("reason", reason);
             request.setAttribute("items", items);
         }
-
-        // ✅ 6. USER INFO (giữ nguyên)
-        Users currentUser = (Users) session.getAttribute("user");
-        UserDAO dao = new UserDAO();
-        String fullname = dao.getFullName(currentUser.getId());
-        Date DoB = dao.getDoB(currentUser.getId());
-
-        if (currentUser != null && DoB != null) {
-            java.util.Calendar cal = java.util.Calendar.getInstance();
-            cal.setTime(DoB);
-            int yearOfBirth = cal.get(java.util.Calendar.YEAR);
-            int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-            int age = currentYear - yearOfBirth;
-            request.setAttribute("age", age);
-        }
-
-        session.setAttribute("currentUser", fullname);
-        session.setAttribute("DoB", DoB);
         
         // ✅ 7. FORWARD TO JSP
         request.getRequestDispatcher("PurchaseOrderForm.jsp").forward(request, response);
@@ -176,6 +181,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         request.getRequestDispatcher("error.jsp").forward(request, response);
     }
 }
+
 
     @Override
     public String getServletInfo() {
